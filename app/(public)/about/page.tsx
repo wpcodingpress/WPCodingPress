@@ -1,0 +1,312 @@
+"use client"
+
+import Link from "next/link"
+import Image from "next/image"
+import { motion } from "framer-motion"
+import { Code2, Palette, Zap, Users, Award, Clock, Star, CheckCircle2, MapPin, Calendar } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+
+const skills = [
+  { name: "WordPress Development", level: 95, color: "from-blue-500 to-cyan-500" },
+  { name: "Elementor Pro", level: 90, color: "from-purple-500 to-pink-500" },
+  { name: "WooCommerce", level: 88, color: "from-green-500 to-emerald-500" },
+  { name: "React / Next.js", level: 85, color: "from-cyan-500 to-blue-500" },
+  { name: "PHP / MySQL", level: 90, color: "from-indigo-500 to-purple-500" },
+  { name: "SEO Optimization", level: 85, color: "from-yellow-500 to-orange-500" },
+]
+
+const values = [
+  {
+    icon: Users,
+    title: "Client-First Approach",
+    description: "Your success is our priority. We listen, understand, and deliver beyond expectations.",
+    color: "from-blue-500 to-cyan-500"
+  },
+  {
+    icon: Zap,
+    title: "Quality & Performance",
+    description: "We build websites that are fast, secure, and scalable. No compromises on quality.",
+    color: "from-purple-500 to-pink-500"
+  },
+  {
+    icon: Clock,
+    title: "On-Time Delivery",
+    description: "We respect deadlines and communicate proactively throughout the project.",
+    color: "from-green-500 to-emerald-500"
+  },
+  {
+    icon: Award,
+    title: "Continuous Support",
+    description: "Our relationship doesn't end at delivery. We're here for ongoing maintenance and growth.",
+    color: "from-orange-500 to-yellow-500"
+  }
+]
+
+const experience = [
+  { years: "8+", label: "Years Experience", color: "text-blue-400" },
+  { years: "150+", label: "Happy Clients", color: "text-purple-400" },
+  { years: "300+", label: "Projects Completed", color: "text-green-400" },
+  { years: "5.0", label: "Average Rating", color: "text-yellow-400" },
+]
+
+export default function AboutPage() {
+  return (
+    <div className="relative">
+      {/* Hero */}
+      <section className="relative py-32 overflow-hidden">
+        <div className="absolute inset-0">
+          <Image 
+            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&q=80"
+            alt="Team Working"
+            fill
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-950/95 via-purple-950/90 to-slate-950/95" />
+        </div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-[150px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[150px]" />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div 
+            className="text-center max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+              About <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">WPCodingPress</span>
+            </h1>
+            <p className="text-lg md:text-xl text-slate-300">
+              We're more than a web development agency. We're your partners in digital success, 
+              combining technical expertise with creative vision.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Experience Stats */}
+      <section className="py-16 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-indigo-950/20 to-slate-950" />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {experience.map((exp, index) => (
+              <motion.div
+                key={exp.label}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="text-center p-6 rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50"
+              >
+                <div className={`text-4xl md:text-5xl font-black mb-2 bg-gradient-to-r ${exp.color.includes('blue') ? 'from-blue-400 to-cyan-400' : exp.color.includes('purple') ? 'from-purple-400 to-pink-400' : exp.color.includes('green') ? 'from-green-400 to-emerald-400' : 'from-yellow-400 to-amber-400'} bg-clip-text text-transparent`}>
+                  {exp.years}
+                </div>
+                <div className="text-slate-400">{exp.label}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Story Section */}
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 to-indigo-950/30" />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                Our <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Story</span>
+              </h2>
+              <div className="space-y-5 text-slate-300">
+                <p>
+                  Founded with a passion for creating exceptional digital experiences, 
+                  WPCodingPress has grown from a solo developer operation into a full-service 
+                  web development agency.
+                </p>
+                <p>
+                  With over 8 years of hands-on experience in WordPress development, we've 
+                  helped businesses across industries transform their online presence. From 
+                  medical spas to e-commerce stores, from local businesses to professional services, 
+                  we've seen it all and delivered excellence every time.
+                </p>
+                <p>
+                  Our approach combines technical expertise with a deep understanding of business 
+                  goals. We don't just build websites – we create digital assets that drive 
+                  real results: more leads, more sales, and more growth for your business.
+                </p>
+              </div>
+              <div className="mt-8 flex items-center gap-4">
+                <MapPin className="h-5 w-5 text-purple-400" />
+                <span className="text-slate-300">Based in Dhaka, Bangladesh</span>
+                <span className="text-slate-600">|</span>
+                <Calendar className="h-5 w-5 text-blue-400" />
+                <span className="text-slate-300">Est. 2016</span>
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="relative"
+            >
+              <Card className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-blue-500/30 overflow-hidden">
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shadow-lg">
+                      <Code2 className="h-10 w-10 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-white">Rahman</h3>
+                      <p className="text-slate-400">Founder & Lead Developer</p>
+                      <div className="flex gap-1 mt-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-slate-300 italic leading-relaxed">
+                    "I believe every business deserves a website that not only looks great 
+                    but performs exceptionally. My mission is to make that a reality for 
+                    each and every client."
+                  </p>
+                </CardContent>
+              </Card>
+              
+              {/* Floating decorative elements */}
+              <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-pink-500/30 to-orange-500/30 rounded-full blur-xl" />
+              <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-gradient-to-br from-blue-500/30 to-cyan-500/30 rounded-full blur-xl" />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Skills Section */}
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/30 via-slate-950 to-slate-950" />
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Our <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Expertise</span>
+            </h2>
+            <p className="text-slate-400 max-w-2xl mx-auto">
+              Years of experience and continuous learning keep us at the cutting edge
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {skills.map((skill, index) => (
+              <motion.div
+                key={skill.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="p-5 rounded-xl bg-slate-800/50 border border-slate-700/50"
+              >
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-white font-medium">{skill.name}</span>
+                  <span className="text-slate-400 text-sm">{skill.level}%</span>
+                </div>
+                <div className="h-3 bg-slate-700/50 rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
+                    initial={{ width: 0 }}
+                    whileInView={{ width: `${skill.level}%` }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1.2, delay: 0.2 }}
+                  />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Values Section */}
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0">
+          <Image 
+            src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=1920&q=80"
+            alt="Team Meeting"
+            fill
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-indigo-950/95 to-slate-950" />
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Why Choose <span className="bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">Us</span>
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {values.map((value, index) => (
+              <motion.div
+                key={value.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className="h-full bg-white/5 backdrop-blur-lg border-white/10 hover:border-blue-500/50 transition-colors">
+                  <CardContent className="p-6 text-center">
+                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${value.color} flex items-center justify-center mx-auto mb-4 shadow-lg`}>
+                      <value.icon className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">{value.title}</h3>
+                    <p className="text-sm text-slate-400">{value.description}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <motion.div 
+            className="text-center mt-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <p className="text-slate-400 mb-6">
+              Ready to work with us? Let's create something amazing together.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Link href="/order">
+                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 shadow-lg shadow-blue-500/25">
+                  Start Your Project
+                </Button>
+              </Link>
+              <Link href="/contact">
+                <Button size="lg" variant="outline" className="bg-white/10 border-white/20 hover:bg-white/20">
+                  Get In Touch
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </div>
+  )
+}

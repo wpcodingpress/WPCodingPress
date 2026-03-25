@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="squareGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#0a0a0a"/>
+    </linearGradient>
+    <linearGradient id="zapGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#60a5fa"/>
+      <stop offset="50%" style="stop-color:#a78bfa"/>
+      <stop offset="100%" style="stop-color:#f472b6"/>
+    </linearGradient>
+    <filter id="zapGlow1">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <rect width="512" height="512" rx="80" fill="url(#squareGradient1)"/>
+  
+  <g transform="translate(100, 80)" filter="url(#zapGlow1)">
+    <path d="M156 0 L0 156 L94 156 L62 312 L220 124 L126 124 Z" fill="url(#zapGradient1)"/>
+  </g>
+  
+  <text x="256" y="420" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="64" font-weight="800" fill="white">
+    WP
+  </text>
+</svg>

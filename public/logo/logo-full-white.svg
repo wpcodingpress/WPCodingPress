@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 80" width="400" height="80">
+  <defs>
+    <linearGradient id="logoGradient4" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="50%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#ec4899"/>
+    </linearGradient>
+    <filter id="glow4">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <rect width="400" height="80" rx="12" fill="white"/>
+  
+  <g transform="translate(10, 15)" filter="url(#glow4)">
+    <path d="M25 0 L0 25 L15 25 L10 50 L35 20 L20 20 Z" fill="url(#logoGradient4)"/>
+  </g>
+  
+  <text x="60" y="52" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="800" fill="#1a1a2e">
+    WP
+  </text>
+  
+  <text x="115" y="52" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="700" fill="url(#logoGradient4)">
+    CodingPress
+  </text>
+</svg>
