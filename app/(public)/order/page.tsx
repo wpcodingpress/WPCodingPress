@@ -29,6 +29,7 @@ function OrderForm() {
   const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     service: searchParams.get("service") || "",
     packageType: searchParams.get("package") || "",
@@ -49,6 +50,7 @@ function OrderForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError(null)
     
     try {
       const response = await fetch("/api/orders", {
@@ -57,11 +59,16 @@ function OrderForm() {
         body: JSON.stringify(formData)
       })
       
+      const data = await response.json()
+      
       if (response.ok) {
         setIsComplete(true)
+      } else {
+        setError(data.error || "Failed to submit order. Please try again.")
       }
-    } catch (error) {
-      console.error("Error submitting order:", error)
+    } catch (err) {
+      console.error("Error submitting order:", err)
+      setError("Network error. Please check your connection and try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -310,6 +317,12 @@ function OrderForm() {
                           )}
                         </Button>
                       </div>
+                      
+                      {error && (
+                        <div className="mt-4 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-sm">
+                          {error}
+                        </div>
+                      )}
                     </motion.div>
                   )}
                 </form>

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import prisma from "@/lib/prisma"
 
 export async function GET() {
   try {
@@ -21,11 +21,26 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { serviceId, packageType, clientName, clientEmail, clientPhone, message } = body
+    const { service, packageType, clientName, clientEmail, clientPhone, message } = body
 
-    if (!serviceId || !packageType || !clientName || !clientEmail || !clientPhone) {
+    if (!service || !packageType || !clientName || !clientEmail || !clientPhone) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
+
+    let serviceId = service
+    let serviceRecord = await prisma.service.findUnique({
+      where: { slug: service }
+    })
+    
+    if (!serviceRecord) {
+      serviceRecord = await prisma.service.findFirst()
+    }
+    
+    if (!serviceRecord) {
+      return NextResponse.json({ error: "No services available. Please seed the database." }, { status: 400 })
+    }
+
+    serviceId = serviceRecord.id
 
     const order = await prisma.order.create({
       data: {
