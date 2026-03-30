@@ -20,6 +20,7 @@ const navItems = [
   { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
   { href: "/admin/contacts", icon: MessageSquare, label: "Contacts" },
   { href: "/admin/services", icon: Settings, label: "Services" },
+  { href: "/admin/products", icon: Image, label: "Products" },
   { href: "/admin/portfolio", icon: Image, label: "Portfolio" },
 ]
 

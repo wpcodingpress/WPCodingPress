@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { Menu, X, Zap } from "lucide-react"
+import { Menu, X, Zap, User, LogIn } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -62,10 +62,17 @@ export function Navbar() {
             ))}
           </div>
 
-          <div className="hidden md:flex items-center gap-4">
-            <Link href="/order">
+          <div className="hidden md:flex items-center gap-3">
+            <Link href="/login">
+              <Button variant="ghost" size="sm" className="font-semibold">
+                <LogIn className="mr-2 h-4 w-4" />
+                Login
+              </Button>
+            </Link>
+            <Link href="/register">
               <Button variant="glow" size="sm" className="font-semibold">
-                Start Project
+                <User className="mr-2 h-4 w-4" />
+                Register
               </Button>
             </Link>
           </div>
@@ -91,11 +98,20 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <Link href="/order" className="mt-2">
-                <Button variant="glow" className="w-full font-semibold">
-                  Start Project
-                </Button>
-              </Link>
+              <div className="flex gap-2 mt-4">
+                <Link href="/login" className="flex-1">
+                  <Button variant="ghost" className="w-full">
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Login
+                  </Button>
+                </Link>
+                <Link href="/register" className="flex-1">
+                  <Button variant="glow" className="w-full">
+                    <User className="mr-2 h-4 w-4" />
+                    Register
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         )}
