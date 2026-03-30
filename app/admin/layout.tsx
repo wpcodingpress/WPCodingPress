@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { useEffect } from "react"
 import { 
   LayoutDashboard, 
@@ -11,7 +11,8 @@ import {
   Settings, 
   Image,
   LogOut,
-  Zap
+  Zap,
+  Users
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/admin/contacts", icon: MessageSquare, label: "Contacts" },
   { href: "/admin/services", icon: Settings, label: "Services" },
   { href: "/admin/products", icon: Image, label: "Products" },
+  { href: "/admin/users", icon: Users, label: "Users" },
   { href: "/admin/portfolio", icon: Image, label: "Portfolio" },
 ]
 
@@ -31,10 +33,11 @@ export default function AdminLayout({
 }) {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/admin/login")
+      router.push("/admin-login")
     }
   }, [status, router])
 
@@ -71,8 +74,7 @@ export default function AdminLayout({
               href={item.href}
               className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
-                "hover:bg-white/5",
-                item.href === "/admin" 
+                pathname === item.href || (item.href === "/admin" && pathname === "/admin")
                   ? "bg-primary/10 text-primary" 
                   : "text-muted-foreground hover:text-white"
               )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { 
@@ -27,6 +27,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -90,7 +91,11 @@ export default function DashboardLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  pathname === item.href
+                    ? "bg-primary/10 text-primary"
+                    : "text-slate-300 hover:bg-white/10 hover:text-white"
+                }`}
               >
                 <item.icon className="h-5 w-5" />
                 {item.label}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -8,7 +9,6 @@ import { Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { authApi } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,15 +24,14 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/auth/callback/credentials`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, password, provider: 'client' }),
+      const result = await signIn("client", {
+        email,
+        password,
+        redirect: false,
       });
 
-      if (!response.ok) {
-        throw new Error('Invalid credentials');
+      if (result?.error) {
+        throw new Error(result.error);
       }
 
       router.push("/dashboard");
@@ -140,10 +139,6 @@ export default function LoginPage() {
             </div>
           </CardContent>
         </Card>
-
-        <p className="text-center text-muted-foreground text-xs mt-4">
-          Default credentials: rahman.ceo@wpcodingpress.com / S0pnahenayf
-        </p>
       </motion.div>
     </div>
   );
