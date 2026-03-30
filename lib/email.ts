@@ -1,6 +1,17 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+let resend: Resend | null = null
+
+function getResend() {
+  if (!resend) {
+    if (!process.env.RESEND_API_KEY) {
+      console.warn('RESEND_API_KEY not set - emails will be logged only')
+      return null
+    }
+    resend = new Resend(process.env.RESEND_API_KEY)
+  }
+  return resend
+}
 
 export async function sendEmail({
   to,
@@ -13,8 +24,15 @@ export async function sendEmail({
   html: string
   from?: string
 }) {
+  const resendClient = getResend()
+  
+  if (!resendClient) {
+    console.log(`[EMAIL] ${subject} to ${to} (RESEND_API_KEY not set)`)
+    return { success: true, data: { id: 'mock-email-id' } }
+  }
+
   try {
-    const data = await resend.emails.send({
+    const data = await resendClient.emails.send({
       from,
       to,
       subject,
