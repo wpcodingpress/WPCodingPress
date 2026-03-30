@@ -11,7 +11,8 @@ import {
   CreditCard,
   Eye,
   Download,
-  Filter
+  Filter,
+  RefreshCw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,7 @@ export default function OrdersPage() {
   }, []);
 
   const fetchOrders = async () => {
+    setIsLoading(true);
     try {
       const sessionRes = await fetch("/api/auth/session");
       const sessionData = await sessionRes.json();
@@ -49,7 +51,7 @@ export default function OrdersPage() {
         return;
       }
 
-      const response = await fetch(`/api/orders?userId=${sessionData.user.id}`);
+      const response = await fetch(`/api/orders?userId=${sessionData.user.id}&t=${Date.now()}`);
       const data = await response.json();
       setOrders(data || []);
     } catch (error) {
@@ -104,12 +106,18 @@ export default function OrdersPage() {
           <h1 className="text-2xl font-bold text-slate-900">My Orders</h1>
           <p className="text-slate-500 mt-1">View and manage your orders</p>
         </div>
-        <Link href="/products">
-          <Button>
-            <ShoppingBag className="mr-2 h-4 w-4" />
-            Browse Products
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={fetchOrders} disabled={isLoading}>
+            <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
           </Button>
-        </Link>
+          <Link href="/products">
+            <Button>
+              <ShoppingBag className="mr-2 h-4 w-4" />
+              Browse Products
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}
