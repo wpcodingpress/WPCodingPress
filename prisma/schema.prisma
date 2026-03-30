@@ -27,6 +27,9 @@ model User {
   isActive        Boolean  @default(true)
   emailVerified   DateTime?
   stripeCustomerId String?
+  notifyOrderUpdates    Boolean @default(true)
+  notifyProductUpdates  Boolean @default(true)
+  notifyPromotional     Boolean @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   orders          Order[]
