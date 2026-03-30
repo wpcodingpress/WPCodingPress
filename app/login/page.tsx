@@ -28,7 +28,7 @@ export default function LoginPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ email, password, provider: 'admin' }),
+        body: JSON.stringify({ email, password, provider: 'client' }),
       });
 
       if (!response.ok) {
