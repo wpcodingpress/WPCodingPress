@@ -31,6 +31,9 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
+        if (result.error === "CredentialsSignin") {
+          throw new Error("Invalid email or password");
+        }
         throw new Error(result.error);
       }
 
