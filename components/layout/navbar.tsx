@@ -2,7 +2,8 @@
 
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { Menu, X, Zap, User, LogIn } from "lucide-react"
+import { useSession, signOut } from "next-auth/react"
+import { Menu, X, Zap, User, LogIn, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -19,6 +20,7 @@ const navLinks = [
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const { data: session, status } = useSession()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,18 +65,57 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="ghost" size="sm" className="font-semibold">
-                <LogIn className="mr-2 h-4 w-4" />
-                Login
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button variant="glow" size="sm" className="font-semibold">
-                <User className="mr-2 h-4 w-4" />
-                Register
-              </Button>
-            </Link>
+            {session?.user ? (
+              <>
+                {session.user.role === 'client' ? (
+                  <>
+                    <Link href="/dashboard">
+                      <Button variant="ghost" size="sm" className="font-semibold">
+                        <User className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </Button>
+                    </Link>
+                    <Link href="/order">
+                      <Button variant="glow" size="sm" className="font-semibold">
+                        Start Your Project
+                      </Button>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/admin">
+                      <Button variant="ghost" size="sm" className="font-semibold">
+                        Admin
+                      </Button>
+                    </Link>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="font-semibold"
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Logout
+                    </Button>
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" size="sm" className="font-semibold">
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Login
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button variant="glow" size="sm" className="font-semibold">
+                    <User className="mr-2 h-4 w-4" />
+                    Register
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           <button
