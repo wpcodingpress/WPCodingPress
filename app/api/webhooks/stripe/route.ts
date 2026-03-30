@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { getStripeInstance } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 import Stripe from 'stripe';
 
@@ -12,6 +12,11 @@ export async function POST(request: Request) {
       { error: 'Missing signature or webhook secret' },
       { status: 400 }
     );
+  }
+
+  const stripe = getStripeInstance();
+  if (!stripe) {
+    return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
   }
 
   let event: Stripe.Event;

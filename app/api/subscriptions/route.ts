@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { stripe } from '@/lib/stripe';
+import { getStripeInstance } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 
 const PRICE_IDS: Record<string, string> = {
@@ -11,6 +11,11 @@ const PRICE_IDS: Record<string, string> = {
 
 export async function POST(request: Request) {
   try {
+    const stripe = getStripeInstance();
+    if (!stripe) {
+      return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
+    }
+
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
