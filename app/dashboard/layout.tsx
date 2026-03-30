@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { 
@@ -54,13 +55,8 @@ export default function DashboardLayout({
   };
 
   const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/signout", { method: "POST" });
-      window.location.reload();
-    } catch (error) {
-      console.error("Logout error:", error);
-      window.location.reload();
-    }
+    await signOut({ redirect: false });
+    window.location.href = "/";
   };
 
   if (isLoading) {
