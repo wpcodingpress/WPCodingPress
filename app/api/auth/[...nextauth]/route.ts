@@ -88,11 +88,11 @@ export const authOptions: NextAuthOptions = {
     signIn: '/login',
   },
   callbacks: {
-    async jwt({ token, user, provider }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.role = user.role
         token.id = user.id
-        token.provider = provider
+        token.provider = account?.provider || 'credentials'
       }
       return token
     },
