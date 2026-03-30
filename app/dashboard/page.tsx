@@ -1,163 +1,264 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ShoppingBag, Package, Clock, CheckCircle } from "lucide-react";
+import { 
+  ShoppingBag, 
+  Package, 
+  Clock, 
+  CheckCircle,
+  ArrowRight,
+  Download,
+  FileText,
+  CreditCard,
+  Zap
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Order {
   id: string;
   status: string;
   paymentStatus: string;
+  amount: number;
+  packageType: string;
   createdAt: string;
-  product?: { name: string };
+  product?: { name: string; downloadUrl: string | null };
   service?: { name: string };
 }
 
+interface User {
+  name: string;
+  email: string;
+}
+
 export default function DashboardOverview() {
-  const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
-  const [stats, setStats] = useState({
-    total: 0,
-    pending: 0,
-    completed: 0,
-    paid: 0
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchOrders();
+    fetchData();
   }, []);
 
-  const fetchOrders = async () => {
+  const fetchData = async () => {
     try {
-      const response = await fetch("/api/orders");
-      const data = await response.json();
-      setOrders(data);
-
-      setStats({
-        total: data.length,
-        pending: data.filter((o: Order) => o.status === "pending").length,
-        completed: data.filter((o: Order) => o.status === "completed").length,
-        paid: data.filter((o: Order) => o.paymentStatus === "paid").length
-      });
+      const [sessionRes, ordersRes] = await Promise.all([
+        fetch("/api/auth/session"),
+        fetch("/api/orders")
+      ]);
+      
+      const sessionData = await sessionRes.json();
+      const ordersData = await ordersRes.json();
+      
+      if (sessionData?.user) {
+        setUser(sessionData.user);
+      }
+      
+      setOrders(ordersData || []);
     } catch (error) {
-      console.error("Error fetching orders:", error);
+      console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const statCards = [
+  const stats = {
+    total: orders.length,
+    pending: orders.filter((o: Order) => o.status === "pending").length,
+    completed: orders.filter((o: Order) => o.status === "completed").length,
+    totalSpent: orders.reduce((acc: number, o: Order) => acc + (o.amount || 0), 0)
+  };
+
+  const quickActions = [
     {
-      title: "Total Orders",
-      value: stats.total,
-      icon: ShoppingBag,
-      color: "bg-blue-500/20 text-blue-400"
-    },
-    {
-      title: "Pending",
-      value: stats.pending,
-      icon: Clock,
-      color: "bg-yellow-500/20 text-yellow-400"
-    },
-    {
-      title: "Completed",
-      value: stats.completed,
-      icon: CheckCircle,
-      color: "bg-green-500/20 text-green-400"
-    },
-    {
-      title: "Paid Orders",
-      value: stats.paid,
+      title: "Browse Products",
+      description: "Explore our premium plugins and tools",
       icon: Package,
-      color: "bg-purple-500/20 text-purple-400"
+      href: "/products",
+      color: "blue"
+    },
+    {
+      title: "Start a Project",
+      description: "Get a custom web development quote",
+      icon: Zap,
+      href: "/order",
+      color: "purple"
+    },
+    {
+      title: "My Orders",
+      description: "View and manage your orders",
+      icon: ShoppingBag,
+      href: "/dashboard/orders",
+      color: "green"
     }
   ];
 
-  return (
-    <div>
-      <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
-      <p className="text-muted-foreground mb-8">Welcome back! Here&apos;s your overview.</p>
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed": return "bg-green-100 text-green-700";
+      case "processing": return "bg-blue-100 text-blue-700";
+      case "cancelled": return "bg-red-100 text-red-700";
+      default: return "bg-yellow-100 text-yellow-700";
+    }
+  };
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {statCards.map((stat, index) => (
+  const getPaymentColor = (status: string) => {
+    switch (status) {
+      case "paid": return "text-green-600";
+      case "refunded": return "text-purple-600";
+      case "failed": return "text-red-600";
+      default: return "text-yellow-600";
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Welcome Banner */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-gradient-to-r from-primary to-purple-600 rounded-2xl p-8 text-white"
+      >
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">
+              Welcome back, {user?.name || "Client"}! 👋
+            </h1>
+            <p className="mt-2 text-white/80">
+              Here&apos;s what&apos;s happening with your account
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <Link href="/products">
+              <Button variant="secondary" size="sm">
+                Browse Products
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { title: "Total Orders", value: stats.total, icon: ShoppingBag, color: "blue" },
+          { title: "Pending", value: stats.pending, icon: Clock, color: "yellow" },
+          { title: "Completed", value: stats.completed, icon: CheckCircle, color: "green" },
+          { title: "Total Spent", value: `$${stats.totalSpent}`, icon: CreditCard, color: "purple" }
+        ].map((stat, index) => (
           <motion.div
             key={stat.title}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-white/5 border border-white/10 rounded-xl p-6"
+            className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg transition-shadow"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">{stat.title}</p>
-                <p className="text-3xl font-bold text-white mt-1">{stat.value}</p>
+                <p className="text-sm text-slate-500">{stat.title}</p>
+                <p className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</p>
               </div>
-              <div className={`p-3 rounded-lg ${stat.color}`}>
-                <stat.icon className="h-6 w-6" />
+              <div className={`p-3 rounded-lg bg-${stat.color}-100`}>
+                <stat.icon className={`h-5 w-5 text-${stat.color}-600`} />
               </div>
             </div>
           </motion.div>
         ))}
       </div>
 
-      <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-white">Recent Orders</h2>
-          <Link
-            href="/dashboard/orders"
-            className="text-sm text-primary hover:underline"
-          >
+      {/* Quick Actions */}
+      <div>
+        <h2 className="text-xl font-semibold text-slate-900 mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {quickActions.map((action, index) => (
+            <motion.div
+              key={action.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 + 0.2 }}
+            >
+              <Link href={action.href}>
+                <div className={`bg-white border border-slate-200 rounded-xl p-5 hover:shadow-lg hover:border-primary/30 transition-all group`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg bg-${action.color}-100`}>
+                      <action.icon className={`h-5 w-5 text-${action.color}-600`} />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-slate-900 group-hover:text-primary transition-colors">
+                        {action.title}
+                      </h3>
+                      <p className="text-xs text-slate-500">{action.description}</p>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Recent Orders */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="bg-white rounded-xl border border-slate-200 overflow-hidden"
+      >
+        <div className="p-5 border-b border-slate-200 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-slate-900">Recent Orders</h2>
+          <Link href="/dashboard/orders" className="text-sm text-primary hover:underline">
             View All →
           </Link>
         </div>
 
         {orders.length === 0 ? (
-          <div className="text-center py-8">
-            <ShoppingBag className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">No orders yet</p>
-            <Link
-              href="/products"
-              className="text-primary hover:underline text-sm mt-2 inline-block"
-            >
-              Browse Products →
+          <div className="p-12 text-center">
+            <Package className="h-12 w-12 mx-auto text-slate-300 mb-4" />
+            <p className="text-slate-500 mb-4">No orders yet</p>
+            <Link href="/products">
+              <Button variant="outline">Browse Products</Button>
             </Link>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="divide-y divide-slate-100">
             {orders.slice(0, 5).map((order) => (
-              <div
-                key={order.id}
-                className="flex items-center justify-between p-4 bg-white/5 rounded-lg"
-              >
-                <div>
-                  <p className="font-medium text-white">
-                    {order.product?.name || order.service?.name || "Order"}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    #{order.id.slice(-8).toUpperCase()}
-                  </p>
+              <div key={order.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <ShoppingBag className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-slate-900">
+                      {order.product?.name || order.service?.name || "Order"}
+                    </p>
+                    <p className="text-sm text-slate-500">
+                      #{order.id.slice(-8).toUpperCase()} • {order.packageType} • ${order.amount || 0}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <span
-                    className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                      order.status === "completed"
-                        ? "bg-green-500/20 text-green-400"
-                        : order.status === "processing"
-                        ? "bg-blue-500/20 text-blue-400"
-                        : "bg-yellow-500/20 text-yellow-400"
-                    }`}
-                  >
+                <div className="flex items-center gap-3">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
                     {order.status}
                   </span>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {new Date(order.createdAt).toLocaleDateString()}
-                  </p>
+                  <span className={`text-sm font-medium ${getPaymentColor(order.paymentStatus)}`}>
+                    {order.paymentStatus}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

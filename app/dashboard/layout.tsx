@@ -8,11 +8,14 @@ import { motion } from "framer-motion";
 import { 
   LayoutDashboard, 
   ShoppingBag, 
-  FileText, 
-  Download, 
+  Download,
   Settings, 
   LogOut,
-  Loader2
+  Loader2,
+  User,
+  CreditCard,
+  ChevronRight,
+  Activity
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -61,7 +64,7 @@ export default function DashboardLayout({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
@@ -70,61 +73,89 @@ export default function DashboardLayout({
   const navItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
     { href: "/dashboard/orders", icon: ShoppingBag, label: "My Orders" },
+    { href: "/dashboard/downloads", icon: Download, label: "Downloads" },
+    { href: "/dashboard/subscription", icon: CreditCard, label: "Subscription" },
+    { href: "/dashboard/settings", icon: Settings, label: "Settings" },
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="flex">
-        <aside className="w-64 min-h-screen bg-white/5 border-r border-white/10 p-4">
-          <div className="mb-8">
-            <Link href="/" className="text-xl font-bold text-white">
-              WPCodingPress
-            </Link>
-            <p className="text-xs text-muted-foreground">Client Dashboard</p>
-          </div>
-
-          <nav className="space-y-2">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  pathname === item.href
-                    ? "bg-primary/10 text-primary"
-                    : "text-slate-300 hover:bg-white/10 hover:text-white"
-                }`}
-              >
-                <item.icon className="h-5 w-5" />
-                {item.label}
+    <div className="min-h-screen bg-slate-50">
+      {/* Top Navigation Bar */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-3">
+              <Link href="/" className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">WP</span>
+                </div>
+                <span className="text-lg font-bold text-slate-900">WPCodingPress</span>
               </Link>
-            ))}
-          </nav>
-
-          <div className="mt-8 pt-8 border-t border-white/10">
-            <div className="mb-4 px-4">
-              <p className="text-sm font-medium text-white">{user?.name}</p>
-              <p className="text-xs text-muted-foreground">{user?.email}</p>
             </div>
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10"
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-3 h-5 w-5" />
-              Logout
-            </Button>
+            
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                  <User className="h-4 w-4 text-primary" />
+                </div>
+                <div className="hidden sm:block">
+                  <p className="text-sm font-medium text-slate-900">{user?.name}</p>
+                  <p className="text-xs text-slate-500">{user?.email}</p>
+                </div>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={handleLogout}
+                className="text-slate-600 hover:text-red-600"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Logout</span>
+              </Button>
+            </div>
           </div>
-        </aside>
+        </div>
+      </header>
 
-        <main className="flex-1 p-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {children}
-          </motion.div>
-        </main>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar */}
+          <aside className="w-full lg:w-64 flex-shrink-0">
+            <nav className="bg-white rounded-xl border border-slate-200 p-2">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                      isActive
+                        ? "bg-primary text-white"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                    }`}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    {item.label}
+                    {isActive && (
+                      <ChevronRight className="h-4 w-4 ml-auto" />
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+          </aside>
+
+          {/* Main Content */}
+          <main className="flex-1">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {children}
+            </motion.div>
+          </main>
+        </div>
       </div>
     </div>
   );
