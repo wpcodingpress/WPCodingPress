@@ -163,7 +163,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
-  role: 'admin' | 'editor' | 'viewer';
+  role: 'admin' | 'client' | 'editor' | 'viewer';
 }
 
 export interface AuthResponse {
@@ -179,6 +179,7 @@ export const authApi = {
     const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/auth/callback/credentials`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(credentials),
     });
 
@@ -193,7 +194,7 @@ export const authApi = {
     return {
       token: 'session',
       refresh_token: 'session',
-      user: session?.user || { id: 0, name: credentials.email, email: credentials.email, role: 'client' },
+      user: session?.user || { id: 0, name: credentials.email, email: credentials.email, role: 'client' as const },
       expires_in: 2592000
     };
   },
@@ -218,7 +219,7 @@ export const authApi = {
     return {
       token: 'registered',
       refresh_token: 'registered',
-      user: { id: 0, name: data.name, email: data.email, role: 'client' },
+      user: { id: 0, name: data.name, email: data.email, role: 'client' as const },
       expires_in: 2592000
     };
   },
@@ -290,7 +291,11 @@ export const servicesApi = {
     services: Service[];
     pagination: any;
   }> {
-    const response = await get<{ services: Service[]; pagination: any }>('/routes/services/get.php', params);
+    const queryParams = params ? {
+      ...params,
+      active: params.active?.toString()
+    } : undefined;
+    const response = await get<{ services: Service[]; pagination: any }>('/routes/services/get.php', queryParams as Record<string, string | number>);
     return response.data;
   },
 
@@ -379,7 +384,11 @@ export const contactsApi = {
     contacts: Contact[];
     pagination: any;
   }> {
-    const response = await get<{ contacts: Contact[]; pagination: any }>('/routes/contacts/get.php', params);
+    const queryParams = params ? {
+      ...params,
+      unread: params.unread?.toString()
+    } : undefined;
+    const response = await get<{ contacts: Contact[]; pagination: any }>('/routes/contacts/get.php', queryParams as Record<string, string | number>);
     return response.data;
   },
 
@@ -431,11 +440,15 @@ export const portfolioApi = {
     categories: string[];
     pagination: any;
   }> {
+    const queryParams = params ? {
+      ...params,
+      active: params.active?.toString()
+    } : undefined;
     const response = await get<{
       portfolio: PortfolioItem[];
       categories: string[];
       pagination: any;
-    }>('/routes/portfolio/get.php', params);
+    }>('/routes/portfolio/get.php', queryParams as Record<string, string | number>);
     return response.data;
   },
 
