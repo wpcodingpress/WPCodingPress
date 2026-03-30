@@ -22,8 +22,8 @@ export interface PaginatedResponse<T = any> {
   success: boolean;
   message: string;
   data: {
-    [key: string]: T[];
-    pagination: {
+    [key: string]: T[] | any;
+    pagination?: {
       total: number;
       page: number;
       per_page: number;
