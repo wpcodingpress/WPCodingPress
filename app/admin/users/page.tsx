@@ -27,6 +27,7 @@ interface User {
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchUsers();
@@ -35,10 +36,20 @@ export default function AdminUsersPage() {
   const fetchUsers = async () => {
     try {
       const response = await fetch("/api/admin/users");
-      const data = await response.json();
-      setUsers(data);
+      if (!response.ok) {
+        if (response.status === 401) {
+          setError("Unauthorized - Please login as admin");
+        } else {
+          const data = await response.json();
+          setError(data.error || "Failed to fetch users");
+        }
+      } else {
+        const data = await response.json();
+        setUsers(data);
+      }
     } catch (error) {
       console.error("Error fetching users:", error);
+      setError("Failed to fetch users");
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +96,17 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      {users.length === 0 ? (
+      {error && (
+        <div className="mb-6 p-4 rounded-lg bg-red-500/20 border border-red-500/50 text-red-400">
+          {error}
+        </div>
+      )}
+
+      {isLoading ? (
+        <div className="flex items-center justify-center min-h-[200px]">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : users.length === 0 ? (
         <div className="bg-white/5 border border-white/10 rounded-xl p-12 text-center">
           <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
           <p className="text-muted-foreground">No users registered yet</p>

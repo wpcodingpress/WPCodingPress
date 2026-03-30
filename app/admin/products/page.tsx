@@ -10,7 +10,8 @@ import {
   Eye, 
   EyeOff,
   Star,
-  Package
+  Package,
+  ExternalLink
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,7 @@ interface Product {
   description: string;
   shortDesc: string;
   type: string;
+  downloadUrl: string | null;
   pricing: any;
   isActive: boolean;
   isFeatured: boolean;
@@ -40,6 +42,7 @@ export default function AdminProductsPage() {
     description: "",
     shortDesc: "",
     type: "plugin",
+    downloadUrl: "",
     pricing: JSON.stringify({ free: { price: 0, features: [] }, pro: { price: 49, features: [] }, enterprise: { price: 199, features: [] } }, null, 2),
     isActive: true,
     isFeatured: false,
@@ -102,6 +105,7 @@ export default function AdminProductsPage() {
       description: product.description,
       shortDesc: product.shortDesc || "",
       type: product.type,
+      downloadUrl: product.downloadUrl || "",
       pricing: JSON.stringify(product.pricing, null, 2),
       isActive: product.isActive,
       isFeatured: product.isFeatured,
@@ -141,6 +145,7 @@ export default function AdminProductsPage() {
       description: "",
       shortDesc: "",
       type: "plugin",
+      downloadUrl: "",
       pricing: JSON.stringify({ free: { price: 0, features: [] }, pro: { price: 49, features: [] }, enterprise: { price: 199, features: [] } }, null, 2),
       isActive: true,
       isFeatured: false,
@@ -237,6 +242,16 @@ export default function AdminProductsPage() {
                   </td>
                   <td className="p-4">
                     <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        asChild
+                        className="text-muted-foreground hover:text-white"
+                      >
+                        <a href={`/products/${product.slug}`} target="_blank">
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -350,6 +365,16 @@ export default function AdminProductsPage() {
                     className="bg-white/5 border-white/10"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm text-slate-300">Download URL (for free products)</label>
+                <Input
+                  value={formData.downloadUrl}
+                  onChange={(e) => setFormData({ ...formData, downloadUrl: e.target.value })}
+                  className="bg-white/5 border-white/10"
+                  placeholder="https://drive.google.com/..."
+                />
               </div>
 
               <div className="space-y-2">
