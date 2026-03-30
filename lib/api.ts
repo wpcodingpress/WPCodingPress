@@ -175,17 +175,27 @@ export interface AuthResponse {
 
 export const authApi = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await post<AuthResponse>('/routes/auth/login.php', credentials);
-    
-    if (response.success) {
-      setAuthToken(response.data.token);
-      // Store refresh token
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('refresh_token', response.data.refresh_token);
-      }
+    // NextAuth login - uses session-based auth
+    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/auth/callback/credentials`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credentials),
+    });
+
+    if (!response.ok) {
+      throw new Error('Login failed');
     }
+
+    // Get session
+    const sessionRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/auth/session`);
+    const session = await sessionRes.json();
     
-    return response.data;
+    return {
+      token: 'session',
+      refresh_token: 'session',
+      user: session?.user || { id: 0, name: credentials.email, email: credentials.email, role: 'client' },
+      expires_in: 2592000
+    };
   },
 
   async register(data: {
@@ -193,16 +203,24 @@ export const authApi = {
     email: string;
     password: string;
   }): Promise<AuthResponse> {
-    const response = await post<AuthResponse>('/routes/auth/register.php', data);
-    
-    if (response.success) {
-      setAuthToken(response.data.token);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('refresh_token', response.data.refresh_token);
-      }
+    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || 'Registration failed');
     }
-    
-    return response.data;
+
+    return {
+      token: 'registered',
+      refresh_token: 'registered',
+      user: { id: 0, name: data.name, email: data.email, role: 'client' },
+      expires_in: 2592000
+    };
   },
 
   async logout(): Promise<void> {

@@ -24,11 +24,18 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await authApi.login({ email, password });
-      
-      if (response.token) {
-        router.push("/dashboard");
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || ''}/api/auth/callback/credentials`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password, provider: 'admin' }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Invalid credentials');
       }
+
+      router.push("/dashboard");
     } catch (err: any) {
       setError(err.message || "Invalid email or password");
     } finally {

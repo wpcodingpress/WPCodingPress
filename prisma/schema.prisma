@@ -16,6 +16,58 @@ model AdminUser {
   createdAt DateTime @default(now())
 }
 
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  password        String
+  name            String
+  avatar          String?
+  phone           String?
+  company         String?
+  isActive        Boolean  @default(true)
+  emailVerified   DateTime?
+  stripeCustomerId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  orders          Order[]
+  subscriptions   Subscription[]
+}
+
+model Product {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  description   String   @db.Text
+  shortDesc     String?
+  type          String   @default("plugin")
+  images        Json?
+  pricing       Json
+  features      Json?
+  downloadUrl   String?
+  documentation String?
+  isActive      Boolean  @default(true)
+  isFeatured    Boolean  @default(false)
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  orders        Order[]
+}
+
+model Subscription {
+  id                   String   @id @default(cuid())
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeSubId          String?
+  stripePriceId        String?
+  status               String   @default("active")
+  plan                 String   @default("free")
+  currentPeriodStart   DateTime @default(now())
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
 model Service {
   id               String   @id @default(cuid())
   name             String
@@ -36,17 +88,25 @@ model Service {
 }
 
 model Order {
-  id          String   @id @default(cuid())
-  serviceId  String
-  service     Service  @relation(fields: [serviceId], references: [id])
-  packageType String
-  clientName  String
-  clientEmail String
-  clientPhone String
-  message     String? @db.Text
-  status      String   @default("pending")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  serviceId     String?
+  service       Service? @relation(fields: [serviceId], references: [id])
+  productId     String?
+  product       Product? @relation(fields: [productId], references: [id])
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id])
+  packageType   String?
+  clientName    String
+  clientEmail   String
+  clientPhone   String?
+  message       String?  @db.Text
+  status        String   @default("pending")
+  paymentStatus String   @default("unpaid")
+  paymentMethod String?
+  amount        Int      @default(0)
+  currency      String   @default("USD")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Contact {
