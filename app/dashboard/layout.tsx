@@ -56,9 +56,10 @@ export default function DashboardLayout({
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/signout", { method: "POST" });
-      router.push("/login");
+      window.location.href = "/";
     } catch (error) {
       console.error("Logout error:", error);
+      window.location.href = "/";
     }
   };
 

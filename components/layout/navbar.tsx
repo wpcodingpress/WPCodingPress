@@ -92,7 +92,10 @@ export function Navbar() {
                       variant="ghost" 
                       size="sm" 
                       className="font-semibold"
-                      onClick={() => signOut({ callbackUrl: "/" })}
+                      onClick={() => {
+                        signOut({ callbackUrl: "/" });
+                        window.location.href = "/";
+                      }}
                     >
                       <LogOut className="mr-2 h-4 w-4" />
                       Logout
