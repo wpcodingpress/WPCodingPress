@@ -9,13 +9,18 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions)
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('userId')
+    const productSlug = searchParams.get('productSlug')
 
-    let whereClause = {}
+    let whereClause: any = {}
     
     if (userId) {
-      whereClause = { userId }
+      whereClause.userId = userId
     } else if (session?.user?.role === 'client') {
-      whereClause = { userId: session?.user?.id }
+      whereClause.userId = session?.user?.id
+    }
+
+    if (productSlug) {
+      whereClause.product = { slug: productSlug }
     }
 
     const orders = await prisma.order.findMany({
@@ -59,6 +64,7 @@ export async function POST(request: NextRequest) {
     let serviceName: string | null = null
     let productPrice = 0
     let freeDownloadUrl: string | null = null
+    let orderAmount = amount || 0
 
     if (product) {
       const productRecord = await prisma.product.findUnique({
@@ -81,11 +87,32 @@ export async function POST(request: NextRequest) {
       if (serviceRecord) {
         serviceId = serviceRecord.id
         serviceName = serviceRecord.name
+        if (packageType === 'basic') orderAmount = serviceRecord.basicPrice
+        else if (packageType === 'standard') orderAmount = serviceRecord.standardPrice
+        else if (packageType === 'premium') orderAmount = serviceRecord.premiumPrice
       }
     }
 
     const isFreeProduct = productPrice === 0
-    const orderAmount = amount || productPrice
+    const isService = !!serviceId
+
+    const defaultStatus = isFreeProduct ? "completed" : (isService ? "approved" : "pending")
+
+    if (productId && userId && isFreeProduct) {
+      const existingOrder = await prisma.order.findFirst({
+        where: {
+          productId,
+          userId,
+          planType: 'free'
+        }
+      })
+      
+      if (existingOrder && existingOrder.downloadCount >= existingOrder.downloadLimit) {
+        return NextResponse.json({ 
+          error: "You have already reached the download limit for this free product. Download limit: 3 times per product." 
+        }, { status: 400 })
+      }
+    }
 
     const order = await prisma.$transaction(async (tx) => {
       const order = await tx.order.create({
@@ -94,8 +121,8 @@ export async function POST(request: NextRequest) {
           clientEmail,
           clientPhone: clientPhone || "",
           message: message || "",
-          status: isFreeProduct ? "completed" : "pending",
-          paymentStatus: serviceId ? "pending" : (isFreeProduct ? "paid" : (orderAmount > 0 ? "unpaid" : "paid")),
+          status: defaultStatus,
+          paymentStatus: isService ? "pending" : (isFreeProduct ? "paid" : (orderAmount > 0 ? "unpaid" : "paid")),
           amount: orderAmount,
           packageType: packageType || 'basic',
           downloadCount: 0,

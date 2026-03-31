@@ -30,6 +30,7 @@ export default function ProductDetailPage() {
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string>("");
   const [user, setUser] = useState<any>(null);
+  const [hasReachedLimit, setHasReachedLimit] = useState(false);
 
   useEffect(() => {
     if (params.slug) {
@@ -43,6 +44,16 @@ export default function ProductDetailPage() {
       const res = await fetch("/api/auth/session");
       const data = await res.json();
       setUser(data?.user || null);
+      
+      if (data?.user?.id && params.slug) {
+        const orderRes = await fetch(`/api/orders?userId=${data.user.id}&productSlug=${params.slug}`);
+        const orders = await orderRes.json();
+        
+        const existingOrder = orders.find((o: any) => o.planType === 'free' && o.product?.slug === params.slug);
+        if (existingOrder && existingOrder.downloadCount >= existingOrder.downloadLimit) {
+          setHasReachedLimit(true);
+        }
+      }
     } catch (err) {
       console.error("Session error:", err);
     }
@@ -230,12 +241,17 @@ export default function ProductDetailPage() {
               className="w-full glow" 
               size="lg" 
               onClick={handleDownload}
-              disabled={isProcessing}
+              disabled={isProcessing || hasReachedLimit}
             >
               {isProcessing ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Processing...
+                </>
+              ) : hasReachedLimit ? (
+                <>
+                  <Zap className="mr-2 h-5 w-5" />
+                  Download Limit Reached
                 </>
               ) : isFree ? (
                 <>

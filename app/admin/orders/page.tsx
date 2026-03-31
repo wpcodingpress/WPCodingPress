@@ -91,12 +91,22 @@ export default function AdminOrdersPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending": return "warning"
-      case "approved": return "default"
-      case "in_progress": return "secondary"
-      case "completed": return "success"
-      case "rejected": return "destructive"
-      default: return "outline"
+      case "pending": return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+      case "approved": return "bg-blue-500/20 text-blue-400 border-blue-500/30"
+      case "in_progress": return "bg-purple-500/20 text-purple-400 border-purple-500/30"
+      case "completed": return "bg-green-500/20 text-green-400 border-green-500/30"
+      case "rejected": return "bg-red-500/20 text-red-400 border-red-500/30"
+      default: return "bg-slate-500/20 text-slate-400 border-slate-500/30"
+    }
+  }
+
+  const getPaymentColor = (status: string) => {
+    switch (status) {
+      case "paid": return "bg-green-500/20 text-green-400 border-green-500/30"
+      case "pending": return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+      case "refunded": return "bg-purple-500/20 text-purple-400 border-purple-500/30"
+      case "failed": return "bg-red-500/20 text-red-400 border-red-500/30"
+      default: return "bg-slate-500/20 text-slate-400 border-slate-500/30"
     }
   }
 
@@ -185,9 +195,9 @@ export default function AdminOrdersPage() {
                         ${order.amount || 0}
                       </td>
                       <td className="p-4">
-                        <Badge variant={order.paymentStatus === "paid" ? "success" : order.paymentStatus === "pending" ? "warning" : "destructive"} className="capitalize">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getPaymentColor(order.paymentStatus)}`}>
                           {order.paymentStatus}
-                        </Badge>
+                        </span>
                       </td>
                       <td className="p-4">
                         {order.product ? (
@@ -199,9 +209,9 @@ export default function AdminOrdersPage() {
                         )}
                       </td>
                       <td className="p-4">
-                        <Badge variant={getStatusColor(order.status)} className="capitalize">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
                           {order.status.replace("_", " ")}
-                        </Badge>
+                        </span>
                       </td>
                       <td className="p-4 text-muted-foreground text-sm">
                         {new Date(order.createdAt).toLocaleDateString()}
