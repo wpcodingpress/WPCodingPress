@@ -75,6 +75,7 @@ export default function DashboardLayout({
     { href: "/dashboard/orders", icon: ShoppingBag, label: "My Orders" },
     { href: "/dashboard/downloads", icon: Download, label: "Downloads" },
     { href: "/dashboard/subscription", icon: CreditCard, label: "Subscription" },
+    { href: "/services", icon: Activity, label: "Services", external: true },
     { href: "/dashboard/settings", icon: Settings, label: "Settings" },
   ];
 
@@ -124,6 +125,23 @@ export default function DashboardLayout({
             <nav className="bg-white rounded-xl border border-slate-200 p-2">
               {navItems.map((item) => {
                 const isActive = pathname === item.href;
+                const isExternal = (item as any).external;
+                
+                if (isExternal) {
+                  return (
+                    <a
+                      key={item.href}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all"
+                    >
+                      <item.icon className="h-5 w-5" />
+                      {item.label}
+                    </a>
+                  );
+                }
+                
                 return (
                   <Link
                     key={item.href}

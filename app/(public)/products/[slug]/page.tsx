@@ -96,15 +96,8 @@ export default function ProductDetailPage() {
       const data = await response.json();
       console.log("Order response:", response.status, data);
 
-      if (response.ok) {
-        const order = await response.json();
-        console.log("Order created successfully:", order);
-        
-        if (isFree && downloadLink) {
-          setDownloadUrl(downloadLink);
-        }
-        
-        setOrderSuccess(true);
+      if (response.status === 201) {
+        router.push("/dashboard/orders");
       } else {
         console.error("Order failed:", data);
         alert(data.error || "Failed to create order. Please try again.");

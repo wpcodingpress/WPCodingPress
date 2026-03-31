@@ -113,9 +113,15 @@ export default function OrdersPage() {
             Refresh
           </Button>
           <Link href="/products">
+            <Button variant="outline">
+              <Package className="mr-2 h-4 w-4" />
+              Products
+            </Button>
+          </Link>
+          <Link href="/services">
             <Button>
               <ShoppingBag className="mr-2 h-4 w-4" />
-              Browse Products
+              Services
             </Button>
           </Link>
         </div>
