@@ -85,25 +85,49 @@ export async function POST(request: NextRequest) {
     }
 
     const isFreeProduct = productPrice === 0
-    
     const orderAmount = amount || productPrice
 
-    const order = await prisma.order.create({
-      data: {
-        serviceId,
-        productId,
-        userId: userId || null,
-        packageType: packageType || 'basic',
-        planType: product ? (isFreeProduct ? 'free' : 'pro') : null,
-        clientName,
-        clientEmail,
-        clientPhone: clientPhone || "",
-        message: message || "",
-        status: isFreeProduct ? "completed" : "pending",
-        paymentStatus: serviceId ? "pending" : (isFreeProduct ? "paid" : (orderAmount > 0 ? "unpaid" : "paid")),
-        amount: orderAmount,
+    const order = await prisma.$transaction(async (tx) => {
+      const order = await tx.order.create({
+        data: {
+          clientName,
+          clientEmail,
+          clientPhone: clientPhone || "",
+          message: message || "",
+          status: isFreeProduct ? "completed" : "pending",
+          paymentStatus: serviceId ? "pending" : (isFreeProduct ? "paid" : (orderAmount > 0 ? "unpaid" : "paid")),
+          amount: orderAmount,
+          packageType: packageType || 'basic',
+          downloadCount: 0,
+          downloadLimit: 3,
+        }
+      })
+
+      if (productId) {
+        await tx.order.update({
+          where: { id: order.id },
+          data: { 
+            productId, 
+            planType: isFreeProduct ? 'free' : 'pro',
+            userId: userId || undefined 
+          }
+        })
+      } else if (serviceId) {
+        await tx.order.update({
+          where: { id: order.id },
+          data: { 
+            serviceId, 
+            userId: userId || undefined 
+          }
+        })
       }
+
+      return await tx.order.findUnique({ where: { id: order.id } })
     })
+
+    if (!order) {
+      return NextResponse.json({ error: "Failed to create order" }, { status: 500 })
+    }
 
     if (clientEmail) {
       await sendOrderConfirmation(
