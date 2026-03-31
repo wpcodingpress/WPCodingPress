@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
     } = body
 
     console.log("DEBUG: service=", service, "product=", product, "amount=", amount)
+    console.log("DEBUG: service is truthy:", !!service, "service value:", service)
 
     if (!clientName || !clientEmail) {
       return NextResponse.json({ error: "Name and email are required" }, { status: 400 })
@@ -133,6 +134,7 @@ export async function POST(request: NextRequest) {
     }
 
     const order = await prisma.$transaction(async (tx) => {
+      console.log("DEBUG: Creating order with status:", defaultStatus, "isService:", isService)
       const order = await tx.order.create({
         data: {
           clientName,
@@ -169,8 +171,8 @@ export async function POST(request: NextRequest) {
 
       return await tx.order.findUnique({ where: { id: order.id } })
     })
-
-    console.log("DEBUG: Final order from DB:", order)
+    
+    console.log("DEBUG: Final order from DB - status:", order?.status)
 
     if (!order) {
       return NextResponse.json({ error: "Failed to create order" }, { status: 500 })
