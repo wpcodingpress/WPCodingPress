@@ -79,10 +79,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    console.log("DEBUG: Looking for service with slug:", service)
+    
     if (service && !productId) {
       const serviceRecord = await prisma.service.findUnique({
         where: { slug: service }
       })
+      console.log("DEBUG: serviceRecord found:", serviceRecord)
       
       if (serviceRecord) {
         serviceId = serviceRecord.id
@@ -96,12 +99,16 @@ export async function POST(request: NextRequest) {
     const isFreeProduct = productPrice === 0
     const isService = !!serviceId
 
+    console.log("DEBUG: isFreeProduct=", isFreeProduct, "isService=", isService, "productId=", productId, "serviceId=", serviceId)
+
     let defaultStatus = "pending"
     if (isFreeProduct) {
       defaultStatus = "completed"
     } else if (isService) {
       defaultStatus = "approved"
     }
+
+    console.log("DEBUG: defaultStatus set to:", defaultStatus)
 
     if (productId && userId && isFreeProduct) {
       const existingOrder = await prisma.order.findFirst({
