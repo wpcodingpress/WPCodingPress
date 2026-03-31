@@ -90,13 +90,20 @@ export default function ProductDetailPage() {
       });
 
       if (response.ok) {
+        const order = await response.json();
+        
         if (isFree && downloadLink) {
           setDownloadUrl(downloadLink);
         }
+        
         setOrderSuccess(true);
+      } else {
+        const error = await response.json();
+        alert(error.error || "Failed to create order");
       }
     } catch (error) {
       console.error("Error creating order:", error);
+      alert("Failed to create order. Please try again.");
     } finally {
       setIsProcessing(false);
     }
