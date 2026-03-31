@@ -121,14 +121,6 @@ export default function ProductsPage() {
                             </span>
                           </div>
                         )}
-                        {product.pricing?.enterprise && (
-                          <div className="flex justify-between items-center">
-                            <span className="text-slate-400">Enterprise</span>
-                            <span className="text-white font-bold">
-                              ${product.pricing.enterprise.price}
-                            </span>
-                          </div>
-                        )}
                       </div>
 
                       <Link href={`/products/${product.slug}`}>

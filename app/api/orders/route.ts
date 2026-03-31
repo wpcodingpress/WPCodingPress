@@ -12,10 +12,10 @@ export async function GET(request: NextRequest) {
 
     let whereClause = {}
     
-    if (session?.user?.role === 'client' || userId) {
-      whereClause = {
-        userId: userId || session?.user?.id
-      }
+    if (userId) {
+      whereClause = { userId }
+    } else if (session?.user?.role === 'client') {
+      whereClause = { userId: session?.user?.id }
     }
 
     const orders = await prisma.order.findMany({

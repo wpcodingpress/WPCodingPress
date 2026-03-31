@@ -46,7 +46,8 @@ model Product {
   images        Json?
   pricing       Json
   features      Json?
-  downloadUrl   String?
+  freeDownloadUrl   String?
+  proDownloadUrl   String?
   documentation String?
   isActive      Boolean  @default(true)
   isFeatured    Boolean  @default(false)
@@ -99,6 +100,7 @@ model Order {
   userId        String?
   user          User?    @relation(fields: [userId], references: [id])
   packageType   String?
+  planType      String?   // "free" or "pro" for product orders
   clientName    String
   clientEmail   String
   clientPhone   String?
