@@ -107,6 +107,7 @@ export async function POST(request: NextRequest) {
     // This handles the case where service record doesn't exist in database
     const isServiceOrder = !!service || !!serviceId
 
+    let defaultStatus = "pending"
     console.log("DEBUG: isFreeProduct=", isFreeProduct, "isService=", isService, "isServiceOrder=", isServiceOrder, "productId=", productId, "serviceId=", serviceId)
     if (isServiceOrder) {
       defaultStatus = "approved"
