@@ -103,19 +103,16 @@ export async function POST(request: NextRequest) {
     const isFreeProduct = productPrice === 0
     const isService = !!serviceId
 
-    console.log("DEBUG: isFreeProduct=", isFreeProduct, "isService=", isService, "productId=", productId, "serviceId=", serviceId)
+    // For status determination, check if service was provided in request (even if not found in DB)
+    // This handles the case where service record doesn't exist in database
+    const isServiceOrder = !!service || !!serviceId
 
-    // Determine default status based on order type
-    let defaultStatus = "pending"
-    console.log("DEBUG: Starting status logic - isFreeProduct:", isFreeProduct, "isService:", isService)
-    if (isFreeProduct) {
-      defaultStatus = "completed"
-      console.log("DEBUG: Set to 'completed' because isFreeProduct is true")
-    } else if (isService) {
+    console.log("DEBUG: isFreeProduct=", isFreeProduct, "isService=", isService, "isServiceOrder=", isServiceOrder, "productId=", productId, "serviceId=", serviceId)
+    if (isServiceOrder) {
       defaultStatus = "approved"
-      console.log("DEBUG: Set to 'approved' because isService is true")
+    } else if (isFreeProduct) {
+      defaultStatus = "completed"
     }
-    console.log("DEBUG: defaultStatus final:", defaultStatus)
 
     if (productId && userId && isFreeProduct) {
       const existingOrder = await prisma.order.findFirst({
@@ -142,7 +139,7 @@ export async function POST(request: NextRequest) {
           clientPhone: clientPhone || "",
           message: message || "",
           status: defaultStatus,
-          paymentStatus: isService ? "pending" : (isFreeProduct ? "paid" : (orderAmount > 0 ? "unpaid" : "paid")),
+          paymentStatus: isServiceOrder ? "pending" : (isFreeProduct ? "paid" : (orderAmount > 0 ? "unpaid" : "paid")),
           amount: orderAmount,
           packageType: packageType || 'basic',
           downloadCount: 0,
