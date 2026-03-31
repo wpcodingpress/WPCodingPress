@@ -18,8 +18,9 @@ interface Order {
   paymentStatus: string;
   amount: number;
   packageType: string;
+  planType: string | null;
   createdAt: string;
-  product?: { name: string; downloadUrl: string | null };
+  product?: { name: string; freeDownloadUrl: string | null; proDownloadUrl: string | null };
 }
 
 export default function DownloadsPage() {
@@ -51,7 +52,12 @@ export default function DownloadsPage() {
   };
 
   const downloadableOrders = orders.filter(
-    (order: Order) => order.paymentStatus === "paid" && (order.product?.downloadUrl || order.status === "completed")
+    (order: Order) => {
+      const hasDownloadUrl = order.planType === 'free' 
+        ? order.product?.freeDownloadUrl 
+        : (order.planType === 'pro' && order.paymentStatus === 'paid' ? order.product?.proDownloadUrl : false);
+      return hasDownloadUrl && (order.status === 'completed' || order.status === 'pending');
+    }
   );
 
   if (isLoading) {
@@ -90,13 +96,22 @@ export default function DownloadsPage() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-lg bg-primary/10">
-                    <Package className="h-6 w-6 text-primary" />
+                  <div className={`p-3 rounded-lg ${order.planType === 'free' ? 'bg-green-100' : 'bg-purple-100'}`}>
+                    {order.planType === 'free' ? (
+                      <Package className="h-6 w-6 text-green-600" />
+                    ) : (
+                      <Package className="h-6 w-6 text-purple-600" />
+                    )}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-slate-900">
-                      {order.product?.name || "Product"}
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-slate-900">
+                        {order.product?.name || "Product"}
+                      </h3>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${order.planType === 'free' ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700'}`}>
+                        {order.planType === 'free' ? 'Free' : 'Premium'}
+                      </span>
+                    </div>
                     <div className="flex items-center gap-3 text-sm text-slate-500 mt-1">
                       <span>Order #{order.id.slice(-8).toUpperCase()}</span>
                       <span>•</span>
@@ -108,9 +123,20 @@ export default function DownloadsPage() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  {order.product?.downloadUrl ? (
+                  {order.planType === 'free' && order.product?.freeDownloadUrl ? (
                     <a 
-                      href={order.product.downloadUrl} 
+                      href={order.product.freeDownloadUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                    >
+                      <Button className="gap-2">
+                        <Download className="h-4 w-4" />
+                        Download
+                      </Button>
+                    </a>
+                  ) : order.planType === 'pro' && order.product?.proDownloadUrl && order.paymentStatus === 'paid' ? (
+                    <a 
+                      href={order.product.proDownloadUrl} 
                       target="_blank" 
                       rel="noopener noreferrer"
                     >
@@ -122,7 +148,7 @@ export default function DownloadsPage() {
                   ) : (
                     <Button disabled className="gap-2">
                       <Clock className="h-4 w-4" />
-                      Preparing
+                      {order.paymentStatus !== 'paid' ? 'Awaiting Payment' : 'Preparing'}
                     </Button>
                   )}
                 </div>

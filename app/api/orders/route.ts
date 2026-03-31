@@ -97,13 +97,14 @@ export async function POST(request: NextRequest) {
         productId,
         userId: userId || null,
         packageType: packageType || 'basic',
+        planType: product ? (pricing?.free?.price === 0 ? 'free' : 'pro') : null,
         clientName,
         clientEmail,
         clientPhone,
         message: message || "",
         status: "pending",
         amount: orderAmount,
-        paymentStatus: orderAmount > 0 ? "unpaid" : "paid"
+        paymentStatus: serviceId ? "pending" : (orderAmount > 0 ? "unpaid" : "paid")
       }
     })
 

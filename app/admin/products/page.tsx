@@ -23,7 +23,8 @@ interface Product {
   description: string;
   shortDesc: string;
   type: string;
-  downloadUrl: string | null;
+  freeDownloadUrl: string | null;
+  proDownloadUrl: string | null;
   pricing: any;
   isActive: boolean;
   isFeatured: boolean;
@@ -42,8 +43,9 @@ export default function AdminProductsPage() {
     description: "",
     shortDesc: "",
     type: "plugin",
-    downloadUrl: "",
-    pricing: JSON.stringify({ free: { price: 0, features: [] }, pro: { price: 49, features: [] }, enterprise: { price: 199, features: [] } }, null, 2),
+    freeDownloadUrl: "",
+    proDownloadUrl: "",
+    pricing: JSON.stringify({ free: { price: 0, features: [] }, pro: { price: 49, features: [] } }, null, 2),
     isActive: true,
     isFeatured: false,
     order: 0
@@ -105,7 +107,8 @@ export default function AdminProductsPage() {
       description: product.description,
       shortDesc: product.shortDesc || "",
       type: product.type,
-      downloadUrl: product.downloadUrl || "",
+      freeDownloadUrl: product.freeDownloadUrl || "",
+      proDownloadUrl: product.proDownloadUrl || "",
       pricing: JSON.stringify(product.pricing, null, 2),
       isActive: product.isActive,
       isFeatured: product.isFeatured,
@@ -145,8 +148,9 @@ export default function AdminProductsPage() {
       description: "",
       shortDesc: "",
       type: "plugin",
-      downloadUrl: "",
-      pricing: JSON.stringify({ free: { price: 0, features: [] }, pro: { price: 49, features: [] }, enterprise: { price: 199, features: [] } }, null, 2),
+      freeDownloadUrl: "",
+      proDownloadUrl: "",
+      pricing: JSON.stringify({ free: { price: 0, features: [] }, pro: { price: 49, features: [] } }, null, 2),
       isActive: true,
       isFeatured: false,
       order: 0
@@ -367,14 +371,27 @@ export default function AdminProductsPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm text-slate-300">Download URL (for free products)</label>
-                <Input
-                  value={formData.downloadUrl}
-                  onChange={(e) => setFormData({ ...formData, downloadUrl: e.target.value })}
-                  className="bg-white/5 border-white/10"
-                  placeholder="https://drive.google.com/..."
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm text-slate-300">Free Download URL</label>
+                  <Input
+                    value={formData.freeDownloadUrl}
+                    onChange={(e) => setFormData({ ...formData, freeDownloadUrl: e.target.value })}
+                    className="bg-white/5 border-white/10"
+                    placeholder="https://your-server.com/files/free.zip"
+                  />
+                  <p className="text-xs text-slate-400">For free products (price = $0)</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-slate-300">Pro Download URL</label>
+                  <Input
+                    value={formData.proDownloadUrl}
+                    onChange={(e) => setFormData({ ...formData, proDownloadUrl: e.target.value })}
+                    className="bg-white/5 border-white/10"
+                    placeholder="https://your-server.com/files/pro.zip"
+                  />
+                  <p className="text-xs text-slate-400">For pro products (price greater than $0)</p>
+                </div>
               </div>
 
               <div className="space-y-2">

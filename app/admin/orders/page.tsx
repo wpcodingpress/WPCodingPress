@@ -19,11 +19,14 @@ interface Order {
   clientName: string
   clientEmail: string
   clientPhone: string
-  packageType: string
+  packageType: string | null
   message: string
   status: string
+  amount: number
+  paymentStatus: string
   createdAt: string
-  service: { name: string }
+  service: { name: string } | null
+  product: { name: string } | null
 }
 
 export default function AdminOrdersPage() {
@@ -135,8 +138,11 @@ export default function AdminOrdersPage() {
               <thead>
                 <tr className="border-b border-border">
                   <th className="text-left p-4 text-sm font-medium text-muted-foreground">Client</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Service</th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Type</th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Product/Service</th>
                   <th className="text-left p-4 text-sm font-medium text-muted-foreground">Package</th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Amount</th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Payment</th>
                   <th className="text-left p-4 text-sm font-medium text-muted-foreground">Status</th>
                   <th className="text-left p-4 text-sm font-medium text-muted-foreground">Date</th>
                   <th className="text-right p-4 text-sm font-medium text-muted-foreground">Actions</th>
@@ -145,7 +151,7 @@ export default function AdminOrdersPage() {
               <tbody>
                 {filteredOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                    <td colSpan={9} className="p-8 text-center text-muted-foreground">
                       No orders found
                     </td>
                   </tr>
@@ -158,12 +164,25 @@ export default function AdminOrdersPage() {
                           <p className="text-sm text-muted-foreground">{order.clientEmail}</p>
                         </div>
                       </td>
+                      <td className="p-4">
+                        <Badge variant={order.service ? "secondary" : "outline"} className="capitalize">
+                          {order.service ? "Service" : "Product"}
+                        </Badge>
+                      </td>
                       <td className="p-4 text-muted-foreground">
-                        {order.service?.name || "N/A"}
+                        {order.product?.name || order.service?.name || "N/A"}
                       </td>
                       <td className="p-4">
                         <Badge variant="outline" className="capitalize">
-                          {order.packageType}
+                          {order.packageType || "standard"}
+                        </Badge>
+                      </td>
+                      <td className="p-4 text-white font-medium">
+                        ${order.amount || 0}
+                      </td>
+                      <td className="p-4">
+                        <Badge variant={order.paymentStatus === "paid" ? "success" : order.paymentStatus === "pending" ? "warning" : "destructive"} className="capitalize">
+                          {order.paymentStatus}
                         </Badge>
                       </td>
                       <td className="p-4">

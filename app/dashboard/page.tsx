@@ -76,18 +76,25 @@ export default function DashboardOverview() {
       color: "blue"
     },
     {
+      title: "Browse Services",
+      description: "Get professional web development services",
+      icon: Zap,
+      href: "/services",
+      color: "purple"
+    },
+    {
       title: "Start a Project",
       description: "Get a custom web development quote",
-      icon: Zap,
+      icon: ShoppingBag,
       href: "/order",
-      color: "purple"
+      color: "green"
     },
     {
       title: "My Orders",
       description: "View and manage your orders",
       icon: ShoppingBag,
       href: "/dashboard/orders",
-      color: "green"
+      color: "orange"
     }
   ];
 
@@ -138,6 +145,12 @@ export default function DashboardOverview() {
             <Link href="/products">
               <Button variant="secondary" size="sm">
                 Browse Products
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/services">
+              <Button variant="outline" size="sm" className="text-white border-white hover:bg-white/10">
+                Browse Services
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
