@@ -63,7 +63,10 @@ export default function DashboardOverview() {
   const stats = {
     total: orders.length,
     pending: orders.filter((o: Order) => o.status === "pending").length,
+    approved: orders.filter((o: Order) => o.status === "approved").length,
+    inProgress: orders.filter((o: Order) => o.status === "in_progress").length,
     completed: orders.filter((o: Order) => o.status === "completed").length,
+    rejected: orders.filter((o: Order) => o.status === "rejected").length,
     totalSpent: orders.reduce((acc: number, o: Order) => acc + (o.amount || 0), 0)
   };
 
@@ -100,19 +103,21 @@ export default function DashboardOverview() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed": return "bg-green-100 text-green-700";
-      case "processing": return "bg-blue-100 text-blue-700";
-      case "cancelled": return "bg-red-100 text-red-700";
-      default: return "bg-yellow-100 text-yellow-700";
+      case "pending": return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 border";
+      case "approved": return "bg-blue-500/20 text-blue-400 border-blue-500/30 border";
+      case "in_progress": return "bg-purple-500/20 text-purple-400 border-purple-500/30 border";
+      case "completed": return "bg-green-500/20 text-green-400 border-green-500/30 border";
+      case "rejected": return "bg-red-500/20 text-red-400 border-red-500/30 border";
+      default: return "bg-slate-500/20 text-slate-400 border-slate-500/30 border";
     }
   };
 
   const getPaymentColor = (status: string) => {
     switch (status) {
-      case "paid": return "text-green-600";
-      case "refunded": return "text-purple-600";
-      case "failed": return "text-red-600";
-      default: return "text-yellow-600";
+      case "paid": return "text-green-400";
+      case "refunded": return "text-purple-400";
+      case "failed": return "text-red-400";
+      default: return "text-yellow-400";
     }
   };
 
@@ -159,12 +164,14 @@ export default function DashboardOverview() {
       </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {[
-          { title: "Total Orders", value: stats.total, icon: ShoppingBag, color: "blue" },
-          { title: "Pending", value: stats.pending, icon: Clock, color: "yellow" },
-          { title: "Completed", value: stats.completed, icon: CheckCircle, color: "green" },
-          { title: "Total Spent", value: `$${stats.totalSpent}`, icon: CreditCard, color: "purple" }
+          { title: "Total Orders", value: stats.total, color: "bg-blue-500" },
+          { title: "Pending", value: stats.pending, color: "bg-yellow-500" },
+          { title: "Approved", value: stats.approved, color: "bg-blue-500" },
+          { title: "In Progress", value: stats.inProgress, color: "bg-purple-500" },
+          { title: "Completed", value: stats.completed, color: "bg-green-500" },
+          { title: "Rejected", value: stats.rejected, color: "bg-red-500" }
         ].map((stat, index) => (
           <motion.div
             key={stat.title}
@@ -173,15 +180,10 @@ export default function DashboardOverview() {
             transition={{ delay: index * 0.1 }}
             className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg transition-shadow"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">{stat.title}</p>
-                <p className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</p>
-              </div>
-              <div className={`p-3 rounded-lg bg-${stat.color}-100`}>
-                <stat.icon className={`h-5 w-5 text-${stat.color}-600`} />
-              </div>
+            <div className={`w-10 h-10 rounded-lg ${stat.color} flex items-center justify-center mb-3`}>
+              <span className="text-white font-bold">{stat.value}</span>
             </div>
+            <p className="text-sm text-slate-500">{stat.title}</p>
           </motion.div>
         ))}
       </div>
@@ -257,10 +259,10 @@ export default function DashboardOverview() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                    {order.status}
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
+                    {order.status.replace("_", " ")}
                   </span>
-                  <span className={`text-sm font-medium ${getPaymentColor(order.paymentStatus)}`}>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getPaymentColor(order.paymentStatus)}`}>
                     {order.paymentStatus}
                   </span>
                 </div>

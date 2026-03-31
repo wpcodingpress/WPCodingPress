@@ -75,19 +75,21 @@ export default function OrdersPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed": return "bg-green-100 text-green-700";
-      case "processing": return "bg-blue-100 text-blue-700";
-      case "cancelled": return "bg-red-100 text-red-700";
-      default: return "bg-yellow-100 text-yellow-700";
+      case "pending": return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 border";
+      case "approved": return "bg-blue-500/20 text-blue-400 border-blue-500/30 border";
+      case "in_progress": return "bg-purple-500/20 text-purple-400 border-purple-500/30 border";
+      case "completed": return "bg-green-500/20 text-green-400 border-green-500/30 border";
+      case "rejected": return "bg-red-500/20 text-red-400 border-red-500/30 border";
+      default: return "bg-slate-500/20 text-slate-400 border-slate-500/30 border";
     }
   };
 
   const getPaymentColor = (status: string) => {
     switch (status) {
-      case "paid": return "text-green-600";
-      case "refunded": return "text-purple-600";
-      case "failed": return "text-red-600";
-      default: return "text-yellow-600";
+      case "paid": return "bg-green-500/20 text-green-400 border-green-500/30 border";
+      case "refunded": return "bg-purple-500/20 text-purple-400 border-purple-500/30 border";
+      case "failed": return "bg-red-500/20 text-red-400 border-red-500/30 border";
+      default: return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 border";
     }
   };
 
@@ -210,10 +212,10 @@ export default function OrdersPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`px-4 py-1.5 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
-                    {order.status}
+                  <span className={`px-4 py-1.5 rounded-full text-sm font-medium border ${getStatusColor(order.status)}`}>
+                    {order.status.replace("_", " ")}
                   </span>
-                  <span className={`text-sm font-medium ${getPaymentColor(order.paymentStatus)}`}>
+                  <span className={`px-3 py-1.5 rounded-full text-sm font-medium border ${getPaymentColor(order.paymentStatus)}`}>
                     {order.paymentStatus}
                   </span>
                   <Button 
