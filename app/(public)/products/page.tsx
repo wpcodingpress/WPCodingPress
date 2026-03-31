@@ -13,11 +13,8 @@ interface Product {
   slug: string;
   shortDesc: string;
   type: string;
-  pricing: {
-    free?: { price: number; features: string[] };
-    pro?: { price: number; features: string[] };
-    enterprise?: { price: number; features: string[] };
-  };
+  price: number;
+  features: string[];
   isFeatured: boolean;
 }
 
@@ -104,28 +101,22 @@ export default function ProductsPage() {
                         {product.shortDesc || product.name}
                       </p>
 
-                      <div className="space-y-3 mb-6">
-                        {product.pricing?.free && (
-                          <div className="flex justify-between items-center">
-                            <span className="text-slate-400">Free</span>
-                            <span className="text-white font-bold">
-                              ${product.pricing.free.price}
-                            </span>
-                          </div>
+                      <div className="flex items-center justify-between mb-6">
+                        {product.price === 0 ? (
+                          <span className="text-2xl font-bold text-green-400">Free</span>
+                        ) : (
+                          <span className="text-2xl font-bold text-white">${product.price}</span>
                         )}
-                        {product.pricing?.pro && (
-                          <div className="flex justify-between items-center">
-                            <span className="text-slate-400">Pro</span>
-                            <span className="text-white font-bold">
-                              ${product.pricing.pro.price}
-                            </span>
-                          </div>
+                        {product.price === 0 ? (
+                          <span className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full">Free</span>
+                        ) : (
+                          <span className="text-xs bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full">Premium</span>
                         )}
                       </div>
 
                       <Link href={`/products/${product.slug}`}>
                         <Button className="w-full glow">
-                          View Details
+                          {product.price === 0 ? 'Download Free' : 'View Details'}
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                       </Link>

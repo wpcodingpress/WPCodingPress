@@ -23,9 +23,10 @@ interface Product {
   description: string;
   shortDesc: string;
   type: string;
+  price: number;
   freeDownloadUrl: string | null;
   proDownloadUrl: string | null;
-  pricing: any;
+  features: any;
   isActive: boolean;
   isFeatured: boolean;
   order: number;
@@ -43,9 +44,10 @@ export default function AdminProductsPage() {
     description: "",
     shortDesc: "",
     type: "plugin",
+    price: 0,
     freeDownloadUrl: "",
     proDownloadUrl: "",
-    pricing: JSON.stringify({ free: { price: 0, features: [] }, pro: { price: 49, features: [] } }, null, 2),
+    features: "",
     isActive: true,
     isFeatured: false,
     order: 0
@@ -73,7 +75,7 @@ export default function AdminProductsPage() {
     try {
       const payload = {
         ...formData,
-        pricing: JSON.parse(formData.pricing)
+        features: formData.features ? JSON.parse(formData.features) : []
       };
 
       if (editingProduct) {
@@ -107,9 +109,10 @@ export default function AdminProductsPage() {
       description: product.description,
       shortDesc: product.shortDesc || "",
       type: product.type,
+      price: product.price || 0,
       freeDownloadUrl: product.freeDownloadUrl || "",
       proDownloadUrl: product.proDownloadUrl || "",
-      pricing: JSON.stringify(product.pricing, null, 2),
+      features: Array.isArray(product.features) ? JSON.stringify(product.features, null, 2) : "",
       isActive: product.isActive,
       isFeatured: product.isFeatured,
       order: product.order
@@ -148,9 +151,10 @@ export default function AdminProductsPage() {
       description: "",
       shortDesc: "",
       type: "plugin",
+      price: 0,
       freeDownloadUrl: "",
       proDownloadUrl: "",
-      pricing: JSON.stringify({ free: { price: 0, features: [] }, pro: { price: 49, features: [] } }, null, 2),
+      features: "",
       isActive: true,
       isFeatured: false,
       order: 0
@@ -230,8 +234,12 @@ export default function AdminProductsPage() {
                       {product.type}
                     </span>
                   </td>
-                  <td className="p-4 text-slate-300">
-                    ${product.pricing?.pro?.price || 0}
+                  <td className="p-4">
+                    {product.price === 0 ? (
+                      <span className="text-green-400 font-medium">Free</span>
+                    ) : (
+                      <span className="text-white font-medium">${product.price}</span>
+                    )}
                   </td>
                   <td className="p-4">
                     <span
@@ -395,11 +403,26 @@ export default function AdminProductsPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm text-slate-300">Pricing (JSON)</label>
+                <label className="text-sm text-slate-300">Price (USD)</label>
+                <Input
+                  type="number"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
+                  className="bg-white/5 border-white/10"
+                  placeholder="0"
+                  min="0"
+                  step="0.01"
+                />
+                <p className="text-xs text-slate-400">Set 0 for free products, any amount for paid products</p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm text-slate-300">Features (one per line)</label>
                 <textarea
-                  value={formData.pricing}
-                  onChange={(e) => setFormData({ ...formData, pricing: e.target.value })}
-                  className="w-full h-40 bg-white/5 border border-white/10 rounded-lg p-3 text-white font-mono text-sm"
+                  value={formData.features}
+                  onChange={(e) => setFormData({ ...formData, features: e.target.value })}
+                  className="w-full h-32 bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm"
+                  placeholder="Feature 1&#10;Feature 2&#10;Feature 3"
                 />
               </div>
 

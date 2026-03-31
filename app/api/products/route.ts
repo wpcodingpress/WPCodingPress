@@ -21,8 +21,8 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const { 
-      name, slug, description, shortDesc, type, images, pricing, 
-      features, downloadUrl, documentation, isActive, isFeatured, order 
+      name, slug, description, shortDesc, type, images, price,
+      features, freeDownloadUrl, proDownloadUrl, documentation, isActive, isFeatured, order 
     } = body
 
     if (!name || !slug || !description) {
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
         shortDesc: shortDesc || null,
         type: type || 'plugin',
         images: images || null,
-        pricing: pricing || { free: { price: 0, features: [] }, pro: { price: 49, features: [] } },
+        price: price || 0,
         features: features || null,
         freeDownloadUrl: body.freeDownloadUrl || null,
         proDownloadUrl: body.proDownloadUrl || null,

@@ -44,7 +44,7 @@ model Product {
   shortDesc     String?
   type          String   @default("plugin")
   images        Json?
-  pricing       Json
+  price         Int      @default(0) // Price in cents, 0 = free
   features      Json?
   freeDownloadUrl   String?
   proDownloadUrl   String?

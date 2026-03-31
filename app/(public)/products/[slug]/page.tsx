@@ -14,10 +14,7 @@ interface Product {
   description: string;
   shortDesc: string;
   type: string;
-  pricing: {
-    free?: { price: number; features: string[] };
-    pro?: { price: number; features: string[] };
-  };
+  price: number;
   features: string[];
   freeDownloadUrl: string | null;
   proDownloadUrl: string | null;
@@ -29,7 +26,6 @@ export default function ProductDetailPage() {
   const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedPlan, setSelectedPlan] = useState<string>("pro");
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string>("");
@@ -58,9 +54,6 @@ export default function ProductDetailPage() {
       if (response.ok) {
         const data = await response.json();
         setProduct(data);
-        if (data.pricing?.free) {
-          setSelectedPlan("free");
-        }
       }
     } catch (error) {
       console.error("Error fetching product:", error);
@@ -75,33 +68,31 @@ export default function ProductDetailPage() {
       return;
     }
 
+    if (!product) return;
+
     setIsProcessing(true);
     try {
-      const planType = selectedPlan;
-      const pricing = product?.pricing?.[planType as keyof typeof product.pricing];
-      const price = pricing?.price || 0;
+      const isFree = product.price === 0;
+      const downloadLink = isFree ? product.freeDownloadUrl : product.proDownloadUrl;
 
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          product: product?.slug,
-          packageType: planType,
+          product: product.slug,
+          packageType: isFree ? "free" : "pro",
           clientName: user.name || "User",
           clientEmail: user.email,
           clientPhone: user.phone || "",
           userId: user.id,
-          amount: price
+          amount: product.price
         })
       });
 
       if (response.ok) {
-        const order = await response.json();
-        
-        if (planType === "free" && product?.freeDownloadUrl) {
-          setDownloadUrl(product.freeDownloadUrl);
+        if (isFree && downloadLink) {
+          setDownloadUrl(downloadLink);
         }
-        
         setOrderSuccess(true);
       }
     } catch (error) {
@@ -132,12 +123,7 @@ export default function ProductDetailPage() {
     );
   }
 
-  const plans = [
-    { key: "free", name: "Free", price: product.pricing?.free?.price || 0, features: product.pricing?.free?.features || [] },
-    { key: "pro", name: "Pro", price: product.pricing?.pro?.price || 0, features: product.pricing?.pro?.features || [] },
-  ];
-
-  const selectedPlanData = plans.find(p => p.key === selectedPlan);
+  const isFree = product.price === 0;
 
   if (orderSuccess) {
     return (
@@ -151,16 +137,16 @@ export default function ProductDetailPage() {
               <Check className="h-10 w-10 text-green-500" />
             </div>
             <h1 className="text-3xl font-bold text-white mb-4">
-              {selectedPlan === "free" ? "Download Ready!" : "Order Placed!"}
+              {isFree ? "Download Ready!" : "Order Placed!"}
             </h1>
             <p className="text-muted-foreground mb-8">
-              {selectedPlan === "free" 
-                ? `Your order for ${product.name} (Free) has been placed. You can download it from your dashboard.`
-                : `Your order for ${product.name} (Pro) has been placed. Check your dashboard for updates.`
+              {isFree 
+                ? `Your order for ${product.name} has been placed. You can download it from your dashboard.`
+                : `Your order for ${product.name} has been placed. Check your dashboard for payment.`
               }
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {downloadUrl && (
+              {isFree && downloadUrl && (
                 <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
                   <Button size="lg" className="gap-2">
                     <Download className="h-5 w-5" />
@@ -198,7 +184,20 @@ export default function ProductDetailPage() {
               {product.type}
             </span>
             <p className="text-lg text-muted-foreground mb-8">{product.shortDesc || product.description}</p>
-            <div className="prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: product.description }} />
+            
+            {product.features && product.features.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-white mb-4">Features</h3>
+                <ul className="space-y-2">
+                  {product.features.map((feature, index) => (
+                    <li key={index} className="flex items-center gap-2 text-muted-foreground">
+                      <Check className="h-4 w-4 text-primary" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </motion.div>
 
           <motion.div
@@ -206,40 +205,17 @@ export default function ProductDetailPage() {
             animate={{ opacity: 1, x: 0 }}
             className="bg-white/5 border border-white/10 rounded-xl p-8"
           >
-            <h2 className="text-2xl font-bold text-white mb-6">Choose Your Plan</h2>
-            
-            <div className="space-y-4 mb-8">
-              {plans.map((plan) => (
-                <button
-                  key={plan.key}
-                  onClick={() => setSelectedPlan(plan.key)}
-                  className={`w-full p-4 rounded-lg border transition-all text-left ${
-                    selectedPlan === plan.key
-                      ? "border-primary bg-primary/10"
-                      : "border-white/10 hover:border-white/30"
-                  }`}
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-white capitalize">{plan.name}</span>
-                      {plan.key === "free" && (
-                        <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Free</span>
-                      )}
-                      {plan.key === "pro" && (
-                        <span className="text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full">Premium</span>
-                      )}
-                    </div>
-                    <span className="text-2xl font-bold text-white">
-                      {plan.price === 0 ? "Free" : `$${plan.price}`}
-                    </span>
-                  </div>
-                  {plan.features.length > 0 && (
-                    <div className="text-sm text-muted-foreground">
-                      {plan.features.slice(0, 2).join(" • ")}
-                    </div>
-                  )}
-                </button>
-              ))}
+            <div className="text-center mb-8">
+              <div className="flex items-center justify-center gap-4 mb-4">
+                {isFree ? (
+                  <span className="text-5xl font-bold text-green-400">Free</span>
+                ) : (
+                  <span className="text-5xl font-bold text-white">${product.price}</span>
+                )}
+              </div>
+              <span className={`text-sm px-4 py-1 rounded-full ${isFree ? 'bg-green-500/20 text-green-400' : 'bg-purple-500/20 text-purple-400'}`}>
+                {isFree ? 'Free Download' : 'Premium Product'}
+              </span>
             </div>
 
             <Button 
@@ -253,7 +229,7 @@ export default function ProductDetailPage() {
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Processing...
                 </>
-              ) : selectedPlan === "free" ? (
+              ) : isFree ? (
                 <>
                   <Zap className="mr-2 h-5 w-5" />
                   Download Free
@@ -261,13 +237,13 @@ export default function ProductDetailPage() {
               ) : (
                 <>
                   <ShoppingCart className="mr-2 h-5 w-5" />
-                  Purchase Now - ${selectedPlanData?.price}
+                  Purchase Now - ${product.price}
                 </>
               )}
             </Button>
 
             <p className="text-center text-sm text-muted-foreground mt-4">
-              Instant access to files after purchase
+              {isFree ? 'Instant download after order' : 'Instant access after payment'}
             </p>
           </motion.div>
         </div>

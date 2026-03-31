@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     let productId: string | null = null
     let productName: string | null = null
     let serviceName: string | null = null
-    let pricing: any = null
+    let productPrice = 0
 
     if (product) {
       const productRecord = await prisma.product.findUnique({
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       if (productRecord) {
         productId = productRecord.id
         productName = productRecord.name
-        pricing = productRecord.pricing as any
+        productPrice = productRecord.price || 0
       }
     }
 
@@ -82,14 +82,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    let orderAmount = amount || 0
-    
-    if (!orderAmount && pricing && packageType) {
-      const pricingTier = pricing[packageType?.toLowerCase()]
-      if (pricingTier) {
-        orderAmount = pricingTier.price || 0
-      }
-    }
+    const orderAmount = amount || productPrice
 
     const order = await prisma.order.create({
       data: {
@@ -97,7 +90,7 @@ export async function POST(request: NextRequest) {
         productId,
         userId: userId || null,
         packageType: packageType || 'basic',
-        planType: product ? (pricing?.free?.price === 0 ? 'free' : 'pro') : null,
+        planType: product ? (productPrice === 0 ? 'free' : 'pro') : null,
         clientName,
         clientEmail,
         clientPhone,
