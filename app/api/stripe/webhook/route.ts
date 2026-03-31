@@ -1,17 +1,26 @@
 import { NextRequest, NextResponse } from "next/server"
-import Stripe from "stripe"
 import prisma from "@/lib/prisma"
 import { sendOrderConfirmation } from "@/lib/email"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-03-25.dahlia"
-})
+// Only initialize Stripe if API key is available
+let stripe: any = null
+if (process.env.STRIPE_SECRET_KEY) {
+  const Stripe = require("stripe")
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2026-03-25.dahlia"
+  })
+}
 
 export async function POST(request: NextRequest) {
+  // Check if Stripe is configured
+  if (!stripe) {
+    return NextResponse.json({ error: "Stripe not configured" }, { status: 503 })
+  }
+  
   const body = await request.text()
   const signature = request.headers.get("stripe-signature")!
 
-  let event: Stripe.Event
+  let event: any
 
   try {
     event = stripe.webhooks.constructEvent(
@@ -25,7 +34,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session
+    const session = event.data.object as any
     
     try {
       const { productId, productSlug, userId, price } = session.metadata || {}
