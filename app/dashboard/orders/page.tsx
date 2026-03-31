@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { 
@@ -12,7 +13,8 @@ import {
   Eye,
   Download,
   Filter,
-  RefreshCw
+  RefreshCw,
+  CheckCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,15 +33,23 @@ interface Order {
 }
 
 export default function OrdersPage() {
+  const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   useEffect(() => {
+    // Check for payment success
+    if (searchParams.get("payment") === "success") {
+      setPaymentSuccess(true);
+      // Clean URL
+      window.history.replaceState({}, "", "/dashboard/orders");
+    }
     fetchOrders();
-  }, []);
+  }, [searchParams]);
 
   const fetchOrders = async () => {
     setIsLoading(true);
@@ -128,6 +138,16 @@ export default function OrdersPage() {
           </Link>
         </div>
       </div>
+
+      {paymentSuccess && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+          <CheckCircle className="h-5 w-5 text-green-600" />
+          <div>
+            <p className="font-medium text-green-800">Payment Successful!</p>
+            <p className="text-sm text-green-600">Your order has been processed and is ready for download.</p>
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4">

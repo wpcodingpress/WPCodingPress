@@ -86,36 +86,64 @@ export default function ProductDetailPage() {
     setIsProcessing(true);
     try {
       const isFree = product.price === 0;
-      const downloadLink = isFree ? product.freeDownloadUrl : product.proDownloadUrl;
 
-      console.log("Creating order, isFree:", isFree, "downloadLink:", downloadLink);
+      // For free products, create order directly
+      if (isFree) {
+        console.log("Creating free order");
 
-      const response = await fetch("/api/orders", {
+        const response = await fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product: product.slug,
+            packageType: "free",
+            clientName: user.name || "User",
+            clientEmail: user.email,
+            clientPhone: user.phone || "",
+            userId: user.id,
+            amount: 0
+          })
+        });
+
+        const data = await response.json();
+        console.log("Order response:", response.status, data);
+
+        if (response.status === 201) {
+          router.push("/dashboard/orders");
+        } else {
+          console.error("Order failed:", data);
+          alert(data.error || "Failed to create order. Please try again.");
+        }
+        return;
+      }
+
+      // For Pro products, initiate Stripe checkout
+      console.log("Initiating Stripe checkout for pro product");
+
+      const response = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          product: product.slug,
-          packageType: isFree ? "free" : "pro",
-          clientName: user.name || "User",
-          clientEmail: user.email,
-          clientPhone: user.phone || "",
+          productSlug: product.slug,
           userId: user.id,
-          amount: product.price
+          userEmail: user.email,
+          userName: user.name
         })
       });
 
       const data = await response.json();
-      console.log("Order response:", response.status, data);
+      console.log("Checkout response:", response.status, data);
 
-      if (response.status === 201) {
-        router.push("/dashboard/orders");
+      if (response.ok && data.url) {
+        // Redirect to Stripe checkout
+        window.location.href = data.url;
       } else {
-        console.error("Order failed:", data);
-        alert(data.error || "Failed to create order. Please try again.");
+        console.error("Checkout failed:", data);
+        alert(data.error || "Failed to initiate checkout. Please try again.");
       }
     } catch (error) {
-      console.error("Error creating order:", error);
-      alert("Failed to create order. Please try again.");
+      console.error("Error:", error);
+      alert("Failed to process request. Please try again.");
     } finally {
       setIsProcessing(false);
     }
