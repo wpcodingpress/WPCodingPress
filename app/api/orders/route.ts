@@ -96,7 +96,12 @@ export async function POST(request: NextRequest) {
     const isFreeProduct = productPrice === 0
     const isService = !!serviceId
 
-    const defaultStatus = isFreeProduct ? "completed" : (isService ? "approved" : "pending")
+    let defaultStatus = "pending"
+    if (isFreeProduct) {
+      defaultStatus = "completed"
+    } else if (isService) {
+      defaultStatus = "approved"
+    }
 
     if (productId && userId && isFreeProduct) {
       const existingOrder = await prisma.order.findFirst({
