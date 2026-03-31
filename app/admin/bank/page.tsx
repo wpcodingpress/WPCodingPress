@@ -93,12 +93,18 @@ export default function BankSettingsPage() {
         body: JSON.stringify(formData)
       })
 
+      const data = await res.json()
+      console.log("Response:", res.status, data)
+
       if (res.ok) {
         fetchSettings()
         closeModal()
+      } else {
+        alert(data.error || "Failed to save bank settings")
       }
     } catch (error) {
       console.error("Error saving bank settings:", error)
+      alert("Failed to save bank settings")
     }
   }
 
