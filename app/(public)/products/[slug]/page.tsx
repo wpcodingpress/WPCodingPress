@@ -117,32 +117,14 @@ export default function ProductDetailPage() {
         return;
       }
 
-      // For Pro products - create order directly (Stripe disabled for now)
-      console.log("Creating pro product order (demo mode)");
-
-      const response = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          product: product.slug,
-          packageType: "pro",
-          clientName: user.name || "User",
-          clientEmail: user.email,
-          clientPhone: user.phone || "",
-          userId: user.id,
-          amount: product.price
-        })
+      // For Pro products - redirect to bank transfer page
+      console.log("Redirecting to bank transfer page");
+      const params = new URLSearchParams({
+        product: product.slug,
+        name: product.name,
+        price: product.price.toString()
       });
-
-      const data = await response.json();
-      console.log("Order response:", response.status, data);
-
-      if (response.status === 201) {
-        router.push("/dashboard/orders?payment=success");
-      } else {
-        console.error("Order failed:", data);
-        alert(data.error || "Failed to create order. Please try again.");
-      }
+      router.push(`/bank-transfer?${params.toString()}`);
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to process request. Please try again.");
