@@ -24,9 +24,12 @@ interface Order {
   status: string
   amount: number
   paymentStatus: string
+  downloadCount: number
+  downloadLimit: number
   createdAt: string
   service: { name: string } | null
   product: { name: string } | null
+  user: { name: string; email: string } | null
 }
 
 export default function AdminOrdersPage() {
@@ -143,6 +146,7 @@ export default function AdminOrdersPage() {
                   <th className="text-left p-4 text-sm font-medium text-muted-foreground">Package</th>
                   <th className="text-left p-4 text-sm font-medium text-muted-foreground">Amount</th>
                   <th className="text-left p-4 text-sm font-medium text-muted-foreground">Payment</th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Downloads</th>
                   <th className="text-left p-4 text-sm font-medium text-muted-foreground">Status</th>
                   <th className="text-left p-4 text-sm font-medium text-muted-foreground">Date</th>
                   <th className="text-right p-4 text-sm font-medium text-muted-foreground">Actions</th>
@@ -184,6 +188,15 @@ export default function AdminOrdersPage() {
                         <Badge variant={order.paymentStatus === "paid" ? "success" : order.paymentStatus === "pending" ? "warning" : "destructive"} className="capitalize">
                           {order.paymentStatus}
                         </Badge>
+                      </td>
+                      <td className="p-4">
+                        {order.product ? (
+                          <span className={`text-sm font-medium ${order.downloadCount >= order.downloadLimit ? 'text-red-400' : 'text-green-400'}`}>
+                            {order.downloadCount}/{order.downloadLimit}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
                       </td>
                       <td className="p-4">
                         <Badge variant={getStatusColor(order.status)} className="capitalize">
@@ -248,8 +261,17 @@ export default function AdminOrdersPage() {
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground">Service</label>
-                  <p className="text-white">{selectedOrder.service?.name || "N/A"}</p>
+                  <p className="text-white">{selectedOrder.service?.name || selectedOrder.product?.name || "N/A"}</p>
                 </div>
+                
+                {selectedOrder.product && (
+                  <div>
+                    <label className="text-sm text-muted-foreground">Downloads</label>
+                    <p className={`text-white font-medium ${selectedOrder.downloadCount >= selectedOrder.downloadLimit ? 'text-red-400' : 'text-green-400'}`}>
+                      {selectedOrder.downloadCount} / {selectedOrder.downloadLimit} downloads used
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div>

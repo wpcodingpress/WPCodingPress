@@ -6,9 +6,8 @@ import { motion } from "framer-motion";
 import { 
   Download, 
   Package, 
-  FileText,
-  ExternalLink,
-  Clock
+  Clock,
+  AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +18,8 @@ interface Order {
   amount: number;
   packageType: string;
   planType: string | null;
+  downloadCount: number;
+  downloadLimit: number;
   createdAt: string;
   product?: { name: string; freeDownloadUrl: string | null; proDownloadUrl: string | null };
 }
@@ -26,6 +27,7 @@ interface Order {
 export default function DownloadsPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchOrders();
@@ -51,12 +53,35 @@ export default function DownloadsPage() {
     }
   };
 
+  const handleDownload = async (orderId: string) => {
+    setDownloadingId(orderId);
+    try {
+      const response = await fetch(`/api/orders/${orderId}/download`, {
+        method: "POST"
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.downloadUrl) {
+        window.open(data.downloadUrl, '_blank');
+        fetchOrders();
+      } else {
+        alert(data.error || "Download failed");
+      }
+    } catch (error) {
+      console.error("Download error:", error);
+      alert("Failed to download");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
   const downloadableOrders = orders.filter(
     (order: Order) => {
       const hasDownloadUrl = order.planType === 'free' 
         ? order.product?.freeDownloadUrl 
         : (order.planType === 'pro' && order.paymentStatus === 'paid' ? order.product?.proDownloadUrl : false);
-      return hasDownloadUrl && (order.status === 'completed' || order.status === 'pending');
+      return hasDownloadUrl;
     }
   );
 
@@ -86,75 +111,77 @@ export default function DownloadsPage() {
         </div>
       ) : (
         <div className="grid gap-4">
-          {downloadableOrders.map((order: Order, index: number) => (
-            <motion.div
-              key={order.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg transition-shadow"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-lg ${order.planType === 'free' ? 'bg-green-100' : 'bg-purple-100'}`}>
-                    {order.planType === 'free' ? (
-                      <Package className="h-6 w-6 text-green-600" />
+          {downloadableOrders.map((order: Order, index: number) => {
+            const canDownload = order.downloadCount < order.downloadLimit;
+            const downloadUrl = order.planType === 'free' 
+              ? order.product?.freeDownloadUrl 
+              : order.product?.proDownloadUrl;
+            
+            return (
+              <motion.div
+                key={order.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-lg transition-shadow"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-lg ${order.planType === 'free' ? 'bg-green-100' : 'bg-purple-100'}`}>
+                      {order.planType === 'free' ? (
+                        <Package className="h-6 w-6 text-green-600" />
+                      ) : (
+                        <Package className="h-6 w-6 text-purple-600" />
+                      )}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-slate-900">
+                          {order.product?.name || "Product"}
+                        </h3>
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${order.planType === 'free' ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700'}`}>
+                          {order.planType === 'free' ? 'Free' : 'Premium'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 text-sm text-slate-500 mt-1">
+                        <span>Order #{order.id.slice(-8).toUpperCase()}</span>
+                        <span>•</span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {new Date(order.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <div className={`text-sm font-medium ${canDownload ? 'text-green-600' : 'text-red-600'}`}>
+                        {order.downloadCount} / {order.downloadLimit} downloads
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        {canDownload ? 'Available' : 'Limit reached'}
+                      </div>
+                    </div>
+                    {canDownload ? (
+                      <Button 
+                        onClick={() => handleDownload(order.id)} 
+                        disabled={downloadingId === order.id}
+                        className="gap-2"
+                      >
+                        <Download className="h-4 w-4" />
+                        {downloadingId === order.id ? 'Downloading...' : 'Download'}
+                      </Button>
                     ) : (
-                      <Package className="h-6 w-6 text-purple-600" />
+                      <Button disabled variant="outline" className="gap-2">
+                        <AlertCircle className="h-4 w-4" />
+                        Limit Reached
+                      </Button>
                     )}
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-slate-900">
-                        {order.product?.name || "Product"}
-                      </h3>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${order.planType === 'free' ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700'}`}>
-                        {order.planType === 'free' ? 'Free' : 'Premium'}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm text-slate-500 mt-1">
-                      <span>Order #{order.id.slice(-8).toUpperCase()}</span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
                 </div>
-                <div className="flex gap-2">
-                  {order.planType === 'free' && order.product?.freeDownloadUrl ? (
-                    <a 
-                      href={order.product.freeDownloadUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                    >
-                      <Button className="gap-2">
-                        <Download className="h-4 w-4" />
-                        Download
-                      </Button>
-                    </a>
-                  ) : order.planType === 'pro' && order.product?.proDownloadUrl && order.paymentStatus === 'paid' ? (
-                    <a 
-                      href={order.product.proDownloadUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                    >
-                      <Button className="gap-2">
-                        <Download className="h-4 w-4" />
-                        Download
-                      </Button>
-                    </a>
-                  ) : (
-                    <Button disabled className="gap-2">
-                      <Clock className="h-4 w-4" />
-                      {order.paymentStatus !== 'paid' ? 'Awaiting Payment' : 'Preparing'}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
       )}
     </div>
