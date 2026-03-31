@@ -49,8 +49,8 @@ export async function POST(request: NextRequest) {
       clientPhone, message, userId, amount 
     } = body
 
-    if (!clientName || !clientEmail || !clientPhone) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    if (!clientName || !clientEmail) {
+      return NextResponse.json({ error: "Name and email are required" }, { status: 400 })
     }
 
     let serviceId: string | null = null
@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
     let productName: string | null = null
     let serviceName: string | null = null
     let productPrice = 0
+    let freeDownloadUrl: string | null = null
 
     if (product) {
       const productRecord = await prisma.product.findUnique({
@@ -68,6 +69,7 @@ export async function POST(request: NextRequest) {
         productId = productRecord.id
         productName = productRecord.name
         productPrice = productRecord.price || 0
+        freeDownloadUrl = productRecord.freeDownloadUrl
       }
     }
 
@@ -82,6 +84,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const isFreeProduct = productPrice === 0
+    
     const orderAmount = amount || productPrice
 
     const order = await prisma.order.create({
@@ -90,14 +94,14 @@ export async function POST(request: NextRequest) {
         productId,
         userId: userId || null,
         packageType: packageType || 'basic',
-        planType: product ? (productPrice === 0 ? 'free' : 'pro') : null,
+        planType: product ? (isFreeProduct ? 'free' : 'pro') : null,
         clientName,
         clientEmail,
-        clientPhone,
+        clientPhone: clientPhone || "",
         message: message || "",
-        status: "pending",
+        status: isFreeProduct ? "completed" : "pending",
+        paymentStatus: serviceId ? "pending" : (isFreeProduct ? "paid" : (orderAmount > 0 ? "unpaid" : "paid")),
         amount: orderAmount,
-        paymentStatus: serviceId ? "pending" : (orderAmount > 0 ? "unpaid" : "paid")
       }
     })
 

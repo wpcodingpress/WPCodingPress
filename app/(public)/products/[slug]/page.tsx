@@ -63,6 +63,8 @@ export default function ProductDetailPage() {
   };
 
   const handleDownload = async () => {
+    console.log("Download clicked, user:", user, "product:", product);
+    
     if (!user) {
       router.push("/login?redirect=" + encodeURIComponent(window.location.pathname));
       return;
@@ -74,6 +76,8 @@ export default function ProductDetailPage() {
     try {
       const isFree = product.price === 0;
       const downloadLink = isFree ? product.freeDownloadUrl : product.proDownloadUrl;
+
+      console.log("Creating order, isFree:", isFree, "downloadLink:", downloadLink);
 
       const response = await fetch("/api/orders", {
         method: "POST",
@@ -89,6 +93,9 @@ export default function ProductDetailPage() {
         })
       });
 
+      const data = await response.json();
+      console.log("Order response:", response.status, data);
+
       if (response.ok) {
         const order = await response.json();
         
@@ -98,8 +105,7 @@ export default function ProductDetailPage() {
         
         setOrderSuccess(true);
       } else {
-        const error = await response.json();
-        alert(error.error || "Failed to create order");
+        alert(data.error || "Failed to create order");
       }
     } catch (error) {
       console.error("Error creating order:", error);
