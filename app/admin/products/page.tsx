@@ -73,9 +73,13 @@ export default function AdminProductsPage() {
     e.preventDefault();
     
     try {
+      const featuresArray = formData.features 
+        ? formData.features.split('\n').filter(f => f.trim()) 
+        : [];
+        
       const payload = {
         ...formData,
-        features: formData.features ? JSON.parse(formData.features) : []
+        features: featuresArray
       };
 
       if (editingProduct) {
@@ -103,6 +107,22 @@ export default function AdminProductsPage() {
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
+    let freeUrl = product.freeDownloadUrl || "";
+    let proUrl = product.proDownloadUrl || "";
+    
+    if (freeUrl.includes('drive.google.com/file/') && !freeUrl.includes('uc?export=download')) {
+      const match = freeUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (match) {
+        freeUrl = `https://drive.google.com/uc?export=download&id=${match[1]}`;
+      }
+    }
+    if (proUrl.includes('drive.google.com/file/') && !proUrl.includes('uc?export=download')) {
+      const match = proUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (match) {
+        proUrl = `https://drive.google.com/uc?export=download&id=${match[1]}`;
+      }
+    }
+    
     setFormData({
       name: product.name,
       slug: product.slug,
@@ -110,9 +130,9 @@ export default function AdminProductsPage() {
       shortDesc: product.shortDesc || "",
       type: product.type,
       price: product.price || 0,
-      freeDownloadUrl: product.freeDownloadUrl || "",
-      proDownloadUrl: product.proDownloadUrl || "",
-      features: Array.isArray(product.features) ? JSON.stringify(product.features, null, 2) : "",
+      freeDownloadUrl: freeUrl,
+      proDownloadUrl: proUrl,
+      features: Array.isArray(product.features) ? product.features.join('\n') : "",
       isActive: product.isActive,
       isFeatured: product.isFeatured,
       order: product.order
@@ -382,22 +402,64 @@ export default function AdminProductsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm text-slate-300">Free Download URL</label>
-                  <Input
-                    value={formData.freeDownloadUrl}
-                    onChange={(e) => setFormData({ ...formData, freeDownloadUrl: e.target.value })}
-                    className="bg-white/5 border-white/10"
-                    placeholder="https://your-server.com/files/free.zip"
-                  />
-                  <p className="text-xs text-slate-400">For free products (price = $0)</p>
+                  <div className="flex gap-2">
+                    <Input
+                      value={formData.freeDownloadUrl}
+                      onChange={(e) => setFormData({ ...formData, freeDownloadUrl: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                      placeholder="https://drive.google.com/uc?export=download&id=..."
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        const link = formData.freeDownloadUrl;
+                        if (link.includes('drive.google.com')) {
+                          const match = link.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                          if (match) {
+                            setFormData({ ...formData, freeDownloadUrl: `https://drive.google.com/uc?export=download&id=${match[1]}` });
+                          } else {
+                            alert('Invalid Google Drive link. Make sure it contains the file ID.');
+                          }
+                        }
+                      }}
+                      title="Convert Google Drive link to direct download"
+                    >
+                      Convert
+                    </Button>
+                  </div>
+                  <p className="text-xs text-slate-400">Paste Google Drive share link and click Convert</p>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm text-slate-300">Pro Download URL</label>
-                  <Input
-                    value={formData.proDownloadUrl}
-                    onChange={(e) => setFormData({ ...formData, proDownloadUrl: e.target.value })}
-                    className="bg-white/5 border-white/10"
-                    placeholder="https://your-server.com/files/pro.zip"
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      value={formData.proDownloadUrl}
+                      onChange={(e) => setFormData({ ...formData, proDownloadUrl: e.target.value })}
+                      className="bg-white/5 border-white/10"
+                      placeholder="https://drive.google.com/uc?export=download&id=..."
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        const link = formData.proDownloadUrl;
+                        if (link.includes('drive.google.com')) {
+                          const match = link.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                          if (match) {
+                            setFormData({ ...formData, proDownloadUrl: `https://drive.google.com/uc?export=download&id=${match[1]}` });
+                          } else {
+                            alert('Invalid Google Drive link. Make sure it contains the file ID.');
+                          }
+                        }
+                      }}
+                      title="Convert Google Drive link to direct download"
+                    >
+                      Convert
+                    </Button>
+                  </div>
                   <p className="text-xs text-slate-400">For pro products (price greater than $0)</p>
                 </div>
               </div>
