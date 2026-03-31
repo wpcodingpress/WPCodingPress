@@ -98,6 +98,7 @@ export default function ProductDetailPage() {
 
       if (response.ok) {
         const order = await response.json();
+        console.log("Order created successfully:", order);
         
         if (isFree && downloadLink) {
           setDownloadUrl(downloadLink);
@@ -105,7 +106,8 @@ export default function ProductDetailPage() {
         
         setOrderSuccess(true);
       } else {
-        alert(data.error || "Failed to create order");
+        console.error("Order failed:", data);
+        alert(data.error || "Failed to create order. Please try again.");
       }
     } catch (error) {
       console.error("Error creating order:", error);

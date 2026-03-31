@@ -120,8 +120,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(order, { status: 201 })
-  } catch (error) {
-    console.error("Error creating order:", error)
-    return NextResponse.json({ error: "Failed to create order" }, { status: 500 })
+  } catch (error: any) {
+    console.error("Error creating order:", error.message || error)
+    return NextResponse.json({ error: "Failed to create order: " + (error.message || 'Unknown error') }, { status: 500 })
   }
 }
