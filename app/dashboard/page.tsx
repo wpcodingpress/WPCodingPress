@@ -43,19 +43,16 @@ export default function DashboardOverview() {
 
   const fetchData = async () => {
     try {
-      const [sessionRes, ordersRes] = await Promise.all([
-        fetch("/api/auth/session"),
-        fetch("/api/orders")
-      ]);
-      
+      const sessionRes = await fetch("/api/auth/session");
       const sessionData = await sessionRes.json();
-      const ordersData = await ordersRes.json();
       
       if (sessionData?.user) {
         setUser(sessionData.user);
+        
+        const ordersRes = await fetch(`/api/orders?userId=${sessionData.user.id}`);
+        const ordersData = await ordersRes.json();
+        setOrders(ordersData || []);
       }
-      
-      setOrders(ordersData || []);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {

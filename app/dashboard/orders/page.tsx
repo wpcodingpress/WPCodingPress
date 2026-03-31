@@ -25,6 +25,7 @@ interface Order {
   packageType: string;
   createdAt: string;
   updatedAt: string;
+  orderType?: string;
   product?: { name: string; slug: string; downloadUrl: string | null };
   service?: { name: string };
 }
@@ -171,15 +172,24 @@ export default function OrdersPage() {
             >
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-lg bg-primary/10">
-                    <Package className="h-5 w-5 text-primary" />
+                  <div className={`p-3 rounded-lg ${order.product ? 'bg-blue-100' : 'bg-purple-100'}`}>
+                    {order.product ? (
+                      <Package className="h-5 w-5 text-blue-600" />
+                    ) : (
+                      <ShoppingBag className="h-5 w-5 text-purple-600" />
+                    )}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-slate-900">
-                      {order.product?.name || order.service?.name || "Order"}
-                    </h3>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-semibold text-slate-900">
+                        {order.product?.name || order.service?.name || "Order"}
+                      </h3>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${order.product ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                        {order.product ? 'Product' : 'Service'}
+                      </span>
+                    </div>
                     <p className="text-sm text-slate-500">
-                      Order #{order.id.slice(-8).toUpperCase()} • {order.packageType}
+                      Order #{order.id.slice(-8).toUpperCase()} • {order.packageType || 'Standard'}
                     </p>
                     <div className="flex items-center gap-4 mt-2 text-xs text-slate-400">
                       <span className="flex items-center gap-1">
@@ -241,12 +251,18 @@ export default function OrdersPage() {
                 <span className="text-slate-900 font-medium">#{selectedOrder.id.slice(-8).toUpperCase()}</span>
               </div>
               <div className="flex justify-between py-3 border-b border-slate-100">
+                <span className="text-slate-500">Type</span>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${selectedOrder.product ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                  {selectedOrder.product ? 'Product' : 'Service'}
+                </span>
+              </div>
+              <div className="flex justify-between py-3 border-b border-slate-100">
                 <span className="text-slate-500">Product/Service</span>
-                <span className="text-slate-900">{selectedOrder.product?.name || selectedOrder.service?.name}</span>
+                <span className="text-slate-900">{selectedOrder.product?.name || selectedOrder.service?.name || '-'}</span>
               </div>
               <div className="flex justify-between py-3 border-b border-slate-100">
                 <span className="text-slate-500">Package</span>
-                <span className="text-slate-900 capitalize">{selectedOrder.packageType}</span>
+                <span className="text-slate-900 capitalize">{selectedOrder.packageType || 'Standard'}</span>
               </div>
               <div className="flex justify-between py-3 border-b border-slate-100">
                 <span className="text-slate-500">Amount</span>

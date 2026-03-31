@@ -1,9 +1,9 @@
 "use client"
 
-import { Suspense, useState } from "react"
+import { Suspense, useState, useEffect } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { CheckCircle2, ArrowRight, ArrowLeft, Loader2 } from "lucide-react"
+import { CheckCircle2, ArrowRight, ArrowLeft, Loader2, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -30,6 +30,8 @@ function OrderForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [formData, setFormData] = useState({
     service: searchParams.get("service") || "",
     packageType: searchParams.get("package") || "",
@@ -38,6 +40,28 @@ function OrderForm() {
     clientPhone: "",
     message: ""
   })
+
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const res = await fetch("/api/auth/session")
+        const data = await res.json()
+        if (data?.user?.id) {
+          setUserId(data.user.id)
+          setIsLoggedIn(true)
+          if (data.user.name && !formData.clientName) {
+            setFormData(prev => ({ ...prev, clientName: data.user.name }))
+          }
+          if (data.user.email && !formData.clientEmail) {
+            setFormData(prev => ({ ...prev, clientEmail: data.user.email }))
+          }
+        }
+      } catch (err) {
+        console.error("Error checking session:", err)
+      }
+    }
+    checkSession()
+  }, [])
 
   const handleSelectChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -53,10 +77,15 @@ function OrderForm() {
     setError(null)
     
     try {
+      const payload = {
+        ...formData,
+        userId: userId
+      }
+      
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       })
       
       const data = await response.json()
@@ -146,6 +175,13 @@ function OrderForm() {
             <Card>
               <CardContent className="p-8">
                 {renderStepIndicator()}
+                
+                {isLoggedIn && (
+                  <div className="flex items-center gap-2 text-sm text-green-400 bg-green-500/10 border border-green-500/20 rounded-lg px-4 py-2 mb-6">
+                    <User className="h-4 w-4" />
+                    Logged in as {formData.clientEmail}
+                  </div>
+                )}
 
                 <form onSubmit={handleSubmit}>
                   {step === 1 && (

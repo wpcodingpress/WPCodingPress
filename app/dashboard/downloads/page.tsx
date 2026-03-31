@@ -32,9 +32,17 @@ export default function DownloadsPage() {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch("/api/orders");
+      const sessionRes = await fetch("/api/auth/session");
+      const sessionData = await sessionRes.json();
+      
+      if (!sessionData?.user?.id) {
+        setIsLoading(false);
+        return;
+      }
+      
+      const response = await fetch(`/api/orders?userId=${sessionData.user.id}`);
       const data = await response.json();
-      setOrders(data);
+      setOrders(data || []);
     } catch (error) {
       console.error("Error fetching orders:", error);
     } finally {
