@@ -14,7 +14,9 @@ import {
   Download,
   Filter,
   RefreshCw,
-  CheckCircle
+  CheckCircle,
+  Building2,
+  Copy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,11 +27,25 @@ interface Order {
   paymentStatus: string;
   amount: number;
   packageType: string;
+  planType: string | null;
   createdAt: string;
   updatedAt: string;
   orderType?: string;
   product?: { name: string; slug: string; downloadUrl: string | null };
   service?: { name: string };
+}
+
+interface BankDetails {
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+  sortCode: string;
+  iban: string;
+  swift: string;
+  bankAddress: string;
+  country: string;
+  currency: string;
+  instructions: string;
 }
 
 export default function OrdersPage() {
@@ -40,16 +56,28 @@ export default function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [bankDetails, setBankDetails] = useState<BankDetails | null>(null);
 
   useEffect(() => {
-    // Check for payment success
     if (searchParams.get("payment") === "success") {
       setPaymentSuccess(true);
-      // Clean URL
       window.history.replaceState({}, "", "/dashboard/orders");
     }
     fetchOrders();
+    fetchBankDetails();
   }, [searchParams]);
+
+  const fetchBankDetails = async () => {
+    try {
+      const res = await fetch("/api/bank-details");
+      if (res.ok) {
+        const data = await res.json();
+        setBankDetails(data);
+      }
+    } catch (error) {
+      console.error("Error fetching bank details:", error);
+    }
+  };
 
   const fetchOrders = async () => {
     setIsLoading(true);
@@ -308,20 +336,82 @@ export default function OrdersPage() {
                   {selectedOrder.paymentStatus}
                 </span>
               </div>
-              <div className="flex justify-between py-3">
+              <div className="flex justify-between py-3 border-b border-slate-100">
                 <span className="text-slate-500">Date</span>
                 <span className="text-slate-900">{new Date(selectedOrder.createdAt).toLocaleDateString()}</span>
               </div>
+
+              {/* Bank Transfer Details for Pro Products */}
+              {selectedOrder.product && selectedOrder.planType === 'pro' && selectedOrder.status === 'in_progress' && bankDetails && (
+                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Building2 className="h-5 w-5 text-yellow-600" />
+                    <h4 className="font-semibold text-yellow-800">Bank Transfer Details</h4>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-yellow-700">Bank Name:</span>
+                      <span className="text-yellow-900 font-medium">{bankDetails.bankName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-yellow-700">Account Name:</span>
+                      <span className="text-yellow-900 font-medium">{bankDetails.accountName}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-yellow-700">Account Number:</span>
+                      <span className="text-yellow-900 font-mono font-medium">{bankDetails.accountNumber}</span>
+                    </div>
+                    {bankDetails.sortCode && (
+                      <div className="flex justify-between">
+                        <span className="text-yellow-700">Sort Code:</span>
+                        <span className="text-yellow-900 font-mono font-medium">{bankDetails.sortCode}</span>
+                      </div>
+                    )}
+                    {bankDetails.iban && (
+                      <div className="flex justify-between">
+                        <span className="text-yellow-700">IBAN:</span>
+                        <span className="text-yellow-900 font-mono font-medium">{bankDetails.iban}</span>
+                      </div>
+                    )}
+                    {bankDetails.country && (
+                      <div className="flex justify-between">
+                        <span className="text-yellow-700">Country:</span>
+                        <span className="text-yellow-900 font-medium">{bankDetails.country}</span>
+                      </div>
+                    )}
+                    {bankDetails.instructions && (
+                      <div className="mt-3 pt-3 border-t border-yellow-200">
+                        <p className="text-yellow-700 text-xs">{bankDetails.instructions}</p>
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-3 text-xs text-yellow-600 bg-yellow-100 p-2 rounded">
+                    Please transfer ${selectedOrder.amount} to the account above. Once confirmed, you'll receive your download.
+                  </div>
+                </div>
+              )}
+
+              {/* Payment Instructions for Pro orders not completed */}
+              {selectedOrder.product && selectedOrder.planType === 'pro' && selectedOrder.status !== 'completed' && !bankDetails && (
+                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-yellow-800 text-sm">Please contact support for payment details.</p>
+                </div>
+              )}
             </div>
 
             <div className="mt-6 flex gap-3">
-              {selectedOrder.product?.downloadUrl && selectedOrder.paymentStatus === "paid" && (
-                <a href={selectedOrder.product.downloadUrl} target="_blank" rel="noopener noreferrer">
+              {selectedOrder.product && selectedOrder.status === 'completed' && (
+                <a href={selectedOrder.product.downloadUrl || '#'} target="_blank" rel="noopener noreferrer">
                   <Button className="w-full">
                     <Download className="mr-2 h-4 w-4" />
                     Download
                   </Button>
                 </a>
+              )}
+              {selectedOrder.product && selectedOrder.planType === 'pro' && selectedOrder.status === 'in_progress' && (
+                <div className="w-full text-center p-3 bg-yellow-50 text-yellow-700 rounded-lg text-sm">
+                  Waiting for payment confirmation
+                </div>
               )}
               <Button variant="outline" onClick={() => setSelectedOrder(null)} className="flex-1">
                 Close

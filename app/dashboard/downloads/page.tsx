@@ -78,10 +78,15 @@ export default function DownloadsPage() {
 
   const downloadableOrders = orders.filter(
     (order: Order) => {
-      const hasDownloadUrl = order.planType === 'free' 
-        ? order.product?.freeDownloadUrl 
-        : (order.planType === 'pro' && order.paymentStatus === 'paid' ? order.product?.proDownloadUrl : false);
-      return hasDownloadUrl;
+      // Free products: always downloadable (status must be completed)
+      if (order.planType === 'free' && order.status === 'completed') {
+        return !!order.product?.freeDownloadUrl;
+      }
+      // Pro products: only downloadable when status is completed
+      if (order.planType === 'pro' && order.status === 'completed') {
+        return !!order.product?.proDownloadUrl;
+      }
+      return false;
     }
   );
 

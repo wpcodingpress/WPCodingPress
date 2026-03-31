@@ -132,10 +132,10 @@ export async function POST(request: NextRequest) {
     }
 
     const order = await prisma.$transaction(async (tx) => {
-      // For Pro products without Stripe, auto-complete payment (test mode)
+      // For Pro products - start as in_progress (waiting for bank transfer confirmation)
       const isProProduct = productId && !isFreeProduct
-      const paymentStatus = isProProduct ? "paid" : (isServiceOrder ? "pending" : (isFreeProduct ? "paid" : (orderAmount > 0 ? "unpaid" : "paid")))
-      const orderStatus = isProProduct ? "completed" : defaultStatus
+      const paymentStatus = isProProduct ? "unpaid" : (isServiceOrder ? "pending" : (isFreeProduct ? "paid" : (orderAmount > 0 ? "unpaid" : "paid")))
+      const orderStatus = isProProduct ? "in_progress" : defaultStatus
       
       console.log("DEBUG: Creating order with status:", orderStatus, "isService:", isService, "isProProduct:", isProProduct)
       const order = await tx.order.create({

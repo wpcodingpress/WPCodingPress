@@ -12,7 +12,8 @@ import {
   Image,
   LogOut,
   Zap,
-  Users
+  Users,
+  Building2
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -24,6 +25,7 @@ const navItems = [
   { href: "/admin/products", icon: Image, label: "Products" },
   { href: "/admin/users", icon: Users, label: "Users" },
   { href: "/admin/portfolio", icon: Image, label: "Portfolio" },
+  { href: "/admin/bank", icon: Building2, label: "Bank Settings" },
 ]
 
 export default function AdminLayout({
