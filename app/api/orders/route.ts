@@ -49,10 +49,13 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    console.log("DEBUG: Full request body:", JSON.stringify(body))
     const { 
       service, product, packageType, clientName, clientEmail, 
       clientPhone, message, userId, amount 
     } = body
+
+    console.log("DEBUG: service=", service, "product=", product, "amount=", amount)
 
     if (!clientName || !clientEmail) {
       return NextResponse.json({ error: "Name and email are required" }, { status: 400 })
@@ -101,14 +104,17 @@ export async function POST(request: NextRequest) {
 
     console.log("DEBUG: isFreeProduct=", isFreeProduct, "isService=", isService, "productId=", productId, "serviceId=", serviceId)
 
+    // Determine default status based on order type
     let defaultStatus = "pending"
+    console.log("DEBUG: Starting status logic - isFreeProduct:", isFreeProduct, "isService:", isService)
     if (isFreeProduct) {
       defaultStatus = "completed"
+      console.log("DEBUG: Set to 'completed' because isFreeProduct is true")
     } else if (isService) {
       defaultStatus = "approved"
+      console.log("DEBUG: Set to 'approved' because isService is true")
     }
-
-    console.log("DEBUG: defaultStatus set to:", defaultStatus)
+    console.log("DEBUG: defaultStatus final:", defaultStatus)
 
     if (productId && userId && isFreeProduct) {
       const existingOrder = await prisma.order.findFirst({
@@ -163,6 +169,8 @@ export async function POST(request: NextRequest) {
 
       return await tx.order.findUnique({ where: { id: order.id } })
     })
+
+    console.log("DEBUG: Final order from DB:", order)
 
     if (!order) {
       return NextResponse.json({ error: "Failed to create order" }, { status: 500 })
