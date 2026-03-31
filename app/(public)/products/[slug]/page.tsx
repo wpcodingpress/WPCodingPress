@@ -117,29 +117,31 @@ export default function ProductDetailPage() {
         return;
       }
 
-      // For Pro products, initiate Stripe checkout
-      console.log("Initiating Stripe checkout for pro product");
+      // For Pro products - create order directly (Stripe disabled for now)
+      console.log("Creating pro product order (demo mode)");
 
-      const response = await fetch("/api/stripe/checkout", {
+      const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          productSlug: product.slug,
+          product: product.slug,
+          packageType: "pro",
+          clientName: user.name || "User",
+          clientEmail: user.email,
+          clientPhone: user.phone || "",
           userId: user.id,
-          userEmail: user.email,
-          userName: user.name
+          amount: product.price
         })
       });
 
       const data = await response.json();
-      console.log("Checkout response:", response.status, data);
+      console.log("Order response:", response.status, data);
 
-      if (response.ok && data.url) {
-        // Redirect to Stripe checkout
-        window.location.href = data.url;
+      if (response.status === 201) {
+        router.push("/dashboard/orders?payment=success");
       } else {
-        console.error("Checkout failed:", data);
-        alert(data.error || "Failed to initiate checkout. Please try again.");
+        console.error("Order failed:", data);
+        alert(data.error || "Failed to create order. Please try again.");
       }
     } catch (error) {
       console.error("Error:", error);
