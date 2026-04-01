@@ -1,84 +1,119 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { getStripeInstance } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 
-const PRICE_IDS: Record<string, string> = {
-  pro: process.env.STRIPE_PRO_PRICE_ID || 'price_pro',
-  enterprise: process.env.STRIPE_ENTERPRISE_PRICE_ID || 'price_enterprise',
+const LEMON_VARIANT_IDS: Record<string, string> = {
+  pro: process.env.LEMON_PRO_VARIANT_ID || 'pro_variant_id',
+  enterprise: process.env.LEMON_ENTERPRISE_VARIANT_ID || 'enterprise_variant_id',
 };
+
+interface LemonCheckoutResponse {
+  data: {
+    attributes: {
+      url: string;
+    };
+  };
+}
+
+async function createLemonCheckout(
+  variantId: string,
+  userEmail: string,
+  userName: string,
+  userId: string,
+  plan: string
+): Promise<string> {
+  const storeId = process.env.LEMON_SQUEEZY_STORE_ID;
+  const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
+  
+  if (!storeId || !apiKey) {
+    throw new Error('Lemon Squeezy not configured');
+  }
+
+  const response = await fetch(`https://api.lemonsqueezy.com/v1/checkouts`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/vnd.api+json',
+      'Accept': 'application/vnd.api+json',
+    },
+    body: JSON.stringify({
+      data: {
+        type: 'checkouts',
+        attributes: {
+          checkout_data: {
+            email: userEmail,
+            name: userName,
+            custom: {
+              userId,
+              plan,
+            },
+          },
+        },
+        relationships: {
+          store: {
+            data: {
+              type: 'stores',
+              id: storeId,
+            },
+          },
+          variant: {
+            data: {
+              type: 'variants',
+              id: variantId,
+            },
+          },
+        },
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Lemon Squeezy checkout failed: ${error}`);
+  }
+
+  const data = (await response.json()) as LemonCheckoutResponse;
+  return data.data.attributes.url;
+}
 
 export async function POST(request: Request) {
   try {
-    const stripe = getStripeInstance();
-    if (!stripe) {
-      return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
-    }
-
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
     const body = await request.json();
     const { plan } = body;
 
-    if (!plan || !PRICE_IDS[plan]) {
+    if (!plan || !LEMON_VARIANT_IDS[plan]) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
     }
 
-    const priceId = PRICE_IDS[plan];
+    const variantId = LEMON_VARIANT_IDS[plan];
+    const checkoutUrl = await createLemonCheckout(
+      variantId,
+      user.email,
+      user.name || user.email.split('@')[0],
+      user.id,
+      plan
+    );
 
-    // Get or create Stripe customer
-    let user = await prisma.user.findUnique({
-      where: { id: session.user.id }
-    });
-
-    let stripeCustomerId = user?.stripeCustomerId;
-
-    if (!stripeCustomerId) {
-      const customer = await stripe.customers.create({
-        email: user?.email || session.user.email || '',
-        name: user?.name || session.user.name || '',
-        metadata: {
-          userId: session.user.id,
-        },
-      });
-      
-      stripeCustomerId = customer.id;
-      
-      await prisma.user.update({
-        where: { id: session.user.id },
-        data: { stripeCustomerId },
-      });
-    }
-
-    // Create checkout session
-    const checkoutSession = await stripe.checkout.sessions.create({
-      customer: stripeCustomerId,
-      mode: 'subscription',
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription?success=true&plan=${plan}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription?cancelled=true`,
-      metadata: {
-        userId: session.user.id,
-        plan,
-      },
-    });
-
-    return NextResponse.json({ url: checkoutSession.url });
+    return NextResponse.json({ url: checkoutUrl });
   } catch (error) {
     console.error('Subscription error:', error);
     return NextResponse.json(
-      { error: 'Failed to create subscription' },
+      { error: 'Failed to create subscription checkout' },
       { status: 500 }
     );
   }

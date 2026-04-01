@@ -34,6 +34,8 @@ model User {
   updatedAt       DateTime @updatedAt
   orders          Order[]
   subscriptions   Subscription[]
+  sites           Site[]
+  jobs            Job[]
 }
 
 model Product {
@@ -63,6 +65,8 @@ model Subscription {
   user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   stripeSubId          String?
   stripePriceId        String?
+  lemonCustomerId      String?
+  lemonSubscriptionId  String?
   status               String   @default("active")
   plan                 String   @default("free")
   currentPeriodStart   DateTime @default(now())
@@ -70,6 +74,36 @@ model Subscription {
   cancelAtPeriodEnd    Boolean  @default(false)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
+}
+
+model Site {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  domain      String
+  apiKey      String   @unique
+  wpSiteUrl   String
+  status      String   @default("disconnected")
+  lastSyncAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  jobs        Job[]
+}
+
+model Job {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  status      String   @default("pending")
+  outputUrl   String?
+  logs        String   @db.LongText
+  error       String?
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Service {
