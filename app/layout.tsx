@@ -24,7 +24,9 @@ export const metadata: Metadata = {
     description: "Professional WordPress development, Elementor design, and modern web applications.",
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
   },
 }
 
