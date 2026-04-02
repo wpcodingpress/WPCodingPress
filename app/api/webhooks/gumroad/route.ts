@@ -57,7 +57,7 @@ export async function POST(request: Request) {
         data: {
           email: payload.email,
           name: payload.email.split('@')[0],
-          password: null,
+          password: '',
         },
       });
     }
