@@ -115,6 +115,12 @@ export default function SubscriptionPage() {
 
       if (data.url) {
         window.location.href = data.url;
+      } else if (data.subscription || data.message) {
+        if (data.subscription) {
+          setCurrentPlan(data.subscription.plan);
+          setVerifySuccess(true);
+        }
+        alert(data.message || 'Subscription activated!');
       } else {
         alert('Failed to create subscription. Please try again.');
       }
