@@ -82,6 +82,7 @@ model Site {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   domain      String
   apiKey      String   @unique
+  wpApiKey    String?
   wpSiteUrl   String
   status      String   @default("disconnected")
   lastSyncAt  DateTime?

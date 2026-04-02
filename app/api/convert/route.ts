@@ -53,6 +53,32 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validate WordPress API key before starting conversion
+    const wpApiKey = site.wpApiKey;
+    if (!wpApiKey) {
+      return NextResponse.json(
+        { error: 'WordPress API key not found. Please reconnect your site.' },
+        { status: 400 }
+      );
+    }
+
+    // Verify the WordPress API key is still valid
+    try {
+      const cleanWpUrl = site.wpSiteUrl.replace(/\/$/, '');
+      const verifyResponse = await fetch(`${cleanWpUrl}/wp-json/headless/v1/verify?api_key=${wpApiKey}`);
+      if (!verifyResponse.ok) {
+        return NextResponse.json(
+          { error: 'WordPress API key is invalid or expired. Please reconnect your site.' },
+          { status: 400 }
+        );
+      }
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Cannot connect to WordPress site. Please check if the site is accessible and the plugin is active.' },
+        { status: 400 }
+      );
+    }
+
     const job = await prisma.job.create({
       data: {
         userId,
@@ -62,7 +88,7 @@ export async function POST(request: Request) {
       },
     });
 
-    processConversionJob(job.id, site.id, site.wpSiteUrl, site.apiKey, site.domain);
+    processConversionJob(job.id, site.id, site.wpSiteUrl, wpApiKey, site.domain);
 
     return NextResponse.json({
       job: {

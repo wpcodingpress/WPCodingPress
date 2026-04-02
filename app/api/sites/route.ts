@@ -75,6 +75,7 @@ export async function POST(request: Request) {
         domain,
         wpSiteUrl: cleanWpUrl,
         apiKey: saasApiKey,
+        wpApiKey: wpApiKey,
         status: 'connected',
         lastSyncAt: new Date(),
       },
@@ -86,6 +87,7 @@ export async function POST(request: Request) {
         domain: site.domain,
         wpSiteUrl: site.wpSiteUrl,
         apiKey: site.apiKey,
+        wpApiKey: site.wpApiKey,
         status: site.status,
       },
     });
