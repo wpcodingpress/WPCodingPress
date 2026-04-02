@@ -72,11 +72,11 @@ export default function DashboardLayout({
 
   const navItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
-    { href: "/dashboard/sites", icon: Activity, label: "My Sites" },
+    { href: "/dashboard/sites", icon: Globe, label: "My Sites" },
     { href: "/dashboard/orders", icon: ShoppingBag, label: "My Orders" },
     { href: "/dashboard/downloads", icon: Download, label: "Downloads" },
     { href: "/dashboard/subscription", icon: CreditCard, label: "Subscription" },
-    { href: "/services", icon: Activity, label: "Services", external: true },
+    { href: "/services", icon: LayoutDashboard, label: "Services", external: true },
     { href: "/dashboard/settings", icon: Settings, label: "Settings" },
   ];
 
