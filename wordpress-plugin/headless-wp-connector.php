@@ -1,13 +1,12 @@
 <?php
 /**
- * Plugin Name: Headless WP Connector
+ * Plugin Name: Headless WP Connector (Enhanced)
  * Plugin URI: https://wpcodingpress.com
- * Description: Connect your WordPress site to WPCodingPress SaaS for headless conversion
- * Version: 1.0.0
+ * Description: Connect your WordPress site to WPCodingPress SaaS - Export data compatible with Next.js headless template
+ * Version: 2.0.0
  * Author: WPCodingPress
  * Author URI: https://wpcodingpress.com
  * License: GPL v2 or later
- * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: headless-wp-connector
  */
 
@@ -15,9 +14,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('HWPC_VERSION', '1.0.0');
-define('HWPC_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('HWPC_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('HWPC_VERSION', '2.0.0');
 
 class Headless_WP_Connector {
     
@@ -31,9 +28,63 @@ class Headless_WP_Connector {
     }
     
     public function register_routes() {
+        register_rest_route('eyepress/v1', '/posts', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_posts'],
+            'permission_callback' => [$this, 'check_api_key'],
+        ]);
+        
+        register_rest_route('eyepress/v1', '/post/(?P<slug>[^/]+)', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_post'],
+            'permission_callback' => [$this, 'check_api_key'],
+        ]);
+        
+        register_rest_route('eyepress/v1', '/categories', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_categories'],
+            'permission_callback' => [$this, 'check_api_key'],
+        ]);
+        
+        register_rest_route('eyepress/v1', '/category/(?P<slug>[^/]+)', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_category_posts'],
+            'permission_callback' => [$this, 'check_api_key'],
+        ]);
+        
+        register_rest_route('eyepress/v1', '/menus', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_menus'],
+            'permission_callback' => [$this, 'check_api_key'],
+        ]);
+        
+        register_rest_route('eyepress/v1', '/site-options', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_site_options'],
+            'permission_callback' => [$this, 'check_api_key'],
+        ]);
+        
+        register_rest_route('eyepress/v1', '/search', [
+            'methods' => 'GET',
+            'callback' => [$this, 'search_posts'],
+            'permission_callback' => [$this, 'check_api_key'],
+        ]);
+        
+        register_rest_route('eyepress/v1', '/stats', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_stats'],
+            'permission_callback' => [$this, 'check_api_key'],
+        ]);
+        
+        register_rest_route('eyepress/v1', '/ticker', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_ticker'],
+            'permission_callback' => [$this, 'check_api_key'],
+        ]);
+        
         register_rest_route('headless/v1', '/export', [
             'methods' => 'GET',
-            'callback' => [$this, 'export_data'],
+            'callback' => [$this, 'export_all_data'],
             'permission_callback' => [$this, 'check_api_key'],
         ]);
         
@@ -48,6 +99,10 @@ class Headless_WP_Connector {
         $provided_key = $request->get_header('X-API-Key');
         
         if (!$provided_key) {
+            $provided_key = $request->get_param('api_key');
+        }
+        
+        if (!$provided_key) {
             return new WP_Error('no_api_key', 'API key is required', ['status' => 401]);
         }
         
@@ -60,7 +115,188 @@ class Headless_WP_Connector {
         return true;
     }
     
-    public function export_data(WP_REST_Request $request) {
+    public function get_posts(WP_REST_Request $request) {
+        $locale = $request->get_param('locale') ?: 'bn';
+        $page = intval($request->get_param('page')) ?: 1;
+        $per_page = intval($request->get_param('per_page')) ?: 20;
+        $category = $request->get_param('category');
+        
+        $args = [
+            'post_status' => 'publish',
+            'posts_per_page' => $per_page,
+            'paged' => $page,
+            'orderby' => 'date',
+            'order' => 'DESC',
+        ];
+        
+        if ($category) {
+            $args['category_name'] = $category;
+        }
+        
+        $posts = get_posts($args);
+        
+        $formatted_posts = array_map([$this, 'format_post'], $posts);
+        
+        return rest_ensure_response($formatted_posts);
+    }
+    
+    public function get_post(WP_REST_Request $request) {
+        $slug = $request->get_param('slug');
+        
+        $posts = get_posts([
+            'name' => $slug,
+            'post_status' => 'publish',
+            'posts_per_page' => 1,
+        ]);
+        
+        if (empty($posts)) {
+            return new WP_Error('not_found', 'Post not found', ['status' => 404]);
+        }
+        
+        $post = $this->format_post($posts[0]);
+        
+        return rest_ensure_response($post);
+    }
+    
+    public function get_categories(WP_REST_Request $request) {
+        $categories = get_categories([
+            'hide_empty' => false,
+            'orderby' => 'count',
+            'order' => 'DESC',
+        ]);
+        
+        $formatted = array_map(function($cat) {
+            return [
+                'id' => $cat->term_id,
+                'name' => $cat->name,
+                'slug' => $cat->slug,
+                'description' => $cat->description,
+                'count' => $cat->count,
+            ];
+        }, $categories);
+        
+        return rest_ensure_response($formatted);
+    }
+    
+    public function get_category_posts(WP_REST_Request $request) {
+        $slug = $request->get_param('slug');
+        $page = intval($request->get_param('page')) ?: 1;
+        $per_page = intval($request->get_param('per_page')) ?: 30;
+        
+        $category = get_category_by_slug($slug);
+        
+        if (!$category) {
+            return new WP_Error('not_found', 'Category not found', ['status' => 404]);
+        }
+        
+        $posts = get_posts([
+            'category' => $category->term_id,
+            'post_status' => 'publish',
+            'posts_per_page' => $per_page,
+            'paged' => $page,
+            'orderby' => 'date',
+            'order' => 'DESC',
+        ]);
+        
+        return rest_ensure_response([
+            'category' => [
+                'id' => $category->term_id,
+                'name' => $category->name,
+                'slug' => $category->slug,
+                'description' => $category->description,
+            ],
+            'posts' => array_map([$this, 'format_post'], $posts),
+        ]);
+    }
+    
+    public function get_menus(WP_REST_Request $request) {
+        $locations = get_nav_menu_locations();
+        $menus = [];
+        
+        foreach ($locations as $location => $menu_id) {
+            if ($menu_id) {
+                $menu = wp_get_nav_menu_object($menu_id);
+                $items = wp_get_nav_menu_items($menu_id);
+                
+                $formatted_items = array_map(function($item) {
+                    return [
+                        'id' => $item->ID,
+                        'title' => $item->title,
+                        'url' => $item->url,
+                        'target' => $item->target,
+                        'children' => [],
+                    ];
+                }, $items);
+                
+                $menus[$location] = [
+                    'name' => $menu->name,
+                    'items' => $formatted_items,
+                ];
+            }
+        }
+        
+        return rest_ensure_response($menus);
+    }
+    
+    public function get_site_options(WP_REST_Request $request) {
+        return rest_ensure_response([
+            'name' => get_bloginfo('name'),
+            'description' => get_bloginfo('description'),
+            'url' => get_site_url(),
+            'language' => get_bloginfo('language'),
+            'charset' => get_bloginfo('charset'),
+        ]);
+    }
+    
+    public function search_posts(WP_REST_Request $request) {
+        $query = $request->get_param('q');
+        $page = intval($request->get_param('page')) ?: 1;
+        
+        $posts = get_posts([
+            's' => $query,
+            'post_status' => 'publish',
+            'posts_per_page' => 20,
+            'paged' => $page,
+        ]);
+        
+        return rest_ensure_response([
+            'results' => array_map([$this, 'format_post'], $posts),
+            'found' => count($posts),
+        ]);
+    }
+    
+    public function get_stats(WP_REST_Request $request) {
+        $total_posts = wp_count_posts()->publish;
+        $total_pages = wp_count_posts('page')->publish;
+        $total_categories = wp_count_terms('category');
+        
+        return rest_ensure_response([
+            'total_posts' => $total_posts,
+            'total_pages' => $total_pages,
+            'total_categories' => $total_categories,
+        ]);
+    }
+    
+    public function get_ticker(WP_REST_Request $request) {
+        $count = intval($request->get_param('count')) ?: 10;
+        
+        $posts = get_posts([
+            'post_status' => 'publish',
+            'posts_per_page' => $count,
+            'orderby' => 'date',
+            'order' => 'DESC',
+        ]);
+        
+        return rest_ensure_response(array_map(function($post) {
+            return [
+                'title' => html_entity_decode($post->post_title),
+                'slug' => $post->post_name,
+                'date' => $post->post_date,
+            ];
+        }, $posts));
+    }
+    
+    public function export_all_data(WP_REST_Request $request) {
         $posts = get_posts([
             'numberposts' => -1,
             'post_status' => 'publish',
@@ -86,7 +322,23 @@ class Headless_WP_Connector {
                 'name' => get_bloginfo('name'),
                 'description' => get_bloginfo('description'),
                 'url' => get_site_url(),
+                'language' => get_bloginfo('language'),
+                'charset' => get_bloginfo('charset'),
                 'exported_at' => current_time('mysql'),
+            ],
+            'api_config' => [
+                'base_url' => get_site_url() . '/wp-json/eyepress/v1',
+                'endpoints' => [
+                    'posts' => '/posts?locale=bn&per_page=20',
+                    'single_post' => '/post/{slug}',
+                    'categories' => '/categories',
+                    'category_posts' => '/category/{slug}',
+                    'menus' => '/menus',
+                    'site_options' => '/site-options',
+                    'search' => '/search?q={query}',
+                    'stats' => '/stats',
+                    'ticker' => '/ticker?count=10',
+                ],
             ],
         ];
         
@@ -94,21 +346,44 @@ class Headless_WP_Connector {
     }
     
     private function format_post($post) {
+        $categories = get_the_category($post->ID);
+        $category_names = array_map(function($cat) {
+            return $cat->name;
+        }, $categories);
+        
         return [
             'id' => $post->ID,
             'title' => html_entity_decode($post->post_title),
+            'slug' => $post->post_name,
             'content' => $post->post_content,
             'excerpt' => $post->post_excerpt,
-            'slug' => $post->post_name,
             'date' => $post->post_date,
             'modified' => $post->post_modified,
             'status' => $post->post_status,
-            'author' => get_the_author_meta('display_name', $post->post_author),
-            'categories' => wp_get_post_categories($post->ID, ['fields' => 'names']),
-            'tags' => wp_get_post_tags($post->ID, ['fields' => 'names']),
-            'featured_image' => get_the_post_thumbnail_url($post->ID, 'full'),
-            'seo_title' => get_post_meta($post->ID, '_yoast_wpseo_title', true) ?: get_post_meta($post->ID, 'Rank_Math_title', true),
-            'seo_description' => get_post_meta($post->ID, '_yoast_wpseo_metadesc', true) ?: get_post_meta($post->ID, 'Rank_Math_description', true),
+            'featuredImage' => [
+                'node' => [
+                    'sourceUrl' => get_the_post_thumbnail_url($post->ID, 'full') ?: '',
+                    'altText' => get_post_meta($post->ID, '_wp_attachment_image_alt', true) ?: '',
+                ],
+            ],
+            'categories' => [
+                'nodes' => array_map(function($cat) {
+                    return [
+                        'name' => $cat->name,
+                        'slug' => $cat->slug,
+                    ];
+                }, $categories),
+            ],
+            'author' => [
+                'node' => [
+                    'name' => get_the_author_meta('display_name', $post->post_author),
+                    'slug' => get_the_author_meta('user_nicename', $post->post_author),
+                ],
+            ],
+            'seo' => [
+                'title' => get_post_meta($post->ID, '_yoast_wpseo_title', true) ?: '',
+                'description' => get_post_meta($post->ID, '_yoast_wpseo_metadesc', true) ?: '',
+            ],
         ];
     }
     
@@ -116,11 +391,13 @@ class Headless_WP_Connector {
         return [
             'id' => $page->ID,
             'title' => html_entity_decode($page->post_title),
-            'content' => $page->post_content,
             'slug' => $page->post_name,
+            'content' => $page->post_content,
             'template' => get_page_template_slug($page->ID),
-            'seo_title' => get_post_meta($page->ID, '_yoast_wpseo_title', true) ?: get_post_meta($page->ID, 'Rank_Math_title', true),
-            'seo_description' => get_post_meta($page->ID, '_yoast_wpseo_metadesc', true) ?: get_post_meta($page->ID, 'Rank_Math_description', true),
+            'seo' => [
+                'title' => get_post_meta($page->ID, '_yoast_wpseo_title', true) ?: '',
+                'description' => get_post_meta($page->ID, '_yoast_wpseo_metadesc', true) ?: '',
+            ],
         ];
     }
     
@@ -161,6 +438,11 @@ class Headless_WP_Connector {
             'success' => true,
             'site' => get_site_url(),
             'plugin_version' => HWPC_VERSION,
+            'api_endpoints' => [
+                'posts' => get_site_url() . '/wp-json/eyepress/v1/posts',
+                'categories' => get_site_url() . '/wp-json/eyepress/v1/categories',
+                'export' => get_site_url() . '/wp-json/headless/v1/export',
+            ],
         ]);
     }
     
@@ -188,10 +470,17 @@ class Headless_WP_Connector {
             echo '<div class="notice notice-success"><p>New API key generated!</p></div>';
         }
         
+        if (isset($_POST['hwpc_save_api_url'])) {
+            check_admin_referer('hwpc_save_api_url');
+            update_option('hwpc_api_url', sanitize_text_field($_POST['api_url']));
+            echo '<div class="notice notice-success"><p>API URL saved!</p></div>';
+        }
+        
         $current_key = get_option($this->api_key_option);
+        $api_url = get_option('hwpc_api_url', get_site_url());
         ?>
         <div class="wrap">
-            <h1>Headless WP Connector</h1>
+            <h1>Headless WP Connector v<?php echo HWPC_VERSION; ?></h1>
             <form method="post">
                 <?php wp_nonce_field('hwpc_generate_key'); ?>
                 <table class="form-table">
@@ -214,10 +503,25 @@ class Headless_WP_Connector {
             
             <hr>
             
+            <h2>API Endpoints Available</h2>
+            <p>Your WordPress site provides these REST API endpoints:</p>
+            <ul>
+                <li><code><?php echo get_site_url(); ?>/wp-json/eyepress/v1/posts</code> - Get all posts</li>
+                <li><code><?php echo get_site_url(); ?>/wp-json/eyepress/v1/post/{slug}</code> - Get single post</li>
+                <li><code><?php echo get_site_url(); ?>/wp-json/eyepress/v1/categories</code> - Get categories</li>
+                <li><code><?php echo get_site_url(); ?>/wp-json/eyepress/v1/category/{slug}</code> - Get posts by category</li>
+                <li><code><?php echo get_site_url(); ?>/wp-json/eyepress/v1/menus</code> - Get menus</li>
+                <li><code><?php echo get_site_url(); ?>/wp-json/eyepress/v1/site-options</code> - Get site options</li>
+                <li><code><?php echo get_site_url(); ?>/wp-json/eyepress/v1/search</code> - Search posts</li>
+                <li><code><?php echo get_site_url(); ?>/wp-json/headless/v1/export</code> - Export all data (for conversion)</li>
+            </ul>
+            
+            <hr>
+            
             <h2>How to Connect</h2>
             <ol>
                 <li>Copy the API key above</li>
-                <li>Go to <a href="https://wpcodingpress.com/dashboard/sites" target="_blank">WPCodingPress Dashboard</a></li>
+                <li>Go to <a href="https://wpcodingpress.onrender.com/dashboard/sites" target="_blank">WPCodingPress Dashboard</a></li>
                 <li>Add a new site and paste the API key</li>
                 <li>Your site will be connected automatically</li>
             </ol>

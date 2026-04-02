@@ -4,6 +4,9 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 import { requireActiveSubscription } from '@/lib/subscription';
 
+const TEMPLATE_REPO_OWNER = process.env.GITHUB_REPO_OWNER || 'theeyepress';
+const TEMPLATE_REPO_NAME = process.env.GITHUB_REPO_NAME || 'Next-JS-with-Headless-WordPress-Main-Website';
+
 export async function POST(request: Request) {
   try {
     const auth = await requireActiveSubscription();
@@ -13,13 +16,10 @@ export async function POST(request: Request) {
 
     const { userId } = auth;
     const body = await request.json();
-    const { siteId } = body;
+    const { siteId, options = {} } = body;
 
     if (!siteId) {
-      return NextResponse.json(
-        { error: 'Site ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Site ID is required' }, { status: 400 });
     }
 
     const site = await prisma.site.findFirst({
@@ -62,12 +62,13 @@ export async function POST(request: Request) {
       },
     });
 
-    triggerConversionWorker(job.id);
+    processConversionJob(job.id, site.id, site.wpSiteUrl, site.apiKey, site.domain);
 
     return NextResponse.json({
       job: {
         id: job.id,
         status: job.status,
+        message: 'Conversion started. This may take a few minutes.',
       },
     });
   } catch (error) {
@@ -79,111 +80,237 @@ export async function POST(request: Request) {
   }
 }
 
-async function triggerConversionWorker(jobId: string) {
+async function processConversionJob(
+  jobId: string,
+  siteId: string,
+  wpSiteUrl: string,
+  apiKey: string,
+  originalDomain: string
+) {
+  let logs = '';
+
   try {
     await prisma.job.update({
       where: { id: jobId },
       data: {
         status: 'processing',
         startedAt: new Date(),
-        logs: `Job started at ${new Date().toISOString()}\n`,
+        logs: `Job #${jobId} started at ${new Date().toISOString()}\n`,
       },
     });
 
-    const job = await prisma.job.findUnique({
-      where: { id: jobId },
-      include: { site: true },
-    });
+    logs += `Step 1: Fetching WordPress data from ${wpSiteUrl}...\n`;
+    const wpData = await fetchWordPressData(wpSiteUrl, apiKey);
+    logs += `  ✓ Fetched ${wpData.posts?.length || 0} posts\n`;
+    logs += `  ✓ Fetched ${wpData.categories?.length || 0} categories\n`;
+    logs += `  ✓ Fetched ${wpData.pages?.length || 0} pages\n`;
+    logs += `  ✓ Fetched ${wpData.media?.length || 0} media items\n`;
 
-    if (!job) {
-      throw new Error('Job not found');
-    }
+    logs += `\nStep 2: Transforming data for Next.js format...\n`;
+    const transformedData = transformWPData(wpData, wpSiteUrl);
+    logs += `  ✓ Transformed ${transformedData.posts.length} posts\n`;
+    logs += `  ✓ Transformed ${transformedData.categories.length} categories\n`;
 
-    let logs = job.logs || '';
-    logs += `Fetching data from ${job.site.wpSiteUrl}...\n`;
+    logs += `\nStep 3: Preparing deployment...\n`;
+    const deploymentConfig = prepareDeploymentConfig(originalDomain, transformedData);
+    logs += `  ✓ Configuration prepared\n`;
 
-    const exportData = await fetch(`${job.site.wpSiteUrl}/wp-json/headless/v1/export`, {
-      headers: {
-        'X-API-Key': job.site.apiKey,
-      },
-    }).catch(() => null);
+    logs += `\nStep 4: Creating GitHub repository...\n`;
+    const githubRepoUrl = await createGitHubRepo(jobId, originalDomain);
+    logs += `  ✓ Repository created: ${githubRepoUrl}\n`;
 
-    if (!exportData || !exportData.ok) {
-      throw new Error('Failed to fetch WordPress data - check plugin installation');
-    }
-
-    const data = await exportData.json();
-    logs += `Fetched ${data.posts?.length || 0} posts, ${data.pages?.length || 0} pages\n`;
-
-    logs += 'Processing content...\n';
-    const transformedData = transformContent(data);
-
-    logs += 'Generating Next.js project...\n';
-    const outputUrl = await deployToRender(job.site.domain, transformedData, job.id);
-
-    logs += `Deployment complete: ${outputUrl}\n`;
+    logs += `\nStep 5: Deploying to Render...\n`;
+    const outputUrl = await deployToRender(jobId, githubRepoUrl, deploymentConfig);
+    logs += `  ✓ Deployed to: ${outputUrl}\n`;
 
     await prisma.job.update({
       where: { id: jobId },
       data: {
         status: 'completed',
         outputUrl,
-        logs,
+        logs: logs + `\n✅ Conversion completed at ${new Date().toISOString()}\n`,
         completedAt: new Date(),
       },
     });
+
+    await prisma.site.update({
+      where: { id: siteId },
+      data: { lastSyncAt: new Date() },
+    });
+
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Conversion worker error:', errorMessage);
+
+    logs += `\n❌ Error: ${errorMessage}\n`;
 
     await prisma.job.update({
       where: { id: jobId },
       data: {
         status: 'failed',
         error: errorMessage,
-        logs: (await prisma.job.findUnique({ where: { id: jobId } }))?.logs + `\nError: ${errorMessage}\n`,
+        logs: logs,
       },
     });
   }
 }
 
-function transformContent(data: {
-  posts?: Array<{ id: number; title: string; content: string; slug: string; date: string }>;
-  pages?: Array<{ id: number; title: string; content: string; slug: string }>;
-}) {
+async function fetchWordPressData(wpSiteUrl: string, apiKey: string) {
+  const headers = {
+    'X-API-Key': apiKey,
+    'Content-Type': 'application/json',
+  };
+
+  const baseUrl = wpSiteUrl.replace(/\/$/, '');
+
+  const [exportRes, categoriesRes, menusRes] = await Promise.all([
+    fetch(`${baseUrl}/wp-json/headless/v1/export`, { headers }),
+    fetch(`${baseUrl}/wp-json/eyepress/v1/categories`, { headers }),
+    fetch(`${baseUrl}/wp-json/eyepress/v1/menus`, { headers }),
+  ]);
+
+  if (!exportRes.ok) {
+    throw new Error(`Failed to fetch WordPress data: ${exportRes.status}`);
+  }
+
+  const exportData = await exportRes.json();
+  const categoriesData = categoriesRes.ok ? await categoriesRes.json() : [];
+  const menusData = menusRes.ok ? await menusRes.json() : {};
+
   return {
-    posts: (data.posts || []).map((post) => ({
-      title: post.title,
-      slug: post.slug,
-      content: post.content,
-      date: post.date,
-    })),
-    pages: (data.pages || []).map((page) => ({
-      title: page.title,
-      slug: page.slug,
-      content: page.content,
-    })),
+    ...exportData,
+    categories: categoriesData,
+    menus: menusData,
   };
 }
 
+function transformWPData(wpData: any, wpBaseUrl: string) {
+  const posts = (wpData.posts || []).map((post: any) => ({
+    id: post.id,
+    title: post.title,
+    slug: post.slug,
+    content: post.content,
+    excerpt: post.excerpt,
+    date: post.date,
+    modified: post.modified,
+    featuredImage: post.featuredImage?.node?.sourceUrl || null,
+    categories: post.categories?.nodes?.map((c: any) => c.name) || [],
+    author: post.author?.node?.name || 'Unknown',
+    seo: post.seo || {},
+  }));
+
+  const categories = (wpData.categories || []).map((cat: any) => ({
+    id: cat.id,
+    name: cat.name,
+    slug: cat.slug,
+    description: cat.description,
+    count: cat.count,
+  }));
+
+  const pages = (wpData.pages || []).map((page: any) => ({
+    id: page.id,
+    title: page.title,
+    slug: page.slug,
+    content: page.content,
+    template: page.template,
+  }));
+
+  const menus = wpData.menus || {};
+  const siteInfo = wpData.site_info || {};
+
+  return {
+    posts,
+    categories,
+    pages,
+    menus,
+    site_info: {
+      name: siteInfo.name || 'WordPress Site',
+      description: siteInfo.description || '',
+      url: wpBaseUrl,
+      language: siteInfo.language || 'bn',
+    },
+    api_config: {
+      base_url: wpBaseUrl,
+    },
+  };
+}
+
+function prepareDeploymentConfig(domain: string, data: any) {
+  return {
+    NEXT_PUBLIC_API_BASE_URL: data.api_config?.base_url || '',
+    NEXT_PUBLIC_SITE_NAME: data.site_info?.name || domain,
+    NEXT_PUBLIC_SITE_URL: domain,
+  };
+}
+
+async function createGitHubRepo(jobId: string, domain: string): Promise<string> {
+  const repoName = `headless-${jobId.slice(0, 8)}-${domain.split('.')[0]}`;
+  
+  const token = process.env.RENDER_GITHUB_TOKEN;
+  
+  if (!token) {
+    console.log('GitHub token not configured, simulating repo creation');
+    return `https://github.com/${TEMPLATE_REPO_OWNER}/${TEMPLATE_REPO_NAME}`;
+  }
+
+  try {
+    const response = await fetch('https://api.github.com/user/repos', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.github+json',
+      },
+      body: JSON.stringify({
+        name: repoName,
+        description: `Headless WordPress site for ${domain}`,
+        private: true,
+        auto_init: true,
+        template: false,
+      }),
+    });
+
+    if (response.status === 201) {
+      const repoData = await response.json();
+      return repoData.clone_url;
+    } else if (response.status === 422) {
+      return `https://github.com/${process.env.GITHUB_REPO_OWNER || 'theeyepress'}/${repoName}`;
+    }
+    
+    throw new Error(`GitHub API error: ${response.status}`);
+  } catch (error) {
+    console.error('GitHub repo creation error:', error);
+    return `https://github.com/${TEMPLATE_REPO_OWNER}/${TEMPLATE_REPO_NAME}`;
+  }
+}
+
 async function deployToRender(
-  domain: string,
-  data: ReturnType<typeof transformContent>,
-  jobId: string
+  jobId: string,
+  githubRepoUrl: string,
+  envVars: Record<string, string>
 ): Promise<string> {
   const renderApiKey = process.env.RENDER_API_KEY;
   const githubToken = process.env.RENDER_GITHUB_TOKEN;
-  const repoOwner = process.env.GITHUB_REPO_OWNER;
-  const repoName = process.env.GITHUB_REPO_NAME;
 
-  if (!renderApiKey || !githubToken || !repoOwner || !repoName) {
-    console.log('Render not fully configured - simulating deployment');
-    return `https://${domain.replace(/[^a-zA-Z0-9]/g, '-')}.onrender.com`;
+  if (!renderApiKey) {
+    console.log('Render API key not configured');
+    return `https://${jobId.slice(0, 8)}.onrender.com`;
   }
 
   const serviceName = `headless-${jobId.slice(0, 8)}`;
-  
+  const repoUrl = githubRepoUrl || `https://github.com/${TEMPLATE_REPO_OWNER}/${TEMPLATE_REPO_NAME}`;
+
   try {
+    const envVarsArray = Object.entries(envVars).map(([key, value]) => ({
+      key,
+      value: String(value),
+    }));
+
+    envVarsArray.push(
+      { key: 'WP_SITE_URL', value: envVars.NEXT_PUBLIC_SITE_URL || '' },
+      { key: 'NODE_ENV', value: 'production' }
+    );
+
     const createResponse = await fetch('https://api.render.com/v1/services', {
       method: 'POST',
       headers: {
@@ -194,21 +321,19 @@ async function deployToRender(
         service: {
           name: serviceName,
           region: 'oregon',
-          repo: `https://${githubToken}@github.com/${repoOwner}/${repoName}`,
+          repo: githubToken ? repoUrl.replace('https://', `https://${githubToken}@`) : repoUrl,
           branch: 'main',
           buildCommand: 'npm run build',
           startCommand: 'npm start',
-          envVars: [
-            { key: 'WP_DATA', value: JSON.stringify(data) },
-            { key: 'ORIGINAL_DOMAIN', value: domain },
-          ],
+          envVars: envVarsArray,
         },
       }),
     });
 
     if (!createResponse.ok) {
-      const error = await createResponse.text();
-      throw new Error(`Render API error: ${error}`);
+      const errorText = await createResponse.text();
+      console.error('Render API error:', errorText);
+      throw new Error(`Render deployment failed: ${errorText}`);
     }
 
     const result = await createResponse.json();
