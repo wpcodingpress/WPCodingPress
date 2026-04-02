@@ -189,25 +189,30 @@ async function fetchWordPressData(wpSiteUrl: string, apiKey: string) {
 
   const baseUrl = wpSiteUrl.replace(/\/$/, '');
 
-  const [exportRes, categoriesRes, menusRes] = await Promise.all([
-    fetch(`${baseUrl}/wp-json/headless/v1/export`, { headers }),
-    fetch(`${baseUrl}/wp-json/eyepress/v1/categories`, { headers }),
-    fetch(`${baseUrl}/wp-json/eyepress/v1/menus`, { headers }),
-  ]);
+  try {
+    const [exportRes, categoriesRes] = await Promise.all([
+      fetch(`${baseUrl}/wp-json/headless/v1/export`, { headers }),
+      fetch(`${baseUrl}/wp-json/headless/v1/categories`, { headers }),
+    ]);
 
-  if (!exportRes.ok) {
-    throw new Error(`Failed to fetch WordPress data: ${exportRes.status}`);
+    if (!exportRes.ok) {
+      const errorText = await exportRes.text();
+      throw new Error(`WordPress API error: ${exportRes.status} - ${errorText}`);
+    }
+
+    const exportData = await exportRes.json();
+    const categoriesData = categoriesRes.ok ? await categoriesRes.json() : [];
+
+    return {
+      ...exportData,
+      categories: categoriesData,
+    };
+  } catch (error) {
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error(`Cannot connect to WordPress site. Please verify the site URL is correct.`);
+    }
+    throw error;
   }
-
-  const exportData = await exportRes.json();
-  const categoriesData = categoriesRes.ok ? await categoriesRes.json() : [];
-  const menusData = menusRes.ok ? await menusRes.json() : {};
-
-  return {
-    ...exportData,
-    categories: categoriesData,
-    menus: menusData,
-  };
 }
 
 function transformWPData(wpData: any, wpBaseUrl: string) {
