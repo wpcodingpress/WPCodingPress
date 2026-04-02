@@ -3,11 +3,20 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
+const TESTING_MODE = process.env.TESTING_MODE === 'true';
+
 export async function requireActiveSubscription() {
   const session = await getServerSession(authOptions);
   
   if (!session?.user) {
     return { error: 'Unauthorized', status: 401 };
+  }
+
+  if (TESTING_MODE) {
+    return { 
+      userId: session.user.id, 
+      subscription: { id: 'test', plan: 'pro', status: 'active' } 
+    };
   }
 
   const subscription = await prisma.subscription.findFirst({
@@ -39,6 +48,10 @@ export async function withSubscriptionCheck<T>(
 }
 
 export async function getUserSubscription(userId: string) {
+  if (TESTING_MODE) {
+    return { id: 'test', plan: 'pro', status: 'active' };
+  }
+  
   return prisma.subscription.findFirst({
     where: {
       userId,
@@ -49,5 +62,6 @@ export async function getUserSubscription(userId: string) {
 }
 
 export function isSubscriptionActive(subscription: { status: string } | null): boolean {
+  if (TESTING_MODE) return true;
   return subscription?.status === 'active';
 }
