@@ -63,10 +63,10 @@ model Subscription {
   id                   String   @id @default(cuid())
   userId               String
   user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  stripeSubId          String?
+  stripeSubId          String?  @unique
   stripePriceId        String?
   lemonCustomerId      String?
-  lemonSubscriptionId  String?
+  lemonSubscriptionId  String?  @unique
   status               String   @default("active")
   plan                 String   @default("free")
   currentPeriodStart   DateTime @default(now())
