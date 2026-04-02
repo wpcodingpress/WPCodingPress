@@ -11,9 +11,12 @@ import {
   Rocket,
   Loader2,
   CheckCircle,
-  XCircle
+  XCircle,
+  Mail
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Link from "next/link";
 
 const plans = [
@@ -26,45 +29,40 @@ const plans = [
     color: "slate",
     planId: "free",
     features: [
-      "Access to free products",
-      "Basic support",
-      "Community access",
-      "Email notifications"
+      "View products only",
+      "Basic support via email",
     ]
   },
   {
     name: "Pro",
     price: 49,
     period: "month",
-    description: "Best for professionals",
+    description: "Convert 1 WordPress site to headless",
     icon: Crown,
     color: "primary",
     popular: true,
     planId: "pro",
     features: [
-      "All free features",
+      "1 WordPress to Headless conversion",
+      "Live deployed site",
       "Priority support",
-      "Access to Pro products",
-      "Early access to new features",
-      "Downloadable resources",
-      "Priority updates"
+      "All future updates",
     ]
   },
   {
     name: "Enterprise",
     price: 199,
     period: "month",
-    description: "For large teams",
+    description: "Unlimited conversions for agencies",
     icon: Rocket,
     color: "purple",
     planId: "enterprise",
     features: [
-      "All Pro features",
+      "Unlimited conversions",
+      "White-label deployment",
       "Dedicated support",
-      "Custom development",
-      "White-label options",
+      "Custom domain setup",
       "API access",
-      "SLA guarantee"
     ]
   }
 ];
@@ -74,6 +72,12 @@ export default function SubscriptionPage() {
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [currentPlan, setCurrentPlan] = useState<string | null>(null);
   const [isLoadingPlan, setIsLoadingPlan] = useState(true);
+  const [showVerify, setShowVerify] = useState(false);
+  const [gumroadEmail, setGumroadEmail] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState("");
+  const [verifySuccess, setVerifySuccess] = useState(false);
+  
   const success = searchParams.get('success');
   const cancelled = searchParams.get('cancelled');
 
@@ -96,6 +100,8 @@ export default function SubscriptionPage() {
   };
 
   const handleSubscribe = async (planId: string) => {
+    if (planId === 'free') return;
+    
     setIsLoading(planId);
     
     try {
@@ -120,6 +126,39 @@ export default function SubscriptionPage() {
     }
   };
 
+  const handleVerifySubscription = async () => {
+    if (!gumroadEmail) {
+      setVerifyError("Please enter your Gumroad email");
+      return;
+    }
+
+    setIsVerifying(true);
+    setVerifyError("");
+
+    try {
+      const response = await fetch('/api/verify-purchase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gumroadEmail }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setVerifySuccess(true);
+        setCurrentPlan(data.plan);
+        setShowVerify(false);
+      } else {
+        setVerifyError(data.error || 'Verification failed');
+      }
+    } catch (error) {
+      console.error('Verification error:', error);
+      setVerifyError('Something went wrong. Please try again.');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
   if (isLoadingPlan) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -135,8 +174,8 @@ export default function SubscriptionPage() {
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
           <CheckCircle className="h-5 w-5 text-green-600" />
           <div>
-            <p className="font-medium text-green-800">Subscription successful!</p>
-            <p className="text-sm text-green-600">Thank you for subscribing to our {success} plan.</p>
+            <p className="font-medium text-green-800">Payment received!</p>
+            <p className="text-sm text-green-600">Now verify your subscription below.</p>
           </div>
         </div>
       )}
@@ -145,116 +184,182 @@ export default function SubscriptionPage() {
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center gap-3">
           <XCircle className="h-5 w-5 text-yellow-600" />
           <div>
-            <p className="font-medium text-yellow-800">Subscription cancelled</p>
+            <p className="font-medium text-yellow-800">Payment cancelled</p>
             <p className="text-sm text-yellow-600">You can subscribe anytime from this page.</p>
           </div>
         </div>
       )}
 
-      <div className="text-center max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold text-slate-900">Choose Your Plan</h1>
-        <p className="text-slate-500 mt-2">Select the plan that best fits your needs</p>
-      </div>
+      {/* Verification Section */}
+      {(success || showVerify) && !verifySuccess && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-xl border-2 border-primary p-6 max-w-md mx-auto"
+        >
+          <div className="text-center mb-4">
+            <Mail className="h-8 w-8 mx-auto text-primary mb-2" />
+            <h3 className="text-lg font-semibold">Verify Your Subscription</h3>
+            <p className="text-sm text-slate-500">
+              Enter the email you used on Gumroad to activate your subscription.
+            </p>
+          </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-        {plans.map((plan, index) => {
-          const isCurrentPlan = currentPlan === plan.planId || (plan.planId === 'free' && !currentPlan);
-          
-          return (
-            <motion.div
-              key={plan.name}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className={`bg-white rounded-xl border-2 p-6 relative ${
-                plan.popular 
-                  ? "border-primary shadow-lg" 
-                  : "border-slate-200 hover:border-slate-300"
-              }`}
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="gumroadEmail">Gumroad Email</Label>
+              <Input
+                id="gumroadEmail"
+                type="email"
+                placeholder="your-email@gmail.com"
+                value={gumroadEmail}
+                onChange={(e) => setGumroadEmail(e.target.value)}
+              />
+            </div>
+
+            {verifyError && (
+              <p className="text-sm text-red-600">{verifyError}</p>
+            )}
+
+            <Button
+              onClick={handleVerifySubscription}
+              disabled={isVerifying}
+              className="w-full"
             >
-              {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="bg-primary text-white text-xs font-medium px-3 py-1 rounded-full">
-                    Most Popular
-                  </span>
-                </div>
+              {isVerifying ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                'Verify & Activate'
               )}
+            </Button>
+          </div>
+        </motion.div>
+      )}
 
-              <div className="text-center mb-6">
-                <div className={`inline-flex p-3 rounded-full mb-4 ${
-                  plan.color === 'primary' ? 'bg-primary/10' :
-                  plan.color === 'purple' ? 'bg-purple-100' :
-                  'bg-slate-100'
-                }`}>
-                  <plan.icon className={`h-6 w-6 ${
-                    plan.color === 'primary' ? 'text-primary' :
-                    plan.color === 'purple' ? 'text-purple-600' :
-                    'text-slate-600'
-                  }`} />
-                </div>
-                <h3 className="text-lg font-semibold text-slate-900">{plan.name}</h3>
-                <p className="text-sm text-slate-500 mt-1">{plan.description}</p>
-              </div>
+      {verifySuccess && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+          <CheckCircle className="h-5 w-5 text-green-600" />
+          <div>
+            <p className="font-medium text-green-800">Subscription activated!</p>
+            <p className="text-sm text-green-600">You now have access to all features.</p>
+          </div>
+        </div>
+      )}
 
-              <div className="text-center mb-6">
-                <span className="text-4xl font-bold text-slate-900">${plan.price}</span>
-                <span className="text-slate-500">/{plan.period}</span>
-              </div>
+      {!showVerify && !verifySuccess && (
+        <>
+          <div className="text-center max-w-2xl mx-auto">
+            <h1 className="text-2xl font-bold text-slate-900">Choose Your Plan</h1>
+            <p className="text-slate-500 mt-2">Select the plan that best fits your needs</p>
+          </div>
 
-              <ul className="space-y-3 mb-6">
-                {plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-slate-600">
-                    <div className={`p-1 rounded-full ${
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {plans.map((plan, index) => {
+              const isCurrentPlan = currentPlan === plan.planId || (plan.planId === 'free' && !currentPlan);
+              
+              return (
+                <motion.div
+                  key={plan.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`bg-white rounded-xl border-2 p-6 relative ${
+                    plan.popular 
+                      ? "border-primary shadow-lg" 
+                      : "border-slate-200 hover:border-slate-300"
+                  }`}
+                >
+                  {plan.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <span className="bg-primary text-white text-xs font-medium px-3 py-1 rounded-full">
+                        Most Popular
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="text-center mb-6">
+                    <div className={`inline-flex p-3 rounded-full mb-4 ${
                       plan.color === 'primary' ? 'bg-primary/10' :
                       plan.color === 'purple' ? 'bg-purple-100' :
                       'bg-slate-100'
                     }`}>
-                      <Check className={`h-3 w-3 ${
+                      <plan.icon className={`h-6 w-6 ${
                         plan.color === 'primary' ? 'text-primary' :
                         plan.color === 'purple' ? 'text-purple-600' :
                         'text-slate-600'
                       }`} />
                     </div>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
+                    <h3 className="text-lg font-semibold text-slate-900">{plan.name}</h3>
+                    <p className="text-sm text-slate-500 mt-1">{plan.description}</p>
+                  </div>
 
-              <Button 
-                className="w-full" 
-                variant={plan.popular ? "default" : "outline"}
-                disabled={isLoading === plan.planId || isCurrentPlan}
-                onClick={() => handleSubscribe(plan.planId)}
+                  <div className="text-center mb-6">
+                    <span className="text-4xl font-bold text-slate-900">${plan.price}</span>
+                    <span className="text-slate-500">/{plan.period}</span>
+                  </div>
+
+                  <ul className="space-y-3 mb-6">
+                    {plan.features.map((feature, i) => (
+                      <li key={i} className="flex items-center gap-3 text-sm text-slate-600">
+                        <div className={`p-1 rounded-full ${
+                          plan.color === 'primary' ? 'bg-primary/10' :
+                          plan.color === 'purple' ? 'bg-purple-100' :
+                          'bg-slate-100'
+                        }`}>
+                          <Check className={`h-3 w-3 ${
+                            plan.color === 'primary' ? 'text-primary' :
+                            plan.color === 'purple' ? 'text-purple-600' :
+                            'text-slate-600'
+                          }`} />
+                        </div>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Button 
+                    className="w-full" 
+                    variant={plan.popular ? "default" : "outline"}
+                    disabled={isLoading === plan.planId || isCurrentPlan}
+                    onClick={() => handleSubscribe(plan.planId)}
+                  >
+                    {isLoading === plan.planId ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : isCurrentPlan ? (
+                      <>
+                        <Check className="mr-2 h-4 w-4" />
+                        Current Plan
+                      </>
+                    ) : plan.price === 0 ? (
+                      'Get Started'
+                    ) : (
+                      'Subscribe Now'
+                    )}
+                  </Button>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Manual Verification Button */}
+          {currentPlan && (
+            <div className="text-center mt-4">
+              <Button
+                variant="link"
+                onClick={() => setShowVerify(true)}
               >
-                {isLoading === plan.planId ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Processing...
-                  </>
-                ) : isCurrentPlan ? (
-                  <>
-                    <Check className="mr-2 h-4 w-4" />
-                    Current Plan
-                  </>
-                ) : plan.price === 0 ? (
-                  'Get Started'
-                ) : (
-                  'Subscribe Now'
-                )}
+                Already paid? Verify your subscription
               </Button>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      <div className="text-center mt-8">
-        <p className="text-slate-500 text-sm">
-          Need a custom plan?{" "}
-          <Link href="/contact" className="text-primary hover:underline">
-            Contact us
-          </Link>
-        </p>
-      </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

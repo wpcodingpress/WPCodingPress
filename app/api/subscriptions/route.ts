@@ -3,18 +3,20 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 
+const GUMROAD_PRODUCT_LINK = process.env.GUMROAD_PRODUCT_LINK || 'https://rahmanbld.gumroad.com/l/wpcodingpress';
+
 const PLANS = {
   pro: {
     name: 'Pro Plan',
     price: 49,
-    gumroadLink: process.env.GUMROAD_PRO_LINK || 'https://gumroad.com/l/YOUR_PRO_LINK',
-    features: 'Convert 1 WordPress site to headless Next.js, Priority support, Basic features',
+    tierName: 'Pro',
+    features: 'Convert 1 WordPress site to headless Next.js, Priority support',
   },
   enterprise: {
     name: 'Enterprise Plan',
     price: 199,
-    gumroadLink: process.env.GUMROAD_ENTERPRISE_LINK || 'https://gumroad.com/l/YOUR_ENTERPRISE_LINK',
-    features: 'Unlimited conversions, Dedicated support, White-label, All features',
+    tierName: 'Enterprise',
+    features: 'Unlimited conversions, Dedicated support, White-label',
   },
 };
 
@@ -46,15 +48,12 @@ export async function POST(request: Request) {
     const successUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription?success=true&plan=${plan}`;
     const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription?cancelled=true`;
     
-    let checkoutUrl = selectedPlan.gumroadLink;
-    if (checkoutUrl.includes('gumroad.com/l/')) {
-      checkoutUrl += `?success=${encodeURIComponent(successUrl)}&cancel=${encodeURIComponent(cancelUrl)}`;
-    }
+    const checkoutUrl = `${GUMROAD_PRODUCT_LINK}?wanted_tier=${encodeURIComponent(selectedPlan.tierName)}&success=${encodeURIComponent(successUrl)}&cancel=${encodeURIComponent(cancelUrl)}`;
 
     return NextResponse.json({ 
       url: checkoutUrl,
       plan: selectedPlan,
-      message: 'You will be redirected to Gumroad to complete payment'
+      message: 'You will be redirected to Gumroad to complete payment. After payment, enter your Gumroad email to verify and activate your subscription.'
     });
   } catch (error) {
     console.error('Subscription error:', error);
