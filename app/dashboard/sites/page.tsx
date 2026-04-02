@@ -73,12 +73,35 @@ export default function SitesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAddingSite, setIsAddingSite] = useState(false);
   const [convertingSiteId, setConvertingSiteId] = useState<string | null>(null);
+  const [pollingSiteId, setPollingSiteId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ domain: "", wpSiteUrl: "", apiKey: "" });
   const [subscriptionData, setSubscriptionData] = useState<SubscriptionData | null>(null);
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (!pollingSiteId) return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/convert?siteId=${pollingSiteId}`);
+        const data = await response.json();
+        const latestJob = data.jobs?.[0];
+
+        if (latestJob?.status === "completed" || latestJob?.status === "failed") {
+          clearInterval(pollInterval);
+          setPollingSiteId(null);
+          await fetchData();
+        }
+      } catch (error) {
+        console.error("Polling error:", error);
+      }
+    }, 3000);
+
+    return () => clearInterval(pollInterval);
+  }, [pollingSiteId]);
 
   const fetchData = async () => {
     try {
@@ -148,6 +171,7 @@ export default function SitesPage() {
 
   const handleConvert = async (siteId: string) => {
     setConvertingSiteId(siteId);
+    setPollingSiteId(siteId);
     try {
       const response = await fetch("/api/convert", {
         method: "POST",
@@ -155,16 +179,16 @@ export default function SitesPage() {
         body: JSON.stringify({ siteId }),
       });
       
-      if (response.ok) {
-        await fetchData();
-      } else {
+      if (!response.ok) {
         const error = await response.json();
         alert(error.error || "Failed to start conversion");
+        setConvertingSiteId(null);
+        setPollingSiteId(null);
       }
     } catch (error) {
       console.error("Error converting site:", error);
-    } finally {
       setConvertingSiteId(null);
+      setPollingSiteId(null);
     }
   };
 
@@ -516,10 +540,10 @@ export default function SitesPage() {
                   <div className="mt-4">
                     <Button
                       onClick={() => handleConvert(site.id)}
-                      disabled={convertingSiteId === site.id || latestJob?.status === "processing"}
+                      disabled={pollingSiteId === site.id || latestJob?.status === "processing"}
                       className="w-full"
                     >
-                      {convertingSiteId === site.id ? (
+                      {pollingSiteId === site.id ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Converting...
