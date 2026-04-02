@@ -7,6 +7,32 @@ import { requireActiveSubscription } from '@/lib/subscription';
 const TEMPLATE_REPO_OWNER = process.env.GITHUB_REPO_OWNER || 'theeyepress';
 const TEMPLATE_REPO_NAME = process.env.GITHUB_REPO_NAME || 'Next-JS-with-Headless-WordPress-Main-Website';
 
+// Simple in-memory job queue for processing
+const jobQueue = new Map<string, { processing: boolean; startedAt: number }>();
+
+// Process queued jobs periodically
+if (typeof setInterval !== 'undefined') {
+  setInterval(async () => {
+    const pendingJobs = await prisma.job.findMany({
+      where: { status: 'pending' },
+      take: 5,
+    });
+
+    for (const job of pendingJobs) {
+      const queueInfo = jobQueue.get(job.id);
+      if (!queueInfo || Date.now() - queueInfo.startedAt > 5000) {
+        // Start processing if not in queue or stuck for more than 5 seconds
+        const site = await prisma.site.findUnique({ where: { id: job.siteId } });
+        if (site?.wpApiKey) {
+          jobQueue.set(job.id, { processing: true, startedAt: Date.now() });
+          processConversionJob(job.id, site.id, site.wpSiteUrl, site.wpApiKey, site.domain)
+            .finally(() => jobQueue.delete(job.id));
+        }
+      }
+    }
+  }, 10000);
+}
+
 export async function POST(request: Request) {
   try {
     const auth = await requireActiveSubscription();
@@ -65,7 +91,9 @@ export async function POST(request: Request) {
     // Verify the WordPress API key is still valid
     try {
       const cleanWpUrl = site.wpSiteUrl.replace(/\/$/, '');
-      const verifyResponse = await fetch(`${cleanWpUrl}/wp-json/headless/v1/verify?api_key=${wpApiKey}`);
+      const verifyResponse = await fetch(`${cleanWpUrl}/wp-json/headless/v1/verify?api_key=${wpApiKey}`, { 
+        signal: AbortSignal.timeout(10000) 
+      });
       if (!verifyResponse.ok) {
         return NextResponse.json(
           { error: 'WordPress API key is invalid or expired. Please reconnect your site.' },
@@ -88,12 +116,21 @@ export async function POST(request: Request) {
       },
     });
 
-    processConversionJob(job.id, site.id, site.wpSiteUrl, wpApiKey, site.domain);
+    // Start processing immediately
+    jobQueue.set(job.id, { processing: true, startedAt: Date.now() });
+    
+    // Fire and forget - process in background
+    processConversionJob(job.id, site.id, site.wpSiteUrl, wpApiKey, site.domain)
+      .then(() => jobQueue.delete(job.id))
+      .catch((err) => {
+        console.error('Job processing error:', err);
+        jobQueue.delete(job.id);
+      });
 
     return NextResponse.json({
       job: {
         id: job.id,
-        status: job.status,
+        status: 'pending',
         message: 'Conversion started. This may take a few minutes.',
       },
     });
