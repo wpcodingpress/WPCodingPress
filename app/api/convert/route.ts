@@ -307,7 +307,7 @@ function transformWPData(wpData: any, wpBaseUrl: string) {
 function prepareDeploymentConfig(domain: string, data: any, wpSiteUrl: string, apiKey: string) {
   return {
     NEXT_PUBLIC_WORDPRESS_URL: wpSiteUrl,
-    NEXT_PUBLIC_API_BASE_URL: `${wpSiteUrl}/wp-json/eyepress/v1`,
+    NEXT_PUBLIC_WORDPRESS_API_URL: `${wpSiteUrl}/wp-json/eyepress/v1`,
     WORDPRESS_API_KEY: apiKey,
     NEXT_PUBLIC_SITE_NAME: data.site_info?.name || domain,
     NEXT_PUBLIC_SITE_URL: domain,
