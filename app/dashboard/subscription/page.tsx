@@ -44,7 +44,7 @@ const plans = [
     planId: "pro",
     features: [
       "1 WordPress to Headless conversion",
-      "Live deployed site",
+      "Live deployed site (Render URL)",
       "Priority support",
       "All future updates",
     ]
@@ -61,7 +61,7 @@ const plans = [
       "Unlimited conversions",
       "White-label deployment",
       "Dedicated support",
-      "Custom domain setup",
+      "Custom domain included",
       "API access",
     ]
   }

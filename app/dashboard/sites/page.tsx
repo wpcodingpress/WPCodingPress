@@ -57,6 +57,14 @@ interface Job {
   };
 }
 
+interface SubscriptionData {
+  hasSubscription: boolean;
+  subscription: {
+    status: string;
+    plan: string;
+  } | null;
+}
+
 export default function SitesPage() {
   const [sites, setSites] = useState<Site[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -64,7 +72,7 @@ export default function SitesPage() {
   const [isAddingSite, setIsAddingSite] = useState(false);
   const [convertingSiteId, setConvertingSiteId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ domain: "", wpSiteUrl: "" });
-  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
+  const [subscriptionData, setSubscriptionData] = useState<SubscriptionData | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -84,13 +92,18 @@ export default function SitesPage() {
       
       setSites(sitesData.sites || []);
       setJobs(jobsData.jobs || []);
-      setSubscriptionStatus(subData.subscription?.status || null);
+      setSubscriptionData(subData);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const getSubscriptionStatus = () => subscriptionData?.subscription?.status;
+  const getSubscriptionPlan = () => subscriptionData?.subscription?.plan;
+  const isEnterprise = getSubscriptionPlan() === 'enterprise';
+  const hasActiveSubscription = getSubscriptionStatus() === 'active';
 
   const handleAddSite = async () => {
     if (!formData.domain || !formData.wpSiteUrl) return;
@@ -203,7 +216,7 @@ export default function SitesPage() {
           <p className="text-slate-500 mt-1">Manage your WordPress sites and convert them to headless</p>
         </div>
         
-        {subscriptionStatus === "active" && (
+        {hasActiveSubscription && (
           <Dialog>
             <DialogTrigger asChild>
               <Button>
@@ -220,13 +233,26 @@ export default function SitesPage() {
               </DialogHeader>
               <div className="space-y-4 mt-4">
                 <div>
-                  <Label htmlFor="domain">Domain</Label>
+                  <Label htmlFor="domain">
+                    {isEnterprise ? "Custom Domain" : "Site Name"} 
+                    {isEnterprise && <span className="text-red-500">*</span>}
+                  </Label>
                   <Input
                     id="domain"
-                    placeholder="example.com"
+                    placeholder={isEnterprise ? "mycustomdomain.com" : "my-site-name"}
                     value={formData.domain}
                     onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
                   />
+                  {!isEnterprise && (
+                    <p className="text-xs text-slate-500 mt-1">
+                      Custom domain available on Enterprise plan. Enter any name for your default URL.
+                    </p>
+                  )}
+                  {isEnterprise && (
+                    <p className="text-xs text-green-600 mt-1">
+                      Custom domain included with your Enterprise plan.
+                    </p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="wpSiteUrl">WordPress Site URL</Label>
@@ -248,7 +274,7 @@ export default function SitesPage() {
       </div>
 
       {/* Subscription Warning */}
-      {subscriptionStatus !== "active" && (
+      {(!hasActiveSubscription) && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start gap-3">
           <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
           <div>
@@ -267,7 +293,7 @@ export default function SitesPage() {
           <Globe className="h-12 w-12 mx-auto text-slate-300 mb-4" />
           <h3 className="text-lg font-medium text-slate-900">No sites connected</h3>
           <p className="text-slate-500 mt-1">Add your WordPress site to get started with headless conversion</p>
-          {subscriptionStatus === "active" && (
+          {hasActiveSubscription && (
             <Dialog>
               <DialogTrigger asChild>
                 <Button className="mt-4">
@@ -281,13 +307,21 @@ export default function SitesPage() {
                 </DialogHeader>
                 <div className="space-y-4 mt-4">
                   <div>
-                    <Label htmlFor="domain">Domain</Label>
+                    <Label htmlFor="domain">
+                      {isEnterprise ? "Custom Domain" : "Site Name"} 
+                      {isEnterprise && <span className="text-red-500">*</span>}
+                    </Label>
                     <Input
                       id="domain"
-                      placeholder="example.com"
+                      placeholder={isEnterprise ? "mycustomdomain.com" : "my-site-name"}
                       value={formData.domain}
                       onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
                     />
+                    {!isEnterprise && (
+                      <p className="text-xs text-slate-500 mt-1">
+                        Custom domain available on Enterprise plan. Enter any name for your default URL.
+                      </p>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="wpSiteUrl">WordPress Site URL</Label>
@@ -391,7 +425,7 @@ export default function SitesPage() {
                 )}
 
                 {/* Convert Button */}
-                {subscriptionStatus === "active" && site.status === "connected" && (
+                {hasActiveSubscription && site.status === "connected" && (
                   <div className="mt-4">
                     <Button
                       onClick={() => handleConvert(site.id)}
