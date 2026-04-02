@@ -3,79 +3,20 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 
-const LEMON_VARIANT_IDS: Record<string, string> = {
-  pro: process.env.LEMON_PRO_VARIANT_ID || 'pro_variant_id',
-  enterprise: process.env.LEMON_ENTERPRISE_VARIANT_ID || 'enterprise_variant_id',
+const PLANS = {
+  pro: {
+    name: 'Pro Plan',
+    price: 49,
+    gumroadLink: process.env.GUMROAD_PRO_LINK || 'https://gumroad.com/l/YOUR_PRO_LINK',
+    features: 'Convert 1 WordPress site to headless Next.js, Priority support, Basic features',
+  },
+  enterprise: {
+    name: 'Enterprise Plan',
+    price: 199,
+    gumroadLink: process.env.GUMROAD_ENTERPRISE_LINK || 'https://gumroad.com/l/YOUR_ENTERPRISE_LINK',
+    features: 'Unlimited conversions, Dedicated support, White-label, All features',
+  },
 };
-
-interface LemonCheckoutResponse {
-  data: {
-    attributes: {
-      url: string;
-    };
-  };
-}
-
-async function createLemonCheckout(
-  variantId: string,
-  userEmail: string,
-  userName: string,
-  userId: string,
-  plan: string
-): Promise<string> {
-  const storeId = process.env.LEMON_SQUEEZY_STORE_ID;
-  const apiKey = process.env.LEMON_SQUEEZY_API_KEY;
-  
-  if (!storeId || !apiKey) {
-    throw new Error('Lemon Squeezy not configured');
-  }
-
-  const response = await fetch(`https://api.lemonsqueezy.com/v1/checkouts`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/vnd.api+json',
-      'Accept': 'application/vnd.api+json',
-    },
-    body: JSON.stringify({
-      data: {
-        type: 'checkouts',
-        attributes: {
-          checkout_data: {
-            email: userEmail,
-            name: userName,
-            custom: {
-              userId,
-              plan,
-            },
-          },
-        },
-        relationships: {
-          store: {
-            data: {
-              type: 'stores',
-              id: storeId,
-            },
-          },
-          variant: {
-            data: {
-              type: 'variants',
-              id: variantId,
-            },
-          },
-        },
-      },
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Lemon Squeezy checkout failed: ${error}`);
-  }
-
-  const data = (await response.json()) as LemonCheckoutResponse;
-  return data.data.attributes.url;
-}
 
 export async function POST(request: Request) {
   try {
@@ -96,20 +37,25 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { plan } = body;
 
-    if (!plan || !LEMON_VARIANT_IDS[plan]) {
+    if (!plan || !PLANS[plan as keyof typeof PLANS]) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
     }
 
-    const variantId = LEMON_VARIANT_IDS[plan];
-    const checkoutUrl = await createLemonCheckout(
-      variantId,
-      user.email,
-      user.name || user.email.split('@')[0],
-      user.id,
-      plan
-    );
+    const selectedPlan = PLANS[plan as keyof typeof PLANS];
+    
+    const successUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription?success=true&plan=${plan}`;
+    const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription?cancelled=true`;
+    
+    let checkoutUrl = selectedPlan.gumroadLink;
+    if (checkoutUrl.includes('gumroad.com/l/')) {
+      checkoutUrl += `?success=${encodeURIComponent(successUrl)}&cancel=${encodeURIComponent(cancelUrl)}`;
+    }
 
-    return NextResponse.json({ url: checkoutUrl });
+    return NextResponse.json({ 
+      url: checkoutUrl,
+      plan: selectedPlan,
+      message: 'You will be redirected to Gumroad to complete payment'
+    });
   } catch (error) {
     console.error('Subscription error:', error);
     return NextResponse.json(
