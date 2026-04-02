@@ -175,11 +175,12 @@ async function processConversionJob(
     logs += `  ✓ Transformed ${transformedData.categories.length} categories\n`;
 
     logs += `\nStep 3: Preparing deployment...\n`;
-    const deploymentConfig = prepareDeploymentConfig(originalDomain, transformedData);
+    const deploymentConfig = prepareDeploymentConfig(originalDomain, transformedData, wpSiteUrl, apiKey);
     logs += `  ✓ Configuration prepared\n`;
+    logs += `  ✓ WordPress API: ${wpSiteUrl}\n`;
 
     logs += `\nStep 4: Creating GitHub repository...\n`;
-    const githubRepoUrl = await createGitHubRepo(jobId, originalDomain);
+    const githubRepoUrl = await createGitHubRepo(jobId, originalDomain, wpSiteUrl, apiKey);
     logs += `  ✓ Repository created: ${githubRepoUrl}\n`;
 
     logs += `\nStep 5: Deploying to Render...\n`;
@@ -303,18 +304,31 @@ function transformWPData(wpData: any, wpBaseUrl: string) {
   };
 }
 
-function prepareDeploymentConfig(domain: string, data: any) {
+function prepareDeploymentConfig(domain: string, data: any, wpSiteUrl: string, apiKey: string) {
   return {
-    NEXT_PUBLIC_API_BASE_URL: data.api_config?.base_url || '',
+    NEXT_PUBLIC_WORDPRESS_URL: wpSiteUrl,
+    NEXT_PUBLIC_API_BASE_URL: `${wpSiteUrl}/wp-json/eyepress/v1`,
+    WORDPRESS_API_KEY: apiKey,
     NEXT_PUBLIC_SITE_NAME: data.site_info?.name || domain,
     NEXT_PUBLIC_SITE_URL: domain,
   };
 }
 
-async function createGitHubRepo(jobId: string, domain: string): Promise<string> {
+async function createGitHubRepo(jobId: string, domain: string, wpSiteUrl: string, apiKey: string): Promise<string> {
   const repoName = `headless-${jobId.slice(0, 8)}-${domain.split('.')[0]}`;
   
   const token = process.env.RENDER_GITHUB_TOKEN;
+  
+  // Create a custom data file that the template will use
+  const siteData = {
+    wordpress_url: wpSiteUrl,
+    api_key: apiKey,
+    site_name: domain,
+    created_at: new Date().toISOString(),
+  };
+  
+  // Store the site data in environment variables passed to Render
+  // This will be used by the deployed site to connect to WordPress
   
   if (!token) {
     console.log('GitHub token not configured, simulating repo creation');
@@ -374,8 +388,11 @@ async function deployToRender(
       value: String(value),
     }));
 
+    // Add required environment variables for WordPress connection
     envVarsArray.push(
-      { key: 'WP_SITE_URL', value: envVars.NEXT_PUBLIC_SITE_URL || '' },
+      { key: 'NEXT_PUBLIC_WORDPRESS_URL', value: envVars.NEXT_PUBLIC_WORDPRESS_URL || '' },
+      { key: 'NEXT_PUBLIC_WORDPRESS_API_URL', value: envVars.NEXT_PUBLIC_API_BASE_URL || '' },
+      { key: 'WORDPRESS_API_KEY', value: envVars.WORDPRESS_API_KEY || '' },
       { key: 'NODE_ENV', value: 'production' }
     );
 
