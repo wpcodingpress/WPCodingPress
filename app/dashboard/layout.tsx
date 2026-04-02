@@ -15,7 +15,7 @@ import {
   User,
   CreditCard,
   ChevronRight,
-  Activity
+  Globe
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -72,6 +72,7 @@ export default function DashboardLayout({
 
   const navItems = [
     { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
+    { href: "/dashboard/sites", icon: Activity, label: "My Sites" },
     { href: "/dashboard/orders", icon: ShoppingBag, label: "My Orders" },
     { href: "/dashboard/downloads", icon: Download, label: "Downloads" },
     { href: "/dashboard/subscription", icon: CreditCard, label: "Subscription" },
