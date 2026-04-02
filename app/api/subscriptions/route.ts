@@ -4,7 +4,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 
 const GUMROAD_PRODUCT_LINK = process.env.GUMROAD_PRODUCT_LINK || 'https://rahmanbld.gumroad.com/l/wpcodingpress';
-const TESTING_MODE = process.env.TESTING_MODE === 'true';
+const TESTING_MODE = process.env.TESTING_MODE === 'true' || process.env.TESTING_MODE === 'TESTING_MODE';
 
 const PLANS = {
   pro: {

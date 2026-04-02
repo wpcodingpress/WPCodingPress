@@ -3,7 +3,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
-const TESTING_MODE = process.env.TESTING_MODE === 'true';
+const TESTING_MODE = process.env.TESTING_MODE === 'true' || process.env.TESTING_MODE === 'TESTING_MODE';
 
 export async function requireActiveSubscription() {
   const session = await getServerSession(authOptions);
