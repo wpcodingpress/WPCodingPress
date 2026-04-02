@@ -535,8 +535,8 @@ export default function SitesPage() {
                   </div>
                 )}
 
-                {/* Convert Button */}
-                {hasActiveSubscription && site.status === "connected" && (
+                {/* Convert Button - only show if no successful conversion yet */}
+                {hasActiveSubscription && site.status === "connected" && !latestJob?.outputUrl && (
                   <div className="mt-4">
                     <Button
                       onClick={() => handleConvert(site.id)}
