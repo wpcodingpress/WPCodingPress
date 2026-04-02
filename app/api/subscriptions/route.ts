@@ -4,6 +4,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 
 const GUMROAD_PRODUCT_LINK = process.env.GUMROAD_PRODUCT_LINK || 'https://rahmanbld.gumroad.com/l/wpcodingpress';
+const TESTING_MODE = process.env.TESTING_MODE === 'true';
 
 const PLANS = {
   pro: {
@@ -41,6 +42,34 @@ export async function POST(request: Request) {
 
     if (!plan || !PLANS[plan as keyof typeof PLANS]) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
+    }
+
+    if (TESTING_MODE) {
+      const existingSub = await prisma.subscription.findFirst({
+        where: { userId: user.id, status: 'active' },
+      });
+
+      if (existingSub) {
+        return NextResponse.json({ 
+          message: 'You already have an active subscription in TESTING_MODE',
+          subscription: existingSub 
+        });
+      }
+
+      const newSub = await prisma.subscription.create({
+        data: {
+          userId: user.id,
+          plan: plan,
+          status: 'active',
+          startDate: new Date(),
+          gumroadOrderId: 'TESTING_MODE',
+        },
+      });
+
+      return NextResponse.json({ 
+        message: 'Subscription activated (TESTING_MODE - no payment required)',
+        subscription: newSub 
+      });
     }
 
     const selectedPlan = PLANS[plan as keyof typeof PLANS];
