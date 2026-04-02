@@ -71,7 +71,7 @@ export default function SitesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAddingSite, setIsAddingSite] = useState(false);
   const [convertingSiteId, setConvertingSiteId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ domain: "", wpSiteUrl: "" });
+  const [formData, setFormData] = useState({ domain: "", wpSiteUrl: "", apiKey: "" });
   const [subscriptionData, setSubscriptionData] = useState<SubscriptionData | null>(null);
 
   useEffect(() => {
@@ -119,7 +119,7 @@ export default function SitesPage() {
       if (response.ok) {
         const data = await response.json();
         setSites([data.site, ...sites]);
-        setFormData({ domain: "", wpSiteUrl: "" });
+        setFormData({ domain: "", wpSiteUrl: "", apiKey: "" });
       } else {
         const error = await response.json();
         alert(error.error || "Failed to add site");
@@ -263,7 +263,19 @@ export default function SitesPage() {
                     onChange={(e) => setFormData({ ...formData, wpSiteUrl: e.target.value })}
                   />
                 </div>
-                <Button onClick={handleAddSite} disabled={isAddingSite} className="w-full">
+                <div>
+                  <Label htmlFor="apiKey">WordPress Plugin API Key</Label>
+                  <Input
+                    id="apiKey"
+                    placeholder="Enter API key from WordPress plugin"
+                    value={formData.apiKey}
+                    onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
+                  />
+                  <p className="text-xs text-slate-500 mt-1">
+                    Install the Headless WP Connector plugin on your WordPress site, generate an API key in plugin settings, and paste it here.
+                  </p>
+                </div>
+                <Button onClick={handleAddSite} disabled={isAddingSite || !formData.apiKey} className="w-full">
                   {isAddingSite ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                   Add Site
                 </Button>
@@ -332,7 +344,16 @@ export default function SitesPage() {
                       onChange={(e) => setFormData({ ...formData, wpSiteUrl: e.target.value })}
                     />
                   </div>
-                  <Button onClick={handleAddSite} disabled={isAddingSite} className="w-full">
+                  <div>
+                    <Label htmlFor="apiKey">WordPress Plugin API Key</Label>
+                    <Input
+                      id="apiKey"
+                      placeholder="Enter API key from WordPress plugin"
+                      value={formData.apiKey}
+                      onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
+                    />
+                  </div>
+                  <Button onClick={handleAddSite} disabled={isAddingSite || !formData.apiKey} className="w-full">
                     {isAddingSite ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                     Add Site
                   </Button>

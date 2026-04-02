@@ -18,11 +18,35 @@ export async function POST(request: Request) {
 
     const { userId } = auth;
     const body = await request.json();
-    const { domain, wpSiteUrl } = body;
+    const { domain, wpSiteUrl, apiKey: wpApiKey } = body;
 
     if (!domain || !wpSiteUrl) {
       return NextResponse.json(
         { error: 'Domain and WordPress site URL are required' },
+        { status: 400 }
+      );
+    }
+
+    if (!wpApiKey) {
+      return NextResponse.json(
+        { error: 'API key is required from WordPress plugin' },
+        { status: 400 }
+      );
+    }
+
+    const cleanWpUrl = wpSiteUrl.startsWith('http') ? wpSiteUrl : `https://${wpSiteUrl}`;
+    
+    try {
+      const verifyResponse = await fetch(`${cleanWpUrl}/wp-json/headless/v1/verify?api_key=${wpApiKey}`);
+      if (!verifyResponse.ok) {
+        return NextResponse.json(
+          { error: 'Failed to verify WordPress connection. Please check your API key.' },
+          { status: 400 }
+        );
+      }
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Cannot connect to WordPress site. Please check the URL and try again.' },
         { status: 400 }
       );
     }
@@ -41,14 +65,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const apiKey = generateApiKey();
+    const saasApiKey = generateApiKey();
 
     const site = await prisma.site.create({
       data: {
         userId,
         domain,
         wpSiteUrl: wpSiteUrl.startsWith('http') ? wpSiteUrl : `https://${wpSiteUrl}`,
-        apiKey,
+        apiKey: saasApiKey,
         status: 'disconnected',
       },
     });
