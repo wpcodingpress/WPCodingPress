@@ -28,58 +28,59 @@ class Headless_WP_Connector {
     }
     
     public function register_routes() {
+        // Public endpoints (read-only content) - no API key required
         register_rest_route('eyepress/v1', '/posts', [
             'methods' => 'GET',
             'callback' => [$this, 'get_posts'],
-            'permission_callback' => [$this, 'check_api_key'],
+            'permission_callback' => '__return_true',
         ]);
         
         register_rest_route('eyepress/v1', '/post/(?P<slug>[^/]+)', [
             'methods' => 'GET',
             'callback' => [$this, 'get_post'],
-            'permission_callback' => [$this, 'check_api_key'],
+            'permission_callback' => '__return_true',
         ]);
         
         register_rest_route('eyepress/v1', '/categories', [
             'methods' => 'GET',
             'callback' => [$this, 'get_categories'],
-            'permission_callback' => [$this, 'check_api_key'],
+            'permission_callback' => '__return_true',
         ]);
         
         register_rest_route('eyepress/v1', '/category/(?P<slug>[^/]+)', [
             'methods' => 'GET',
             'callback' => [$this, 'get_category_posts'],
-            'permission_callback' => [$this, 'check_api_key'],
+            'permission_callback' => '__return_true',
         ]);
         
         register_rest_route('eyepress/v1', '/menus', [
             'methods' => 'GET',
             'callback' => [$this, 'get_menus'],
-            'permission_callback' => [$this, 'check_api_key'],
+            'permission_callback' => '__return_true',
         ]);
         
         register_rest_route('eyepress/v1', '/site-options', [
             'methods' => 'GET',
             'callback' => [$this, 'get_site_options'],
-            'permission_callback' => [$this, 'check_api_key'],
+            'permission_callback' => '__return_true',
         ]);
         
         register_rest_route('eyepress/v1', '/search', [
             'methods' => 'GET',
             'callback' => [$this, 'search_posts'],
-            'permission_callback' => [$this, 'check_api_key'],
+            'permission_callback' => '__return_true',
         ]);
         
         register_rest_route('eyepress/v1', '/stats', [
             'methods' => 'GET',
             'callback' => [$this, 'get_stats'],
-            'permission_callback' => [$this, 'check_api_key'],
+            'permission_callback' => '__return_true',
         ]);
         
         register_rest_route('eyepress/v1', '/ticker', [
             'methods' => 'GET',
             'callback' => [$this, 'get_ticker'],
-            'permission_callback' => [$this, 'check_api_key'],
+            'permission_callback' => '__return_true',
         ]);
         
         register_rest_route('headless/v1', '/export', [
