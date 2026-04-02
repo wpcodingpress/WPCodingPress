@@ -36,31 +36,33 @@ export async function POST(request: Request) {
 
     const cleanWpUrl = wpSiteUrl.startsWith('http') ? wpSiteUrl : `https://${wpSiteUrl}`;
     
+    let verifyResult;
     try {
       const verifyResponse = await fetch(`${cleanWpUrl}/wp-json/headless/v1/verify?api_key=${wpApiKey}`);
       if (!verifyResponse.ok) {
         return NextResponse.json(
-          { error: 'Failed to verify WordPress connection. Please check your API key.' },
+          { error: 'Invalid API key. Please check your WordPress plugin settings and generate a new key.' },
           { status: 400 }
         );
       }
+      verifyResult = await verifyResponse.json();
     } catch (error) {
       return NextResponse.json(
-        { error: 'Cannot connect to WordPress site. Please check the URL and try again.' },
+        { error: 'Cannot connect to WordPress site. Please verify your WordPress URL is correct and the plugin is installed.' },
         { status: 400 }
       );
     }
 
     const existingSite = await prisma.site.findFirst({
       where: {
-        domain,
+        wpSiteUrl: cleanWpUrl,
         userId,
       },
     });
 
     if (existingSite) {
       return NextResponse.json(
-        { error: 'Site already exists' },
+        { error: 'This WordPress site is already connected to your account' },
         { status: 400 }
       );
     }
@@ -71,9 +73,10 @@ export async function POST(request: Request) {
       data: {
         userId,
         domain,
-        wpSiteUrl: wpSiteUrl.startsWith('http') ? wpSiteUrl : `https://${wpSiteUrl}`,
+        wpSiteUrl: cleanWpUrl,
         apiKey: saasApiKey,
-        status: 'disconnected',
+        status: 'connected',
+        lastSyncAt: new Date(),
       },
     });
 

@@ -13,7 +13,9 @@ import {
   ExternalLink,
   Zap,
   Copy,
-  AlertCircle
+  AlertCircle,
+  Check,
+  ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -226,58 +228,88 @@ export default function SitesPage() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add WordPress Site</DialogTitle>
-                <DialogDescription>
-                  Enter your WordPress site details to connect it to WPCodingPress.
+                <DialogTitle>Connect Your WordPress Site</DialogTitle>
+                <DialogDescription className="text-left">
+                  Follow these simple steps to connect your WordPress site and convert it to headless Next.js.
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-4 mt-4">
-                <div>
-                  <Label htmlFor="domain">
-                    {isEnterprise ? "Custom Domain" : "Site Name"} 
-                    {isEnterprise && <span className="text-red-500">*</span>}
-                  </Label>
-                  <Input
-                    id="domain"
-                    placeholder={isEnterprise ? "mycustomdomain.com" : "my-site-name"}
-                    value={formData.domain}
-                    onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
-                  />
-                  {!isEnterprise && (
-                    <p className="text-xs text-slate-500 mt-1">
-                      Custom domain available on Enterprise plan. Enter any name for your default URL.
-                    </p>
-                  )}
-                  {isEnterprise && (
-                    <p className="text-xs text-green-600 mt-1">
-                      Custom domain included with your Enterprise plan.
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="wpSiteUrl">WordPress Site URL</Label>
-                  <Input
-                    id="wpSiteUrl"
-                    placeholder="https://example.com"
-                    value={formData.wpSiteUrl}
-                    onChange={(e) => setFormData({ ...formData, wpSiteUrl: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="apiKey">WordPress Plugin API Key</Label>
-                  <Input
-                    id="apiKey"
-                    placeholder="Enter API key from WordPress plugin"
-                    value={formData.apiKey}
-                    onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
-                  />
-                  <p className="text-xs text-slate-500 mt-1">
-                    Install the Headless WP Connector plugin on your WordPress site, generate an API key in plugin settings, and paste it here.
+              
+              <div className="mt-4 space-y-6">
+                {/* Step-by-step instructions */}
+                <div className="bg-blue-50 rounded-lg p-4 space-y-3">
+                  <p className="font-semibold text-blue-900 flex items-center gap-2">
+                    <span className="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">1</span>
+                    Install the WordPress Plugin
+                  </p>
+                  <p className="text-sm text-blue-800 ml-8">
+                    Download the plugin from your <a href="/dashboard/downloads" className="underline font-medium">Downloads page</a>, then upload and activate it on your WordPress site.
+                  </p>
+                  
+                  <p className="font-semibold text-blue-900 flex items-center gap-2 mt-4">
+                    <span className="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">2</span>
+                    Generate API Key in WordPress
+                  </p>
+                  <p className="text-sm text-blue-800 ml-8">
+                    Go to <strong>Settings → Headless Connector</strong> in your WordPress admin, then click <strong>"Generate New API Key"</strong>.
+                  </p>
+                  
+                  <p className="font-semibold text-blue-900 flex items-center gap-2 mt-4">
+                    <span className="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">3</span>
+                    Paste API Key Below
+                  </p>
+                  <p className="text-sm text-blue-800 ml-8">
+                    Copy the API key from your WordPress plugin and paste it in the field below.
                   </p>
                 </div>
-                <Button onClick={handleAddSite} disabled={isAddingSite || !formData.apiKey} className="w-full">
-                  {isAddingSite ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  Add Site
+                
+                {/* Form Fields */}
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="wpSiteUrl">Your WordPress Site URL</Label>
+                    <Input
+                      id="wpSiteUrl"
+                      placeholder="https://mywordpress.com"
+                      value={formData.wpSiteUrl}
+                      onChange={(e) => setFormData({ ...formData, wpSiteUrl: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="apiKey">Plugin API Key</Label>
+                    <Input
+                      id="apiKey"
+                      placeholder="hwpc_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                      value={formData.apiKey}
+                      onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="domain">
+                      {isEnterprise ? "Custom Domain" : "Site Name (Optional)"} 
+                    </Label>
+                    <Input
+                      id="domain"
+                      placeholder={isEnterprise ? "mycustomdomain.com" : "my-site (optional - for your default URL)"}
+                      value={formData.domain}
+                      onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
+                    />
+                    {!isEnterprise && (
+                      <p className="text-xs text-slate-500 mt-1">
+                        Optional. Custom domain available on Enterprise plan.
+                      </p>
+                    )}
+                  </div>
+                </div>
+                
+                <Button 
+                  onClick={handleAddSite} 
+                  disabled={isAddingSite || !formData.wpSiteUrl || !formData.apiKey} 
+                  className="w-full"
+                >
+                  {isAddingSite ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Connecting...</>
+                  ) : (
+                    <><Zap className="mr-2 h-4 w-4" /> Connect Site</>
+                  )}
                 </Button>
               </div>
             </DialogContent>
@@ -313,49 +345,86 @@ export default function SitesPage() {
                   Add Your First Site
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="max-w-lg">
                 <DialogHeader>
-                  <DialogTitle>Add WordPress Site</DialogTitle>
+                  <DialogTitle>Connect Your WordPress Site</DialogTitle>
+                  <DialogDescription className="text-left">
+                    Follow these simple steps to connect your WordPress site and convert it to headless Next.js.
+                  </DialogDescription>
                 </DialogHeader>
-                <div className="space-y-4 mt-4">
-                  <div>
-                    <Label htmlFor="domain">
-                      {isEnterprise ? "Custom Domain" : "Site Name"} 
-                      {isEnterprise && <span className="text-red-500">*</span>}
-                    </Label>
-                    <Input
-                      id="domain"
-                      placeholder={isEnterprise ? "mycustomdomain.com" : "my-site-name"}
-                      value={formData.domain}
-                      onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
-                    />
-                    {!isEnterprise && (
+                
+                <div className="mt-4 space-y-6">
+                  {/* Step-by-step instructions */}
+                  <div className="bg-blue-50 rounded-lg p-4 space-y-3">
+                    <p className="font-semibold text-blue-900 flex items-center gap-2">
+                      <span className="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">1</span>
+                      Install the WordPress Plugin
+                    </p>
+                    <p className="text-sm text-blue-800 ml-8">
+                      Download the plugin from your <a href="/dashboard/downloads" className="underline font-medium">Downloads page</a>, then upload and activate it on your WordPress site.
+                    </p>
+                    
+                    <p className="font-semibold text-blue-900 flex items-center gap-2 mt-4">
+                      <span className="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">2</span>
+                      Generate API Key in WordPress
+                    </p>
+                    <p className="text-sm text-blue-800 ml-8">
+                      Go to <strong>Settings → Headless Connector</strong> in your WordPress admin, then click <strong>"Generate New API Key"</strong>.
+                    </p>
+                    
+                    <p className="font-semibold text-blue-900 flex items-center gap-2 mt-4">
+                      <span className="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">3</span>
+                      Paste API Key Below
+                    </p>
+                    <p className="text-sm text-blue-800 ml-8">
+                      Copy the API key from your WordPress plugin and paste it in the field below.
+                    </p>
+                  </div>
+                  
+                  {/* Form Fields */}
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="wpSiteUrl">Your WordPress Site URL</Label>
+                      <Input
+                        id="wpSiteUrl"
+                        placeholder="https://mywordpress.com"
+                        value={formData.wpSiteUrl}
+                        onChange={(e) => setFormData({ ...formData, wpSiteUrl: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="apiKey">Plugin API Key</Label>
+                      <Input
+                        id="apiKey"
+                        placeholder="hwpc_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                        value={formData.apiKey}
+                        onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="domain">Site Name (Optional)</Label>
+                      <Input
+                        id="domain"
+                        placeholder="my-site (optional - for your default URL)"
+                        value={formData.domain}
+                        onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
+                      />
                       <p className="text-xs text-slate-500 mt-1">
-                        Custom domain available on Enterprise plan. Enter any name for your default URL.
+                        Optional. Custom domain available on Enterprise plan.
                       </p>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    onClick={handleAddSite} 
+                    disabled={isAddingSite || !formData.wpSiteUrl || !formData.apiKey} 
+                    className="w-full"
+                  >
+                    {isAddingSite ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Connecting...</>
+                    ) : (
+                      <><Zap className="mr-2 h-4 w-4" /> Connect Site</>
                     )}
-                  </div>
-                  <div>
-                    <Label htmlFor="wpSiteUrl">WordPress Site URL</Label>
-                    <Input
-                      id="wpSiteUrl"
-                      placeholder="https://example.com"
-                      value={formData.wpSiteUrl}
-                      onChange={(e) => setFormData({ ...formData, wpSiteUrl: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="apiKey">WordPress Plugin API Key</Label>
-                    <Input
-                      id="apiKey"
-                      placeholder="Enter API key from WordPress plugin"
-                      value={formData.apiKey}
-                      onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
-                    />
-                  </div>
-                  <Button onClick={handleAddSite} disabled={isAddingSite || !formData.apiKey} className="w-full">
-                    {isAddingSite ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    Add Site
                   </Button>
                 </div>
               </DialogContent>
@@ -392,14 +461,6 @@ export default function SitesPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => copyApiKey(site.apiKey)}
-                    >
-                      <Copy className="h-4 w-4 mr-1" />
-                      API Key
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
                       className="text-red-600 hover:text-red-700"
                       onClick={() => handleDeleteSite(site.id)}
                     >
@@ -408,13 +469,18 @@ export default function SitesPage() {
                   </div>
                 </div>
 
-                {/* API Key Display */}
-                <div className="mt-4 p-3 bg-slate-50 rounded-lg">
-                  <p className="text-xs text-slate-500 mb-1">API Key</p>
-                  <code className="text-sm font-mono text-slate-700">{site.apiKey}</code>
-                  <p className="text-xs text-slate-500 mt-2">
-                    Install the Headless WP Connector plugin on your WordPress site and enter this API key in the plugin settings.
-                  </p>
+                {/* Quick Info */}
+                <div className="mt-4 flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-4">
+                    <span className="text-slate-500">
+                      <strong className="text-slate-700">WordPress:</strong> {site.wpSiteUrl}
+                    </span>
+                  </div>
+                  {site.lastSyncAt && (
+                    <span className="text-slate-400 text-xs">
+                      Last synced: {new Date(site.lastSyncAt).toLocaleString()}
+                    </span>
+                  )}
                 </div>
 
                 {/* Conversion Status */}
