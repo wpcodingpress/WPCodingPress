@@ -4,9 +4,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 
 const GUMROAD_PRODUCT_LINK = process.env.GUMROAD_PRODUCT_LINK || 'https://rahmanbld.gumroad.com/l/wpcodingpress';
-const TESTING_MODE = process.env.TESTING_MODE === 'true' || process.env.TESTING_MODE === 'true';
-
-console.log('TESTING_MODE env:', process.env.TESTING_MODE);
+const TESTING_MODE = process.env.TESTING_MODE === 'true';
 
 const PLANS = {
   pro: {
@@ -95,10 +93,10 @@ export async function POST(request: Request) {
       plan: selectedPlan,
       message: 'You will be redirected to Gumroad to complete payment. After payment, enter your Gumroad email to verify and activate your subscription.'
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Subscription error:', error);
     return NextResponse.json(
-      { error: 'Failed to create subscription checkout' },
+      { error: error.message || 'Failed to create subscription', details: error.stack },
       { status: 500 }
     );
   }

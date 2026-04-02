@@ -113,6 +113,8 @@ export default function SubscriptionPage() {
 
       const data = await response.json();
 
+      console.log('Subscription response:', data);
+
       if (data.url) {
         window.location.href = data.url;
       } else if (data.subscription || data.message) {
@@ -122,7 +124,7 @@ export default function SubscriptionPage() {
         }
         alert(data.message || 'Subscription activated!');
       } else {
-        alert('Failed to create subscription. Please try again.');
+        alert(data.error || 'Failed to create subscription. Please try again.');
       }
     } catch (error) {
       console.error('Subscription error:', error);
