@@ -76,17 +76,21 @@ export async function POST(request: Request) {
         const subscriptionId = data.id;
         const status = getSubscriptionStatus(attributes.status);
         const planName = mapPlanName(attributes.plan_name);
-        const periodEnd = attributes.ends_at ? new Date(attributes.ends_at) : null;
         const cancelAtPeriodEnd = attributes.cancel_at !== null;
+
+        const updateData: Record<string, unknown> = {
+          status,
+          plan: planName,
+          cancelAtPeriodEnd,
+        };
+
+        if (attributes.ends_at) {
+          updateData.currentPeriodEnd = new Date(attributes.ends_at);
+        }
 
         await prisma.subscription.updateMany({
           where: { lemonSubscriptionId: subscriptionId },
-          data: {
-            status,
-            plan: planName,
-            currentPeriodEnd: periodEnd,
-            cancelAtPeriodEnd,
-          },
+          data: updateData,
         });
 
         console.log(`Subscription updated: ${subscriptionId}`);
@@ -95,15 +99,19 @@ export async function POST(request: Request) {
 
       case 'subscription_cancelled': {
         const subscriptionId = data.id;
-        const endsAt = attributes.ends_at ? new Date(attributes.ends_at) : null;
+
+        const updateData: Record<string, unknown> = {
+          status: 'cancelled',
+          cancelAtPeriodEnd: true,
+        };
+
+        if (attributes.ends_at) {
+          updateData.currentPeriodEnd = new Date(attributes.ends_at);
+        }
 
         await prisma.subscription.updateMany({
           where: { lemonSubscriptionId: subscriptionId },
-          data: {
-            status: 'cancelled',
-            cancelAtPeriodEnd: true,
-            currentPeriodEnd: endsAt,
-          },
+          data: updateData,
         });
 
         console.log(`Subscription cancelled: ${subscriptionId}`);
