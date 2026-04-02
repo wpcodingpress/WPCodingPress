@@ -4,7 +4,9 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 
 const GUMROAD_PRODUCT_LINK = process.env.GUMROAD_PRODUCT_LINK || 'https://rahmanbld.gumroad.com/l/wpcodingpress';
-const TESTING_MODE = process.env.TESTING_MODE === 'true' || process.env.TESTING_MODE === 'TESTING_MODE';
+const TESTING_MODE = process.env.TESTING_MODE === 'true' || process.env.TESTING_MODE === 'true';
+
+console.log('TESTING_MODE env:', process.env.TESTING_MODE);
 
 const PLANS = {
   pro: {
@@ -29,22 +31,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    console.log('Session user:', session.user);
+
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
     });
 
     if (!user) {
+      console.log('User not found for id:', session.user.id);
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     const body = await request.json();
     const { plan } = body;
 
+    console.log('Plan:', plan, 'TESTING_MODE:', TESTING_MODE);
+
     if (!plan || !PLANS[plan as keyof typeof PLANS]) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
     }
 
     if (TESTING_MODE) {
+      console.log('Entering TESTING_MODE block');
       const existingSub = await prisma.subscription.findFirst({
         where: { userId: user.id, status: 'active' },
       });
@@ -64,6 +72,9 @@ export async function POST(request: Request) {
           currentPeriodStart: new Date(),
           currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         },
+      }).catch(err => {
+        console.error('Prisma create error:', err);
+        throw err;
       });
 
       return NextResponse.json({ 
