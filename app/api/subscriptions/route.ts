@@ -61,8 +61,8 @@ export async function POST(request: Request) {
           userId: user.id,
           plan: plan,
           status: 'active',
-          startDate: new Date(),
-          gumroadOrderId: 'TESTING_MODE',
+          currentPeriodStart: new Date(),
+          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         },
       });
 
