@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TEMPLATES } from "@/components/templates";
 
 interface Site {
   id: string;
@@ -35,6 +36,7 @@ interface Site {
   wpSiteUrl: string;
   apiKey: string;
   status: string;
+  template: string;
   lastSyncAt: string | null;
   createdAt: string;
   jobs: Array<{
@@ -76,6 +78,9 @@ export default function SitesPage() {
   const [pollingSiteId, setPollingSiteId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ domain: "", wpSiteUrl: "", apiKey: "" });
   const [subscriptionData, setSubscriptionData] = useState<SubscriptionData | null>(null);
+  const [showTemplateDialog, setShowTemplateDialog] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("news");
+  const [convertingSiteIdForTemplate, setConvertingSiteIdForTemplate] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -169,14 +174,28 @@ export default function SitesPage() {
     }
   };
 
-  const handleConvert = async (siteId: string) => {
-    setConvertingSiteId(siteId);
-    setPollingSiteId(siteId);
+  const openTemplateDialog = (siteId: string) => {
+    setConvertingSiteIdForTemplate(siteId);
+    const site = sites.find(s => s.id === siteId);
+    setSelectedTemplate(site?.template || 'news');
+    setShowTemplateDialog(true);
+  };
+
+  const handleConvert = async () => {
+    if (!convertingSiteIdForTemplate) return;
+    
+    setShowTemplateDialog(false);
+    setConvertingSiteId(convertingSiteIdForTemplate);
+    setPollingSiteId(convertingSiteIdForTemplate);
+    
     try {
       const response = await fetch("/api/convert", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ siteId }),
+        body: JSON.stringify({ 
+          siteId: convertingSiteIdForTemplate,
+          options: { template: selectedTemplate }
+        }),
       });
       
       if (!response.ok) {
@@ -185,10 +204,12 @@ export default function SitesPage() {
         setConvertingSiteId(null);
         setPollingSiteId(null);
       }
+      setConvertingSiteIdForTemplate(null);
     } catch (error) {
       console.error("Error converting site:", error);
       setConvertingSiteId(null);
       setPollingSiteId(null);
+      setConvertingSiteIdForTemplate(null);
     }
   };
 
@@ -539,7 +560,7 @@ export default function SitesPage() {
                 {hasActiveSubscription && site.status === "connected" && !latestJob?.outputUrl && (
                   <div className="mt-4">
                     <Button
-                      onClick={() => handleConvert(site.id)}
+                      onClick={() => openTemplateDialog(site.id)}
                       disabled={pollingSiteId === site.id || latestJob?.status === "processing"}
                       className="w-full"
                     >
@@ -597,6 +618,53 @@ export default function SitesPage() {
           </div>
         </div>
       )}
+
+      {/* Template Selection Dialog */}
+      <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Choose Your Template</DialogTitle>
+            <DialogDescription>
+              Select a design template for your headless site. This choice is final - to change, you'll need to reconnect your WordPress site with a new API key.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-3 gap-4 py-4">
+            {TEMPLATES.map((template) => (
+              <div
+                key={template.id}
+                onClick={() => setSelectedTemplate(template.id)}
+                className={`cursor-pointer rounded-lg border-2 p-4 transition ${
+                  selectedTemplate === template.id
+                    ? "border-primary bg-primary/5"
+                    : "border-slate-200 hover:border-slate-300"
+                }`}
+              >
+                <div className="text-4xl mb-2 text-center">{template.preview}</div>
+                <h3 className="font-semibold text-center text-slate-900">{template.name}</h3>
+                <p className="text-xs text-slate-500 text-center mt-2 line-clamp-3">
+                  {template.description}
+                </p>
+                {selectedTemplate === template.id && (
+                  <div className="mt-3 flex justify-center">
+                    <Check className="h-5 w-5 text-primary" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setShowTemplateDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleConvert}>
+              <Zap className="mr-2 h-4 w-4" />
+              Convert Now
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

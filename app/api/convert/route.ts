@@ -43,6 +43,13 @@ export async function POST(request: Request) {
     const { userId } = auth;
     const body = await request.json();
     const { siteId, options = {} } = body;
+    const template = options.template || 'news';
+
+    // Validate template
+    const validTemplates = ['news', 'business', 'modern'];
+    if (!validTemplates.includes(template)) {
+      return NextResponse.json({ error: 'Invalid template selected' }, { status: 400 });
+    }
 
     if (!siteId) {
       return NextResponse.json({ error: 'Site ID is required' }, { status: 400 });
@@ -120,7 +127,7 @@ export async function POST(request: Request) {
     jobQueue.set(job.id, { processing: true, startedAt: Date.now() });
     
     // Fire and forget - process in background
-    processConversionJob(job.id, site.id, site.wpSiteUrl, wpApiKey, site.domain)
+    processConversionJob(job.id, site.id, site.wpSiteUrl, wpApiKey, site.domain, template)
       .then(() => jobQueue.delete(job.id))
       .catch((err) => {
         console.error('Job processing error:', err);
@@ -148,7 +155,8 @@ async function processConversionJob(
   siteId: string,
   wpSiteUrl: string,
   apiKey: string,
-  originalDomain: string
+  originalDomain: string,
+  template: string = 'news'
 ) {
   let logs = '';
 
@@ -158,7 +166,7 @@ async function processConversionJob(
       data: {
         status: 'processing',
         startedAt: new Date(),
-        logs: `Job #${jobId} started at ${new Date().toISOString()}\n`,
+        logs: `Job #${jobId} started at ${new Date().toISOString()}\nTemplate: ${template}\n`,
       },
     });
 
@@ -203,7 +211,10 @@ async function processConversionJob(
 
     await prisma.site.update({
       where: { id: siteId },
-      data: { lastSyncAt: new Date() },
+      data: { 
+        lastSyncAt: new Date(),
+        template: template,
+      },
     });
 
   } catch (error) {

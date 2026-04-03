@@ -1,6 +1,9 @@
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
-import HeadlessSiteRenderer from './HeadlessSiteRenderer';
+import NewsMagazineTemplate from '@/components/templates/NewsMagazine';
+import BusinessTemplate from '@/components/templates/Business';
+import ModernTemplate from '@/components/templates/Modern';
+import { TEMPLATES } from '@/components/templates';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -19,12 +22,6 @@ async function getSiteBySlug(slug: string) {
         orderBy: { completedAt: 'desc' },
         take: 1,
       },
-      user: {
-        select: {
-          email: true,
-          name: true,
-        },
-      },
     },
   });
 
@@ -36,6 +33,18 @@ async function getSiteBySlug(slug: string) {
   return matchingSite || null;
 }
 
+function getTemplateComponent(template: string) {
+  switch (template) {
+    case 'business':
+      return BusinessTemplate;
+    case 'modern':
+      return ModernTemplate;
+    case 'news':
+    default:
+      return NewsMagazineTemplate;
+  }
+}
+
 export default async function SitePage({ params }: PageProps) {
   const { slug } = await params;
   
@@ -45,14 +54,14 @@ export default async function SitePage({ params }: PageProps) {
     notFound();
   }
 
-  const latestJob = site.jobs[0];
-  const wpSiteUrl = site.wpSiteUrl;
-  const apiKey = site.wpApiKey || '';
+  const template = site.template || 'news';
+  const TemplateComponent = getTemplateComponent(template);
+  const templateInfo = TEMPLATES.find(t => t.id === template);
 
   return (
-    <HeadlessSiteRenderer
-      wpSiteUrl={wpSiteUrl}
-      apiKey={apiKey}
+    <TemplateComponent
+      wpSiteUrl={site.wpSiteUrl}
+      apiKey={site.wpApiKey || ''}
       siteName={site.domain}
     />
   );
