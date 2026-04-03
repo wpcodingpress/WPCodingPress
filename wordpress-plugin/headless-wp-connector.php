@@ -31,12 +31,50 @@ class Headless_WP_Connector {
         $this->subscriptions_table = $wpdb->prefix . 'eyepress_subscriptions';
         
         register_activation_hook(__FILE__, [$this, 'create_tables']);
+        register_activation_hook(__FILE__, [$this, 'register_post_types']);
         
+        add_action('init', [$this, 'register_post_types']);
         add_action('rest_api_init', [$this, 'register_routes']);
         add_action('admin_menu', [$this, 'add_admin_menu']);
         add_action('admin_init', [$this, 'settings_init']);
         add_action('wp_insert_comment', [$this, 'track_new_comment'], 99, 2);
         add_action('transition_comment_status', [$this, 'track_comment_status_change'], 99, 3);
+    }
+    
+    public function register_post_types() {
+        register_post_type('video', [
+            'labels' => [
+                'name' => 'Videos',
+                'singular_name' => 'Video',
+            ],
+            'public' => true,
+            'show_in_rest' => true,
+            'supports' => ['title', 'editor', 'thumbnail', 'excerpt', 'custom-fields'],
+            'has_archive' => true,
+            'rewrite' => ['slug' => 'videos'],
+        ]);
+        
+        register_post_type('ad', [
+            'labels' => [
+                'name' => 'Advertisements',
+                'singular_name' => 'Advertisement',
+            ],
+            'public' => true,
+            'show_in_rest' => true,
+            'supports' => ['title', 'thumbnail', 'custom-fields'],
+            'has_archive' => false,
+            'rewrite' => ['slug' => 'ads'],
+        ]);
+        
+        register_taxonomy('ad_position', 'ad', [
+            'labels' => [
+                'name' => 'Ad Positions',
+                'singular_name' => 'Ad Position',
+            ],
+            'public' => true,
+            'show_in_rest' => true,
+            'hierarchical' => true,
+        ]);
     }
     
     public function create_tables() {
