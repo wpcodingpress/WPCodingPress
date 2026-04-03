@@ -174,18 +174,22 @@ async function processConversionJob(
     logs += `  ✓ Transformed ${transformedData.posts.length} posts\n`;
     logs += `  ✓ Transformed ${transformedData.categories.length} categories\n`;
 
-    logs += `\nStep 3: Preparing deployment...\n`;
+    logs += `\nStep 3: Preparing headless configuration...\n`;
     const deploymentConfig = prepareDeploymentConfig(originalDomain, transformedData, wpSiteUrl, apiKey);
     logs += `  ✓ Configuration prepared\n`;
     logs += `  ✓ WordPress API: ${wpSiteUrl}\n`;
+    logs += `  ✓ API Endpoint: ${wpSiteUrl}/wp-json/eyepress/v1\n`;
 
-    logs += `\nStep 4: Creating GitHub repository...\n`;
-    const githubRepoUrl = await createGitHubRepo(jobId, originalDomain, wpSiteUrl, apiKey);
-    logs += `  ✓ Repository created: ${githubRepoUrl}\n`;
+    logs += `\nStep 4: Generating site URL...\n`;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://wpcodingpress.onrender.com';
+    const siteSlug = originalDomain.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+    const outputUrl = `${appUrl}/sites/${siteSlug}`;
+    logs += `  ✓ Site URL: ${outputUrl}\n`;
 
-    logs += `\nStep 5: Deploying to Render...\n`;
-    const outputUrl = await deployToRender(jobId, githubRepoUrl, deploymentConfig);
-    logs += `  ✓ Deployed to: ${outputUrl}\n`;
+    logs += `\n✅ Conversion completed!\n`;
+    logs += `Your headless site is now live at: ${outputUrl}\n`;
+    logs += `\nThe site will display your WordPress content through our Next.js renderer.\n`;
+    logs += `Any changes in your WordPress site will appear automatically.\n`;
 
     await prisma.job.update({
       where: { id: jobId },
@@ -319,51 +323,14 @@ async function createGitHubRepo(jobId: string, domain: string, wpSiteUrl: string
   
   const token = process.env.RENDER_GITHUB_TOKEN;
   
-  // Create a custom data file that the template will use
-  const siteData = {
-    wordpress_url: wpSiteUrl,
-    api_key: apiKey,
-    site_name: domain,
-    created_at: new Date().toISOString(),
-  };
-  
-  // Store the site data in environment variables passed to Render
-  // This will be used by the deployed site to connect to WordPress
-  
   if (!token) {
-    console.log('GitHub token not configured, simulating repo creation');
+    console.log('GitHub token not configured, using template repo directly');
     return `https://github.com/${TEMPLATE_REPO_OWNER}/${TEMPLATE_REPO_NAME}`;
   }
 
-  try {
-    const response = await fetch('https://api.github.com/user/repos', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/vnd.github+json',
-      },
-      body: JSON.stringify({
-        name: repoName,
-        description: `Headless WordPress site for ${domain}`,
-        private: true,
-        auto_init: true,
-        template: false,
-      }),
-    });
-
-    if (response.status === 201) {
-      const repoData = await response.json();
-      return repoData.clone_url;
-    } else if (response.status === 422) {
-      return `https://github.com/${process.env.GITHUB_REPO_OWNER || 'theeyepress'}/${repoName}`;
-    }
-    
-    throw new Error(`GitHub API error: ${response.status}`);
-  } catch (error) {
-    console.error('GitHub repo creation error:', error);
-    return `https://github.com/${TEMPLATE_REPO_OWNER}/${TEMPLATE_REPO_NAME}`;
-  }
+  // Since we can't easily push files to GitHub, use the template repo directly
+  // The template will be deployed and env vars will be set
+  return `https://github.com/${TEMPLATE_REPO_OWNER}/${TEMPLATE_REPO_NAME}`;
 }
 
 async function deployToRender(
@@ -373,6 +340,7 @@ async function deployToRender(
 ): Promise<string> {
   const renderApiKey = process.env.RENDER_API_KEY;
   const githubToken = process.env.RENDER_GITHUB_TOKEN;
+  const renderOwnerId = process.env.RENDER_OWNER_ID || 'tea-d756jl4hg0os73adtcc0';
 
   if (!renderApiKey) {
     console.log('Render API key not configured');
@@ -391,7 +359,7 @@ async function deployToRender(
     // Add required environment variables for WordPress connection
     envVarsArray.push(
       { key: 'NEXT_PUBLIC_WORDPRESS_URL', value: envVars.NEXT_PUBLIC_WORDPRESS_URL || '' },
-      { key: 'NEXT_PUBLIC_WORDPRESS_API_URL', value: envVars.NEXT_PUBLIC_API_BASE_URL || '' },
+      { key: 'NEXT_PUBLIC_WORDPRESS_API_URL', value: envVars.NEXT_PUBLIC_WORDPRESS_API_URL || '' },
       { key: 'WORDPRESS_API_KEY', value: envVars.WORDPRESS_API_KEY || '' },
       { key: 'NODE_ENV', value: 'production' }
     );
@@ -405,6 +373,7 @@ async function deployToRender(
       body: JSON.stringify({
         service: {
           name: serviceName,
+          ownerId: renderOwnerId,
           region: 'oregon',
           repo: githubToken ? repoUrl.replace('https://', `https://${githubToken}@`) : repoUrl,
           branch: 'main',
