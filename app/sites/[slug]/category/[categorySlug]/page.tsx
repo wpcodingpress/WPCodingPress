@@ -9,10 +9,7 @@ interface PageProps {
 async function getSiteBySlug(slug: string) {
   const site = await prisma.site.findFirst({
     where: {
-      domain: {
-        equals: slug,
-        mode: 'insensitive',
-      },
+      domain: slug.toLowerCase(),
       status: 'connected',
     },
     include: {
