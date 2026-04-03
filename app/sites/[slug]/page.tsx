@@ -68,16 +68,5 @@ export default async function SitePage({ params }: PageProps) {
 }
 
 export async function generateStaticParams() {
-  try {
-    const sites = await prisma.site.findMany({
-      where: { status: 'connected' },
-      select: { domain: true },
-    });
-    
-    return sites.map((site) => ({
-      slug: domainToSlug(site.domain),
-    }));
-  } catch {
-    return [];
-  }
+  return [];
 }

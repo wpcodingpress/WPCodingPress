@@ -189,8 +189,8 @@ async function processConversionJob(
     logs += `  ✓ API Endpoint: ${wpSiteUrl}/wp-json/eyepress/v1\n`;
 
     logs += `\nStep 4: Generating site URL...\n`;
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://wpcodingpress.onrender.com';
-    const siteSlug = originalDomain.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://wpcodingpress.com';
+    const siteSlug = originalDomain.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
     const outputUrl = `${appUrl}/sites/${siteSlug}`;
     logs += `  ✓ Site URL: ${outputUrl}\n`;
 
