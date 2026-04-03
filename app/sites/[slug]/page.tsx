@@ -6,12 +6,13 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+function domainToSlug(domain: string): string {
+  return domain.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+}
+
 async function getSiteBySlug(slug: string) {
-  const site = await prisma.site.findFirst({
-    where: {
-      domain: slug.toLowerCase(),
-      status: 'connected',
-    },
+  const allSites = await prisma.site.findMany({
+    where: { status: 'connected' },
     include: {
       jobs: {
         where: { status: 'completed' },
@@ -26,7 +27,13 @@ async function getSiteBySlug(slug: string) {
       },
     },
   });
-  return site;
+
+  const matchingSite = allSites.find(site => {
+    const siteSlug = domainToSlug(site.domain);
+    return siteSlug === slug.toLowerCase() || site.domain.toLowerCase() === slug.toLowerCase();
+  });
+
+  return matchingSite || null;
 }
 
 export default async function SitePage({ params }: PageProps) {
@@ -60,7 +67,7 @@ export async function generateStaticParams() {
     });
     
     return sites.map((site) => ({
-      slug: site.domain.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-'),
+      slug: domainToSlug(site.domain),
     }));
   } catch {
     return [];
