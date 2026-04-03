@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     const template = options.template || 'news';
 
     // Validate template
-    const validTemplates = ['news', 'business', 'modern'];
+    const validTemplates = ['news', 'business', 'modern', 'advanced'];
     if (!validTemplates.includes(template)) {
       return NextResponse.json({ error: 'Invalid template selected' }, { status: 400 });
     }
