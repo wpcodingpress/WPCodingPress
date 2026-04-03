@@ -54,7 +54,6 @@ export default async function SitePage({ params }: PageProps) {
       wpSiteUrl={wpSiteUrl}
       apiKey={apiKey}
       siteName={site.domain}
-      userEmail={site.user?.email}
     />
   );
 }
