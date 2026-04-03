@@ -22,11 +22,13 @@ class Headless_WP_Connector {
     private $api_key_option = 'hwpc_api_key';
     private $contacts_table;
     private $notifications_table;
+    private $subscriptions_table;
     
     public function __construct() {
         global $wpdb;
         $this->contacts_table = $wpdb->prefix . 'eyepress_contacts';
         $this->notifications_table = $wpdb->prefix . 'eyepress_comment_notifications';
+        $this->subscriptions_table = $wpdb->prefix . 'eyepress_subscriptions';
         
         register_activation_hook(__FILE__, [$this, 'create_tables']);
         
@@ -68,9 +70,21 @@ class Headless_WP_Connector {
             KEY comment_idx (comment_id)
         ) $charset_collate;";
         
+        $sub_sql = "CREATE TABLE IF NOT EXISTS {$this->subscriptions_table} (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            email varchar(100) NOT NULL UNIQUE,
+            locale varchar(10) DEFAULT 'bn',
+            subscribed tinyint(1) DEFAULT 1,
+            subscribed_at datetime DEFAULT CURRENT_TIMESTAMP,
+            unsubscribed_at datetime DEFAULT NULL,
+            PRIMARY KEY  (id),
+            KEY email_idx (email)
+        ) $charset_collate;";
+        
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($contacts_sql);
         dbDelta($notif_sql);
+        dbDelta($sub_sql);
     }
     
     private function notification_table_exists() {
@@ -282,6 +296,30 @@ class Headless_WP_Connector {
         register_rest_route('eyepress/v1', '/register', [
             'methods' => 'POST',
             'callback' => [$this, 'user_register'],
+            'permission_callback' => '__return_true',
+        ]);
+        
+        register_rest_route('eyepress/v1', '/subscribe', [
+            'methods' => 'POST',
+            'callback' => [$this, 'subscribe'],
+            'permission_callback' => '__return_true',
+        ]);
+        
+        register_rest_route('eyepress/v1', '/subscription-status', [
+            'methods' => 'POST',
+            'callback' => [$this, 'check_subscription'],
+            'permission_callback' => '__return_true',
+        ]);
+        
+        register_rest_route('eyepress/v1', '/unsubscribe', [
+            'methods' => 'POST',
+            'callback' => [$this, 'unsubscribe'],
+            'permission_callback' => '__return_true',
+        ]);
+        
+        register_rest_route('eyepress/v1', '/resubscribe', [
+            'methods' => 'POST',
+            'callback' => [$this, 'resubscribe'],
             'permission_callback' => '__return_true',
         ]);
         
@@ -1005,6 +1043,86 @@ class Headless_WP_Connector {
         ];
     }
     
+    public function subscribe(WP_REST_Request $request) {
+        global $wpdb;
+        
+        $params = $request->get_json_params();
+        $email = isset($params['email']) ? sanitize_email($params['email']) : '';
+        $locale = isset($params['locale']) ? sanitize_text_field($params['locale']) : 'bn';
+        
+        if (empty($email) || !is_email($email)) {
+            return ['success' => false, 'message' => 'Valid email is required'];
+        }
+        
+        $existing = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$this->subscriptions_table} WHERE email = %s",
+            $email
+        ));
+        
+        if ($existing) {
+            if ($existing->subscribed) {
+                return ['success' => false, 'message' => 'Email already subscribed'];
+            }
+            $wpdb->update($this->subscriptions_table, 
+                ['subscribed' => 1, 'subscribed_at' => current_time('mysql'), 'unsubscribed_at' => null],
+                ['email' => $email]
+            );
+            return ['success' => true, 'message' => 'Successfully resubscribed!'];
+        }
+        
+        $wpdb->insert($this->subscriptions_table, [
+            'email' => $email,
+            'locale' => $locale,
+            'subscribed' => 1,
+            'subscribed_at' => current_time('mysql')
+        ]);
+        
+        return ['success' => true, 'message' => 'Successfully subscribed!'];
+    }
+    
+    public function check_subscription(WP_REST_Request $request) {
+        global $wpdb;
+        
+        $params = $request->get_json_params();
+        $email = isset($params['email']) ? sanitize_email($params['email']) : '';
+        
+        if (empty($email) || !is_email($email)) {
+            return ['subscribed' => false];
+        }
+        
+        $sub = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$this->subscriptions_table} WHERE email = %s",
+            $email
+        ));
+        
+        return [
+            'subscribed' => $sub && $sub->subscribed ? true : false,
+            'email' => $email
+        ];
+    }
+    
+    public function unsubscribe(WP_REST_Request $request) {
+        global $wpdb;
+        
+        $params = $request->get_json_params();
+        $email = isset($params['email']) ? sanitize_email($params['email']) : '';
+        
+        if (empty($email) || !is_email($email)) {
+            return ['success' => false, 'message' => 'Valid email is required'];
+        }
+        
+        $wpdb->update($this->subscriptions_table, 
+            ['subscribed' => 0, 'unsubscribed_at' => current_time('mysql')],
+            ['email' => $email]
+        );
+        
+        return ['success' => true, 'message' => 'Successfully unsubscribed'];
+    }
+    
+    public function resubscribe(WP_REST_Request $request) {
+        return $this->subscribe($request);
+    }
+    
     public function export_all_data(WP_REST_Request $request) {
         $posts = get_posts(['numberposts' => -1, 'post_status' => 'publish']);
         $pages = get_pages(['post_status' => 'publish']);
@@ -1047,6 +1165,10 @@ class Headless_WP_Connector {
                     'notifications' => '/notifications?email={email}',
                     'login' => '/login',
                     'register' => '/register',
+                    'subscribe' => '/subscribe',
+                    'subscription-status' => '/subscription-status',
+                    'unsubscribe' => '/unsubscribe',
+                    'resubscribe' => '/resubscribe',
                 ],
             ],
         ];
