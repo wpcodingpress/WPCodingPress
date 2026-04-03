@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import NewsMagazineTemplate from '@/components/templates/NewsMagazine';
 import BusinessTemplate from '@/components/templates/Business';
 import ModernTemplate from '@/components/templates/Modern';
+import AdvancedTemplate from '@/components/templates/AdvancedTemplate';
 import { TEMPLATES } from '@/components/templates';
 
 interface PageProps {
@@ -39,6 +40,8 @@ function getTemplateComponent(template: string) {
       return BusinessTemplate;
     case 'modern':
       return ModernTemplate;
+    case 'advanced':
+      return AdvancedTemplate;
     case 'news':
     default:
       return NewsMagazineTemplate;
