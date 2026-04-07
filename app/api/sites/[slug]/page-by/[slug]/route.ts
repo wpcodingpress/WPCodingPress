@@ -7,10 +7,10 @@ function domainToSlug(domain: string): string {
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ slug: string; slug: string }> }
+  { params }: { params: Promise<{ siteSlug: string; pageSlug: string }> }
 ) {
   try {
-    const { slug: siteSlug, slug: pageSlug } = await params;
+    const { siteSlug, pageSlug } = await params;
     
     // Find site by slug
     const allSites = await prisma.site.findMany({

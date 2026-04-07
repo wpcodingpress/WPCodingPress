@@ -13,7 +13,8 @@ type Page = {
 
 export default function PageRoute() {
   const params = useParams();
-  const slug = params?.slug as string;
+  const pageSlug = params?.slug as string;
+  const siteSlug = params?.slug as string;
   
   const [page, setPage] = useState<Page | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,25 +28,13 @@ export default function PageRoute() {
 
   useEffect(() => {
     async function fetchPage() {
-      if (!slug) return;
+      if (!siteSlug || !pageSlug) return;
       
       setLoading(true);
       setError("");
       
       try {
-        // Get the site URL from the URL path
-        const pathParts = window.location.pathname.split('/');
-        const sitesIndex = pathParts.indexOf('sites');
-        const siteSlug = sitesIndex >= 0 ? pathParts[sitesIndex + 1] : '';
-        
-        if (!siteSlug) {
-          setError("Site not found");
-          setLoading(false);
-          return;
-        }
-
-        // Fetch page from WordPress
-        const response = await fetch(`/api/sites/${siteSlug}/page/${slug}`);
+        const response = await fetch(`/api/sites/${siteSlug}/page-by/${pageSlug}`);
         
         if (!response.ok) {
           setError("Page not found");
@@ -64,7 +53,7 @@ export default function PageRoute() {
     }
     
     fetchPage();
-  }, [slug]);
+  }, [siteSlug, pageSlug]);
 
   if (loading) {
     return (
