@@ -123,8 +123,18 @@ export default function AdvancedTemplate({ wpSiteUrl, apiKey, siteName }: Advanc
           const data = await optionsRes.json();
           setSiteLogo(data.logo || "");
           setSiteOptions(data);
-          if (data.videos) {
-            setVideos(data.videos);
+          
+          // Transform videos from API format to component format
+          if (data.videos && Array.isArray(data.videos)) {
+            const formattedVideos = data.videos.map((v: { videoId?: string; url?: string; thumbnail?: string; type?: string }) => ({
+              type: v.type || 'youtube',
+              videoId: v.videoId || '',
+              url: v.url || '',
+              title: 'Video', // Required field, use default
+              thumbnail: v.thumbnail || '',
+              watchUrl: v.url ? `https://www.youtube.com/watch?v=${v.videoId}` : '',
+            }));
+            setVideos(formattedVideos);
           }
         }
         if (categoriesRes.ok) {
@@ -157,6 +167,8 @@ export default function AdvancedTemplate({ wpSiteUrl, apiKey, siteName }: Advanc
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+        console.log("API_URL:", API_URL);
+        console.log("locale:", locale);
       } finally {
         setLoading(false);
       }
