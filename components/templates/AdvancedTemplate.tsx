@@ -36,8 +36,22 @@ type VideoPost = {
   type: string;
   videoId?: string;
   url?: string;
-  title?: string;
+  title: string;
   thumbnail?: string;
+  embedUrl?: string;
+  watchUrl?: string;
+  slug?: string;
+  excerpt?: string;
+  date?: string;
+  featuredImage?: {
+    node: {
+      sourceUrl: string;
+      altText?: string;
+    };
+  };
+  categories?: {
+    nodes: Array<{ name: string; slug: string }>;
+  };
 };
 
 type Page = {
