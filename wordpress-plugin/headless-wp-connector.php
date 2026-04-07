@@ -361,6 +361,24 @@ class Headless_WP_Connector {
             'permission_callback' => '__return_true',
         ]);
         
+        register_rest_route('eyepress/v1', '/search-all', [
+            'methods' => 'GET',
+            'callback' => [$this, 'search_all'],
+            'permission_callback' => '__return_true',
+        ]);
+        
+        register_rest_route('eyepress/v1', '/category-slugs', [
+            'methods' => 'GET',
+            'callback' => [$this, 'get_category_slugs'],
+            'permission_callback' => '__return_true',
+        ]);
+        
+        register_rest_route('eyepress/v1', '/track-view', [
+            'methods' => 'GET',
+            'callback' => [$this, 'track_view'],
+            'permission_callback' => '__return_true',
+        ]);
+        
         register_rest_route('headless/v1', '/export', [
             'methods' => 'GET',
             'callback' => [$this, 'export_all_data'],
@@ -557,12 +575,21 @@ class Headless_WP_Connector {
     }
     
     public function get_site_options(WP_REST_Request $request) {
+        $logo = get_option('hwpc_site_logo', '');
+        $site_icon = get_option('hwpc_site_icon', '');
+        $urgent_notice = get_option('hwpc_urgent_notice', '');
+        $youtube_url = get_option('hwpc_youtube_url', 'https://www.youtube.com/@TheEyePress');
+        
         return rest_ensure_response([
             'name' => get_bloginfo('name'),
             'description' => get_bloginfo('description'),
             'url' => get_site_url(),
             'language' => get_bloginfo('language'),
             'charset' => get_bloginfo('charset'),
+            'logo' => $logo,
+            'siteIcon' => $site_icon,
+            'urgentNotice' => $urgent_notice,
+            'youtubeUrl' => $youtube_url,
         ]);
     }
     
@@ -1161,6 +1188,73 @@ class Headless_WP_Connector {
         return $this->subscribe($request);
     }
     
+    public function search_all(WP_REST_Request $request) {
+        $query = $request->get_param('q');
+        $locale = $request->get_param('locale') ?: 'bn';
+        
+        if (empty($query)) {
+            return ['results' => [], 'found' => 0];
+        }
+        
+        $posts = get_posts([
+            's' => $query,
+            'post_status' => 'publish',
+            'posts_per_page' => 50,
+            'orderby' => 'relevance',
+        ]);
+        
+        $results = array_map([$this, 'format_post'], $posts);
+        
+        return ['results' => $results, 'found' => count($results)];
+    }
+    
+    public function get_category_slugs(WP_REST_Request $request) {
+        $locale = $request->get_param('locale') ?: 'bn';
+        
+        $categories = get_categories([
+            'hide_empty' => false,
+            'orderby' => 'count',
+            'order' => 'DESC',
+        ]);
+        
+        $slugs = [];
+        foreach ($categories as $cat) {
+            $slugs[] = [
+                'bn_slug' => $cat->slug,
+                'en_slug' => $cat->slug,
+                'bn_name' => $cat->name,
+                'en_name' => $cat->name,
+                'translation_group_id' => '',
+            ];
+        }
+        
+        return $slugs;
+    }
+    
+    public function track_view(WP_REST_Request $request) {
+        $slug = $request->get_param('slug');
+        
+        if (empty($slug)) {
+            return ['success' => false];
+        }
+        
+        $posts = get_posts([
+            'name' => $slug,
+            'post_status' => 'publish',
+            'posts_per_page' => 1,
+        ]);
+        
+        if (empty($posts)) {
+            return ['success' => false];
+        }
+        
+        $post_id = $posts[0]->ID;
+        $views = get_post_meta($post_id, 'views', true) ?: 0;
+        update_post_meta($post_id, 'views', intval($views) + 1);
+        
+        return ['success' => true, 'views' => intval($views) + 1];
+    }
+    
     public function export_all_data(WP_REST_Request $request) {
         $posts = get_posts(['numberposts' => -1, 'post_status' => 'publish']);
         $pages = get_pages(['post_status' => 'publish']);
@@ -1207,6 +1301,9 @@ class Headless_WP_Connector {
                     'subscription-status' => '/subscription-status',
                     'unsubscribe' => '/unsubscribe',
                     'resubscribe' => '/resubscribe',
+                    'search-all' => '/search-all?q={query}',
+                    'category-slugs' => '/category-slugs',
+                    'track-view' => '/track-view?slug={slug}',
                 ],
             ],
         ];
@@ -1320,6 +1417,10 @@ class Headless_WP_Connector {
     
     public function settings_init() {
         register_setting('headless_wp_connector', $this->api_key_option);
+        register_setting('headless_wp_connector', 'hwpc_site_logo');
+        register_setting('headless_wp_connector', 'hwpc_site_icon');
+        register_setting('headless_wp_connector', 'hwpc_urgent_notice');
+        register_setting('headless_wp_connector', 'hwpc_youtube_url');
     }
     
     public function options_page() {
@@ -1330,15 +1431,70 @@ class Headless_WP_Connector {
             echo '<div class="notice notice-success"><p>New API key generated!</p></div>';
         }
         
+        if (isset($_POST['hwpc_save_settings']) && current_user_can('manage_options')) {
+            check_admin_referer('hwpc_settings');
+            update_option('hwpc_site_logo', esc_url($_POST['hwpc_site_logo']));
+            update_option('hwpc_site_icon', esc_url($_POST['hwpc_site_icon']));
+            update_option('hwpc_urgent_notice', sanitize_text_field($_POST['hwpc_urgent_notice']));
+            update_option('hwpc_youtube_url', esc_url($_POST['hwpc_youtube_url']));
+            echo '<div class="notice notice-success"><p>Settings saved!</p></div>';
+        }
+        
         $current_key = get_option($this->api_key_option);
+        $site_logo = get_option('hwpc_site_logo', '');
+        $site_icon = get_option('hwpc_site_icon', '');
+        $urgent_notice = get_option('hwpc_urgent_notice', '');
+        $youtube_url = get_option('hwpc_youtube_url', 'https://www.youtube.com/@TheEyePress');
         ?>
         <div class="wrap">
             <h1>Headless WP Connector v<?php echo HWPC_VERSION; ?></h1>
-            <form method="post">
-                <?php wp_nonce_field('hwpc_generate_key'); ?>
+            
+            <form method="post" class="wp-core-ui">
+                <?php wp_nonce_field('hwpc_settings'); ?>
+                <h2>Site Settings</h2>
                 <table class="form-table">
                     <tr>
-                        <th>API Key</th>
+                        <th>Site Logo URL</th>
+                        <td>
+                            <input type="url" name="hwpc_site_logo" value="<?php echo esc_attr($site_logo); ?>" class="regular-text" placeholder="https://example.com/logo.png" />
+                            <p class="description">Enter the URL of your site logo image.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Site Icon URL</th>
+                        <td>
+                            <input type="url" name="hwpc_site_icon" value="<?php echo esc_attr($site_icon); ?>" class="regular-text" placeholder="https://example.com/icon.png" />
+                            <p class="description">Enter the URL of your site icon (shown when scrolled).</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Urgent Notice</th>
+                        <td>
+                            <input type="text" name="hwpc_urgent_notice" value="<?php echo esc_attr($urgent_notice); ?>" class="regular-text" placeholder="Breaking news text" />
+                            <p class="description">Enter a notice to display in the header.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>YouTube URL</th>
+                        <td>
+                            <input type="url" name="hwpc_youtube_url" value="<?php echo esc_attr($youtube_url); ?>" class="regular-text" placeholder="https://www.youtube.com/@ChannelName" />
+                            <p class="description">Your YouTube channel URL for the LIVE button.</p>
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    <button type="submit" name="hwpc_save_settings" class="button button-primary">Save Settings</button>
+                </p>
+            </form>
+            
+            <hr>
+            
+            <form method="post">
+                <?php wp_nonce_field('hwpc_generate_key'); ?>
+                <h2>API Key</h2>
+                <table class="form-table">
+                    <tr>
+                        <th>Current API Key</th>
                         <td>
                             <input type="text" name="api_key_display" value="<?php echo esc_attr($current_key ?: 'No API key generated'); ?>" class="regular-text" readonly />
                             <p class="description">Use this key in your WPCodingPress dashboard to connect this site.</p>
@@ -1368,7 +1524,26 @@ class Headless_WP_Connector {
                 <li><code>/wp-json/eyepress/v1/guest-comment</code> - Submit guest comment</li>
                 <li><code>/wp-json/eyepress/v1/login</code> - User login</li>
                 <li><code>/wp-json/eyepress/v1/register</code> - User registration</li>
-                <li><code>/wp-json/headless/v1/export</code> - Export all data</li>
+                <li><code>/wp-json/eyepress/v1/subscribe</code> - Subscribe to newsletter</li>
+                <li><code>/wp-json/eyepress/v1/notifications</code> - Get comment notifications</li>
+                <li><code>/wp-json/headless/v1/export</code> - Export all data (requires API key)</li>
+            </ul>
+            
+            <hr>
+            
+            <h2>Custom Post Types</h2>
+            <p>This plugin creates the following custom post types:</p>
+            <ul>
+                <li><strong>Videos</strong> - Create video posts (appears in <code>/wp-json/eyepress/v1/videos</code>)</li>
+                <li><strong>Advertisements</strong> - Create ad placements with positions</li>
+            </ul>
+            
+            <h2>Database Tables</h2>
+            <p>This plugin creates the following database tables:</p>
+            <ul>
+                <li><strong>eyepress_contacts</strong> - Stores contact form submissions</li>
+                <li><strong>eyepress_comment_notifications</strong> - Stores comment notifications</li>
+                <li><strong>eyepress_subscriptions</strong> - Stores newsletter subscriptions</li>
             </ul>
         </div>
         <?php
