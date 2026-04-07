@@ -34,9 +34,25 @@ type MenuItem = {
 
 type VideoPost = {
   type: string;
+  videoId?: string;
+  url?: string;
+  title?: string;
+  thumbnail?: string;
+};
+
+type Page = {
+  id: string;
   title: string;
-  slug?: string;
-  featuredImage?: { node: { sourceUrl: string; altText?: string } };
+  slug: string;
+  content: string;
+};
+
+type SiteOptions = {
+  logo?: string;
+  urgentNotice?: string;
+  youtubeUrl?: string;
+  videos?: VideoPost[];
+  ads?: Record<string, { image: string; link: string }>;
 };
 
 interface AdvancedTemplateProps {
@@ -56,6 +72,8 @@ export default function AdvancedTemplate({ wpSiteUrl, apiKey, siteName }: Advanc
   const [tickerItems, setTickerItems] = useState<{ title: string; slug: string }[]>([]);
   const [videos, setVideos] = useState<VideoPost[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [pages, setPages] = useState<Page[]>([]);
+  const [siteOptions, setSiteOptions] = useState<SiteOptions>({});
 
   const API_URL = wpSiteUrl.replace(/\/$/, "");
 
@@ -74,7 +92,7 @@ export default function AdvancedTemplate({ wpSiteUrl, apiKey, siteName }: Advanc
           trendingRes,
           latestRes,
           tickerRes,
-          videosRes,
+          pagesRes,
           menusRes,
         ] = await Promise.all([
           fetch(`${API_URL}/wp-json/eyepress/v1/site-options?locale=${locale}`),
@@ -83,13 +101,17 @@ export default function AdvancedTemplate({ wpSiteUrl, apiKey, siteName }: Advanc
           fetch(`${API_URL}/wp-json/eyepress/v1/trending?locale=${locale}&per_page=10`),
           fetch(`${API_URL}/wp-json/eyepress/v1/posts?locale=${locale}&per_page=30`),
           fetch(`${API_URL}/wp-json/eyepress/v1/ticker?locale=${locale}&count=10`),
-          fetch(`${API_URL}/wp-json/eyepress/v1/videos?locale=${locale}`),
+          fetch(`${API_URL}/wp-json/eyepress/v1/pages`),
           fetch(`${API_URL}/wp-json/eyepress/v1/menus?locale=${locale}`),
         ]);
 
         if (optionsRes.ok) {
           const data = await optionsRes.json();
           setSiteLogo(data.logo || "");
+          setSiteOptions(data);
+          if (data.videos) {
+            setVideos(data.videos);
+          }
         }
         if (categoriesRes.ok) {
           const data = await categoriesRes.json();
@@ -111,9 +133,9 @@ export default function AdvancedTemplate({ wpSiteUrl, apiKey, siteName }: Advanc
           const data = await tickerRes.json();
           setTickerItems(Array.isArray(data) ? data : []);
         }
-        if (videosRes.ok) {
-          const data = await videosRes.json();
-          setVideos(Array.isArray(data) ? data : []);
+        if (pagesRes.ok) {
+          const data = await pagesRes.json();
+          setPages(Array.isArray(data) ? data : []);
         }
         if (menusRes.ok) {
           const data = await menusRes.json();
