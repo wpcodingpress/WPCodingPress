@@ -7,28 +7,25 @@ function domainToSlug(domain: string): string {
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ siteSlug: string; pageSlug: string }> }
+  { params }: { params: Promise<{ site: string; pageSlug: string }> }
 ) {
   try {
-    const { siteSlug, pageSlug } = await params;
+    const { site, pageSlug } = await params;
     
-    // Find site by slug
     const allSites = await prisma.site.findMany({
       where: { status: 'connected' },
     });
 
-    const site = allSites.find(s => 
-      domainToSlug(s.domain) === siteSlug.toLowerCase() || 
-      s.domain.toLowerCase() === siteSlug.toLowerCase()
+    const wpSite = allSites.find(s => 
+      domainToSlug(s.domain) === site.toLowerCase() || 
+      s.domain.toLowerCase() === site.toLowerCase()
     );
 
-    if (!site) {
+    if (!wpSite) {
       return NextResponse.json({ error: 'Site not found' }, { status: 404 });
     }
 
-    const wpSiteUrl = site.wpSiteUrl.replace(/\/$/, '');
-    
-    // Fetch page from WordPress
+    const wpSiteUrl = wpSite.wpSiteUrl.replace(/\/$/, '');
     const response = await fetch(`${wpSiteUrl}/wp-json/eyepress/v1/page/${pageSlug}`);
     
     if (!response.ok) {
