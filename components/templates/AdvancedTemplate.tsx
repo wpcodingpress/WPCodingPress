@@ -73,9 +73,10 @@ interface AdvancedTemplateProps {
   wpSiteUrl: string;
   apiKey: string;
   siteName: string;
+  siteSlug?: string;
 }
 
-export default function AdvancedTemplate({ wpSiteUrl, apiKey, siteName }: AdvancedTemplateProps) {
+export default function AdvancedTemplate({ wpSiteUrl, apiKey, siteName, siteSlug = '' }: AdvancedTemplateProps) {
   const [locale, setLocale] = useState<"bn" | "en">("bn");
   const [loading, setLoading] = useState(true);
   const [siteLogo, setSiteLogo] = useState<string>("");
@@ -210,6 +211,7 @@ export default function AdvancedTemplate({ wpSiteUrl, apiKey, siteName }: Advanc
         siteLogo={siteLogo}
         menuItems={menuItems}
         apiBaseUrl={API_URL}
+        siteSlug={siteSlug}
       />
 
       <main className="bg-gray-50 min-h-screen pt-24 sm:pt-28 lg:pt-32">
@@ -305,6 +307,7 @@ export default function AdvancedTemplate({ wpSiteUrl, apiKey, siteName }: Advanc
         menuItems={menuItems}
         categories={categories}
         locale={locale}
+        siteSlug={siteSlug}
       />
     </div>
   );

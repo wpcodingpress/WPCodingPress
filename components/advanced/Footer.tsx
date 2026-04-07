@@ -15,14 +15,16 @@ type FooterProps = {
   menuItems?: MenuItem[];
   categories?: { id: string; name: string; slug: string }[];
   locale?: string;
+  siteSlug?: string;
 };
 
 export default function Footer({
-  siteName = "",
+  siteName,
   siteLogo,
   menuItems = [],
   categories = [],
   locale = "bn",
+  siteSlug = "",
 }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
@@ -44,9 +46,9 @@ export default function Footer({
               {locale === "bn" ? "দ্রুত লিংক" : "Quick Links"}
             </h3>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li><Link href={`/${locale}`} className="hover:text-white">Home</Link></li>
-              <li><Link href={`/${locale}/about`} className="hover:text-white">About</Link></li>
-              <li><Link href={`/${locale}/contact`} className="hover:text-white">Contact</Link></li>
+              <li><Link href={`/sites/${siteSlug}`} className="hover:text-white">Home</Link></li>
+              <li><Link href={`/sites/${siteSlug}/login`} className="hover:text-white">Login</Link></li>
+              <li><Link href={`/sites/${siteSlug}/contact`} className="hover:text-white">Contact</Link></li>
             </ul>
           </div>
 
@@ -57,7 +59,7 @@ export default function Footer({
             <ul className="space-y-2 text-sm text-gray-400">
               {categories.slice(0, 6).map((cat) => (
                 <li key={cat.id}>
-                  <Link href={`/${locale}/category/${cat.slug}`} className="hover:text-white">
+                  <Link href={`/sites/${siteSlug}/category/${cat.slug}`} className="hover:text-white">
                     {cat.name}
                   </Link>
                 </li>

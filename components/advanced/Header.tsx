@@ -15,6 +15,7 @@ type HeaderProps = {
   siteLogo?: string;
   menuItems?: MenuItem[];
   apiBaseUrl?: string;
+  siteSlug?: string;
 };
 
 export default function Header({
@@ -22,6 +23,7 @@ export default function Header({
   siteLogo,
   menuItems = [],
   apiBaseUrl = "",
+  siteSlug = "",
 }: HeaderProps) {
   const [locale, setLocale] = useState("bn");
   const [tickerItems, setTickerItems] = useState<{ title: string; slug: string }[]>([]);
@@ -114,10 +116,16 @@ export default function Header({
               </svg>
             </button>
             <Link
-              href={`/${locale}/subscribe`}
+              href={`/sites/${siteSlug}/subscribe`}
               className="px-3 py-1.5 bg-[#A41E22] text-white rounded-full text-sm font-semibold hover:bg-[#8a1a1d]"
             >
               {locale === "bn" ? "সাবস্ক্রাইব" : "Subscribe"}
+            </Link>
+            <Link
+              href={`/sites/${siteSlug}/login`}
+              className="px-3 py-1.5 text-[#A41E22] border border-[#A41E22] rounded-full text-sm font-semibold hover:bg-[#A41E22] hover:text-white"
+            >
+              {locale === "bn" ? "লগইন" : "Login"}
             </Link>
           </div>
         </div>

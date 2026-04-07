@@ -66,6 +66,7 @@ export default async function SitePage({ params }: PageProps) {
       wpSiteUrl={site.wpSiteUrl}
       apiKey={site.wpApiKey || ''}
       siteName={site.domain}
+      siteSlug={slug}
     />
   );
 }
