@@ -3,10 +3,9 @@
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useSession, signOut } from "next-auth/react"
-import { Menu, X, Zap, User, LogIn, LogOut, Sun, Moon, CheckCircle } from "lucide-react"
+import { Menu, X, Zap, User, LogIn, LogOut, Sun, Moon, CheckCircle, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { useTheme } from "@/components/providers"
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -21,7 +20,6 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const { data: session, status } = useSession()
-  const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,7 +34,7 @@ export function Navbar() {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         isScrolled
-          ? "glass py-3 border-b border-border/50"
+          ? "bg-white/90 backdrop-blur-lg shadow-lg py-3"
           : "bg-transparent py-5"
       )}
     >
@@ -44,11 +42,11 @@ export function Navbar() {
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
             <div className="relative">
-              <Zap className="h-8 w-8 text-primary group-hover:fill-primary transition-all duration-300" />
-              <div className="absolute inset-0 bg-primary/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <Zap className={cn("h-8 w-8 transition-all duration-300", isScrolled ? "text-sky-500 fill-sky-500" : "text-slate-800")} />
+              <div className="absolute inset-0 bg-sky-400/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
             <span className="text-xl font-bold tracking-tight">
-              <span className="text-white dark:text-white text-foreground">WP</span>
+              <span className="text-slate-800">WP</span>
               <span className="gradient-text">CodingPress</span>
             </span>
           </Link>
@@ -58,7 +56,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200 rounded-lg hover:bg-white/5 dark:hover:bg-white/5"
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors duration-200 rounded-lg hover:bg-sky-50"
               >
                 {link.label}
               </Link>
@@ -66,30 +64,18 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <button
-              onClick={toggleTheme}
-              className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 transition-all duration-300 hover:scale-105"
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? (
-                <Sun className="h-5 w-5 text-yellow-400" />
-              ) : (
-                <Moon className="h-5 w-5 text-slate-700" />
-              )}
-            </button>
-
             {session?.user ? (
               <>
                 {session.user.role === 'client' ? (
                   <>
                     <Link href="/dashboard">
-                      <Button variant="ghost" size="sm" className="font-semibold">
+                      <Button variant="ghost" size="sm" className="font-semibold text-slate-700">
                         <User className="mr-2 h-4 w-4" />
                         Dashboard
                       </Button>
                     </Link>
                     <Link href="/order">
-                      <Button variant="glow" size="sm" className="font-semibold">
+                      <Button size="sm" className="bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 font-semibold">
                         Start Your Project
                       </Button>
                     </Link>
@@ -97,14 +83,14 @@ export function Navbar() {
                 ) : (
                   <>
                     <Link href="/admin">
-                      <Button variant="ghost" size="sm" className="font-semibold">
+                      <Button variant="ghost" size="sm" className="font-semibold text-slate-700">
                         Admin
                       </Button>
                     </Link>
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="font-semibold"
+                      className="font-semibold text-slate-700"
                       onClick={async () => {
                         await signOut({ redirect: false });
                         window.location.reload();
@@ -119,13 +105,13 @@ export function Navbar() {
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" size="sm" className="font-semibold">
+                  <Button variant="ghost" size="sm" className="font-semibold text-slate-700">
                     <LogIn className="mr-2 h-4 w-4" />
                     Login
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button variant="glow" size="sm" className="font-semibold">
+                  <Button size="sm" className="bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 font-semibold">
                     <User className="mr-2 h-4 w-4" />
                     Register
                   </Button>
@@ -134,49 +120,36 @@ export function Navbar() {
             )}
           </div>
 
-          <div className="flex md:hidden items-center gap-2">
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg bg-white/10"
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? (
-                <Sun className="h-5 w-5 text-yellow-400" />
-              ) : (
-                <Moon className="h-5 w-5 text-slate-700" />
-              )}
-            </button>
-            <button
-              className="p-2 text-foreground"
-              onClick={() => setIsOpen(!isOpen)}
-            >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
+          <button
+            className="md:hidden p-2 text-slate-700"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
 
         {isOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t border-border/50 pt-4">
+          <div className="md:hidden mt-4 pb-4 border-t border-slate-200 pt-4">
             <div className="flex flex-col gap-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className="px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-200 rounded-lg hover:bg-white/5"
+                  className="px-4 py-3 text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors duration-200 rounded-lg hover:bg-sky-50"
                 >
                   {link.label}
                 </Link>
               ))}
               <div className="flex gap-2 mt-4">
                 <Link href="/login" className="flex-1">
-                  <Button variant="ghost" className="w-full">
+                  <Button variant="outline" className="w-full border-slate-300">
                     <LogIn className="mr-2 h-4 w-4" />
                     Login
                   </Button>
                 </Link>
                 <Link href="/register" className="flex-1">
-                  <Button variant="glow" className="w-full">
+                  <Button className="w-full bg-gradient-to-r from-sky-500 to-cyan-500">
                     <User className="mr-2 h-4 w-4" />
                     Register
                   </Button>
