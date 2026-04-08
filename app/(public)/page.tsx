@@ -209,26 +209,139 @@ export default function HomePage() {
     target: heroRef,
     offset: ["start start", "end start"]
   })
-  const y = useTransform(scrollYProgress, [0, 1], [0, 100])
-  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.5])
+  const y = useTransform(scrollYProgress, [0, 1], [0, 150])
+  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0])
 
   return (
     <div className="relative overflow-hidden bg-dots-pattern">
       {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-[100vh] flex items-center overflow-hidden bg-gradient-to-br from-sky-50 via-white to-cyan-50">
+      <section ref={heroRef} className="relative min-h-[100vh] flex items-center overflow-hidden bg-gradient-to-br from-sky-50 via-white via-50% to-cyan-50">
         <motion.div style={{ y, opacity }} className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-sky-100/50 via-white to-cyan-100/50" />
+          <div className="absolute inset-0 bg-gradient-to-br from-sky-100/30 via-white/50 to-cyan-100/30" />
         </motion.div>
         
-        {/* Animated decorative elements */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-sky-400/20 rounded-full blur-[100px]" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-orange-400/20 rounded-full blur-[120px]" />
-        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-teal-400/20 rounded-full blur-[80px]" />
+        {/* Grid Pattern Overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(14,165,233,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(14,165,233,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
+
+        {/* Animated Blobs */}
+        <motion.div 
+          className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-gradient-to-r from-sky-300/20 to-cyan-300/20 rounded-full blur-[120px]"
+          animate={{ 
+            scale: [1, 1.1, 1],
+            x: [0, 50, 0],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div 
+          className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-gradient-to-r from-orange-300/20 to-pink-300/20 rounded-full blur-[100px]"
+          animate={{ 
+            scale: [1, 1.2, 1],
+            x: [0, -30, 0],
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        />
         
-        {/* Floating shapes */}
-        <motion.div className="absolute top-32 right-[15%] w-20 h-20 bg-sky-400/30 rounded-2xl rotate-12 animate-float-slow" />
-        <motion.div className="absolute bottom-32 left-[10%] w-16 h-16 bg-orange-400/30 rounded-full animate-float-reverse" />
-        <motion.div className="absolute top-1/3 right-[10%] w-12 h-12 bg-teal-400/30 rounded-lg rotate-45 animate-float-slow" style={{ animationDelay: '1s' }} />
+        {/* Floating Code Elements */}
+        <motion.div 
+          className="absolute top-[15%] left-[8%] hidden lg:block"
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
+          <motion.div 
+            className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-xl border border-sky-100"
+            animate={{ y: [0, -15, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <Code2 className="h-8 w-8 text-sky-500" />
+            <div className="text-xs text-slate-500 mt-2 font-mono">wp_headless_convert()</div>
+          </motion.div>
+        </motion.div>
+
+        <motion.div 
+          className="absolute top-[25%] right-[10%] hidden lg:block"
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.7 }}
+        >
+          <motion.div 
+            className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-xl border border-cyan-100"
+            animate={{ y: [0, 20, 0] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+          >
+            <Zap className="h-8 w-8 text-cyan-500" />
+            <div className="text-xs text-slate-500 mt-2 font-mono">next_js_render()</div>
+          </motion.div>
+        </motion.div>
+
+        <motion.div 
+          className="absolute bottom-[25%] left-[12%] hidden lg:block"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.9 }}
+        >
+          <motion.div 
+            className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-xl border border-orange-100"
+            animate={{ y: [0, -20, 0], rotate: [0, 5, -5, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <Rocket className="h-8 w-8 text-orange-500" />
+            <div className="text-xs text-slate-500 mt-2 font-mono">deploy_render()</div>
+          </motion.div>
+        </motion.div>
+
+        <motion.div 
+          className="absolute bottom-[30%] right-[15%] hidden lg:block"
+          initial={{ opacity: 0, x: -30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 1.1 }}
+        >
+          <motion.div 
+            className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-xl border border-teal-100"
+            animate={{ y: [0, 15, 0], rotate: [0, -3, 3, 0] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+          >
+            <Shield className="h-8 w-8 text-teal-500" />
+            <div className="text-xs text-slate-500 mt-2 font-mono">ssl_secure</div>
+          </motion.div>
+        </motion.div>
+
+        {/* Floating Geometric Shapes */}
+        <motion.div 
+          className="absolute top-[20%] left-[20%] w-4 h-4 bg-sky-400/40 rounded-sm"
+          animate={{ rotate: 360, scale: [1, 1.5, 1] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.div 
+          className="absolute top-[35%] right-[25%] w-6 h-6 bg-cyan-400/30 rounded-full"
+          animate={{ scale: [1, 1.8, 1], opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div 
+          className="absolute bottom-[35%] left-[25%] w-3 h-3 bg-orange-400/50 rounded-sm rotate-45"
+          animate={{ rotate: [45, 180, 45], scale: [1, 1.3, 1] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+        />
+        
+        {/* Animated Connecting Lines */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
+          <motion.path
+            d="M 200 300 Q 400 200 600 300 T 1000 300"
+            fill="none"
+            stroke="url(#gradient)"
+            strokeWidth="2"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 2, delay: 0.5 }}
+          />
+          <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#0ea5e9" />
+              <stop offset="50%" stopColor="#06b6d4" />
+              <stop offset="100%" stopColor="#f97316" />
+            </linearGradient>
+          </defs>
+        </svg>
         
         <div className="container mx-auto px-4 relative z-10 py-20">
           <motion.div 
@@ -236,88 +349,154 @@ export default function HomePage() {
             initial="initial"
             animate="animate"
           >
+            {/* Badge with glow */}
             <motion.div 
               className="mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
             >
-              <span className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-sky-100 to-cyan-100 border border-sky-300 text-sm text-sky-700 font-medium">
-                <Sparkles className="h-5 w-5" />
+              <span className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/90 backdrop-blur-sm border-2 border-sky-200 text-sm text-sky-700 font-semibold shadow-lg shadow-sky-500/20 hover:shadow-xl transition-shadow">
+                <motion.span 
+                  animate={{ rotate: [0, 15, -15, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Sparkles className="h-5 w-5" />
+                </motion.span>
                 AI-Powered Web Development Agency
               </span>
             </motion.div>
 
+            {/* Main Title with character-by-character animation */}
             <motion.h1 
               className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
             >
-              <span className="text-slate-800">Transform Your</span>
-              <br />
-              <span className="gradient-text">
+              <motion.span 
+                className="text-slate-800 block"
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+              >
+                Transform Your
+              </motion.span>
+              <motion.span 
+                className="gradient-text block my-2"
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.6 }}
+              >
                 WordPress to Next.js
-              </span>
-              <br />
-              <span className="text-slate-800">Automatically</span>
+              </motion.span>
+              <motion.span 
+                className="text-slate-800 block"
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.8, duration: 0.6 }}
+              >
+                Automatically
+              </motion.span>
             </motion.h1>
 
+            {/* Description */}
             <motion.p 
               className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto mb-12 leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 1 }}
             >
               Automate your headless WordPress conversion with our cutting-edge SaaS platform. 
-              Build lightning-fast news portals, blogs and portfolios that load in milliseconds.
+              Build <motion.span 
+                className="text-sky-600 font-semibold"
+                animate={{ scale: [1, 1.02, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                lightning-fast
+              </motion.span> news portals, blogs and portfolios that load in milliseconds.
             </motion.p>
 
+            {/* CTA Buttons with staggered animation */}
             <motion.div 
               className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 1.2 }}
             >
               <Link href="/pricing">
-                <Button size="lg" className="w-full sm:w-auto text-lg font-semibold px-10 py-7 bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 shadow-lg hover:shadow-xl transition-all">
-                  Start Free Trial
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+                <motion.div
+                  whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(14, 165, 233, 0.3)" }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Button size="lg" className="w-full sm:w-auto text-lg font-semibold px-10 py-7 bg-gradient-to-r from-sky-500 via-cyan-500 to-sky-500 bg-[length:200%_200%] animate-gradient hover:shadow-xl transition-all">
+                    Start Free Trial
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </motion.div>
               </Link>
               <Link href="/portfolio">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto text-lg px-10 py-7 border-2 border-slate-300 hover:border-sky-500 hover:bg-sky-50 transition-all">
-                  View Our Work
-                  <Play className="ml-2 h-5 w-5" />
-                </Button>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto text-lg px-10 py-7 border-2 border-slate-300 hover:border-sky-500 hover:bg-sky-50 hover:shadow-lg transition-all">
+                    View Our Work
+                    <Play className="ml-2 h-5 w-5" />
+                  </Button>
+                </motion.div>
               </Link>
             </motion.div>
 
-            {/* Hero Stats */}
+            {/* Hero Stats with counting animation */}
             <motion.div 
               className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto"
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
+              transition={{ delay: 1.4 }}
             >
               {stats.map((stat, index) => (
-                <div key={index} className="text-center p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-slate-200 shadow-lg">
-                  <stat.icon className={`h-8 w-8 mx-auto mb-3 ${stat.color}`} />
+                <motion.div 
+                  key={index}
+                  className="text-center p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-slate-200 shadow-lg hover:shadow-xl hover:border-sky-300 transition-all group"
+                  whileHover={{ y: -5 }}
+                >
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    transition={{ delay: index * 0.1, type: "spring" }}
+                  >
+                    <stat.icon className={`h-8 w-8 mx-auto mb-3 ${stat.color} group-hover:scale-110 transition-transform`} />
+                  </motion.div>
                   <div className="text-4xl md:text-5xl font-bold text-slate-800">{stat.value}</div>
                   <div className="text-sm text-slate-500">{stat.label}</div>
-                </div>
+                </motion.div>
               ))}
             </motion.div>
           </motion.div>
         </div>
 
-        {/* Scroll Indicator */}
+        {/* Scroll Indicator with bounce */}
         <motion.div 
-          className="absolute bottom-10 left-1/2 -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2 }}
         >
-          <ChevronDown className="h-8 w-8 text-slate-400" />
+          <motion.div
+            animate={{ y: [0, 12, 0] }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+            className="flex flex-col items-center gap-2"
+          >
+            <span className="text-xs text-slate-400 font-medium">Scroll to explore</span>
+            <div className="w-6 h-10 rounded-full border-2 border-slate-300 flex justify-center pt-2">
+              <motion.div 
+                className="w-1.5 h-1.5 bg-sky-500 rounded-full"
+                animate={{ y: [0, 12, 0] }}
+                transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+              />
+            </div>
+          </motion.div>
         </motion.div>
       </section>
 
