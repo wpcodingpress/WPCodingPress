@@ -1,6 +1,6 @@
 "use client"
 
-import { Navbar, Footer } from "@/components/layout"
+import { Navbar } from "@/components/layout"
 
 export default function PublicLayout({
   children,
@@ -13,7 +13,6 @@ export default function PublicLayout({
       <main className="flex-1 pt-16">
         {children}
       </main>
-      <Footer />
     </>
   )
 }
