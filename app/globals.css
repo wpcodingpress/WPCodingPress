@@ -29,14 +29,42 @@
     --warning: 38 92% 50%;
   }
 
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 4%;
+    --card: 0 0% 98%;
+    --card-foreground: 222 47% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 4%;
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 262 83% 58%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 4% 92%;
+    --muted-foreground: 240 4% 40%;
+    --accent: 186 85% 52%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 4% 85%;
+    --input: 240 4% 85%;
+    --ring: 239 84% 67%;
+    --success: 160 84% 39%;
+    --warning: 38 92% 50%;
+  }
+
   * {
     border-color: hsl(var(--border));
   }
 
   body {
-    background: linear-gradient(180deg, hsl(222 47% 4%) 0%, hsl(222 47% 7%) 100%);
+    background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--card)) 100%);
     color: hsl(var(--foreground));
     font-family: 'Inter', sans-serif;
+  }
+
+  .light body {
+    background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(240 4% 95%) 100%);
   }
 }
 

@@ -2,80 +2,129 @@
 
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Check, ArrowRight, Zap } from "lucide-react"
+import { Check, ArrowRight, Zap, Star, Crown, Rocket } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 
-const packages = [
+const subscriptions = [
   {
-    name: "Basic",
-    price: 150,
-    description: "Perfect for landing pages, portfolios, and small business websites.",
+    name: "Starter",
+    price: "Free",
+    period: "",
+    description: "Perfect for testing and small projects. Get started at no cost.",
+    icon: Rocket,
     features: [
-      "5 Pages",
-      "Elementor Design",
-      "Mobile Responsive",
-      "Contact Form",
+      "1 WordPress Site Conversion",
+      "Basic Next.js Template",
+      "Community Support",
+      "5GB Bandwidth",
       "Basic SEO Setup",
-      "Social Media Links",
-      "Hosting Setup",
-      "5 Revisions"
+      "WordPress Plugin Access"
     ],
     popular: false,
-    premium: false
+    color: "from-slate-600 to-slate-700",
+    borderColor: "border-slate-500",
+    cta: "Start Free"
   },
   {
-    name: "Standard",
-    price: 300,
-    description: "Ideal for growing businesses needing e-commerce and advanced features.",
+    name: "Pro",
+    price: "$19",
+    period: "/month",
+    description: "Ideal for growing businesses and agencies. Scale your online presence.",
+    icon: Star,
     features: [
-      "10 Pages",
-      "WooCommerce Setup",
-      "Payment Integration",
-      "Speed Optimization",
-      "Advanced SEO",
-      "Email Marketing Setup",
-      "Inventory Management",
-      "Unlimited Revisions"
+      "5 WordPress Site Conversions",
+      "Advanced Next.js Templates",
+      "Priority Support",
+      "100GB Bandwidth",
+      "Custom Domain",
+      "Analytics Dashboard",
+      "Auto Content Sync",
+      "API Access"
     ],
     popular: true,
-    premium: false
+    color: "from-blue-600 to-purple-600",
+    borderColor: "border-blue-500",
+    cta: "Start Pro Trial"
   },
   {
-    name: "Premium",
-    price: 500,
-    description: "Full custom solution for complex requirements and enterprise projects.",
+    name: "Enterprise",
+    price: "$99",
+    period: "/month",
+    description: "For agencies and high-volume needs. White-label solution with dedicated support.",
+    icon: Crown,
     features: [
-      "Unlimited Pages",
+      "Unlimited Conversions",
+      "White-label Solution",
+      "24/7 Dedicated Support",
+      "Unlimited Bandwidth",
       "Custom Development",
-      "Booking System",
-      "Stripe & PayPal",
-      "24/7 Priority Support",
-      "HIPAA Compliance (if needed)",
-      "Multi-language Support",
-      "Custom Animations"
+      "API Access",
+      "Advanced Caching",
+      "Custom Integrations"
     ],
     popular: false,
-    premium: true
+    color: "from-amber-600 to-orange-600",
+    borderColor: "border-amber-500",
+    cta: "Contact Sales"
+  }
+]
+
+const servicePricing = [
+  {
+    name: "Elementor Pro Design",
+    basic: 100,
+    standard: 200,
+    premium: 350,
+    desc: "Professional Elementor website design"
+  },
+  {
+    name: "WooCommerce Store",
+    basic: 250,
+    standard: 450,
+    premium: 700,
+    desc: "Full e-commerce solution"
+  },
+  {
+    name: "SEO & Marketing",
+    basic: 150,
+    standard: 300,
+    premium: 500,
+    desc: "Digital marketing services"
+  },
+  {
+    name: "Website Redesign",
+    basic: 200,
+    standard: 400,
+    premium: 600,
+    desc: "Modernize your existing site"
   }
 ]
 
 const faqs = [
   {
-    q: "What's included in every package?",
-    a: "Every package includes responsive design, contact forms, social media integration, and basic SEO optimization."
+    q: "What's included in the Free plan?",
+    a: "The Free plan includes 1 WordPress site conversion with basic Next.js template, community support, and 5GB bandwidth. Perfect for testing our platform."
   },
   {
-    q: "Can I upgrade my package later?",
-    a: "Absolutely! You can upgrade at any time. We'll prorate the cost based on what's already been completed."
+    q: "Can I cancel my subscription anytime?",
+    a: "Yes! You can cancel your subscription at any time. No questions asked. Your access continues until the end of your billing period."
   },
   {
-    q: "Do you offer payment plans?",
-    a: "Yes, we offer milestone-based payments. You pay as we complete each phase of your project."
+    q: "Do you offer refunds?",
+    a: "We offer a 7-day money-back guarantee for all paid plans. If you're not satisfied, contact us for a full refund."
   },
   {
-    q: "What if I'm not satisfied with the work?",
-    a: "We offer free revisions until you're 100% satisfied. If we can't meet your requirements, we offer a satisfaction guarantee."
+    q: "What payment methods do you accept?",
+    a: "We accept all major credit cards, PayPal, and bank transfers for Enterprise plans."
+  },
+  {
+    q: "Can I upgrade or downgrade my plan?",
+    a: "Absolutely! You can change your plan at any time. We'll prorate the difference based on your new plan."
+  },
+  {
+    q: "Is there a setup fee?",
+    a: "No setup fees for any plan. You can start using our platform immediately after signing up."
   }
 ]
 
@@ -93,58 +142,60 @@ export default function PricingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Transparent <span className="gradient-text">Pricing</span>
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+              Simple, <span className="gradient-text">Transparent</span> Pricing
             </h1>
             <p className="text-lg text-muted-foreground">
-              No hidden fees. No surprises. Get a professional website at a price that fits your budget.
+              Choose the perfect plan for your needs. Start free and scale as you grow. 
+              No hidden fees, no surprises.
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Pricing Cards */}
+      {/* Subscription Plans */}
       <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {packages.map((pkg, index) => (
+            {subscriptions.map((sub, index) => (
               <motion.div
-                key={pkg.name}
+                key={sub.name}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className={`h-full relative ${pkg.popular ? 'border-primary/50 bg-gradient-to-b from-primary/5 to-transparent' : ''} ${pkg.premium ? 'bg-gradient-to-b from-secondary/5 to-transparent' : ''}`}>
-                  {pkg.popular && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                      <span className="inline-flex items-center gap-1 px-4 py-1 text-sm font-semibold rounded-full bg-primary text-white">
-                        <Zap className="h-4 w-4" />
-                        Most Popular
+                <Card className={`h-full relative bg-gradient-to-br ${sub.color} border-2 ${sub.borderColor} overflow-hidden`}>
+                  {sub.popular && (
+                    <div className="absolute -top-0 left-1/2 -translate-x-1/2">
+                      <span className="px-4 py-1.5 text-xs font-bold rounded-b-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg">
+                        MOST POPULAR
                       </span>
                     </div>
                   )}
-                  <CardHeader className="text-center pb-4">
-                    <CardTitle className="text-2xl text-white">{pkg.name}</CardTitle>
+                  <CardHeader className="text-center pb-4 pt-8">
+                    <sub.icon className="h-10 w-10 mx-auto mb-4 text-white" />
+                    <CardTitle className="text-2xl text-white">{sub.name}</CardTitle>
                     <div className="mt-4">
-                      <span className="text-5xl font-bold gradient-text">${pkg.price}</span>
+                      <span className="text-5xl font-black text-white">{sub.price}</span>
+                      {sub.period && <span className="text-sm text-white/70">{sub.period}</span>}
                     </div>
-                    <CardDescription className="mt-4">{pkg.description}</CardDescription>
+                    <CardDescription className="mt-2 text-white/80">{sub.description}</CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <ul className="space-y-3">
-                      {pkg.features.map((feature, fIndex) => (
+                      {sub.features.map((feature, fIndex) => (
                         <li key={fIndex} className="flex items-start gap-3">
-                          <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                          <span className="text-sm text-muted-foreground">{feature}</span>
+                          <Check className="h-5 w-5 text-green-400 mt-0.5 flex-shrink-0" />
+                          <span className="text-sm text-white/90">{feature}</span>
                         </li>
                       ))}
                     </ul>
                   </CardContent>
                   <CardFooter className="pt-6">
-                    <Link href={`/order?package=${pkg.name.toLowerCase()}`} className="w-full">
-                      <Button className="w-full" variant={pkg.popular ? "glow" : "outline"}>
-                        Get Started
+                    <Link href="/register" className="w-full">
+                      <Button className={`w-full ${sub.popular ? 'bg-white text-slate-900 hover:bg-slate-100' : 'bg-white/20 hover:bg-white/30 text-white'}`}>
+                        {sub.cta}
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </Link>
@@ -152,6 +203,63 @@ export default function PricingPage() {
                 </Card>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* One-time Services */}
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl font-bold text-foreground mb-4">
+              One-Time <span className="gradient-text">Services</span>
+            </h2>
+            <p className="text-muted-foreground">Need a custom project? Choose a one-time service package</p>
+          </motion.div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full max-w-4xl mx-auto">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left py-4 px-4 text-foreground font-semibold">Service</th>
+                  <th className="text-center py-4 px-4 text-foreground font-semibold">Basic</th>
+                  <th className="text-center py-4 px-4 text-foreground font-semibold">Standard</th>
+                  <th className="text-center py-4 px-4 text-foreground font-semibold">Premium</th>
+                  <th className="text-center py-4 px-4"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {servicePricing.map((service, index) => (
+                  <tr key={index} className="border-b border-border/50 hover:bg-card/50 transition-colors">
+                    <td className="py-4 px-4">
+                      <div className="font-medium text-foreground">{service.name}</div>
+                      <div className="text-sm text-muted-foreground">{service.desc}</div>
+                    </td>
+                    <td className="py-4 px-4 text-center">
+                      <span className="text-lg font-bold gradient-text">${service.basic}</span>
+                    </td>
+                    <td className="py-4 px-4 text-center">
+                      <span className="text-lg font-bold gradient-text">${service.standard}</span>
+                    </td>
+                    <td className="py-4 px-4 text-center">
+                      <span className="text-lg font-bold gradient-text">${service.premium}</span>
+                    </td>
+                    <td className="py-4 px-4 text-center">
+                      <Link href={`/order?service=${service.name.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`}>
+                        <Button size="sm" variant="outline">
+                          Order
+                        </Button>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -167,7 +275,7 @@ export default function PricingPage() {
           >
             <Card className="border-primary/20">
               <CardContent className="p-8">
-                <h3 className="text-2xl font-bold text-white mb-4">
+                <h3 className="text-2xl font-bold text-foreground mb-4">
                   Need a Custom Solution?
                 </h3>
                 <p className="text-muted-foreground mb-6">
@@ -195,7 +303,7 @@ export default function PricingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl font-bold text-white mb-4">
+            <h2 className="text-3xl font-bold text-foreground mb-4">
               Frequently Asked <span className="gradient-text">Questions</span>
             </h2>
           </motion.div>
@@ -211,7 +319,7 @@ export default function PricingPage() {
               >
                 <Card>
                   <CardContent className="p-6">
-                    <h3 className="text-lg font-semibold text-white mb-2">{faq.q}</h3>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">{faq.q}</h3>
                     <p className="text-muted-foreground">{faq.a}</p>
                   </CardContent>
                 </Card>

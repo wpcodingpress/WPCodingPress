@@ -2,90 +2,111 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { motion } from "framer-motion"
-import { ExternalLink, Eye } from "lucide-react"
+import { ExternalLink, Eye, ArrowRight, Globe } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 
 const portfolioItems = [
   {
     id: 1,
-    title: "Medical Spa Website",
-    category: "Healthcare",
-    description: "Complete medical spa website with booking system and patient portal",
-    image: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=80",
-    color: "from-blue-500 to-cyan-500"
+    title: "HomePicks Daily",
+    category: "E-Commerce",
+    description: "WooCommerce dropshipping e-commerce website with payment integration",
+    client: "Beth Moran",
+    tech: ["WordPress", "WooCommerce", "Elementor"],
+    color: "from-green-500 to-emerald-500",
+    liveUrl: "#"
   },
   {
     id: 2,
-    title: "E-commerce Fashion Store",
-    category: "E-commerce",
-    description: "WooCommerce store with modern design and seamless checkout",
-    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80",
-    color: "from-pink-500 to-rose-500"
+    title: "Trip Monarch",
+    category: "Travel Portal",
+    description: "Flight and bus booking travel portal with booking system",
+    client: "Trip Monarch",
+    tech: ["WordPress", "Booking System", "Elementor"],
+    color: "from-blue-500 to-cyan-500",
+    liveUrl: "#"
   },
   {
     id: 3,
-    title: "Law Firm Portal",
-    category: "Professional Services",
-    description: "Corporate website with case management and client portal",
-    image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80",
-    color: "from-indigo-500 to-blue-500"
+    title: "RankUpper",
+    category: "SEO Agency",
+    description: "Professional SEO agency website with lead generation",
+    client: "RankUpper",
+    tech: ["WordPress", "Elementor Pro", "SEO Tools"],
+    color: "from-purple-500 to-pink-500",
+    liveUrl: "#"
   },
   {
     id: 4,
-    title: "Restaurant Booking App",
-    category: "Food & Beverage",
-    description: "Online ordering and reservation system with menu management",
-    image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80",
-    color: "from-orange-500 to-amber-500"
+    title: "Pro Consultant",
+    category: "Consulting",
+    description: "Professional consultant portfolio and booking website",
+    client: "Pro Consultant UK",
+    tech: ["WordPress", "Elementor", "Custom Plugin"],
+    color: "from-orange-500 to-amber-500",
+    liveUrl: "#"
   },
   {
     id: 5,
-    title: "Real Estate Platform",
-    category: "Real Estate",
-    description: "Property listings with advanced search and virtual tours",
-    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80",
-    color: "from-emerald-500 to-green-500"
+    title: "Masjid Press",
+    category: "Non-Profit",
+    description: "Islamic organization website with donation system",
+    client: "Masjid Press",
+    tech: ["WordPress", "Donation Plugin", "Elementor"],
+    color: "from-indigo-500 to-purple-500",
+    liveUrl: "#"
   },
   {
     id: 6,
-    title: "Fitness Studio",
-    category: "Health & Fitness",
-    description: "Gym website with class scheduling and membership management",
-    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
-    color: "from-red-500 to-pink-500"
+    title: "Movie Server",
+    category: "Entertainment",
+    description: "Video streaming and server management platform",
+    client: "Movie Server BD",
+    tech: ["WordPress", "Custom Theme", "Video Plugin"],
+    color: "from-red-500 to-pink-500",
+    liveUrl: "#"
   },
   {
     id: 7,
-    title: "Online Academy",
-    category: "Education",
-    description: "Learning management system with video courses and progress tracking",
-    image: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800&q=80",
-    color: "from-purple-500 to-indigo-500"
+    title: "Construction BD",
+    category: "Construction",
+    description: "Construction company portfolio with project showcase",
+    client: "BuildTech BD",
+    tech: ["WordPress", "Elementor", "Portfolio"],
+    color: "from-yellow-500 to-orange-500",
+    liveUrl: "#"
   },
   {
     id: 8,
-    title: "Beauty Salon",
-    category: "Beauty",
-    description: "Salon website with appointment booking and service showcase",
-    image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80",
-    color: "from-rose-500 to-pink-500"
+    title: "Virtual Assistant",
+    category: "Services",
+    description: "Virtual assistant services website with booking",
+    client: "Beth VA Services",
+    tech: ["WordPress", "Elementor Pro", "Booking"],
+    color: "from-cyan-500 to-blue-500",
+    liveUrl: "#"
   },
   {
     id: 9,
-    title: "SaaS Dashboard",
-    category: "Technology",
-    description: "Custom web application dashboard with analytics and reporting",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
-    color: "from-cyan-500 to-blue-500"
+    title: "E-Commerce Giant",
+    category: "E-Commerce",
+    description: "Full-featured dropshipping e-commerce store",
+    client: "EcomGiantz",
+    tech: ["WordPress", "WooCommerce", "Payment"],
+    color: "from-pink-500 to-rose-500",
+    liveUrl: "#"
   }
 ]
 
-const categories = ["All", "Healthcare", "E-commerce", "Professional Services", "Technology", "Education", "Real Estate", "Health & Fitness", "Food & Beverage", "Beauty"]
+const categories = ["All", "E-Commerce", "Travel Portal", "SEO Agency", "Consulting", "Non-Profit", "Entertainment", "Construction", "Services"]
 
 export default function PortfolioPage() {
   const [activeCategory, setActiveCategory] = useState("All")
+  const [hoveredId, setHoveredId] = useState<number | null>(null)
   
   const filteredItems = activeCategory === "All" 
     ? portfolioItems 
@@ -163,26 +184,36 @@ export default function PortfolioPage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.08 }}
                 className="group"
+                onMouseEnter={() => setHoveredId(item.id)}
+                onMouseLeave={() => setHoveredId(null)}
               >
                 <Card className="overflow-hidden bg-slate-900/50 border-slate-700/50 hover:border-slate-500 transition-all duration-500">
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <Image 
-                      src={item.image}
-                      alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-30 transition-opacity duration-300`} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
+                  <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-slate-800 to-slate-900">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className={`w-full h-full bg-gradient-to-br ${item.color} opacity-20`} />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <Globe className={`h-20 w-20 ${item.color.replace('from-', 'text-')} opacity-50`} />
+                        <span className="mt-4 text-lg font-semibold text-white">{item.title}</span>
+                        <span className="text-sm text-slate-400">{item.category}</span>
+                      </div>
+                    </div>
                     
-                    {/* Overlay Icons */}
-                    <div className="absolute inset-0 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                        <Eye className="h-6 w-6 text-white" />
-                      </div>
-                      <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300" style={{ transitionDelay: '50ms' }}>
-                        <ExternalLink className="h-6 w-6 text-white" />
-                      </div>
+                    {/* Hover Overlay */}
+                    <div className={`absolute inset-0 bg-black/80 flex flex-col items-center justify-center gap-4 transition-opacity duration-300 ${hoveredId === item.id ? 'opacity-100' : 'opacity-0'}`}>
+                      <Button 
+                        variant="outline" 
+                        className="bg-white/10 border-white/20 hover:bg-white/20"
+                        onClick={() => window.open(item.liveUrl, '_blank')}
+                      >
+                        <ExternalLink className="mr-2 h-4 w-4" />
+                        Visit Live Site
+                      </Button>
+                      <Link href={`/portfolio/${item.id}`}>
+                        <Button variant="ghost" className="text-white">
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Details
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                   
@@ -193,15 +224,20 @@ export default function PortfolioPage() {
                     >
                       {item.category}
                     </Badge>
-                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:${item.color} group-hover:bg-clip-text transition-all">
-                      {item.title}
-                    </h3>
-                    <p className="text-slate-400 text-sm leading-relaxed">
+                    <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
+                    <p className="text-slate-400 text-sm leading-relaxed mb-4">
                       {item.description}
                     </p>
-                    <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
-                      <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${item.color}`} />
-                      WordPress / Elementor
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {item.tech.map((tech, tIndex) => (
+                        <span key={tIndex} className="text-xs px-2 py-1 rounded-full bg-slate-800 text-slate-300">
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-slate-800">
+                      <span className="text-xs text-slate-500">Client: </span>
+                      <span className="text-xs text-slate-300">{item.client}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -219,12 +255,12 @@ export default function PortfolioPage() {
             <p className="text-slate-400 mb-6 text-lg">
               Ready to add your project to our portfolio?
             </p>
-            <a 
-              href="/order"
-              className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold hover:from-blue-500 hover:to-purple-500 shadow-lg shadow-blue-500/25 transition-all hover:scale-105"
-            >
-              Start Your Project
-            </a>
+            <Link href="/order">
+              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500">
+                Start Your Project
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
           </motion.div>
         </div>
       </section>
