@@ -170,6 +170,16 @@ export default function HomePage() {
     return () => clearTimeout(timer)
   }, [])
 
+  // Always running conversion steps animation (like ticker)
+  useEffect(() => {
+    let step = 0
+    const tickerInterval = setInterval(() => {
+      step = (step + 1) % conversionSteps.length
+      setConversionStep(step)
+    }, 800)
+    return () => clearInterval(tickerInterval)
+  }, [])
+
   const startConversion = () => {
     setIsConverting(true)
     setConversionStep(0)
@@ -190,7 +200,7 @@ export default function HomePage() {
 
   const startGame = () => {
     setIsGameStarted(true)
-    setGameScore(10)
+    setGameScore(20)
     setClicks(0)
     const gameInterval = setInterval(() => {
       setGameScore(prev => {
@@ -886,13 +896,13 @@ export default function HomePage() {
                 {(() => {
                   const isCurrentPlan = userPlan === plan.planId || (!userPlan && plan.planId === 'free')
                   return isCurrentPlan ? (
-                    <div className="w-full py-3 text-center bg-green-100 text-green-700 font-semibold rounded-xl flex items-center justify-center gap-2">
-                      <CheckCircle2 className="w-5 h-5" />
+                    <Button className={`w-full ${plan.popular ? 'bg-purple-600 cursor-default' : 'border-2 border-slate-200 text-slate-700'}`} disabled>
+                      <CheckCircle2 className="mr-2 h-4 w-4" />
                       Current Plan
-                    </div>
+                    </Button>
                   ) : (
                     <Link href={plan.href} className="block">
-                      <Button className={`w-full ${plan.popular ? 'bg-purple-600 hover:bg-purple-700' : 'border-2 border-slate-200 hover:border-slate-300 text-slate-700'}`}>
+                      <Button className={`w-full ${plan.popular ? 'bg-purple-600 hover:bg-purple-700' : 'border-2 border-slate-200 hover:border-slate-300 text-slate-700 hover:bg-slate-50'}`}>
                         {plan.price === '$0' ? 'Get Started' : 'Subscribe Now'}
                       </Button>
                     </Link>

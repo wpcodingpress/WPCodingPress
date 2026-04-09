@@ -71,16 +71,12 @@ export default function DashboardLayout({
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [liveNotifications, setLiveNotifications] = useState<Notification[]>([])
-  const sidebarNotifRef = useRef<HTMLDivElement>(null)
   const headerNotifRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (notificationsOpen) {
-        if (sidebarNotifRef.current && !sidebarNotifRef.current.contains(event.target as Node) &&
-            headerNotifRef.current && !headerNotifRef.current.contains(event.target as Node)) {
-          setNotificationsOpen(false)
-        }
+      if (notificationsOpen && headerNotifRef.current && !headerNotifRef.current.contains(event.target as Node)) {
+        setNotificationsOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -340,9 +336,15 @@ export default function DashboardLayout({
                       ) : (
                         <div className="divide-y divide-gray-100">
                           {notifications.slice(0, 8).map((notif) => (
-                            <div
+                            <Link
                               key={notif.id}
-                              className={`p-3 hover:bg-gray-50 transition-colors ${!notif.isRead ? "bg-purple-50/50" : ""}`}
+                              href={notif.link || '/dashboard'}
+                              onClick={() => {
+                                if (!notif.isRead) {
+                                  markAsRead(notif.id)
+                                }
+                              }}
+                              className={`block p-3 hover:bg-gray-50 transition-colors ${!notif.isRead ? "bg-purple-50/50" : ""}`}
                             >
                               <div className="flex gap-3">
                                 <div className={`p-1.5 rounded-lg ${getNotificationColor(notif.type)}`}>
@@ -357,7 +359,7 @@ export default function DashboardLayout({
                                   <div className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0 mt-2" />
                                 )}
                               </div>
-                            </div>
+                            </Link>
                           ))}
                         </div>
                       )}

@@ -218,10 +218,10 @@ export default function PricingPage() {
                     {(() => {
                       const isCurrentPlan = userPlan === sub.planId || (!userPlan && sub.planId === 'free')
                       return isCurrentPlan ? (
-                        <div className="w-full py-3 text-center bg-green-500 text-white font-semibold rounded-xl flex items-center justify-center gap-2">
-                          <CheckCircle2 className="w-5 h-5" />
+                        <Button className={`w-full ${sub.popular ? 'bg-white text-slate-900' : 'bg-white/20 text-white'}`} disabled>
+                          <CheckCircle2 className="mr-2 h-4 w-4" />
                           Current Plan
-                        </div>
+                        </Button>
                       ) : (
                         <Link href={sub.planId === 'free' ? '/register' : '/dashboard/subscription'} className="w-full">
                           <Button className={`w-full ${sub.popular ? 'bg-white text-slate-900 hover:bg-slate-100' : 'bg-white/20 hover:bg-white/30 text-white'}`}>
