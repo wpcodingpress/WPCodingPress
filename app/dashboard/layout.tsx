@@ -341,7 +341,9 @@ export default function DashboardLayout({
                               href={notif.link || '/dashboard'}
                               onClick={() => {
                                 if (!notif.isRead) {
-                                  markAsRead(notif.id)
+                                  setNotifications(prev => prev.map(n => 
+                                    n.id === notif.id ? { ...n, isRead: true } : n
+                                  ))
                                 }
                               }}
                               className={`block p-3 hover:bg-gray-50 transition-colors ${!notif.isRead ? "bg-purple-50/50" : ""}`}
