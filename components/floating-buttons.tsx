@@ -2,12 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowUp, MessageCircle, X, Send, Bot, User, ChevronDown, Loader2 } from "lucide-react"
+import { ArrowUp, MessageCircle, X, Send, Bot, User, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function FloatingButtons() {
   const [showBackToTop, setShowBackToTop] = useState(false)
-  const [showChat, setShowChat] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,7 +21,9 @@ export function FloatingButtons() {
   }
 
   return (
-    <>
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+      <AIChatWidget />
+      
       <AnimatePresence>
         {showBackToTop && (
           <motion.button
@@ -31,11 +32,11 @@ export function FloatingButtons() {
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             onClick={scrollToTop}
-            className="fixed bottom-24 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-emerald-400 via-cyan-500 to-blue-500 text-white shadow-lg shadow-emerald-500/30 flex items-center justify-center cursor-pointer group hover:shadow-xl hover:shadow-emerald-500/40 hover:scale-110 transition-all duration-300"
+            className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 text-white shadow-lg shadow-indigo-500/30 flex items-center justify-center cursor-pointer group hover:shadow-xl hover:shadow-indigo-500/40 hover:scale-110 transition-all duration-300"
             aria-label="Back to top"
           >
             <motion.div
-              className="absolute inset-0 rounded-full bg-white/30 opacity-0 group-hover:opacity-100"
+              className="absolute inset-0 rounded-full bg-white/20"
               initial={{ scale: 0 }}
               whileHover={{ scale: 1.5 }}
               transition={{ duration: 0.3 }}
@@ -48,9 +49,7 @@ export function FloatingButtons() {
           </motion.button>
         )}
       </AnimatePresence>
-
-      <AIChatWidget />
-    </>
+    </div>
   )
 }
 
@@ -136,7 +135,7 @@ export function AIChatWidget() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.2 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 via-cyan-500 to-blue-500 text-white shadow-lg shadow-emerald-500/30 flex items-center justify-center cursor-pointer group hover:shadow-xl hover:shadow-emerald-500/40 hover:scale-110 transition-all duration-300"
+        className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 text-white shadow-lg shadow-indigo-500/30 flex items-center justify-center cursor-pointer group hover:shadow-xl hover:shadow-indigo-500/40 hover:scale-110 transition-all duration-300"
         aria-label="Open AI Chat"
       >
         <motion.div
@@ -183,9 +182,9 @@ export function AIChatWidget() {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.8, opacity: 0, y: 20 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed bottom-24 right-6 z-50 w-[380px] max-w-[calc(100vw-48px)] h-[550px] max-h-[calc(100vh-200px)] bg-white rounded-3xl shadow-2xl shadow-emerald-500/20 overflow-hidden flex flex-col"
+            className="fixed bottom-24 right-6 z-50 w-[380px] max-w-[calc(100vw-48px)] h-[550px] max-h-[calc(100vh-200px)] bg-white rounded-3xl shadow-2xl shadow-indigo-500/20 overflow-hidden flex flex-col"
           >
-            <div className="bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 p-4 flex items-center gap-3">
+            <div className="bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 p-4 flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
                 <Bot className="w-7 h-7 text-white" />
               </div>
@@ -207,18 +206,18 @@ export function AIChatWidget() {
                   className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   {message.role === "assistant" && (
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
                       <Bot className="w-5 h-5 text-white" />
                     </div>
                   )}
                   <div
                     className={`max-w-[75%] px-4 py-3 rounded-2xl ${
                       message.role === "user"
-                        ? "bg-gradient-to-br from-emerald-500 to-cyan-500 text-white rounded-br-md"
+                        ? "bg-gradient-to-br from-indigo-500 to-violet-500 text-white rounded-br-md"
                         : "bg-white text-slate-700 rounded-bl-md shadow-sm border border-slate-100"
                     }`}
                   >
-                    <p className="text-sm leading-relaxed">{message.content}</p>
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
                   </div>
                   {message.role === "user" && (
                     <div className="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center flex-shrink-0">
@@ -234,23 +233,23 @@ export function AIChatWidget() {
                   animate={{ opacity: 1 }}
                   className="flex gap-3"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center">
                     <Bot className="w-5 h-5 text-white" />
                   </div>
                   <div className="bg-white px-4 py-3 rounded-2xl rounded-bl-md shadow-sm border border-slate-100">
                     <div className="flex gap-1">
                       <motion.span
-                        className="w-2 h-2 bg-emerald-500 rounded-full"
+                        className="w-2 h-2 bg-indigo-500 rounded-full"
                         animate={{ y: [0, -5, 0] }}
                         transition={{ duration: 0.5, repeat: Infinity, delay: 0 }}
                       />
                       <motion.span
-                        className="w-2 h-2 bg-cyan-500 rounded-full"
+                        className="w-2 h-2 bg-violet-500 rounded-full"
                         animate={{ y: [0, -5, 0] }}
                         transition={{ duration: 0.5, repeat: Infinity, delay: 0.15 }}
                       />
                       <motion.span
-                        className="w-2 h-2 bg-blue-500 rounded-full"
+                        className="w-2 h-2 bg-pink-500 rounded-full"
                         animate={{ y: [0, -5, 0] }}
                         transition={{ duration: 0.5, repeat: Infinity, delay: 0.3 }}
                       />
@@ -268,7 +267,7 @@ export function AIChatWidget() {
                     <button
                       key={i}
                       onClick={() => handleQuickReply(reply)}
-                      className="text-xs px-3 py-1.5 bg-white border border-slate-200 rounded-full text-slate-600 hover:bg-emerald-50 hover:border-emerald-300 hover:text-emerald-600 transition-colors"
+                      className="text-xs px-3 py-1.5 bg-white border border-slate-200 rounded-full text-slate-600 hover:bg-indigo-50 hover:border-indigo-300 hover:text-indigo-600 transition-colors"
                     >
                       {reply}
                     </button>
@@ -285,12 +284,12 @@ export function AIChatWidget() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSend()}
                   placeholder="Type your message..."
-                  className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                  className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
                 />
                 <Button
                   onClick={handleSend}
                   disabled={!input.trim()}
-                  className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:shadow-lg hover:shadow-emerald-500/30 px-4"
+                  className="bg-gradient-to-r from-indigo-500 to-violet-500 hover:shadow-lg hover:shadow-indigo-500/30 px-4"
                 >
                   <Send className="w-5 h-5" />
                 </Button>

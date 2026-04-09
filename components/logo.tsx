@@ -12,8 +12,8 @@ interface LogoProps {
 const sizes = {
   sm: { icon: 32, text: "text-lg", padding: "p-1.5" },
   md: { icon: 40, text: "text-xl", padding: "p-2" },
-  lg: { icon: 48, text: "text-2xl", padding: "p-2.5" },
-  xl: { icon: 56, text: "text-3xl", padding: "p-3" },
+  lg: { icon: 48, text: "2xl", padding: "p-2.5" },
+  xl: { icon: 56, text: "3xl", padding: "p-3" },
 }
 
 export function AnimatedLogo({ className = "", size = "md", showText = true }: LogoProps) {
@@ -22,8 +22,8 @@ export function AnimatedLogo({ className = "", size = "md", showText = true }: L
   return (
     <Link href="/" className={`flex items-center gap-3 group ${className}`}>
       <motion.div
-        className={`${s.padding} rounded-xl bg-gradient-to-br from-emerald-400 via-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-emerald-500/25 relative overflow-hidden`}
-        whileHover={{ scale: 1.05, rotate: [0, -5, 5, 0] }}
+        className={`${s.padding} rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 relative overflow-hidden`}
+        whileHover={{ scale: 1.05 }}
         transition={{ duration: 0.3 }}
       >
         <motion.div
@@ -41,38 +41,16 @@ export function AnimatedLogo({ className = "", size = "md", showText = true }: L
           className="relative z-10"
         >
           <motion.path
-            d="M24 4L4 14v20l20 10 20-10V14L24 4z"
+            d="M28 4L12 26H22L20 44L36 22H26L28 4Z"
             fill="white"
             initial={{ pathLength: 0 }}
             animate={{ pathLength: 1 }}
             transition={{ duration: 1.5, ease: "easeOut" }}
           />
-          <motion.path
-            d="M24 14L14 19v10l10 5 10-5V19L24 14z"
-            fill="url(#logo-gradient)"
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-          />
-          <motion.circle
-            cx="24"
-            cy="24"
-            r="4"
-            fill="white"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.8, duration: 0.3 }}
-          />
-          <defs>
-            <linearGradient id="logo-gradient" x1="14" y1="14" x2="34" y2="34">
-              <stop stopColor="#10b981" />
-              <stop offset="1" stopColor="#06b6d4" />
-            </linearGradient>
-          </defs>
         </svg>
         
         <motion.div
-          className="absolute -inset-1 rounded-xl bg-gradient-to-r from-emerald-400 via-cyan-500 to-blue-500 opacity-0 blur-lg"
+          className="absolute -inset-1 rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 opacity-0 blur-lg"
           animate={{ opacity: [0, 0.5, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
         />
@@ -86,19 +64,10 @@ export function AnimatedLogo({ className = "", size = "md", showText = true }: L
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <span className="text-slate-800">WP</span>
-            <span className="bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 bg-clip-text text-transparent">
-              Coding
+            <span className="text-slate-800">WPCoding</span>
+            <span className="bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 bg-clip-text text-transparent">
+              Press
             </span>
-            <span className="text-slate-800">Press</span>
-          </motion.span>
-          <motion.span
-            className="text-[10px] text-slate-500 tracking-widest uppercase font-medium"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            Web Development Agency
           </motion.span>
         </div>
       )}
@@ -109,8 +78,8 @@ export function AnimatedLogo({ className = "", size = "md", showText = true }: L
 export function LogoIcon({ className = "", size = 40 }: { className?: string, size?: number }) {
   return (
     <motion.div
-      className={`rounded-xl bg-gradient-to-br from-emerald-400 via-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-emerald-500/25 relative overflow-hidden ${className}`}
-      whileHover={{ scale: 1.1, rotate: [0, -5, 5, 0] }}
+      className={`rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 relative overflow-hidden ${className}`}
+      whileHover={{ scale: 1.1, rotate: 5 }}
       transition={{ duration: 0.3 }}
       style={{ width: size, height: size }}
     >
@@ -129,34 +98,12 @@ export function LogoIcon({ className = "", size = 40 }: { className?: string, si
         className="relative z-10"
       >
         <motion.path
-          d="M24 4L4 14v20l20 10 20-10V14L24 4z"
+          d="M28 4L12 26H22L20 44L36 22H26L28 4Z"
           fill="white"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
         />
-        <motion.path
-          d="M24 14L14 19v10l10 5 10-5V19L24 14z"
-          fill="url(#logo-gradient-2)"
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-        />
-        <motion.circle
-          cx="24"
-          cy="24"
-          r="4"
-          fill="white"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.8, duration: 0.3 }}
-        />
-        <defs>
-          <linearGradient id="logo-gradient-2" x1="14" y1="14" x2="34" y2="34">
-            <stop stopColor="#10b981" />
-            <stop offset="1" stopColor="#06b6d4" />
-          </linearGradient>
-        </defs>
       </svg>
     </motion.div>
   )
@@ -165,7 +112,7 @@ export function LogoIcon({ className = "", size = 40 }: { className?: string, si
 export function LogoMark({ className = "" }: { className?: string }) {
   return (
     <motion.div
-      className={`w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 via-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-emerald-500/25 ${className}`}
+      className={`w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 ${className}`}
       whileHover={{ rotate: 360 }}
       transition={{ duration: 0.5 }}
     >
@@ -176,21 +123,24 @@ export function LogoMark({ className = "" }: { className?: string }) {
         fill="none"
       >
         <path
-          d="M24 4L4 14v20l20 10 20-10V14L24 4z"
+          d="M28 4L12 26H22L20 44L36 22H26L28 4Z"
           fill="white"
         />
-        <path
-          d="M24 14L14 19v10l10 5 10-5V19L24 14z"
-          fill="url(#logo-gradient-3)"
-        />
-        <circle cx="24" cy="24" r="4" fill="white" />
-        <defs>
-          <linearGradient id="logo-gradient-3" x1="14" y1="14" x2="34" y2="34">
-            <stop stopColor="#10b981" />
-            <stop offset="1" stopColor="#06b6d4" />
-          </linearGradient>
-        </defs>
       </svg>
     </motion.div>
+  )
+}
+
+export function LogoWithText({ className = "" }: { className?: string }) {
+  return (
+    <Link href="/" className={`flex items-center gap-2 ${className}`}>
+      <LogoIcon size={36} />
+      <span className="text-xl font-bold">
+        <span className="text-slate-800">WPCoding</span>
+        <span className="bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 bg-clip-text text-transparent">
+          Press
+        </span>
+      </span>
+    </Link>
   )
 }
