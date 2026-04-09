@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { signOut } from "next-auth/react"
 import Link from "next/link"
@@ -71,6 +71,21 @@ export default function DashboardLayout({
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [liveNotifications, setLiveNotifications] = useState<Notification[]>([])
+  const sidebarNotifRef = useRef<HTMLDivElement>(null)
+  const headerNotifRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationsOpen) {
+        if (sidebarNotifRef.current && !sidebarNotifRef.current.contains(event.target as Node) &&
+            headerNotifRef.current && !headerNotifRef.current.contains(event.target as Node)) {
+          setNotificationsOpen(false)
+        }
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [notificationsOpen])
 
   useEffect(() => {
     checkAuth()
@@ -244,7 +259,7 @@ export default function DashboardLayout({
         </div>
         
         {/* Notifications Button */}
-        <div className="p-4 border-b border-gray-100">
+        <div className="p-4 border-b border-gray-100" ref={sidebarNotifRef}>
           <button
             onClick={() => setNotificationsOpen(!notificationsOpen)}
             className="w-full flex items-center justify-between px-4 py-3 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors relative"
@@ -353,7 +368,7 @@ export default function DashboardLayout({
             </div>
             <div className="flex items-center gap-3">
               {/* Header Notification Bell */}
-              <div className="relative">
+              <div className="relative" ref={headerNotifRef}>
                 <Button 
                   variant="ghost" 
                   size="icon" 

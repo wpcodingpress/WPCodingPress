@@ -8,18 +8,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 
 const subscriptions = [
   {
-    name: "Starter",
+    name: "Free",
     price: "Free",
-    period: "",
-    description: "Perfect for testing and small projects. Get started at no cost.",
+    period: "forever",
+    description: "Perfect for getting started with WordPress to Next.js conversion",
     icon: Rocket,
     features: [
-      "1 WordPress Site Conversion",
-      "Basic Next.js Template",
-      "Community Support",
-      "5GB Bandwidth",
-      "Basic SEO Setup",
-      "WordPress Plugin Access"
+      "1 WordPress site conversion",
+      "Basic Next.js template",
+      "Community support",
+      "Basic SEO setup"
     ],
     popular: false,
     color: "from-slate-600 to-slate-700",
@@ -30,38 +28,37 @@ const subscriptions = [
     name: "Pro",
     price: "$19",
     period: "/month",
-    description: "Ideal for growing businesses and agencies. Scale your online presence.",
+    description: "Convert up to 5 WordPress sites to headless Next.js",
     icon: Star,
     features: [
-      "5 WordPress Site Conversions",
-      "Advanced Next.js Templates",
-      "Priority Support",
-      "100GB Bandwidth",
-      "Custom Domain",
-      "Analytics Dashboard",
-      "Auto Content Sync",
-      "API Access"
+      "5 WordPress to Headless conversions",
+      "Live deployed sites (Vercel/Render)",
+      "Advanced Next.js templates",
+      "Priority email support",
+      "Custom domain support",
+      "Analytics dashboard",
+      "Auto content sync"
     ],
     popular: true,
     color: "from-blue-600 to-purple-600",
     borderColor: "border-blue-500",
-    cta: "Start Pro Trial"
+    cta: "Start Pro"
   },
   {
     name: "Enterprise",
     price: "$99",
     period: "/month",
-    description: "For agencies and high-volume needs. White-label solution with dedicated support.",
+    description: "Unlimited conversions for agencies and businesses",
     icon: Crown,
     features: [
-      "Unlimited Conversions",
-      "White-label Solution",
-      "24/7 Dedicated Support",
-      "Unlimited Bandwidth",
-      "Custom Development",
-      "API Access",
-      "Advanced Caching",
-      "Custom Integrations"
+      "Unlimited conversions",
+      "White-label deployment",
+      "24/7 Dedicated support",
+      "Custom domain included",
+      "API access",
+      "Advanced analytics",
+      "Team collaboration",
+      "Custom integrations"
     ],
     popular: false,
     color: "from-amber-600 to-orange-600",

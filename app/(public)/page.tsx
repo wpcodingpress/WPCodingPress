@@ -53,9 +53,9 @@ const features = [
 ]
 
 const plans = [
-  { name: "Free", price: "$0", period: "forever", features: ["1 WordPress Site Conversion", "Basic Next.js Template", "Community Support", "Basic SEO Setup"], cta: "Get Started", href: "/register", popular: false },
-  { name: "Pro", price: "$19", period: "/month", features: ["5 WordPress Site Conversions", "Advanced Next.js Templates", "Priority Support", "Custom Domain", "Analytics Dashboard", "Auto Content Sync"], cta: "Start Pro", href: "/register?plan=pro", popular: true },
-  { name: "Enterprise", price: "$99", period: "/month", features: ["Unlimited Conversions", "White-label Solution", "24/7 Dedicated Support", "Unlimited Bandwidth", "Custom Development", "API Access"], cta: "Contact Sales", href: "/contact", popular: false },
+  { name: "Free", price: "$0", period: "forever", description: "Perfect for getting started with WordPress to Next.js conversion", features: ["1 WordPress site conversion", "Basic Next.js template", "Community support", "Basic SEO setup"], cta: "Get Started", href: "/register", popular: false },
+  { name: "Pro", price: "$19", period: "/month", description: "Convert up to 5 WordPress sites to headless Next.js", features: ["5 WordPress to Headless conversions", "Live deployed sites (Vercel/Render)", "Advanced Next.js templates", "Priority email support", "Custom domain support", "Analytics dashboard", "Auto content sync"], cta: "Start Pro", href: "/register?plan=pro", popular: true },
+  { name: "Enterprise", price: "$99", period: "/month", description: "Unlimited conversions for agencies and businesses", features: ["Unlimited conversions", "White-label deployment", "24/7 Dedicated support", "Custom domain included", "API access", "Advanced analytics", "Team collaboration", "Custom integrations"], cta: "Contact Sales", href: "/contact", popular: false },
 ]
 
 const testimonials = [
@@ -121,6 +121,28 @@ export default function HomePage() {
     { text: '→ Optimizing 450+ images...', delay: 1.5 },
     { text: '→ Deploying to edge network...', delay: 1.8 },
   ]
+
+  useEffect(() => {
+    const autoConvert = () => {
+      setIsConverting(true)
+      setConversionStep(0)
+      let step = 0
+      const interval = setInterval(() => {
+        step++
+        if (step >= conversionSteps.length) {
+          clearInterval(interval)
+          setTimeout(() => {
+            setIsConverting(false)
+            setConversionStep(0)
+          }, 4000)
+        } else {
+          setConversionStep(step)
+        }
+      }, 350)
+    }
+    const timer = setTimeout(autoConvert, 1500)
+    return () => clearTimeout(timer)
+  }, [])
 
   const startConversion = () => {
     setIsConverting(true)
@@ -762,8 +784,63 @@ export default function HomePage() {
                   </motion.div>
                 )}
               </div>
-            </div>
-          </motion.div>
+</div>
+            </motion.div>
+        </div>
+      </section>
+
+      {/* Pricing Section - Below Game */}
+      <section className="py-24 px-6 bg-gradient-to-br from-purple-50 via-white to-violet-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <Badge className="bg-purple-100 text-purple-700 border-purple-200 px-4 py-1.5 text-sm font-medium mb-6">
+              Pricing
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Simple, <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Transparent</span> Pricing
+            </h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">Start free, upgrade when you're ready. No hidden fees.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {plans.map((plan, i) => (
+              <motion.div
+                key={i}
+                className={`relative bg-white border rounded-3xl p-8 ${
+                  plan.popular ? 'border-purple-400 shadow-xl shadow-purple-100 ring-2 ring-purple-300' : 'border-slate-200'
+                }`}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <Badge className="bg-gradient-to-r from-purple-600 to-violet-600 text-white px-4 py-1 shadow-lg">Most Popular</Badge>
+                  </div>
+                )}
+                <h3 className="text-xl font-bold text-slate-900 mb-2">{plan.name}</h3>
+                <p className="text-sm text-slate-500 mb-4">{(plan as any).description}</p>
+                <div className="mb-6">
+                  <span className="text-5xl font-bold text-slate-900">{plan.price}</span>
+                  <span className="text-slate-500">{plan.period}</span>
+                </div>
+                <ul className="space-y-3 mb-8">
+                  {plan.features.map((feature, j) => (
+                    <li key={j} className="flex items-center gap-3 text-slate-700">
+                      <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Link href={plan.href} className="block">
+                  <Button className={`w-full ${plan.popular ? 'bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 shadow-lg' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}>
+                    {plan.cta}
+                  </Button>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -1119,60 +1196,6 @@ export default function HomePage() {
                 ))}
               </div>
             </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section className="py-24 px-6 bg-gradient-to-br from-purple-50 via-white to-violet-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <Badge className="bg-purple-100 text-purple-700 border-purple-200 px-4 py-1.5 text-sm font-medium mb-6">
-              Pricing
-            </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-              Simple, <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Transparent</span> Pricing
-            </h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">Start free, upgrade when you're ready. No hidden fees.</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {plans.map((plan, i) => (
-              <motion.div
-                key={i}
-                className={`relative bg-white border rounded-3xl p-8 ${
-                  plan.popular ? 'border-purple-400 shadow-xl shadow-purple-100 ring-2 ring-purple-300' : 'border-slate-200'
-                }`}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-gradient-to-r from-purple-600 to-violet-600 text-white px-4 py-1 shadow-lg">Most Popular</Badge>
-                  </div>
-                )}
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{plan.name}</h3>
-                <div className="mb-6">
-                  <span className="text-5xl font-bold text-slate-900">{plan.price}</span>
-                  <span className="text-slate-500">{plan.period}</span>
-                </div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, j) => (
-                    <li key={j} className="flex items-center gap-3 text-slate-700">
-                      <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Link href={plan.href} className="block">
-                  <Button className={`w-full ${plan.popular ? 'bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 shadow-lg' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}>
-                    {plan.cta}
-                  </Button>
-                </Link>
-              </motion.div>
-            ))}
           </div>
         </div>
       </section>
