@@ -38,12 +38,15 @@ const products = [
 
 function NotificationBell() {
   const [hasNotifications, setHasNotifications] = useState(false)
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [notifications, setNotifications] = useState<any[]>([])
   
   useEffect(() => {
     const checkNotifications = async () => {
       try {
         const res = await fetch("/api/notifications?type=user")
         const data = await res.json()
+        setNotifications(data)
         setHasNotifications(data.length > 0)
       } catch (e) {
         setHasNotifications(false)
@@ -54,15 +57,63 @@ function NotificationBell() {
     return () => clearInterval(interval)
   }, [])
 
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diff = now.getTime() - date.getTime()
+    const minutes = Math.floor(diff / 60000)
+    if (minutes < 1) return "Just now"
+    if (minutes < 60) return `${minutes}m ago`
+    return `${Math.floor(minutes / 60)}h ago`
+  }
+
   return (
-    <Button variant="ghost" size="icon" className="relative text-slate-700 hover:text-purple-600 hover:bg-purple-50">
-      <Bell className="w-5 h-5" />
-      {hasNotifications && (
-        <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse">
-          !
-        </span>
+    <div className="relative">
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        className="relative text-slate-700 hover:text-purple-600 hover:bg-purple-50"
+        onClick={() => setNotificationsOpen(!notificationsOpen)}
+      >
+        <Bell className="w-5 h-5" />
+        {hasNotifications && (
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse">
+            !
+          </span>
+        )}
+      </Button>
+      
+      {/* Notifications Dropdown */}
+      {notificationsOpen && (
+        <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-2xl max-h-96 overflow-y-auto z-50">
+          <div className="sticky top-0 bg-white p-3 border-b border-gray-100 flex items-center justify-between">
+            <span className="text-gray-700 font-semibold text-sm">Notifications</span>
+          </div>
+          {notifications.length === 0 ? (
+            <div className="p-6 text-center text-gray-500 text-sm">
+              No new notifications
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {notifications.slice(0, 8).map((notif: any) => (
+                <div key={notif.id} className="p-3 hover:bg-gray-50 transition-colors">
+                  <div className="flex gap-3">
+                    <div className="p-1.5 rounded-lg bg-purple-100 text-purple-600">
+                      <Bell className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-900 font-medium truncate">{notif.title}</p>
+                      <p className="text-xs text-gray-500 truncate">{notif.message}</p>
+                      <p className="text-xs text-gray-400 mt-1">{formatTime(notif.createdAt)}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       )}
-    </Button>
+    </div>
   )
 }
 
