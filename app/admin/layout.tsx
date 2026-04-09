@@ -125,8 +125,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <div className="animate-pulse text-indigo-400 text-lg">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="animate-pulse text-purple-600 text-lg">Loading...</div>
       </div>
     )
   }
@@ -136,27 +136,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-slate-800 border-r border-slate-700 z-40">
-        <div className="p-6 border-b border-slate-700">
+      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-gray-200 z-40 shadow-sm">
+        <div className="p-6 border-b border-gray-100">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center">
               <Zap className="h-4 w-4 text-white" />
             </div>
-            <span className="text-lg font-bold text-white">WPCodingPress</span>
+            <span className="text-lg font-bold text-gray-900">WPCodingPress</span>
           </Link>
         </div>
 
         {/* Notifications Button */}
-        <div className="p-4 border-b border-slate-700">
+        <div className="p-4 border-b border-gray-100">
           <button
             onClick={() => setNotificationsOpen(!notificationsOpen)}
-            className="w-full flex items-center justify-between px-4 py-3 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-colors relative"
+            className="w-full flex items-center justify-between px-4 py-3 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors relative"
           >
             <div className="flex items-center gap-3">
-              <Bell className="w-5 h-5 text-slate-400" />
-              <span className="text-white font-medium">Notifications</span>
+              <Bell className="w-5 h-5 text-purple-600" />
+              <span className="text-gray-700 font-medium">Notifications</span>
             </div>
             {unreadCount > 0 && (
               <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
@@ -172,39 +172,39 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="absolute left-4 right-4 mt-2 w-[calc(100%-2rem)] bg-slate-700 border border-slate-600 rounded-xl shadow-2xl max-h-80 overflow-y-auto z-50"
+                className="absolute left-4 right-4 mt-2 w-[calc(100%-2rem)] bg-white border border-gray-200 rounded-xl shadow-2xl max-h-80 overflow-y-auto z-50"
               >
-                <div className="sticky top-0 bg-slate-700 p-3 border-b border-slate-600 flex items-center justify-between">
-                  <span className="text-white font-medium text-sm">Recent Activity</span>
+                <div className="sticky top-0 bg-white p-3 border-b border-gray-100 flex items-center justify-between">
+                  <span className="text-gray-700 font-medium text-sm">Recent Activity</span>
                   {unreadCount > 0 && (
-                    <button onClick={markAllRead} className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
+                    <button onClick={markAllRead} className="text-xs text-purple-600 hover:text-purple-700 flex items-center gap-1">
                       <Check className="w-3 h-3" />
                       Mark all read
                     </button>
                   )}
                 </div>
                 {notifications.length === 0 ? (
-                  <div className="p-6 text-center text-slate-500 text-sm">
+                  <div className="p-6 text-center text-gray-500 text-sm">
                     No new notifications
                   </div>
                 ) : (
-                  <div className="divide-y divide-slate-600">
+                  <div className="divide-y divide-gray-100">
                     {notifications.slice(0, 10).map((notif) => (
                       <div
                         key={notif.id}
-                        className={`p-3 hover:bg-slate-600/50 transition-colors ${!notif.isRead ? "bg-slate-600/30" : ""}`}
+                        className={`p-3 hover:bg-gray-50 transition-colors ${!notif.isRead ? "bg-purple-50/50" : ""}`}
                       >
                         <div className="flex gap-3">
                           <div className={`p-1.5 rounded-lg ${getNotificationColor(notif.type)}`}>
                             {getNotificationIcon(notif.type)}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm text-white font-medium truncate">{notif.title}</p>
-                            <p className="text-xs text-slate-400 truncate">{notif.message}</p>
-                            <p className="text-xs text-slate-500 mt-1">{formatTime(notif.createdAt)}</p>
+                            <p className="text-sm text-gray-900 font-medium truncate">{notif.title}</p>
+                            <p className="text-xs text-gray-500 truncate">{notif.message}</p>
+                            <p className="text-xs text-gray-400 mt-1">{formatTime(notif.createdAt)}</p>
                           </div>
                           {!notif.isRead && (
-                            <div className="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0 mt-2" />
+                            <div className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0 mt-2" />
                           )}
                         </div>
                       </div>
@@ -226,8 +226,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                   isActive 
-                    ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/20" 
-                    : "text-slate-400 hover:text-white hover:bg-slate-700"
+                    ? "bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-lg shadow-purple-500/20" 
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 )}
               >
                 <item.icon className="h-5 w-5" />
@@ -237,19 +237,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700">
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100">
           <Link href="/" className="block mb-4">
-            <span className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">
+            <span className="text-xs text-purple-600 hover:text-purple-700 transition-colors">
               ← Back to Website
             </span>
           </Link>
           <div className="mb-4 px-4">
-            <p className="text-sm font-medium text-white">{session.user?.name || "Admin"}</p>
-            <p className="text-xs text-slate-400">{session.user?.email}</p>
+            <p className="text-sm font-medium text-gray-900">{session.user?.name || "Admin"}</p>
+            <p className="text-xs text-gray-500">{session.user?.email}</p>
           </div>
           <button
             onClick={() => signOut({ callbackUrl: "/admin/login" })}
-            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
           >
             <LogOut className="h-5 w-5" />
             Sign Out

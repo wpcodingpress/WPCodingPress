@@ -1,8 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useRef, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import Head from "next/head"
+import { useEffect, useRef, useState, useCallback } from "react"
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import {
@@ -11,7 +12,7 @@ import {
   Bot, TrendingUp, Users, Globe, Sparkles, Layout, Server,
   Lock, Gauge, Headphones, ArrowRightLeft, Eye, ExternalLink,
   ChevronDown, Rocket, Target, Award, Clock, Code2, Database, Globe2, ArrowUpRight,
-  Terminal, GitBranch, Package, BarChart3, Cpu, RefreshCcw, ShieldCheck, SearchCheck, Globe as GlobeIcon, FileCode, Database as DatabaseIcon, Server as ServerIcon, Boxes, Accessibility, Download, Zap as ZapIcon, Clock3, MessageCircle, Star as StarIcon, CheckCircle2, Settings
+  Terminal, GitBranch, Package, BarChart3, Cpu, RefreshCcw, ShieldCheck, SearchCheck, Globe as GlobeIcon, FileCode, Database as DatabaseIcon, Server as ServerIcon, Boxes, Accessibility, Download, Zap as ZapIcon, Clock3, MessageCircle, Star as StarIcon, CheckCircle2, Settings, MousePointer2, Activity, Disc, Dna, Cpu as CpuIcon, Gem, Box, Grid3X3, Sparkle, Move3d, Layers3, Zapplets, Wand2, Heart, ThumbsUp
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -100,6 +101,48 @@ export default function HomePage() {
   const heroRef = useRef<HTMLDivElement>(null)
   const [selectedPortfolio, setSelectedPortfolio] = useState<typeof portfolioItems[0] | null>(null)
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [isGameStarted, setIsGameStarted] = useState(false)
+  const [gameScore, setGameScore] = useState(0)
+  const [terminalLines, setTerminalLines] = useState<string[]>([])
+  const [hoveredSection, setHoveredSection] = useState<string | null>(null)
+
+  const { scrollY } = useScroll()
+  const heroOpacity = useTransform(scrollY, [0, 300], [1, 0])
+  const heroScale = useTransform(scrollY, [0, 300], [1, 0.95])
+  const parallaxY = useTransform(scrollY, [0, 500], [0, -100])
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect()
+      setMousePosition({
+        x: ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        y: ((e.clientY - rect.top) / rect.height) * 2 - 1
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (container) {
+      container.addEventListener('mousemove', handleMouseMove)
+      return () => container.removeEventListener('mousemove', handleMouseMove)
+    }
+  }, [handleMouseMove])
+
+  const startGame = () => {
+    setIsGameStarted(true)
+    setGameScore(0)
+    setTerminalLines(['> init game...', '> Ready! Click to collect'])
+  }
+
+  const collectPoint = () => {
+    if (isGameStarted) {
+      setGameScore(prev => prev + 10)
+      const newLines = [...terminalLines, `> +10 points! Score: ${gameScore + 10}`]
+      setTerminalLines(newLines.slice(-5))
+    }
+  }
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -111,6 +154,57 @@ export default function HomePage() {
       gsap.fromTo(".float-element",
         { y: 0 },
         { y: -20, duration: 2, repeat: -1, yoyo: true, ease: "power1.inOut", stagger: 0.2 }
+      )
+
+      gsap.to(".float-element", {
+        x: (i) => Math.sin(i) * 30,
+        duration: 3,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut"
+      })
+
+      gsap.fromTo(".scroll-reveal",
+        { opacity: 0, y: 100, scale: 0.9 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".scroll-reveal",
+            start: "top 80%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      )
+
+      gsap.utils.toArray('.parallax-section').forEach((section: any) => {
+        gsap.to(section, {
+          y: -50,
+          scrollTrigger: {
+            trigger: section,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1
+          }
+        })
+      })
+
+      gsap.to(".hero-glow", {
+        scale: 1.2,
+        opacity: 0.8,
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut"
+      })
+
+      gsap.fromTo(".game-particle",
+        { scale: 0, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.3, stagger: 0.1 }
       )
     }, containerRef)
 
@@ -125,17 +219,112 @@ export default function HomePage() {
   }, [])
 
   return (
-    <div ref={containerRef} className="relative min-h-screen bg-white">
+    <div ref={containerRef} className="relative min-h-screen bg-white cursor-none">
+      <style jsx global>{`
+        .cursor-dot {
+          width: 20px;
+          height: 20px;
+          background: radial-gradient(circle, rgba(139, 92, 246, 0.8) 0%, transparent 70%);
+          border-radius: 50%;
+          position: fixed;
+          pointer-events: none;
+          z-index: 9999;
+          transform: translate(-50%, -50%);
+          transition: transform 0.1s ease-out;
+        }
+        .cursor-dot.active {
+          transform: translate(-50%, -50%) scale(2);
+        }
+      `}</style>
       <FloatingButtons />
+      <div className="cursor-dot" style={{
+        left: typeof window !== 'undefined' ? window.innerWidth / 2 + mousePosition.x * 100 : '50%',
+        top: typeof window !== 'undefined' ? window.innerHeight / 2 + mousePosition.y * 100 : '50%'
+      }} />
+
+      {/* SEO Metadata */}
+      <Head>
+        <title>WPCodingPress | WordPress to Next.js Migration & Web Development Services</title>
+        <meta name="description" content="Transform your WordPress website to Next.js for lightning-fast performance, better SEO rankings, and enhanced security. Join 700+ happy clients with AI-powered migration." />
+        <meta name="keywords" content="WordPress to Next.js, web development, SEO services, WooCommerce, React development, website migration, performance optimization" />
+        <meta property="og:title" content="WPCodingPress | Professional WordPress to Next.js Migration" />
+        <meta property="og:description" content="Lightning-fast, SEO-optimized websites that load in milliseconds. Convert automatically with our AI-powered platform." />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" href="https://wpcodingpress.com" />
+      </Head>
 
       {/* Hero Section - Light Purple Gradient with Centered Text */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden bg-gradient-to-br from-purple-50 via-white to-violet-50">
-        {/* Floating Background Elements */}
-        <div className="absolute top-32 right-10 w-20 h-20 bg-purple-200/50 rounded-3xl float-element animate-float-slow opacity-60" />
-        <div className="absolute top-48 left-20 w-16 h-16 bg-violet-200/50 rounded-2xl float-element animate-float-slow opacity-60" />
-        <div className="absolute bottom-40 right-1/4 w-12 h-12 bg-pink-200/50 rounded-full float-element animate-float-slow opacity-60" />
-        <div className="absolute top-1/3 left-10 w-14 h-14 bg-indigo-200/50 rounded-xl float-element animate-float-slow opacity-60" />
-        <div className="absolute bottom-1/3 right-20 w-10 h-10 bg-purple-300/50 rounded-lg float-element animate-float-slow opacity-60" />
+      <section 
+        ref={heroRef} 
+        className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden bg-gradient-to-br from-purple-50 via-white to-violet-50"
+        onMouseEnter={() => setHoveredSection('hero')}
+        onMouseLeave={() => setHoveredSection(null)}
+      >
+        {/* Enhanced Interactive Background */}
+        <motion.div 
+          className="absolute inset-0 overflow-hidden"
+          style={{ opacity: heroOpacity }}
+        >
+          <motion.div 
+            className="hero-glow absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-gradient-to-r from-purple-300/40 to-violet-300/40 rounded-full blur-[120px]"
+            style={{ 
+              x: mousePosition.x * 50,
+              y: mousePosition.y * 50 
+            }}
+          />
+          <motion.div 
+            className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-gradient-to-r from-indigo-300/30 to-purple-300/30 rounded-full blur-[100px]"
+            style={{ 
+              x: mousePosition.x * -30,
+              y: mousePosition.y * -30 
+            }}
+          />
+        </motion.div>
+
+        {/* Floating Background Elements with Mouse Tracking */}
+        <motion.div 
+          className="absolute top-32 right-10 w-20 h-20 bg-purple-200/50 rounded-3xl float-element"
+          style={{ 
+            x: mousePosition.x * 20,
+            y: mousePosition.y * 20,
+            opacity: hoveredSection === 'hero' ? 0.8 : 0.6 
+          }}
+        />
+        <motion.div 
+          className="absolute top-48 left-20 w-16 h-16 bg-violet-200/50 rounded-2xl float-element"
+          style={{ 
+            x: mousePosition.x * -15,
+            y: mousePosition.y * 15,
+            opacity: hoveredSection === 'hero' ? 0.8 : 0.6 
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-40 right-1/4 w-12 h-12 bg-pink-200/50 rounded-full float-element"
+          style={{ 
+            x: mousePosition.x * 25,
+            y: mousePosition.y * -25,
+            opacity: hoveredSection === 'hero' ? 0.8 : 0.6 
+          }}
+        />
+        <motion.div 
+          className="absolute top-1/3 left-10 w-14 h-14 bg-indigo-200/50 rounded-xl float-element"
+          style={{ 
+            x: mousePosition.x * 18,
+            y: mousePosition.y * 18,
+            opacity: hoveredSection === 'hero' ? 0.8 : 0.6 
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-1/3 right-20 w-10 h-10 bg-purple-300/50 rounded-lg float-element"
+          style={{ 
+            x: mousePosition.x * -22,
+            y: mousePosition.y * 22,
+            opacity: hoveredSection === 'hero' ? 0.8 : 0.6 
+          }}
+        />
+        
+        {/* Interactive Grid Pattern */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #8b5cf6 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         
         {/* Blur Circles */}
         <div className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-purple-200/30 rounded-full blur-[100px]" />
@@ -147,7 +336,7 @@ export default function HomePage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="hero-animate inline-flex items-center gap-2 px-5 py-2.5 bg-purple-100 border border-purple-200 rounded-full text-purple-700 text-sm font-semibold mb-8 shadow-sm"
+              className="hero-animate inline-flex items-center gap-2 px-5 py-2.5 bg-purple-100 border border-purple-200 rounded-full text-purple-700 text-sm font-semibold mb-6 sm:mb-8 shadow-sm"
             >
               <Sparkles className="w-4 h-4" />
               AI-Powered Web Development Agency
@@ -157,7 +346,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="hero-animate text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight"
+              className="hero-animate text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-slate-900 mb-4 sm:mb-6 leading-tight"
             >
               Transform Your
               <span className="block bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 bg-clip-text text-transparent">
@@ -169,7 +358,7 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="hero-animate text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto"
+              className="hero-animate text-base sm:text-lg md:text-xl text-slate-600 mb-8 sm:mb-10 max-w-xl sm:max-w-2xl mx-auto leading-relaxed"
             >
               Lightning-fast, SEO-optimized websites that load in milliseconds. 
               Convert automatically with our AI-powered platform.
@@ -179,16 +368,16 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="hero-animate flex flex-col sm:flex-row gap-4 justify-center mb-12"
+              className="hero-animate flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 px-4"
             >
               <Link href="/register">
-                <Button size="lg" className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold px-10 py-6 shadow-lg shadow-purple-500/25 text-lg">
+                <Button size="xl" className="w-full sm:w-auto min-w-[200px] bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold px-8 py-4 shadow-lg shadow-purple-500/25 text-base sm:text-lg">
                   Start Free Today
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
               <Link href="/services/wordpress-to-nextjs">
-                <Button size="lg" variant="outline" className="border-2 border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 px-10 py-6 font-semibold text-lg">
+                <Button size="xl" variant="outline" className="w-full sm:w-auto min-w-[200px] border-2 border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 px-8 py-4 font-semibold text-base sm:text-lg">
                   Learn More
                 </Button>
               </Link>
@@ -817,6 +1006,146 @@ export default function HomePage() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Interactive Terminal Game Section */}
+      <section className="py-24 px-6 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+        {/* Game Background Effects */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-0 w-full h-full" style={{ 
+            backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%)',
+          }} />
+          <div className="absolute top-10 left-10 w-32 h-32 bg-purple-500/20 rounded-full blur-[60px]" />
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-violet-500/20 rounded-full blur-[80px]" />
+        </div>
+        
+        <div className="max-w-4xl mx-auto relative z-10">
+          <div className="text-center mb-12">
+            <Badge className="bg-gradient-to-r from-purple-500 to-violet-500 text-white border-0 px-4 py-1.5 text-sm font-medium mb-6">
+              <Sparkle className="w-4 h-4 mr-2" />
+              Interactive Demo
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Experience Our <span className="bg-gradient-to-r from-purple-400 to-violet-400 bg-clip-text text-transparent">Terminal Power</span>
+            </h2>
+            <p className="text-slate-300 max-w-2xl mx-auto">
+              Play our interactive terminal game to see how fast our conversion process works. 
+              Click the glowing code blocks to collect points and experience the speed of AI-powered migration.
+            </p>
+          </div>
+
+          {/* Interactive Terminal Game */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative bg-slate-950 border border-slate-700 rounded-3xl p-8 shadow-2xl"
+            onClick={collectPoint}
+          >
+            {/* Terminal Header */}
+            <div className="flex items-center gap-3 mb-6 border-b border-slate-800 pb-4">
+              <div className="flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500" />
+                <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                <div className="w-3 h-3 rounded-full bg-green-500" />
+              </div>
+              <span className="text-sm text-slate-400 font-mono">wpcodingpress-demo</span>
+              <div className="ml-auto flex items-center gap-2">
+                <span className="text-sm text-purple-400 font-mono">Score: {gameScore}</span>
+                <Button 
+                  size="sm" 
+                  onClick={(e) => { e.stopPropagation(); startGame() }}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  {isGameStarted ? 'Restart' : 'Start'}
+                </Button>
+              </div>
+            </div>
+
+            {/* Terminal Content - Game Area */}
+            <div className="relative min-h-[300px]">
+              {!isGameStarted ? (
+                <div className="flex flex-col items-center justify-center h-full py-12">
+                  <Terminal className="w-16 h-16 text-purple-500 mb-4" />
+                  <p className="text-slate-400 mb-6">Click "Start" to begin the demo</p>
+                  <div className="grid grid-cols-3 gap-4 max-w-md">
+                    {[
+                      { cmd: 'npx wpcodingpress', desc: 'Initialize CLI' },
+                      { cmd: '--convert', desc: 'Convert WordPress' },
+                      { cmd: '--deploy', desc: 'Deploy to edge' }
+                    ].map((item, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.2 }}
+                        className="p-4 bg-slate-900 border border-slate-700 rounded-xl text-center cursor-pointer hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/20 transition-all"
+                      >
+                        <Code className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                        <div className="text-xs text-slate-300 font-mono">{item.cmd}</div>
+                        <div className="text-xs text-slate-500">{item.desc}</div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="font-mono text-sm space-y-2">
+                  {terminalLines.map((line, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="text-purple-400"
+                    >
+                      {line}
+                    </motion.div>
+                  ))}
+                  
+                  {/* Interactive Elements */}
+                  <div className="grid grid-cols-4 gap-3 mt-8">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <motion.button
+                        key={i}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        transition={{ delay: i * 0.1 }}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setGameScore(prev => prev + 10)
+                          setTerminalLines(prev => [...prev, `> +10 points! Total: ${gameScore + 10}`])
+                        }}
+                        className="game-particle p-4 bg-slate-900 border border-purple-500/50 rounded-xl hover:bg-purple-500/20 hover:border-purple-400 transition-all group"
+                      >
+                        <Zap className="w-6 h-6 text-purple-400 group-hover:text-purple-300 mx-auto" />
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Speed Metrics */}
+            <div className="grid grid-cols-3 gap-4 mt-8 pt-6 border-t border-slate-800">
+              {[
+                { label: 'Conversion Time', value: '< 3 min', icon: Clock3 },
+                { label: 'PageSpeed Score', value: '98/100', icon: Gauge },
+                { label: 'SEO Improvement', value: '+45%', icon: TrendingUp }
+              ].map((metric, i) => (
+                <div key={i} className="text-center">
+                  <metric.icon className="w-5 h-5 text-purple-400 mx-auto mb-2" />
+                  <div className="text-lg font-bold text-white">{metric.value}</div>
+                  <div className="text-xs text-slate-500">{metric.label}</div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          <p className="text-center text-slate-500 text-sm mt-6">
+            Real results from real clients. Experience the speed of AI-powered WordPress to Next.js migration.
+          </p>
         </div>
       </section>
 

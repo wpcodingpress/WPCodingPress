@@ -19,10 +19,24 @@ import {
   X,
   Bell,
   Zap,
-  ChevronRight
+  ChevronRight,
+  Check,
+  Package,
+  ShoppingBag,
+  MessageSquare,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { FloatingButtons } from "@/components/floating-buttons"
+
+interface Notification {
+  id: string
+  type: string
+  title: string
+  message: string
+  isRead: boolean
+  createdAt: string
+  link?: string
+}
 
 const sidebarLinks = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -53,6 +67,73 @@ export default function DashboardLayout({
   useEffect(() => {
     checkAuth()
   }, [])
+
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [liveNotifications, setLiveNotifications] = useState<Notification[]>([])
+
+  useEffect(() => {
+    checkAuth()
+  }, [])
+
+  useEffect(() => {
+    if (user) {
+      const fetchNotifications = async () => {
+        try {
+          const res = await fetch("/api/notifications?type=user")
+          if (res.ok) {
+            const data = await res.json()
+            setNotifications(data)
+          }
+        } catch (error) {
+          console.error("Error fetching notifications:", error)
+        }
+      }
+      fetchNotifications()
+      const interval = setInterval(fetchNotifications, 10000)
+      return () => clearInterval(interval)
+    }
+  }, [user])
+
+  const unreadCount = notifications.filter(n => !n.isRead).length
+
+  const markAllRead = async () => {
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
+  }
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case "order": return <ShoppingBag className="w-4 h-4" />
+      case "subscriber": return <Package className="w-4 h-4" />
+      case "download": return <DownloadCloud className="w-4 h-4" />
+      case "payment": return <CreditCard className="w-4 h-4" />
+      case "contact": return <MessageSquare className="w-4 h-4" />
+      default: return <Bell className="w-4 h-4" />
+    }
+  }
+
+  const getNotificationColor = (type: string) => {
+    switch (type) {
+      case "order": return "bg-blue-100 text-blue-600"
+      case "subscriber": return "bg-green-100 text-green-600"
+      case "download": return "bg-purple-100 text-purple-600"
+      case "payment": return "bg-green-100 text-green-600"
+      case "contact": return "bg-orange-100 text-orange-600"
+      default: return "bg-slate-100 text-slate-600"
+    }
+  }
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diff = now.getTime() - date.getTime()
+    const minutes = Math.floor(diff / 60000)
+    const hours = Math.floor(diff / 3600000)
+    if (minutes < 1) return "Just now"
+    if (minutes < 60) return `${minutes}m ago`
+    if (hours < 24) return `${hours}h ago`
+    return date.toLocaleDateString()
+  }
 
   const checkAuth = async () => {
     try {
@@ -85,14 +166,14 @@ export default function DashboardLayout({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-gray-50">
       <FloatingButtons />
       
       {/* Mobile Sidebar */}
@@ -106,18 +187,18 @@ export default function DashboardLayout({
             />
             <motion.aside
               initial={{ x: -300 }} animate={{ x: 0 }} exit={{ x: -300 }}
-              className="fixed left-0 top-0 h-full w-72 bg-slate-800 z-50 lg:hidden border-r border-slate-700"
+              className="fixed left-0 top-0 h-full w-72 bg-white z-50 lg:hidden border-r border-gray-200 shadow-xl"
             >
-              <div className="p-6 border-b border-slate-700">
+              <div className="p-6 border-b border-gray-100">
                 <div className="flex items-center justify-between">
                   <Link href="/" className="flex items-center gap-2" onClick={() => setSidebarOpen(false)}>
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center">
                       <Zap className="w-4 h-4 text-white" />
                     </div>
-                    <span className="text-lg font-bold text-white">WPCodingPress</span>
+                    <span className="text-lg font-bold text-gray-900">WPCodingPress</span>
                   </Link>
-                  <button onClick={() => setSidebarOpen(false)} className="p-2 hover:bg-slate-700 rounded-lg">
-                    <X className="w-5 h-5 text-slate-400" />
+                  <button onClick={() => setSidebarOpen(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+                    <X className="w-5 h-5 text-gray-500" />
                   </button>
                 </div>
               </div>
@@ -127,8 +208,8 @@ export default function DashboardLayout({
                     <div className={`
                       flex items-center gap-3 px-4 py-3 rounded-xl transition-all
                       ${pathname === link.href 
-                        ? "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30" 
-                        : "text-slate-400 hover:text-white hover:bg-slate-700"
+                        ? "bg-purple-100 text-purple-700 border border-purple-200" 
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                       }
                     `}>
                       <link.icon className="w-5 h-5" />
@@ -137,10 +218,10 @@ export default function DashboardLayout({
                   </Link>
                 ))}
               </nav>
-              <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700">
+              <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100">
                 <button 
                   onClick={handleLogout}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 transition-all w-full"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all w-full"
                 >
                   <LogOut className="w-5 h-5" />
                   <span className="font-medium">Logout</span>
@@ -152,23 +233,92 @@ export default function DashboardLayout({
       </AnimatePresence>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:block fixed left-0 top-0 h-full w-72 bg-slate-800 border-r border-slate-700 z-40">
-        <div className="p-6 border-b border-slate-700">
+      <aside className="hidden lg:block fixed left-0 top-0 h-full w-72 bg-white border-r border-gray-200 z-40 shadow-sm">
+        <div className="p-6 border-b border-gray-100">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center">
               <Zap className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-white">WPCodingPress</span>
+            <span className="text-xl font-bold text-gray-900">WPCodingPress</span>
           </Link>
         </div>
+        
+        {/* Notifications Button */}
+        <div className="p-4 border-b border-gray-100">
+          <button
+            onClick={() => setNotificationsOpen(!notificationsOpen)}
+            className="w-full flex items-center justify-between px-4 py-3 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors relative"
+          >
+            <div className="flex items-center gap-3">
+              <Bell className="w-5 h-5 text-purple-600" />
+              <span className="text-gray-700 font-medium">Notifications</span>
+            </div>
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </button>
+
+          {/* Notifications Dropdown */}
+          <AnimatePresence>
+            {notificationsOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute left-4 right-4 mt-2 w-[calc(100%-2rem)] bg-white border border-gray-200 rounded-xl shadow-2xl max-h-80 overflow-y-auto z-50"
+              >
+                <div className="sticky top-0 bg-white p-3 border-b border-gray-100 flex items-center justify-between">
+                  <span className="text-gray-700 font-medium text-sm">Recent Activity</span>
+                  {unreadCount > 0 && (
+                    <button onClick={markAllRead} className="text-xs text-purple-600 hover:text-purple-700 flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      Mark all read
+                    </button>
+                  )}
+                </div>
+                {notifications.length === 0 ? (
+                  <div className="p-6 text-center text-gray-500 text-sm">
+                    No new notifications
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-100">
+                    {notifications.slice(0, 10).map((notif) => (
+                      <div
+                        key={notif.id}
+                        className={`p-3 hover:bg-gray-50 transition-colors ${!notif.isRead ? "bg-purple-50/50" : ""}`}
+                      >
+                        <div className="flex gap-3">
+                          <div className={`p-1.5 rounded-lg ${getNotificationColor(notif.type)}`}>
+                            {getNotificationIcon(notif.type)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-gray-900 font-medium truncate">{notif.title}</p>
+                            <p className="text-xs text-gray-500 truncate">{notif.message}</p>
+                            <p className="text-xs text-gray-400 mt-1">{formatTime(notif.createdAt)}</p>
+                          </div>
+                          {!notif.isRead && (
+                            <div className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0 mt-2" />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        
         <nav className="p-4 space-y-1">
           {sidebarLinks.map((link) => (
             <Link key={link.href} href={link.href}>
               <div className={`
                 flex items-center gap-3 px-4 py-3 rounded-xl transition-all
                 ${pathname === link.href 
-                  ? "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30" 
-                  : "text-slate-400 hover:text-white hover:bg-slate-700"
+                  ? "bg-purple-100 text-purple-700 border border-purple-200" 
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }
               `}>
                 <link.icon className="w-5 h-5" />
@@ -177,10 +327,10 @@ export default function DashboardLayout({
             </Link>
           ))}
         </nav>
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700">
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100">
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 transition-all w-full"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all w-full"
           >
             <LogOut className="w-5 h-5" />
             <span className="font-medium">Logout</span>
@@ -190,22 +340,22 @@ export default function DashboardLayout({
 
       {/* Main Content */}
       <div className="lg:ml-72">
-        <header className="sticky top-0 z-30 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800">
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-200 shadow-sm">
           <div className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center gap-4">
-              <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 hover:bg-slate-800 rounded-lg">
-                <Menu className="w-5 h-5 text-slate-400" />
+              <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 hover:bg-gray-100 rounded-lg">
+                <Menu className="w-5 h-5 text-gray-500" />
               </button>
               <div>
-                <h1 className="text-xl font-bold text-white">{getPageTitle()}</h1>
-                <p className="text-sm text-slate-400">Welcome back, {user?.name}</p>
+                <h1 className="text-xl font-bold text-gray-900">{getPageTitle()}</h1>
+                <p className="text-sm text-gray-500">Welcome back, {user?.name}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative text-slate-400 hover:text-white">
+              <Button variant="ghost" size="icon" className="relative text-gray-500 hover:text-gray-900">
                 <Bell className="w-5 h-5" />
               </Button>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center">
                 <User className="w-5 h-5 text-white" />
               </div>
             </div>

@@ -24,17 +24,17 @@ export async function GET(request: Request) {
     }> = []
 
     if (type === 'admin') {
-      const [recentOrders, recentContacts, recentSubscriptions] = await Promise.all([
+      const [recentOrders, recentContacts, recentSubscriptions, allOrders] = await Promise.all([
         prisma.order.findMany({
           where: { createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
           orderBy: { createdAt: 'desc' },
-          take: 5,
+          take: 10,
           include: { service: true }
         }),
         prisma.contact.findMany({
           where: { createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
           orderBy: { createdAt: 'desc' },
-          take: 5
+          take: 10
         }),
         prisma.subscription.findMany({
           where: { 
@@ -42,8 +42,14 @@ export async function GET(request: Request) {
             status: 'active'
           },
           orderBy: { createdAt: 'desc' },
-          take: 5,
+          take: 10,
           include: { user: { select: { name: true, email: true } } }
+        }),
+        prisma.order.findMany({
+          where: { updatedAt: { gte: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) } },
+          orderBy: { updatedAt: 'desc' },
+          take: 20,
+          include: { service: true }
         })
       ])
 
@@ -84,6 +90,20 @@ export async function GET(request: Request) {
           })
         }
       })
+
+      allOrders.forEach(order => {
+        if (order.status !== 'pending') {
+          notifications.push({
+            id: `order-status-${order.id}`,
+            type: 'order',
+            title: `Order ${order.status.replace(/_/g, ' ')}`,
+            message: `Order #${order.id} for ${order.clientName} is now ${order.status.replace(/_/g, ' ')}`,
+            isRead: false,
+            createdAt: order.updatedAt.toISOString(),
+            link: '/admin/orders'
+          })
+        }
+      })
     } else if (type === 'user') {
       const userId = session.user?.id
       if (userId) {
@@ -91,36 +111,50 @@ export async function GET(request: Request) {
           prisma.order.findMany({
             where: { userId },
             orderBy: { updatedAt: 'desc' },
-            take: 5,
+            take: 10,
             include: { service: true }
           }),
           prisma.subscription.findMany({
             where: { userId },
             orderBy: { updatedAt: 'desc' },
-            take: 5
+            take: 10
           })
         ])
 
         userOrders.forEach(order => {
-          if (order.status !== 'pending') {
-            notifications.push({
-              id: `order-${order.id}`,
-              type: 'order',
-              title: `Order ${order.status.replace('_', ' ')}`,
-              message: `Your order for ${order.service?.name || 'service'} is now ${order.status.replace('_', ' ')}`,
-              isRead: false,
-              createdAt: order.updatedAt.toISOString(),
-              link: '/dashboard/orders'
-            })
+          const statusMessages: Record<string, string> = {
+            pending: 'is being processed',
+            processing: 'is being prepared',
+            completed: 'has been completed',
+            cancelled: 'was cancelled',
+            refunded: 'has been refunded',
+            shipped: 'has been shipped',
+            delivered: 'has been delivered'
           }
+          notifications.push({
+            id: `order-${order.id}`,
+            type: 'order',
+            title: `Order ${order.status.replace('_', ' ')}`,
+            message: `Your order for ${order.service?.name || 'service'} ${statusMessages[order.status] || 'status updated'}`,
+            isRead: false,
+            createdAt: order.updatedAt.toISOString(),
+            link: '/dashboard/orders'
+          })
         })
 
         userSubscriptions.forEach(sub => {
+          const statusMessages: Record<string, string> = {
+            active: 'is now active',
+            cancelled: 'has been cancelled',
+            expired: 'has expired',
+            paused: 'has been paused',
+            past_due: 'needs attention'
+          }
           notifications.push({
             id: `sub-${sub.id}`,
             type: 'subscriber',
-            title: `${sub.plan.charAt(0).toUpperCase() + sub.plan.slice(1)} Plan Active`,
-            message: `Your ${sub.plan} subscription is ${sub.status}`,
+            title: `${sub.plan.charAt(0).toUpperCase() + sub.plan.slice(1)} Plan ${sub.status === 'active' ? 'Active' : sub.status}`,
+            message: `Your ${sub.plan} subscription ${statusMessages[sub.status] || 'status updated'}`,
             isRead: false,
             createdAt: sub.updatedAt.toISOString(),
             link: '/dashboard/subscription'

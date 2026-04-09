@@ -53,6 +53,10 @@ module.exports = {
       fontFamily: {
         sans: ["Inter", "sans-serif"],
       },
+      screens: {
+        'xs': '475px',
+        '3xl': '1920px',
+      },
       keyframes: {
         float: {
           "0%, 100%": { transform: "translateY(0px)" },
@@ -62,10 +66,25 @@ module.exports = {
           "0%, 100%": { opacity: 0.5 },
           "50%": { opacity: 1 },
         },
+        "bounce-subtle": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-5px)" },
+        },
+        "spin-slow": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        "pulse-ring": {
+          "0%": { transform: "scale(0.8)", opacity: "1" },
+          "100%": { transform: "scale(1.5)", opacity: "0" },
+        },
       },
       animation: {
         float: "float 3s ease-in-out infinite",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "bounce-subtle": "bounce-subtle 2s ease-in-out infinite",
+        "spin-slow": "spin-slow 8s linear infinite",
+        "pulse-ring": "pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },
