@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
 import { useRouter, usePathname } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { 
   LayoutDashboard, 
   ShoppingCart, 
@@ -16,9 +16,17 @@ import {
   Building2,
   DollarSign,
   Users as SubscribersIcon,
-  BarChart3
+  BarChart3,
+  Bell,
+  X,
+  Check,
+  ShoppingBag,
+  User,
+  Download,
+  DollarSign as PaymentIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { motion, AnimatePresence } from "framer-motion"
 
 const navItems = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
@@ -33,14 +41,22 @@ const navItems = [
   { href: "/admin/bank", icon: Building2, label: "Bank Settings" },
 ]
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+interface Notification {
+  id: string
+  type: string
+  title: string
+  message: string
+  isRead: boolean
+  createdAt: string
+  link?: string
+}
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const router = useRouter()
   const pathname = usePathname()
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [notifications, setNotifications] = useState<Notification[]>([])
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -48,10 +64,69 @@ export default function AdminLayout({
     }
   }, [status, router])
 
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch("/api/notifications?type=admin")
+        if (res.ok) {
+          const data = await res.json()
+          setNotifications(data)
+        }
+      } catch (error) {
+        console.error("Error fetching notifications:", error)
+      }
+    }
+    if (session) {
+      fetchNotifications()
+      const interval = setInterval(fetchNotifications, 15000)
+      return () => clearInterval(interval)
+    }
+  }, [session])
+
+  const unreadCount = notifications.filter(n => !n.isRead).length
+
+  const markAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
+  }
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case "order": return <ShoppingBag className="w-4 h-4" />
+      case "subscriber": return <User className="w-4 h-4" />
+      case "download": return <Download className="w-4 h-4" />
+      case "payment": return <PaymentIcon className="w-4 h-4" />
+      case "contact": return <MessageSquare className="w-4 h-4" />
+      default: return <Bell className="w-4 h-4" />
+    }
+  }
+
+  const getNotificationColor = (type: string) => {
+    switch (type) {
+      case "order": return "bg-blue-500/20 text-blue-400"
+      case "subscriber": return "bg-green-500/20 text-green-400"
+      case "download": return "bg-purple-500/20 text-purple-400"
+      case "payment": return "bg-green-500/20 text-green-400"
+      case "contact": return "bg-orange-500/20 text-orange-400"
+      default: return "bg-slate-500/20 text-slate-400"
+    }
+  }
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diff = now.getTime() - date.getTime()
+    const minutes = Math.floor(diff / 60000)
+    const hours = Math.floor(diff / 3600000)
+    if (minutes < 1) return "Just now"
+    if (minutes < 60) return `${minutes}m ago`
+    if (hours < 24) return `${hours}h ago`
+    return date.toLocaleDateString()
+  }
+
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <div className="animate-pulse text-indigo-400">Loading...</div>
+        <div className="animate-pulse text-indigo-400 text-lg">Loading...</div>
       </div>
     )
   }
@@ -69,10 +144,76 @@ export default function AdminLayout({
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
               <Zap className="h-4 w-4 text-white" />
             </div>
-            <span className="text-lg font-bold text-white">
-              WPCodingPress
-            </span>
+            <span className="text-lg font-bold text-white">WPCodingPress</span>
           </Link>
+        </div>
+
+        {/* Notifications Button */}
+        <div className="p-4 border-b border-slate-700">
+          <button
+            onClick={() => setNotificationsOpen(!notificationsOpen)}
+            className="w-full flex items-center justify-between px-4 py-3 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-colors relative"
+          >
+            <div className="flex items-center gap-3">
+              <Bell className="w-5 h-5 text-slate-400" />
+              <span className="text-white font-medium">Notifications</span>
+            </div>
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </button>
+
+          {/* Notifications Dropdown */}
+          <AnimatePresence>
+            {notificationsOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute left-4 right-4 mt-2 w-[calc(100%-2rem)] bg-slate-700 border border-slate-600 rounded-xl shadow-2xl max-h-80 overflow-y-auto z-50"
+              >
+                <div className="sticky top-0 bg-slate-700 p-3 border-b border-slate-600 flex items-center justify-between">
+                  <span className="text-white font-medium text-sm">Recent Activity</span>
+                  {unreadCount > 0 && (
+                    <button onClick={markAllRead} className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      Mark all read
+                    </button>
+                  )}
+                </div>
+                {notifications.length === 0 ? (
+                  <div className="p-6 text-center text-slate-500 text-sm">
+                    No new notifications
+                  </div>
+                ) : (
+                  <div className="divide-y divide-slate-600">
+                    {notifications.slice(0, 10).map((notif) => (
+                      <div
+                        key={notif.id}
+                        className={`p-3 hover:bg-slate-600/50 transition-colors ${!notif.isRead ? "bg-slate-600/30" : ""}`}
+                      >
+                        <div className="flex gap-3">
+                          <div className={`p-1.5 rounded-lg ${getNotificationColor(notif.type)}`}>
+                            {getNotificationIcon(notif.type)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-white font-medium truncate">{notif.title}</p>
+                            <p className="text-xs text-slate-400 truncate">{notif.message}</p>
+                            <p className="text-xs text-slate-500 mt-1">{formatTime(notif.createdAt)}</p>
+                          </div>
+                          {!notif.isRead && (
+                            <div className="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0 mt-2" />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         <nav className="p-4 space-y-1">
@@ -83,7 +224,7 @@ export default function AdminLayout({
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                  "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                   isActive 
                     ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/20" 
                     : "text-slate-400 hover:text-white hover:bg-slate-700"
@@ -108,7 +249,7 @@ export default function AdminLayout({
           </div>
           <button
             onClick={() => signOut({ callbackUrl: "/admin/login" })}
-            className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
           >
             <LogOut className="h-5 w-5" />
             Sign Out

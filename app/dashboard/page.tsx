@@ -1,29 +1,18 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
-  ShoppingBag, Package, Clock, CheckCircle, ArrowRight, Download, FileText, 
-  CreditCard, Zap, LayoutDashboard, Settings, ShoppingCart, DownloadCloud,
-  User, Bell, Menu, X, Plus, TrendingUp, Calendar,
-  ChevronRight, HelpCircle, LogOut, ExternalLink, Globe, Play, DollarSign,
-  ArrowUpRight, CreditCard as CardIcon
+  LayoutDashboard, ShoppingCart, DownloadCloud, CreditCard, Globe, Settings,
+  User, Bell, Menu, X, LogOut, Plus, Package, Zap, ChevronRight, CheckCircle,
+  Clock, ShoppingBag, DollarSign, TrendingUp, HelpCircle, Calendar, ExternalLink,
+  ArrowUpRight, Bell as BellIcon
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { FloatingButtons } from "@/components/floating-buttons"
-
-interface Order {
-  id: string
-  status: string
-  paymentStatus: string
-  amount: number
-  packageType: string
-  createdAt: string
-  service?: { name: string }
-}
 
 const sidebarLinks = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -34,10 +23,6 @@ const sidebarLinks = [
   { title: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 
-const userOrders = [
-  { id: "ORD-001", service: "WordPress to Next.js", amount: 0, status: "active", date: "Apr 9, 2026" },
-]
-
 const plans = [
   { name: "Free", price: "$0/mo", features: ["1 Site", "Basic Template", "Community Support"], current: true },
   { name: "Pro", price: "$19/mo", features: ["5 Sites", "Advanced Templates", "Priority Support", "Custom Domain"], current: false },
@@ -45,29 +30,22 @@ const plans = [
 ]
 
 export default function DashboardOverview() {
-  const [orders, setOrders] = useState<Order[]>([])
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [user] = useState({ name: "User", email: "user@example.com" })
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: "Order Completed", message: "Your WordPress to Next.js conversion is complete!", time: "2m ago", unread: true },
+    { id: 2, title: "Download Ready", message: "Your template is ready for download.", time: "1h ago", unread: true },
+  ])
 
-  const stats = {
-    total: 1,
-    completed: 1,
-    inProgress: 0,
-    totalSpent: 0,
-  }
+  const stats = { total: 0, completed: 0, inProgress: 0, totalSpent: 0 }
 
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case "active":
-        return { bg: "bg-green-500/20", text: "text-green-400", label: "Active" }
-      case "completed":
-        return { bg: "bg-emerald-500/20", text: "text-emerald-400", label: "Completed" }
-      case "in_progress":
-        return { bg: "bg-blue-500/20", text: "text-blue-400", label: "In Progress" }
-      case "pending":
-        return { bg: "bg-amber-500/20", text: "text-amber-400", label: "Pending" }
-      default:
-        return { bg: "bg-slate-500/20", text: "text-slate-400", label: status }
+      case "active": return { bg: "bg-green-500/20", text: "text-green-400", label: "Active" }
+      case "completed": return { bg: "bg-green-500/20", text: "text-green-400", label: "Completed" }
+      case "in_progress": return { bg: "bg-blue-500/20", text: "text-blue-400", label: "In Progress" }
+      case "pending": return { bg: "bg-amber-500/20", text: "text-amber-400", label: "Pending" }
+      default: return { bg: "bg-slate-500/20", text: "text-slate-400", label: status }
     }
   }
 
@@ -75,26 +53,22 @@ export default function DashboardOverview() {
     <div className="min-h-screen bg-slate-900">
       <FloatingButtons />
       
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile Sidebar */}
       <AnimatePresence>
         {sidebarOpen && (
           <>
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/50 z-50 lg:hidden"
               onClick={() => setSidebarOpen(false)}
             />
             <motion.aside
-              initial={{ x: -300 }}
-              animate={{ x: 0 }}
-              exit={{ x: -300 }}
+              initial={{ x: -300 }} animate={{ x: 0 }} exit={{ x: -300 }}
               className="fixed left-0 top-0 h-full w-72 bg-slate-800 z-50 lg:hidden border-r border-slate-700"
             >
               <div className="p-6 border-b border-slate-700">
                 <div className="flex items-center justify-between">
-                  <Link href="/" className="flex items-center gap-2">
+                  <Link href="/" className="flex items-center gap-2" onClick={() => setSidebarOpen(false)}>
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
                       <Zap className="w-4 h-4 text-white" />
                     </div>
@@ -164,10 +138,16 @@ export default function DashboardOverview() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="w-5 h-5 text-slate-400" />
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-indigo-500 text-white text-xs rounded-full flex items-center justify-center">2</span>
-              </Button>
+              <div className="relative">
+                <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
+                  <BellIcon className="w-5 h-5" />
+                </Button>
+                {notifications.some(n => n.unread) && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                    {notifications.filter(n => n.unread).length}
+                  </span>
+                )}
+              </div>
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
                 <User className="w-5 h-5 text-white" />
               </div>
@@ -185,7 +165,6 @@ export default function DashboardOverview() {
             <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-3xl p-8 text-white relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
-              
               <div className="relative z-10">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                   <div>
@@ -241,57 +220,46 @@ export default function DashboardOverview() {
             ))}
           </div>
 
-          {/* Orders & Quick Actions */}
+          {/* Notifications & Quick Actions */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            {/* Recent Orders */}
+            {/* Notifications */}
             <div className="lg:col-span-2">
               <Card className="bg-slate-800 border-slate-700">
-                <CardHeader className="flex flex-row items-center justify-between border-b border-slate-700 pb-4">
-                  <CardTitle className="text-lg font-semibold text-white">Recent Orders</CardTitle>
-                  <Link href="/dashboard/orders">
-                    <Button variant="ghost" size="sm" className="text-indigo-400 hover:text-indigo-300">
-                      View All <ChevronRight className="w-4 h-4 ml-1" />
-                    </Button>
-                  </Link>
+                <CardHeader className="border-b border-slate-700 pb-4">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-semibold text-white">Recent Notifications</CardTitle>
+                    <Badge className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                      {notifications.filter(n => n.unread).length} New
+                    </Badge>
+                  </div>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <div className="divide-y divide-slate-700">
-                    {userOrders.map((order, i) => {
-                      const status = getStatusConfig(order.status)
-                      return (
-                        <motion.div
-                          key={order.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: i * 0.05 }}
-                          className="p-6 hover:bg-slate-700/50 transition-colors"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
-                                <ShoppingBag className="w-6 h-6 text-indigo-400" />
-                              </div>
-                              <div>
-                                <p className="font-semibold text-white">{order.service}</p>
-                                <p className="text-sm text-slate-400">{order.id} • {order.date}</p>
-                              </div>
+                  {notifications.length === 0 ? (
+                    <div className="p-8 text-center text-slate-500">
+                      <BellIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p>No notifications yet</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-slate-700">
+                      {notifications.map((notif) => (
+                        <div key={notif.id} className="p-4 hover:bg-slate-700/50 transition-colors">
+                          <div className="flex items-start gap-3">
+                            <div className={`p-2 rounded-xl ${notif.unread ? "bg-indigo-500/20 text-indigo-400" : "bg-slate-700 text-slate-400"}`}>
+                              <BellIcon className="w-4 h-4" />
                             </div>
-                            <div className="flex items-center gap-4">
-                              <div className="text-right">
-                                <p className="font-bold text-white">${order.amount}</p>
-                                <Badge className={`${status.bg} ${status.text}`}>{status.label}</Badge>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <p className="font-medium text-white text-sm">{notif.title}</p>
+                                {notif.unread && <div className="w-2 h-2 rounded-full bg-indigo-500" />}
                               </div>
-                              {order.status === "active" && (
-                                <Button variant="ghost" size="icon" className="hover:bg-indigo-500/20">
-                                  <ArrowUpRight className="w-5 h-5 text-indigo-400" />
-                                </Button>
-                              )}
+                              <p className="text-slate-400 text-sm mt-1">{notif.message}</p>
+                              <p className="text-slate-500 text-xs mt-2">{notif.time}</p>
                             </div>
                           </div>
-                        </motion.div>
-                      )
-                    })}
-                  </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -304,9 +272,9 @@ export default function DashboardOverview() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {[
-                    { title: "New Order", description: "Place a custom order", icon: Plus, href: "/order", color: "from-indigo-500 to-purple-500" },
-                    { title: "Browse Products", description: "Premium tools", icon: Package, href: "/products", color: "from-purple-500 to-pink-500" },
-                    { title: "Browse Services", description: "Professional services", icon: Zap, href: "/services", color: "from-pink-500 to-rose-500" },
+                    { title: "New Order", icon: Plus, href: "/order", color: "from-indigo-500 to-purple-500" },
+                    { title: "Browse Products", icon: Package, href: "/products", color: "from-purple-500 to-pink-500" },
+                    { title: "Browse Services", icon: Zap, href: "/services", color: "from-pink-500 to-rose-500" },
                   ].map((action, i) => (
                     <Link key={i} href={action.href}>
                       <motion.div
@@ -318,7 +286,6 @@ export default function DashboardOverview() {
                         </div>
                         <div className="flex-1">
                           <p className="font-semibold text-white group-hover:text-indigo-400 transition-colors">{action.title}</p>
-                          <p className="text-xs text-slate-400">{action.description}</p>
                         </div>
                         <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-indigo-400 transition-colors" />
                       </motion.div>
@@ -357,7 +324,7 @@ export default function DashboardOverview() {
             </div>
           </div>
 
-          {/* Current Plan */}
+          {/* Plans */}
           <Card className="bg-slate-800 border-slate-700 mb-8">
             <CardHeader className="border-b border-slate-700">
               <CardTitle className="text-lg font-semibold text-white">Your Current Plan</CardTitle>
@@ -390,10 +357,7 @@ export default function DashboardOverview() {
                     </ul>
                     {!plan.current && (
                       <Link href="/pricing">
-                        <Button 
-                          variant="outline" 
-                          className="w-full border-indigo-500 text-indigo-400 hover:bg-indigo-500/10"
-                        >
+                        <Button variant="outline" className="w-full border-indigo-500 text-indigo-400 hover:bg-indigo-500/10">
                           Upgrade
                         </Button>
                       </Link>
@@ -404,7 +368,7 @@ export default function DashboardOverview() {
             </CardContent>
           </Card>
 
-          {/* Help Card */}
+          {/* Help Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card className="bg-slate-800 border-slate-700">
               <CardContent className="p-6">
@@ -418,7 +382,9 @@ export default function DashboardOverview() {
                   </div>
                 </div>
                 <Link href="/contact">
-                  <Button variant="outline" className="w-full border-slate-600 text-slate-300 hover:bg-slate-700">Get Help</Button>
+                  <Button variant="outline" className="w-full border-slate-600 text-slate-300 hover:bg-slate-700">
+                    Get Help
+                  </Button>
                 </Link>
               </CardContent>
             </Card>
