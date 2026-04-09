@@ -1044,7 +1044,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-12">
             <Badge className="bg-gradient-to-r from-purple-500 to-violet-500 text-white border-0 px-4 py-1.5 text-sm font-medium mb-6">
-              <Sparkle className="w-4 h-4 mr-2" />
+              <Sparkles className="w-4 h-4 mr-2" />
               Interactive Demo
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
