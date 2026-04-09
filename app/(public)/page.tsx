@@ -53,9 +53,9 @@ const features = [
 ]
 
 const plans = [
-  { name: "Free", price: "$0", period: "forever", description: "Perfect for getting started with WordPress to Next.js conversion", features: ["1 WordPress site conversion", "Basic Next.js template", "Community support", "Basic SEO setup"], cta: "Get Started", href: "/register", popular: false },
-  { name: "Pro", price: "$19", period: "/month", description: "Convert up to 5 WordPress sites to headless Next.js", features: ["5 WordPress to Headless conversions", "Live deployed sites (Vercel/Render)", "Advanced Next.js templates", "Priority email support", "Custom domain support", "Analytics dashboard", "Auto content sync"], cta: "Start Pro", href: "/register?plan=pro", popular: true },
-  { name: "Enterprise", price: "$99", period: "/month", description: "Unlimited conversions for agencies and businesses", features: ["Unlimited conversions", "White-label deployment", "24/7 Dedicated support", "Custom domain included", "API access", "Advanced analytics", "Team collaboration", "Custom integrations"], cta: "Contact Sales", href: "/contact", popular: false },
+  { name: "Free", planId: "free", price: "$0", period: "forever", description: "Perfect for getting started with WordPress to Next.js conversion", features: ["1 WordPress site conversion", "Basic Next.js template", "Community support", "Basic SEO setup"], cta: "Get Started", href: "/register", popular: false },
+  { name: "Pro", planId: "pro", price: "$19", period: "/month", description: "Convert up to 5 WordPress sites to headless Next.js", features: ["5 WordPress to Headless conversions", "Live deployed sites (Vercel/Render)", "Advanced Next.js templates", "Priority email support", "Custom domain support", "Analytics dashboard", "Auto content sync"], cta: "Start Pro", href: "/register?plan=pro", popular: true },
+  { name: "Enterprise", planId: "enterprise", price: "$99", period: "/month", description: "Unlimited conversions for agencies and businesses", features: ["Unlimited conversions", "White-label deployment", "24/7 Dedicated support", "Custom domain included", "API access", "Advanced analytics", "Team collaboration", "Custom integrations"], cta: "Contact Sales", href: "/contact", popularity: false },
 ]
 
 const testimonials = [

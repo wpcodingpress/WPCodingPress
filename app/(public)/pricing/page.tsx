@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 const subscriptions = [
   {
     name: "Free",
+    planId: "free",
     price: "Free",
     period: "forever",
     description: "Perfect for getting started with WordPress to Next.js conversion",
@@ -26,6 +27,7 @@ const subscriptions = [
   },
   {
     name: "Pro",
+    planId: "pro",
     price: "$19",
     period: "/month",
     description: "Convert up to 5 WordPress sites to headless Next.js",
@@ -46,6 +48,7 @@ const subscriptions = [
   },
   {
     name: "Enterprise",
+    planId: "enterprise",
     price: "$99",
     period: "/month",
     description: "Unlimited conversions for agencies and businesses",
