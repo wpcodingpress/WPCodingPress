@@ -757,11 +757,11 @@ export default function HomePage() {
                     <div className="relative h-32 bg-slate-700 rounded-xl overflow-hidden">
                       <motion.div 
                         className="absolute bottom-0 left-0 h-full bg-gradient-to-r from-yellow-500 to-orange-500"
-                        animate={{ width: isGameStarted ? `${gameScore}%` : '10%' }}
+                        animate={{ width: isGameStarted ? `${gameScore}%` : '20%' }}
                         transition={{ duration: 0.5 }}
                       />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-white font-bold text-2xl">{gameScore}%</span>
+                        <span className="text-white font-bold text-2xl">{isGameStarted ? gameScore : 20}%</span>
                       </div>
                     </div>
                     <p className="text-slate-400 text-xs mt-2">Loading: 3.2s | PageSpeed: 52</p>
@@ -776,11 +776,11 @@ export default function HomePage() {
                     <div className="relative h-32 bg-slate-700 rounded-xl overflow-hidden">
                       <motion.div 
                         className="absolute bottom-0 left-0 h-full bg-gradient-to-r from-green-500 to-emerald-500"
-                        animate={{ width: isGameStarted ? `${gameScore + 20}%` : '30%' }}
+                        animate={{ width: isGameStarted ? `${gameScore + 20}%` : '20%' }}
                         transition={{ duration: 0.3 }}
                       />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-white font-bold text-2xl">{Math.min(gameScore + 20, 100)}%</span>
+                        <span className="text-white font-bold text-2xl">{isGameStarted ? Math.min(gameScore + 20, 100) : 20}%</span>
                       </div>
                     </div>
                     <p className="text-slate-400 text-xs mt-2">Loading: 180ms | PageSpeed: 98</p>

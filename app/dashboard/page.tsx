@@ -116,7 +116,7 @@ export default function DashboardOverview() {
                     New Order
                   </Button>
                 </Link>
-                <Link href="/services">
+                <Link href="/order?service=wordpress-development">
                   <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 font-semibold px-6">
                     Browse Services
                   </Button>
