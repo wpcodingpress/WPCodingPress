@@ -12,7 +12,7 @@ import {
   Bot, TrendingUp, Users, Globe, Sparkles, Layout, Server,
   Lock, Gauge, Headphones, ArrowRightLeft, Eye, ExternalLink,
   ChevronDown, Rocket, Target, Award, Clock, Code2, Database, Globe2, ArrowUpRight,
-  Terminal, GitBranch, Package, BarChart3, Cpu, RefreshCcw, ShieldCheck, SearchCheck, Globe as GlobeIcon, FileCode, Database as DatabaseIcon, Server as ServerIcon, Boxes, Accessibility, Download, Zap as ZapIcon, Clock3, MessageCircle, Star as StarIcon, CheckCircle2, Settings, MousePointer2, Activity, Disc, Dna, Cpu as CpuIcon, Gem, Box, Grid3X3, Sparkle, Move3d, Layers3, Zapplets, Wand2, Heart, ThumbsUp
+  Terminal, GitBranch, Package, BarChart3, Cpu, RefreshCcw, ShieldCheck, SearchCheck, Globe as GlobeIcon, FileCode, Database as DatabaseIcon, Server as ServerIcon, Boxes, Accessibility, Download, Zap as ZapIcon, Clock3, MessageCircle, Star as StarIcon, CheckCircle2, Settings, MousePointer2, Activity, Disc, Dna, Cpu as CpuIcon, Gem, Box, Grid3X3, Sparkle, Move3d, Layers3, Wand2, Heart, ThumbsUp
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
