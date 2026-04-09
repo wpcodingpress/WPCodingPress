@@ -229,39 +229,38 @@ export default function DashboardOverview() {
                   ))}
                 </div>
               )}
-            </CardContent>
+</CardContent>
           </Card>
         </div>
       </div>
 
-          {/* Upgrade Card */}
-          <Card className="bg-gradient-to-br from-purple-600 to-violet-600 border-0">
-            <CardContent className="p-6 text-white">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-xl bg-white/20">
-                  <TrendingUp className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="font-bold text-lg">Upgrade to Pro</p>
-                  <p className="text-white/80 text-sm">Unlock all features</p>
-                </div>
-              </div>
-              <ul className="space-y-2 mb-6">
-                {["Unlimited Sites", "Priority Support", "Advanced Templates"].map((feature, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="w-4 h-4" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/pricing">
-                <Button className="w-full bg-white text-purple-600 hover:bg-purple-50 font-semibold">
-                  Get Started - $19/mo
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
+      {/* Upgrade Card */}
+      <Card className="bg-gradient-to-br from-purple-600 to-violet-600 border-0">
+        <CardContent className="p-6 text-white">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-xl bg-white/20">
+              <TrendingUp className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="font-bold text-lg">Upgrade to Pro</p>
+              <p className="text-white/80 text-sm">Unlock all features</p>
+            </div>
+          </div>
+          <ul className="space-y-2 mb-6">
+            {["Unlimited Sites", "Priority Support", "Advanced Templates"].map((feature, i) => (
+              <li key={i} className="flex items-center gap-2 text-sm">
+                <CheckCircle className="w-4 h-4" />
+                {feature}
+              </li>
+            ))}
+          </ul>
+          <Link href="/pricing">
+            <Button className="w-full bg-white text-purple-600 hover:bg-purple-50 font-semibold">
+              Get Started - $19/mo
+            </Button>
+          </Link>
+        </CardContent>
+      </Card>
       </div>
 
       {/* Plans */}
