@@ -844,6 +844,64 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Features Comparison Table */}
+      <section className="py-24 px-6 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Compare <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Plans</span>
+            </h2>
+            <p className="text-slate-600">Choose the plan that fits your needs</p>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-200">
+                  <th className="text-left py-4 px-4 text-slate-900 font-bold">Feature</th>
+                  <th className="text-center py-4 px-4 text-slate-900 font-bold bg-purple-50">Free</th>
+                  <th className="text-center py-4 px-4 text-slate-900 font-bold bg-gradient-to-r from-purple-100 to-pink-50">Pro</th>
+                  <th className="text-center py-4 px-4 text-slate-900 font-bold bg-amber-50">Enterprise</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { feature: "WordPress Site Conversions", free: "1", pro: "5", enterprise: "Unlimited" },
+                  { feature: "Live Deployment (Vercel/Render)", free: false, pro: true, enterprise: true },
+                  { feature: "Custom Domain Support", free: false, pro: true, enterprise: true },
+                  { feature: "Analytics Dashboard", free: false, pro: true, enterprise: true },
+                  { feature: "Auto Content Sync", free: false, pro: true, enterprise: true },
+                  { feature: "White-label Deployment", free: false, pro: false, enterprise: true },
+                  { feature: "Priority Support", free: false, pro: true, enterprise: true },
+                  { feature: "24/7 Dedicated Support", free: false, pro: false, enterprise: true },
+                  { feature: "API Access", free: false, pro: true, enterprise: true },
+                  { feature: "Team Collaboration", free: false, pro: false, enterprise: true },
+                ].map((row, i) => (
+                  <tr key={i} className="border-b border-slate-100 hover:bg-slate-50">
+                    <td className="py-4 px-4 text-slate-700">{row.feature}</td>
+                    <td className="text-center py-4 px-4 bg-purple-50/30">
+                      {typeof row.free === 'boolean' ? (
+                        row.free ? <CheckCircle2 className="w-5 h-5 text-green-500 mx-auto" /> : <X className="w-5 h-5 text-red-300 mx-auto" />
+                      ) : <span className="text-slate-900 font-medium">{row.free}</span>}
+                    </td>
+                    <td className="text-center py-4 px-4 bg-gradient-to-r from-purple-50 to-pink-50/30">
+                      {typeof row.pro === 'boolean' ? (
+                        row.pro ? <CheckCircle2 className="w-5 h-5 text-green-500 mx-auto" /> : <X className="w-5 h-5 text-red-300 mx-auto" />
+                      ) : <span className="text-slate-900 font-medium">{row.pro}</span>}
+                    </td>
+                    <td className="text-center py-4 px-4 bg-amber-50/30">
+                      {typeof row.enterprise === 'boolean' ? (
+                        row.enterprise ? <CheckCircle2 className="w-5 h-5 text-green-500 mx-auto" /> : <X className="w-5 h-5 text-red-300 mx-auto" />
+                      ) : <span className="text-slate-900 font-medium">{row.enterprise}</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       {/* Process Section */}
       <section className="py-24 px-6 bg-gradient-to-b from-white to-purple-50">
         <div className="max-w-6xl mx-auto">
