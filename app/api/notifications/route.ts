@@ -13,7 +13,15 @@ export async function GET(request: Request) {
       return NextResponse.json([], { status: 200 })
     }
 
-    const notifications = []
+    const notifications: Array<{
+      id: string;
+      type: string;
+      title: string;
+      message: string;
+      isRead: boolean;
+      createdAt: string;
+      link?: string;
+    }> = []
 
     if (type === 'admin') {
       const [recentOrders, recentContacts, recentSubscriptions] = await Promise.all([
@@ -26,8 +34,7 @@ export async function GET(request: Request) {
         prisma.contact.findMany({
           where: { createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
           orderBy: { createdAt: 'desc' },
-          take: 5,
-          isRead: false
+          take: 5
         }),
         prisma.subscription.findMany({
           where: { 
