@@ -277,8 +277,8 @@ export default function DashboardOverview() {
                   </Link>
                 )}
               </div>
-              )})}
-            ))}
+              )
+            })}
           </div>
         </CardContent>
       </Card>
