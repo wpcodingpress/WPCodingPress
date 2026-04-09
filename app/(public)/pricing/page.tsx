@@ -264,6 +264,50 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* Features Comparison Table */}
+      <section className="py-16 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">
+              Compare <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Plans</span>
+            </h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-200">
+                  <th className="text-left py-4 px-4 font-bold">Feature</th>
+                  <th className="text-center py-4 px-4 bg-purple-50 font-bold">Free</th>
+                  <th className="text-center py-4 px-4 bg-purple-50 font-bold">Pro</th>
+                  <th className="text-center py-4 px-4 bg-amber-50 font-bold">Enterprise</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { f: "WordPress Sites", free: "1", pro: "5", ent: "Unlimited" },
+                  { f: "Live Deployment", free: false, pro: true, ent: true },
+                  { f: "Custom Domain", free: false, pro: true, ent: true },
+                  { f: "Analytics", free: false, pro: true, ent: true },
+                  { f: "Auto Sync", free: false, pro: true, ent: true },
+                  { f: "White-label", free: false, pro: false, ent: true },
+                  { f: "Priority Support", free: false, pro: true, ent: true },
+                  { f: "24/7 Support", free: false, pro: false, ent: true },
+                  { f: "API Access", free: false, pro: true, ent: true },
+                  { f: "Team Collab", free: false, pro: false, ent: true },
+                ].map((r, i) => (
+                  <tr key={i} className="border-b border-slate-100">
+                    <td className="py-3 px-4">{r.f}</td>
+                    <td className="text-center py-3 px-4">{r.free === true ? '✓' : r.free === false ? '—' : r.free}</td>
+                    <td className="text-center py-3 px-4">{r.pro === true ? '✓' : r.pro === false ? '—' : r.pro}</td>
+                    <td className="text-center py-3 px-4">{r.ent === true ? '✓' : r.ent === false ? '—' : r.ent}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       {/* Custom Quote */}
       <section className="py-16">
         <div className="container mx-auto px-4">
