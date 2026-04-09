@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import {
@@ -11,7 +11,7 @@ import {
   Bot, TrendingUp, Users, Globe, Sparkles, Layout, Server,
   Lock, Gauge, Headphones, ArrowRightLeft, Eye, ExternalLink,
   ChevronDown, Rocket, Target, Award, Clock, Code2, Database, Globe2, ArrowUpRight,
-  Terminal, GitBranch, Package, BarChart3, Cpu, Zap as ZapIcon, RefreshCcw, ShieldCheck, SearchCheck, Globe as GlobeIcon, FileCode, Database as DatabaseIcon, Server as ServerIcon, Boxes, Accessibility
+  Terminal, GitBranch, Package, BarChart3, Cpu, RefreshCcw, ShieldCheck, SearchCheck, Globe as GlobeIcon, FileCode, Database as DatabaseIcon, Server as ServerIcon, Boxes, Accessibility, Download, Zap as ZapIcon, Clock3, MessageCircle, Star as StarIcon, CheckCircle2, Settings
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -29,7 +29,7 @@ const portfolioItems = [
 ]
 
 const services = [
-  { icon: ArrowRightLeft, title: "WordPress to Next.js", description: "Lightning-fast conversion with auto-sync", color: "from-indigo-500 to-violet-500", href: "/services/wordpress-to-nextjs" },
+  { icon: ArrowRightLeft, title: "WordPress to Next.js", description: "Lightning-fast conversion with auto-sync", color: "from-purple-600 to-violet-600", href: "/services/wordpress-to-nextjs" },
   { icon: Palette, title: "Elementor Pro Design", description: "Stunning designs that convert", color: "from-pink-500 to-rose-500", href: "/services/elementor-pro-design" },
   { icon: ShoppingCart, title: "WooCommerce Stores", description: "Full e-commerce solutions", color: "from-green-500 to-emerald-500", href: "/services/woocommerce-stores" },
   { icon: Search, title: "SEO & Marketing", description: "Dominate search rankings", color: "from-orange-500 to-amber-500", href: "/services/seo-marketing" },
@@ -73,19 +73,26 @@ const techStack = [
 ]
 
 const integrations = [
-  { name: "Vercel", logo: "▲", desc: "Instant deployments with global CDN" },
-  { name: "Sanity", logo: "☁️", desc: "Flexible headless CMS" },
-  { name: "Stripe", logo: "💳", desc: "Payment processing" },
-  { name: "Cloudinary", logo: "🖼️", desc: "Image optimization" },
-  { name: "Algolia", logo: "🔍", desc: "Lightning search" },
-  { name: "Resend", logo: "📧", desc: "Email delivery" },
+  { name: "Vercel", logo: "▲", desc: "Instant deployments" },
+  { name: "Sanity", logo: "☁️", desc: "Headless CMS" },
+  { name: "Stripe", logo: "💳", desc: "Payments" },
+  { name: "Cloudinary", logo: "🖼️", desc: "Images" },
+  { name: "Algolia", logo: "🔍", desc: "Search" },
+  { name: "Resend", logo: "📧", desc: "Email" },
 ]
 
 const faqs = [
-  { q: "How long does a WordPress to Next.js migration take?", a: "Most projects are completed within 24-72 hours depending on site complexity. Our automated tools handle most of the heavy lifting." },
-  { q: "Will my SEO rankings be affected?", a: "No! We preserve all URLs, meta tags, and sitemaps during migration. Many clients actually see improved rankings due to faster load times." },
-  { q: "Can I still use WordPress to manage content?", a: "Yes! We connect your WordPress admin to Next.js using WPGraphQL, so you can continue managing content while enjoying Next.js performance." },
-  { q: "What happens to my existing plugins?", a: "We migrate all essential functionality to modern, faster alternatives. You won't need most WP plugins anymore." },
+  { q: "How long does migration take?", a: "Most projects are completed within 24-72 hours depending on complexity." },
+  { q: "Will my SEO rankings be affected?", a: "No! We preserve all URLs, meta tags, and sitemaps during migration." },
+  { q: "Can I still use WordPress?", a: "Yes! We connect WordPress admin to Next.js using WPGraphQL." },
+  { q: "What about my plugins?", a: "We migrate functionality to modern, faster alternatives." },
+]
+
+const processSteps = [
+  { icon: Download, title: "Connect", desc: "Link your WordPress site" },
+  { icon: Settings, title: "Configure", desc: "Choose your options" },
+  { icon: Zap, title: "Convert", desc: "AI handles the migration" },
+  { icon: Rocket, title: "Deploy", desc: "Go live instantly" },
 ]
 
 export default function HomePage() {
@@ -93,10 +100,6 @@ export default function HomePage() {
   const heroRef = useRef<HTMLDivElement>(null)
   const [selectedPortfolio, setSelectedPortfolio] = useState<typeof portfolioItems[0] | null>(null)
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
-
-  const { scrollYProgress } = useScroll({ target: heroRef })
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 200])
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -108,24 +111,6 @@ export default function HomePage() {
       gsap.fromTo(".float-element",
         { y: 0 },
         { y: -20, duration: 2, repeat: -1, yoyo: true, ease: "power1.inOut", stagger: 0.2 }
-      )
-
-      const cards = gsap.utils.toArray(".service-card")
-      cards.forEach((card: any, i) => {
-        gsap.fromTo(card,
-          { opacity: 0, y: 60 },
-          {
-            opacity: 1, y: 0, duration: 0.8,
-            scrollTrigger: { trigger: card, start: "top 85%", once: true },
-            delay: i * 0.1
-          }
-        )
-      })
-
-      const statsElements = gsap.utils.toArray(".stat-item")
-      gsap.fromTo(statsElements,
-        { scale: 0.8, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.6, stagger: 0.1, ease: "back.out(1.4)" }
       )
     }, containerRef)
 
@@ -140,23 +125,13 @@ export default function HomePage() {
   }, [])
 
   return (
-    <div ref={containerRef} className="relative min-h-screen bg-slate-900">
+    <div ref={containerRef} className="relative min-h-screen bg-white">
       <FloatingButtons />
 
-      {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/30 to-slate-900" />
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-purple-500/20 rounded-full blur-[180px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-pink-500/10 rounded-full blur-[200px]" />
-
-        {/* Floating Elements */}
-        <div className="absolute top-1/4 right-1/4 float-element">
-          <div className="w-20 h-20 bg-gradient-to-br from-indigo-500/30 to-purple-500/30 rounded-3xl backdrop-blur-sm border border-white/10" />
-        </div>
-        <div className="absolute bottom-1/3 left-1/4 float-element">
-          <div className="w-16 h-16 bg-gradient-to-br from-pink-500/30 to-rose-500/30 rounded-2xl backdrop-blur-sm border border-white/10" />
-        </div>
+      {/* Hero Section - Light Purple Gradient */}
+      <section ref={heroRef} className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-gradient-to-br from-purple-50 via-white to-violet-50">
+        <div className="absolute top-20 right-20 w-[400px] h-[400px] bg-purple-200/30 rounded-full blur-[100px]" />
+        <div className="absolute bottom-20 left-20 w-[500px] h-[500px] bg-violet-200/30 rounded-full blur-[120px]" />
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <div className="max-w-6xl mx-auto">
@@ -165,7 +140,7 @@ export default function HomePage() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="hero-animate inline-flex items-center gap-2 px-4 py-2 bg-indigo-500/20 border border-indigo-500/30 rounded-full text-indigo-300 text-sm font-medium mb-8"
+                  className="hero-animate inline-flex items-center gap-2 px-4 py-2 bg-purple-100 border border-purple-200 rounded-full text-purple-700 text-sm font-medium mb-8"
                 >
                   <Sparkles className="w-4 h-4" />
                   AI-Powered Web Development
@@ -175,10 +150,10 @@ export default function HomePage() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="hero-animate text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
+                  className="hero-animate text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight"
                 >
                   Transform Your
-                  <span className="block bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  <span className="block bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 bg-clip-text text-transparent">
                     WordPress to Next.js
                   </span>
                 </motion.h1>
@@ -187,7 +162,7 @@ export default function HomePage() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="hero-animate text-xl text-slate-300 mb-10 max-w-xl mx-auto lg:mx-0"
+                  className="hero-animate text-lg text-slate-600 mb-8 max-w-xl mx-auto lg:mx-0"
                 >
                   Lightning-fast, SEO-optimized websites that load in milliseconds. 
                   Convert automatically with our AI-powered platform.
@@ -197,16 +172,16 @@ export default function HomePage() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 }}
-                  className="hero-animate flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12"
+                  className="hero-animate flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-10"
                 >
                   <Link href="/register">
-                    <Button size="lg" className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white text-lg px-10 py-6 h-auto font-bold shadow-xl shadow-indigo-500/25">
+                    <Button size="lg" className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold px-8 py-5 shadow-lg shadow-purple-500/25">
                       Start Free Today
-                      <ArrowRight className="ml-2 w-5 h-5" />
+                      <ArrowRight className="ml-2 w-4 h-4" />
                     </Button>
                   </Link>
                   <Link href="/services/wordpress-to-nextjs">
-                    <Button size="lg" variant="outline" className="border-2 border-slate-600 text-white hover:bg-slate-800 text-lg px-10 py-6 h-auto">
+                    <Button size="lg" variant="outline" className="border-2 border-purple-200 text-purple-700 hover:bg-purple-50 px-8 py-5 font-medium">
                       Learn More
                     </Button>
                   </Link>
@@ -216,20 +191,20 @@ export default function HomePage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.8 }}
-                  className="hero-animate flex items-center gap-6 justify-center lg:justify-start text-sm text-slate-400"
+                  className="hero-animate flex items-center gap-6 justify-center lg:justify-start text-sm text-slate-500"
                 >
                   <div className="flex items-center gap-2">
-                    <Check className="w-5 h-5 text-green-400" />
+                    <CheckCircle2 className="w-5 h-5 text-green-500" />
                     <span>No credit card required</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Check className="w-5 h-5 text-green-400" />
+                    <CheckCircle2 className="w-5 h-5 text-green-500" />
                     <span>Free forever plan</span>
                   </div>
                 </motion.div>
               </div>
 
-              {/* Hero Visual */}
+              {/* Hero Terminal Visual */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -237,43 +212,42 @@ export default function HomePage() {
                 className="relative hidden lg:block"
               >
                 <div className="relative">
-                  <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-3xl blur-2xl opacity-30" />
-                  <div className="relative bg-slate-800/80 backdrop-blur-xl border border-slate-700 rounded-3xl p-8">
+                  <div className="absolute -inset-4 bg-gradient-to-r from-purple-400 to-violet-400 rounded-3xl blur-xl opacity-20" />
+                  <div className="relative bg-white border border-purple-100 rounded-3xl p-8 shadow-2xl shadow-purple-100/50">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="flex gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-red-500" />
-                        <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                        <div className="w-3 h-3 rounded-full bg-green-500" />
+                        <div className="w-3 h-3 rounded-full bg-red-400" />
+                        <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                        <div className="w-3 h-3 rounded-full bg-green-400" />
                       </div>
-                      <span className="text-sm text-slate-500">Terminal</span>
+                      <span className="text-sm text-slate-400 font-medium">Terminal</span>
                     </div>
                     <div className="font-mono text-sm space-y-2">
-                      <div className="text-slate-500"># Convert your WordPress site</div>
+                      <div className="text-slate-400"># Convert your WordPress site</div>
                       <div className="flex items-center gap-2">
-                        <span className="text-green-400">$</span>
-                        <span className="text-white">npx wpcodingpress convert</span>
+                        <span className="text-green-600">$</span>
+                        <span className="text-slate-800">npx wpcodingpress convert</span>
                       </div>
-                      <div className="text-indigo-400 animate-pulse">Converting your site...</div>
-                      <div className="text-green-400">✓ Analyzing content...</div>
-                      <div className="text-green-400">✓ Building pages...</div>
-                      <div className="text-green-400">✓ Optimizing images...</div>
-                      <div className="text-green-400">✓ Deploying to CDN...</div>
-                      <div className="mt-4 p-4 bg-green-500/20 border border-green-500/30 rounded-xl">
-                        <div className="text-green-400 font-bold">🚀 Live in 3 minutes!</div>
-                        <div className="text-green-300 text-sm">Load time: 180ms</div>
+                      <div className="text-purple-600 animate-pulse">Converting your site...</div>
+                      <div className="text-green-600">✓ Analyzing content...</div>
+                      <div className="text-green-600">✓ Building pages...</div>
+                      <div className="text-green-600">✓ Optimizing images...</div>
+                      <div className="text-green-600">✓ Deploying to CDN...</div>
+                      <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
+                        <div className="text-green-600 font-bold">🚀 Live in 3 minutes!</div>
+                        <div className="text-green-500 text-sm">Load time: 180ms</div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Floating Stats */}
-                  <div className="absolute -bottom-6 -left-6 bg-slate-800/90 backdrop-blur-xl border border-slate-700 rounded-2xl p-4 shadow-xl">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
-                        <TrendingUp className="w-6 h-6 text-white" />
+                  <div className="absolute -bottom-6 -left-6 bg-white border border-purple-100 rounded-2xl p-5 shadow-xl">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
+                        <TrendingUp className="w-7 h-7 text-white" />
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-white">+40%</div>
-                        <div className="text-sm text-slate-400">Performance</div>
+                        <div className="text-2xl font-bold text-slate-900">+40%</div>
+                        <div className="text-sm text-slate-500">Performance</div>
                       </div>
                     </div>
                   </div>
@@ -286,64 +260,83 @@ export default function HomePage() {
               {stats.map((stat, i) => (
                 <motion.div
                   key={i}
-                  className="stat-item text-center p-6 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl"
+                  className="stat-item text-center p-6 bg-white border border-purple-100 rounded-2xl shadow-sm"
                 >
-                  <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent mb-2">
+                  <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent mb-2">
                     {stat.value}
                   </div>
-                  <div className="text-slate-400">{stat.label}</div>
+                  <div className="text-slate-600 font-medium">{stat.label}</div>
                 </motion.div>
               ))}
             </div>
           </div>
         </div>
+      </section>
 
-        <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5 }}
-        >
-          <ChevronDown className="w-8 h-8 text-slate-400" />
-        </motion.div>
+      {/* Process Section */}
+      <section className="py-24 px-6 bg-gradient-to-b from-white to-purple-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <Badge className="bg-purple-100 text-purple-700 border-purple-200 px-4 py-1.5 text-sm font-medium mb-6">
+              How It Works
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Four Simple Steps to <span className="bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">Success</span>
+            </h2>
+          </div>
+          
+          <div className="grid md:grid-cols-4 gap-8">
+            {processSteps.map((step, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="text-center"
+              >
+                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-violet-500 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-200">
+                  <step.icon className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{step.title}</h3>
+                <p className="text-slate-600 text-sm">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Services Section */}
-      <section className="py-32 px-6 bg-slate-900/50">
+      <section className="py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/30 px-4 py-1.5 text-sm font-medium mb-6">
-                Our Services
-              </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                Everything You Need to <span className="bg-gradient-to-r from-indigo-400 to-pink-400 bg-clip-text text-transparent">Succeed Online</span>
-              </h2>
-              <p className="text-slate-400 max-w-2xl mx-auto">
-                From WordPress migrations to custom web applications, we deliver high-performance solutions.
-              </p>
-            </motion.div>
+            <Badge className="bg-violet-100 text-violet-700 border-violet-200 px-4 py-1.5 text-sm font-medium mb-6">
+              Our Services
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Everything You Need to <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Succeed Online</span>
+            </h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">
+              From WordPress migrations to custom web applications, we deliver high-performance solutions.
+            </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {services.map((service, i) => (
               <motion.div
                 key={i}
-                className="service-card group p-8 bg-slate-800/50 border border-slate-700/50 rounded-2xl hover:border-indigo-500/50 transition-all hover:-translate-y-2"
+                className="group p-8 bg-white border border-slate-200 rounded-2xl hover:border-purple-300 hover:shadow-xl hover:shadow-purple-100 transition-all hover:-translate-y-1"
                 whileHover={{ y: -8 }}
               >
                 <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
                   <service.icon className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-indigo-400 transition-colors">
+                <h3 className="text-lg font-bold text-slate-900 mb-3 group-hover:text-purple-600 transition-colors">
                   {service.title}
                 </h3>
-                <p className="text-slate-400 mb-6">{service.description}</p>
+                <p className="text-slate-600 mb-6">{service.description}</p>
                 <Link href={service.href}>
-                  <Button variant="ghost" className="p-0 h-auto text-indigo-400 hover:text-indigo-300">
+                  <Button variant="ghost" className="p-0 h-auto text-purple-600 hover:text-purple-700 font-medium">
                     Learn More
                     <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
@@ -354,7 +347,7 @@ export default function HomePage() {
 
           <div className="text-center mt-12">
             <Link href="/services">
-              <Button variant="outline" className="border-indigo-500 text-indigo-400 hover:bg-indigo-500/10">
+              <Button variant="outline" className="border-2 border-purple-200 text-purple-700 hover:bg-purple-50 font-medium px-8">
                 View All Services
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
@@ -363,20 +356,53 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Features Section */}
+      <section className="py-24 px-6 bg-gradient-to-br from-purple-50 via-white to-violet-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <Badge className="bg-purple-100 text-purple-700 border-purple-200 px-4 py-1.5 text-sm font-medium mb-6">
+              Why Choose Us
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Industry-Leading <span className="bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">Features</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {features.map((feature, i) => (
+              <motion.div
+                key={i}
+                className="text-center p-6 bg-white border border-purple-100 rounded-2xl"
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+              >
+                <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-purple-100 to-violet-100 rounded-2xl flex items-center justify-center">
+                  <feature.icon className="w-7 h-7 text-purple-600" />
+                </div>
+                <h3 className="font-bold text-slate-900 mb-1">{feature.title}</h3>
+                <p className="text-sm text-slate-600">{feature.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Portfolio Section */}
-      <section className="py-32 px-6">
+      <section className="py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
             <div>
-              <Badge className="bg-pink-500/20 text-pink-300 border-pink-500/30 px-4 py-1.5 text-sm font-medium mb-6">
+              <Badge className="bg-pink-100 text-pink-700 border-pink-200 px-4 py-1.5 text-sm font-medium mb-6">
                 Portfolio
               </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-white">
-                Featured <span className="bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">Projects</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900">
+                Featured <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">Projects</span>
               </h2>
             </div>
             <Link href="/portfolio" className="mt-6 md:mt-0">
-              <Button variant="outline" className="border-pink-500 text-pink-400 hover:bg-pink-500/10">
+              <Button variant="outline" className="border-pink-200 text-pink-600 hover:bg-pink-50 font-medium">
                 View All Projects
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
@@ -387,23 +413,23 @@ export default function HomePage() {
             {portfolioItems.slice(0, 6).map((item, i) => (
               <motion.div
                 key={item.id}
-                className="group relative bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden cursor-pointer hover:border-pink-500/50 transition-all"
-                whileHover={{ y: -8, scale: 1.02 }}
+                className="group relative bg-white border border-slate-200 rounded-2xl overflow-hidden cursor-pointer hover:border-pink-300 hover:shadow-xl transition-all"
+                whileHover={{ y: -8 }}
                 onClick={() => setSelectedPortfolio(item)}
               >
                 <div className="aspect-video relative overflow-hidden">
                   <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-60" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="w-10 h-10 rounded-full bg-indigo-500/80 flex items-center justify-center backdrop-blur-sm">
-                    <Eye className="w-5 h-5 text-white" />
+                  <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
+                    <Eye className="w-5 h-5 text-purple-600" />
                   </div>
                 </div>
                 <div className="p-6">
-                  <Badge className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 mb-3">{item.category}</Badge>
-                  <h3 className="text-xl font-bold text-white mb-1">{item.title}</h3>
-                  <p className="text-slate-400 text-sm">Client: {item.client}</p>
+                  <Badge className="bg-purple-100 text-purple-700 border border-purple-200 mb-3">{item.category}</Badge>
+                  <h3 className="text-lg font-bold text-slate-900 mb-1">{item.title}</h3>
+                  <p className="text-slate-500 text-sm">Client: {item.client}</p>
                 </div>
               </motion.div>
             ))}
@@ -418,30 +444,30 @@ export default function HomePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
             onClick={() => setSelectedPortfolio(null)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-slate-800 border border-slate-700 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+              className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="aspect-video relative overflow-hidden">
                 <img src={selectedPortfolio.image} alt={selectedPortfolio.title} className="w-full h-full object-cover" />
-                <button className="absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-900/80 flex items-center justify-center hover:bg-slate-800" onClick={() => setSelectedPortfolio(null)}>
-                  <X className="w-5 h-5 text-white" />
+                <button className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center hover:bg-white" onClick={() => setSelectedPortfolio(null)}>
+                  <X className="w-5 h-5 text-slate-700" />
                 </button>
               </div>
               <div className="p-8">
-                <Badge className="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 mb-4">{selectedPortfolio.category}</Badge>
-                <h2 className="text-3xl font-bold text-white mb-2">{selectedPortfolio.title}</h2>
-                <p className="text-slate-400 mb-6">Client: {selectedPortfolio.client}</p>
+                <Badge className="bg-purple-100 text-purple-700 border border-purple-200 mb-4">{selectedPortfolio.category}</Badge>
+                <h2 className="text-3xl font-bold text-slate-900 mb-2">{selectedPortfolio.title}</h2>
+                <p className="text-slate-600 mb-6">Client: {selectedPortfolio.client}</p>
                 <div className="flex gap-4">
                   {selectedPortfolio.liveUrl && (
                     <a href={selectedPortfolio.liveUrl} target="_blank" rel="noopener noreferrer">
-                      <Button className="bg-gradient-to-r from-indigo-500 to-purple-500">
+                      <Button className="bg-gradient-to-r from-purple-600 to-violet-600">
                         <ExternalLink className="w-4 h-4 mr-2" />
                         Visit Live Site
                       </Button>
@@ -455,152 +481,19 @@ export default function HomePage() {
         )}
       </AnimatePresence>
 
-      {/* Pricing Section */}
-      <section className="py-32 px-6 bg-slate-900/50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30 px-4 py-1.5 text-sm font-medium mb-6">
-              Pricing
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Simple, <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Transparent</span> Pricing
-            </h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">Start free, upgrade when you're ready. No hidden fees.</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {plans.map((plan, i) => (
-              <motion.div
-                key={i}
-                className={`relative bg-slate-800 border rounded-2xl p-8 ${
-                  plan.popular ? 'border-indigo-500 shadow-lg shadow-indigo-500/20 md:-mt-4 md:mb-[-16px]' : 'border-slate-700'
-                }`}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-1 shadow-lg">Most Popular</Badge>
-                  </div>
-                )}
-                <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
-                <div className="mb-6">
-                  <span className="text-5xl font-bold text-white">{plan.price}</span>
-                  <span className="text-slate-400">{plan.period}</span>
-                </div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, j) => (
-                    <li key={j} className="flex items-center gap-3 text-slate-300">
-                      <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Link href={plan.href} className="block">
-                  <Button className={`w-full ${plan.popular ? 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600' : 'bg-slate-700 hover:bg-slate-600'}`}>
-                    {plan.cta}
-                  </Button>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-32 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 px-4 py-1.5 text-sm font-medium mb-6">
-              Why Choose Us
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-white">
-              Industry-Leading <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Features</span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {features.map((feature, i) => (
-              <motion.div
-                key={i}
-                className="text-center p-6 bg-slate-800/50 border border-slate-700/50 rounded-2xl"
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-              >
-                <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center">
-                  <feature.icon className="w-7 h-7 text-indigo-400" />
-                </div>
-                <h3 className="font-bold text-white mb-1">{feature.title}</h3>
-                <p className="text-sm text-slate-400">{feature.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-32 px-6 bg-slate-900/50">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
-            <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 px-4 py-1.5 text-sm font-medium mb-6">
-              Testimonials
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-white">
-              What Our <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Clients Say</span>
-            </h2>
-          </div>
-
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentTestimonial}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="bg-slate-800 border border-slate-700 rounded-3xl p-10 text-center"
-            >
-              <div className="flex justify-center gap-1 mb-6">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-6 h-6 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <p className="text-2xl text-white italic mb-8">"{testimonials[currentTestimonial].content}"</p>
-              <div className="border-t border-slate-700 pt-6">
-                <div className="font-bold text-white text-lg">{testimonials[currentTestimonial].name}</div>
-                <div className="text-slate-400">{testimonials[currentTestimonial].role}</div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-
-          <div className="flex justify-center gap-2 mt-8">
-            {testimonials.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentTestimonial(i)}
-                className={`w-3 h-3 rounded-full transition-all ${i === currentTestimonial ? "bg-indigo-500 w-8" : "bg-slate-600 hover:bg-slate-500"}`}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Tech Stack Section */}
-      <section className="py-32 px-6 bg-slate-900/50">
+      <section className="py-24 px-6 bg-gradient-to-br from-purple-50 via-white to-violet-50">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 px-4 py-1.5 text-sm font-medium mb-6">
+              <Badge className="bg-cyan-100 text-cyan-700 border-cyan-200 px-4 py-1.5 text-sm font-medium mb-6">
                 Modern Stack
               </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                Built with <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Industry-Leading</span> Tech
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+                Built with <span className="bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">Industry-Leading</span> Tech
               </h2>
-              <p className="text-slate-400 text-lg mb-8">
-                We use the most modern and performant technologies to build websites that scale. 
-                Every project benefits from our carefully selected tech stack.
+              <p className="text-slate-600 text-lg mb-8">
+                We use the most modern and performant technologies to build websites that scale.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 {techStack.map((tech, i) => (
@@ -610,12 +503,12 @@ export default function HomePage() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.1 }}
-                    className="flex items-center gap-3 p-4 bg-slate-800/50 border border-slate-700/50 rounded-xl"
+                    className="flex items-center gap-3 p-4 bg-white border border-purple-100 rounded-xl"
                   >
                     <span className="text-2xl">{tech.icon}</span>
                     <div>
-                      <div className="font-semibold text-white">{tech.name}</div>
-                      <div className="text-xs text-slate-400">{tech.desc}</div>
+                      <div className="font-semibold text-slate-900">{tech.name}</div>
+                      <div className="text-xs text-slate-500">{tech.desc}</div>
                     </div>
                   </motion.div>
                 ))}
@@ -627,26 +520,26 @@ export default function HomePage() {
               viewport={{ once: true }}
               className="relative"
             >
-              <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-3xl blur-2xl opacity-20" />
-              <div className="relative bg-slate-800/90 backdrop-blur-xl border border-slate-700 rounded-3xl p-6 font-mono text-sm">
+              <div className="absolute -inset-4 bg-gradient-to-r from-purple-400 to-violet-400 rounded-3xl blur-xl opacity-20" />
+              <div className="relative bg-white border border-purple-100 rounded-3xl p-6 shadow-2xl font-mono text-sm">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                    <div className="w-3 h-3 rounded-full bg-red-400" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                    <div className="w-3 h-3 rounded-full bg-green-400" />
                   </div>
-                  <span className="text-sm text-slate-500">package.json</span>
+                  <span className="text-sm text-slate-400">package.json</span>
                 </div>
                 <div className="space-y-2">
-                  <div className="text-slate-500">{"{"}</div>
-                  <div className="text-purple-400 pl-4">"dependencies": {"{"}</div>
-                  <div className="text-green-400 pl-8">"next": <span className="text-orange-300">"^14.0.0"</span>,</div>
-                  <div className="text-green-400 pl-8">"react": <span className="text-orange-300">"^18.2.0"</span>,</div>
-                  <div className="text-green-400 pl-8">"typescript": <span className="text-orange-300">"^5.0.0"</span>,</div>
-                  <div className="text-green-400 pl-8">"tailwindcss": <span className="text-orange-300">"^3.4.0"</span>,</div>
-                  <div className="text-green-400 pl-8">"prisma": <span className="text-orange-300">"^5.0.0"</span>,</div>
-                  <div className="text-purple-400 pl-4">{"}"}</div>
-                  <div className="text-slate-500">{"}"}</div>
+                  <div className="text-slate-400">{"{"}</div>
+                  <div className="text-purple-600 pl-4">"dependencies": {"{"}</div>
+                  <div className="text-green-600 pl-8">"next": <span className="text-orange-500">"^14.0.0"</span>,</div>
+                  <div className="text-green-600 pl-8">"react": <span className="text-orange-500">"^18.2.0"</span>,</div>
+                  <div className="text-green-600 pl-8">"typescript": <span className="text-orange-500">"^5.0.0"</span>,</div>
+                  <div className="text-green-600 pl-8">"tailwindcss": <span className="text-orange-500">"^3.4.0"</span>,</div>
+                  <div className="text-green-600 pl-8">"prisma": <span className="text-orange-500">"^5.0.0"</span>,</div>
+                  <div className="text-purple-600 pl-4">{"}"}</div>
+                  <div className="text-slate-400">{"}"}</div>
                 </div>
               </div>
             </motion.div>
@@ -654,19 +547,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Performance Comparison Section */}
-      <section className="py-32 px-6">
+      {/* Performance Comparison */}
+      <section className="py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <Badge className="bg-green-500/20 text-green-300 border-green-500/30 px-4 py-1.5 text-sm font-medium mb-6">
+            <Badge className="bg-green-100 text-green-700 border-green-200 px-4 py-1.5 text-sm font-medium mb-6">
               Performance
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              See the <span className="bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">Difference</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              See the <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Difference</span>
             </h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">
-              Our Next.js sites consistently outperform WordPress in every metric that matters.
-            </p>
           </div>
           
           <div className="grid md:grid-cols-2 gap-8">
@@ -674,31 +564,29 @@ export default function HomePage() {
               initial={{ opacity: 0, x: -40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-red-500/10 border border-red-500/20 rounded-3xl p-8"
+              className="bg-red-50 border border-red-200 rounded-3xl p-8"
             >
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center">
-                  <Code className="w-6 h-6 text-red-400" />
+                <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
+                  <Code className="w-6 h-6 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">WordPress</h3>
-                  <p className="text-sm text-red-400">Before Migration</p>
+                  <h3 className="text-xl font-bold text-slate-900">WordPress</h3>
+                  <p className="text-sm text-red-600">Before Migration</p>
                 </div>
               </div>
               <div className="space-y-4">
                 {[
-                  { label: "Load Time", value: "3.2s", color: "bg-red-500" },
-                  { label: "PageSpeed Score", value: "52", color: "bg-red-500" },
-                  { label: "TTFB", value: "850ms", color: "bg-red-500" },
-                  { label: "LCP", value: "4.1s", color: "bg-red-500" },
+                  { label: "Load Time", value: "3.2s", color: "bg-red-500", width: "w-1/4" },
+                  { label: "PageSpeed", value: "52", color: "bg-red-500", width: "w-1/2" },
                 ].map((metric, i) => (
                   <div key={i}>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-slate-400">{metric.label}</span>
-                      <span className="text-red-400 font-mono">{metric.value}</span>
+                      <span className="text-slate-600">{metric.label}</span>
+                      <span className="text-red-600 font-mono font-medium">{metric.value}</span>
                     </div>
-                    <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-                      <div className={`h-full ${metric.color} w-1/4 rounded-full`} />
+                    <div className="h-2 bg-red-100 rounded-full overflow-hidden">
+                      <div className={`h-full ${metric.color} ${metric.width} rounded-full`} />
                     </div>
                   </div>
                 ))}
@@ -709,31 +597,29 @@ export default function HomePage() {
               initial={{ opacity: 0, x: 40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="bg-green-500/10 border border-green-500/20 rounded-3xl p-8"
+              className="bg-green-50 border border-green-200 rounded-3xl p-8"
             >
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
-                  <Zap className="w-6 h-6 text-green-400" />
+                <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
+                  <Zap className="w-6 h-6 text-green-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">Next.js</h3>
-                  <p className="text-sm text-green-400">After Migration</p>
+                  <h3 className="text-xl font-bold text-slate-900">Next.js</h3>
+                  <p className="text-sm text-green-600">After Migration</p>
                 </div>
               </div>
               <div className="space-y-4">
                 {[
-                  { label: "Load Time", value: "180ms", color: "bg-green-500" },
-                  { label: "PageSpeed Score", value: "98", color: "bg-green-500" },
-                  { label: "TTFB", value: "45ms", color: "bg-green-500" },
-                  { label: "LCP", value: "0.8s", color: "bg-green-500" },
+                  { label: "Load Time", value: "180ms", color: "bg-green-500", width: "w-full" },
+                  { label: "PageSpeed", value: "98", color: "bg-green-500", width: "w-full" },
                 ].map((metric, i) => (
                   <div key={i}>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-slate-400">{metric.label}</span>
-                      <span className="text-green-400 font-mono">{metric.value}</span>
+                      <span className="text-slate-600">{metric.label}</span>
+                      <span className="text-green-600 font-mono font-medium">{metric.value}</span>
                     </div>
-                    <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-                      <div className={`h-full ${metric.color} w-full rounded-full`} />
+                    <div className="h-2 bg-green-100 rounded-full overflow-hidden">
+                      <div className={`h-full ${metric.color} ${metric.width} rounded-full`} />
                     </div>
                   </div>
                 ))}
@@ -743,93 +629,115 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Code Quality Section */}
-      <section className="py-32 px-6 bg-slate-900/50">
+      {/* Pricing Section */}
+      <section className="py-24 px-6 bg-gradient-to-br from-purple-50 via-white to-violet-50">
         <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="relative order-2 lg:order-1"
-            >
-              <div className="absolute -inset-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl blur-2xl opacity-20" />
-              <div className="relative bg-slate-800/90 backdrop-blur-xl border border-slate-700 rounded-3xl p-6 font-mono text-sm">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                    <div className="w-3 h-3 rounded-full bg-green-500" />
+          <div className="text-center mb-16">
+            <Badge className="bg-purple-100 text-purple-700 border-purple-200 px-4 py-1.5 text-sm font-medium mb-6">
+              Pricing
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Simple, <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Transparent</span> Pricing
+            </h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">Start free, upgrade when you're ready. No hidden fees.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {plans.map((plan, i) => (
+              <motion.div
+                key={i}
+                className={`relative bg-white border rounded-3xl p-8 ${
+                  plan.popular ? 'border-purple-400 shadow-xl shadow-purple-100 ring-2 ring-purple-300' : 'border-slate-200'
+                }`}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <Badge className="bg-gradient-to-r from-purple-600 to-violet-600 text-white px-4 py-1 shadow-lg">Most Popular</Badge>
                   </div>
-                  <span className="text-sm text-slate-500">next.config.ts</span>
+                )}
+                <h3 className="text-xl font-bold text-slate-900 mb-2">{plan.name}</h3>
+                <div className="mb-6">
+                  <span className="text-5xl font-bold text-slate-900">{plan.price}</span>
+                  <span className="text-slate-500">{plan.period}</span>
                 </div>
-                <div className="space-y-3">
-                  <div className="text-purple-400">const nextConfig = {"{"}</div>
-                  <div className="text-cyan-400 pl-4">images: {"{"}</div>
-                  <div className="text-green-400 pl-8">domains: [<span className="text-orange-300">'wpcodingpress.com'</span>],</div>
-                  <div className="text-cyan-400 pl-4">{"}"}</div>
-                  <div className="text-cyan-400 pl-4">compress: <span className="text-orange-300">true</span>,</div>
-                  <div className="text-cyan-400 pl-4">poweredByHeader: <span className="text-orange-300">false</span>,</div>
-                  <div className="text-purple-400">{"}"}</div>
-                  <div className="text-slate-500 mt-4">// Production optimizations</div>
-                  <div className="text-green-400">output: <span className="text-purple-400">'standalone'</span></div>
-                </div>
-              </div>
-            </motion.div>
-            <div className="order-1 lg:order-2">
-              <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30 px-4 py-1.5 text-sm font-medium mb-6">
-                Code Quality
-              </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                Enterprise-Grade <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Code Quality</span>
-              </h2>
-              <p className="text-slate-400 text-lg mb-8">
-                Every project follows industry best practices with strict TypeScript types, 
-                comprehensive testing, and optimized production builds.
-              </p>
-              <div className="space-y-4">
-                {[
-                  { icon: FileCode, title: "TypeScript", desc: "100% type-safe code with zero any" },
-                  { icon: ShieldCheck, title: "Security First", desc: "CSP headers, sanitization, auth" },
-                  { icon: Accessibility, title: "WCAG 2.1", desc: "Accessible to all users" },
-                  { icon: BarChart3, title: "Analytics Ready", desc: "Built-in performance tracking" },
-                ].map((item, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="flex items-start gap-4 p-4 bg-slate-800/50 border border-slate-700/50 rounded-xl"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-                      <item.icon className="w-5 h-5 text-purple-400" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-white">{item.title}</h4>
-                      <p className="text-sm text-slate-400">{item.desc}</p>
-                    </div>
-                  </motion.div>
+                <ul className="space-y-3 mb-8">
+                  {plan.features.map((feature, j) => (
+                    <li key={j} className="flex items-center gap-3 text-slate-700">
+                      <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Link href={plan.href} className="block">
+                  <Button className={`w-full ${plan.popular ? 'bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 shadow-lg' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}>
+                    {plan.cta}
+                  </Button>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-24 px-6 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <Badge className="bg-amber-100 text-amber-700 border-amber-200 px-4 py-1.5 text-sm font-medium mb-6">
+              Testimonials
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900">
+              What Our <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">Clients Say</span>
+            </h2>
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentTestimonial}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-100 rounded-3xl p-10 text-center"
+            >
+              <div className="flex justify-center gap-1 mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <StarIcon key={i} className="w-6 h-6 fill-amber-400 text-amber-400" />
                 ))}
               </div>
-            </div>
+              <p className="text-2xl text-slate-800 italic mb-8">"{testimonials[currentTestimonial].content}"</p>
+              <div className="border-t border-purple-100 pt-6">
+                <div className="font-bold text-slate-900 text-lg">{testimonials[currentTestimonial].name}</div>
+                <div className="text-slate-600">{testimonials[currentTestimonial].role}</div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          <div className="flex justify-center gap-2 mt-8">
+            {testimonials.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentTestimonial(i)}
+                className={`w-3 h-3 rounded-full transition-all ${i === currentTestimonial ? "bg-purple-600 w-8" : "bg-slate-300 hover:bg-slate-400"}`}
+              />
+            ))}
           </div>
         </div>
       </section>
 
       {/* Integrations Section */}
-      <section className="py-32 px-6">
+      <section className="py-24 px-6 bg-gradient-to-br from-purple-50 via-white to-violet-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 px-4 py-1.5 text-sm font-medium mb-6">
+            <Badge className="bg-amber-100 text-amber-700 border-amber-200 px-4 py-1.5 text-sm font-medium mb-6">
               Integrations
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Seamlessly Connect with <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Popular Tools</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Seamless <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">Connections</span>
             </h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">
-              Our solutions integrate with your favorite platforms out of the box.
-            </p>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -840,11 +748,11 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }}
-                className="p-6 bg-slate-800/50 border border-slate-700/50 rounded-2xl text-center hover:border-amber-500/50 transition-all group"
+                className="p-6 bg-white border border-purple-100 rounded-2xl text-center hover:border-amber-300 hover:shadow-lg transition-all group"
               >
                 <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">{item.logo}</div>
-                <h4 className="font-semibold text-white mb-1">{item.name}</h4>
-                <p className="text-xs text-slate-400">{item.desc}</p>
+                <h4 className="font-semibold text-slate-900 mb-1">{item.name}</h4>
+                <p className="text-xs text-slate-500">{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -852,14 +760,14 @@ export default function HomePage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-32 px-6 bg-slate-900/50">
+      <section className="py-24 px-6 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 px-4 py-1.5 text-sm font-medium mb-6">
+            <Badge className="bg-blue-100 text-blue-700 border-blue-200 px-4 py-1.5 text-sm font-medium mb-6">
               FAQ
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Frequently Asked <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Questions</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900">
+              Frequently Asked <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">Questions</span>
             </h2>
           </div>
           
@@ -871,17 +779,17 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="bg-slate-800/50 border border-slate-700/50 rounded-2xl overflow-hidden"
+                className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-purple-200 transition-colors"
               >
                 <details className="group">
                   <summary className="flex items-center justify-between p-6 cursor-pointer list-none">
-                    <h3 className="font-semibold text-white pr-4">{faq.q}</h3>
-                    <div className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center flex-shrink-0 group-open:rotate-180 transition-transform">
-                      <ChevronDown className="w-4 h-4 text-slate-400" />
+                    <h3 className="font-semibold text-slate-900 pr-4">{faq.q}</h3>
+                    <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 group-open:bg-purple-600 group-open:rotate-180 transition-all">
+                      <ChevronDown className="w-4 h-4 text-purple-600 group-open:text-white" />
                     </div>
                   </summary>
                   <div className="px-6 pb-6 pt-0">
-                    <p className="text-slate-400">{faq.a}</p>
+                    <p className="text-slate-600">{faq.a}</p>
                   </div>
                 </details>
               </motion.div>
@@ -890,61 +798,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Trust Badges Section */}
-      <section className="py-32 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/30 px-4 py-1.5 text-sm font-medium mb-6">
-              Trusted By
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Join <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">500+ Businesses</span> Who Trust Us
-            </h2>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { icon: Award, title: "5+ Years Experience", desc: "Decade of expertise in modern web development" },
-              { icon: Shield, title: "99.9% Uptime", desc: "Reliable infrastructure with global CDN" },
-              { icon: Headphones, title: "24/7 Support", desc: "Expert help whenever you need it" },
-            ].map((badge, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-slate-700 rounded-3xl p-8 text-center hover:border-indigo-500/50 transition-all"
-              >
-                <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center">
-                  <badge.icon className="w-8 h-8 text-indigo-400" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">{badge.title}</h3>
-                <p className="text-slate-400">{badge.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
-      <section className="py-32 px-6">
+      <section className="py-24 px-6 bg-gradient-to-br from-purple-600 via-violet-600 to-purple-700">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to <span className="bg-gradient-to-r from-indigo-400 to-pink-400 bg-clip-text text-transparent">Transform</span> Your Website?
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            Ready to <span className="bg-gradient-to-r from-amber-300 to-pink-300 bg-clip-text text-transparent">Transform</span> Your Website?
           </h2>
-          <p className="text-xl text-slate-400 mb-10">
+          <p className="text-xl text-white/80 mb-10">
             Join 500+ happy clients who switched to lightning-fast Next.js.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/register">
-              <Button size="lg" className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white text-lg px-12 py-6 h-auto font-bold shadow-xl">
+              <Button size="lg" className="bg-white text-purple-700 hover:bg-white/90 text-lg px-10 py-6 shadow-xl font-bold">
                 Start Free Today
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
             <Link href="/contact">
-              <Button size="lg" variant="outline" className="border-2 border-slate-600 text-white hover:bg-slate-800 text-lg px-12 py-6 h-auto">
+              <Button size="lg" variant="outline" className="border-2 border-white/30 text-white hover:bg-white/10 text-lg px-10 py-6 font-semibold">
                 Contact Sales
               </Button>
             </Link>

@@ -22,7 +22,7 @@ export function AnimatedLogo({ className = "", size = "md", showText = true }: L
   return (
     <Link href="/" className={`flex items-center gap-3 group ${className}`}>
       <motion.div
-        className={`${s.padding} rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 relative overflow-hidden`}
+        className={`${s.padding} rounded-xl bg-gradient-to-br from-purple-600 via-violet-600 to-purple-700 flex items-center justify-center shadow-lg shadow-purple-500/25 relative overflow-hidden`}
         whileHover={{ scale: 1.05 }}
         transition={{ duration: 0.3 }}
       >
@@ -50,7 +50,7 @@ export function AnimatedLogo({ className = "", size = "md", showText = true }: L
         </svg>
         
         <motion.div
-          className="absolute -inset-1 rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 opacity-0 blur-lg"
+          className="absolute -inset-1 rounded-xl bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 opacity-0 blur-lg"
           animate={{ opacity: [0, 0.5, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
         />
@@ -64,8 +64,8 @@ export function AnimatedLogo({ className = "", size = "md", showText = true }: L
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <span className="text-white">WPCoding</span>
-            <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent font-extrabold">
+            <span className="text-slate-900">WPCoding</span>
+            <span className="bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 bg-clip-text text-transparent font-extrabold">
               Press
             </span>
           </motion.span>
@@ -78,7 +78,7 @@ export function AnimatedLogo({ className = "", size = "md", showText = true }: L
 export function LogoIcon({ className = "", size = 40 }: { className?: string, size?: number }) {
   return (
     <motion.div
-      className={`rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 relative overflow-hidden ${className}`}
+      className={`rounded-xl bg-gradient-to-br from-purple-600 via-violet-600 to-purple-700 flex items-center justify-center shadow-lg shadow-purple-500/25 relative overflow-hidden ${className}`}
       whileHover={{ scale: 1.1, rotate: 5 }}
       transition={{ duration: 0.3 }}
       style={{ width: size, height: size }}
@@ -112,7 +112,7 @@ export function LogoIcon({ className = "", size = 40 }: { className?: string, si
 export function LogoMark({ className = "" }: { className?: string }) {
   return (
     <motion.div
-      className={`w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 ${className}`}
+      className={`w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 via-violet-600 to-purple-700 flex items-center justify-center shadow-lg shadow-purple-500/25 ${className}`}
       whileHover={{ rotate: 360 }}
       transition={{ duration: 0.5 }}
     >
@@ -136,8 +136,8 @@ export function LogoWithText({ className = "" }: { className?: string }) {
     <Link href="/" className={`flex items-center gap-2 ${className}`}>
       <LogoIcon size={36} />
       <span className="text-xl font-bold">
-        <span className="text-white">WPCoding</span>
-        <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent font-extrabold">
+        <span className="text-slate-900">WPCoding</span>
+        <span className="bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 bg-clip-text text-transparent font-extrabold">
           Press
         </span>
       </span>

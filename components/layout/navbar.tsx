@@ -8,7 +8,6 @@ import { Menu, X, User, Bell, ArrowRight, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { AnimatedLogo } from "@/components/logo"
-import { NotificationProvider, useNotifications } from "@/components/notifications"
 
 const mainNavLinks = [
   { href: "/", label: "Home" },
@@ -36,20 +35,6 @@ const products = [
   { title: "AI Agents", description: "Smart automation", icon: "🧠", href: "/products/ai-agents" },
   { title: "WordPress Themes", description: "Beautiful designs", icon: "🎨", href: "/products/themes" },
 ]
-
-function NotificationBell() {
-  const { unreadCount } = useNotifications()
-  return (
-    <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/10">
-      <Bell className="w-5 h-5" />
-      {unreadCount > 0 && (
-        <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse">
-          {unreadCount > 9 ? "9+" : unreadCount}
-        </span>
-      )}
-    </Button>
-  )
-}
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -88,8 +73,8 @@ export function Navbar() {
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-slate-900/95 backdrop-blur-xl border-b border-slate-800",
-        isScrolled ? "shadow-lg" : ""
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-xl border-b border-slate-200",
+        isScrolled ? "shadow-lg" : "shadow-sm"
       )}
     >
       <div className="container mx-auto px-4 lg:px-8">
@@ -106,8 +91,8 @@ export function Navbar() {
                     className={cn(
                       "flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-semibold transition-colors",
                       activeDropdown === link.label.toLowerCase()
-                        ? "text-indigo-400"
-                        : "text-white/90 hover:text-white hover:bg-white/10"
+                        ? "text-purple-600"
+                        : "text-slate-700 hover:text-purple-600 hover:bg-purple-50"
                     )}
                   >
                     {link.label}
@@ -123,7 +108,7 @@ export function Navbar() {
                     href={link.href}
                     className={cn(
                       "px-4 py-2 rounded-lg text-sm font-semibold transition-colors",
-                      "text-white/90 hover:text-white hover:bg-white/10"
+                      "text-slate-700 hover:text-purple-600 hover:bg-purple-50"
                     )}
                   >
                     {link.label}
@@ -132,7 +117,6 @@ export function Navbar() {
               </div>
             ))}
 
-            {/* Mega Menu Dropdown */}
             <AnimatePresence>
               {activeDropdown && (
                 <motion.div
@@ -142,7 +126,7 @@ export function Navbar() {
                   transition={{ duration: 0.2 }}
                   onMouseEnter={() => handleDropdownEnter(activeDropdown)}
                   onMouseLeave={handleDropdownLeave}
-                  className="absolute top-full left-0 w-full bg-slate-900/98 backdrop-blur-xl shadow-2xl border-t border-slate-700"
+                  className="absolute top-full left-0 w-full bg-white/98 backdrop-blur-xl shadow-2xl border-t border-purple-200"
                 >
                   <div className="container mx-auto px-4 py-8">
                     {activeDropdown === "services" && (
@@ -152,20 +136,20 @@ export function Navbar() {
                             key={service.href}
                             href={service.href}
                             onClick={() => setActiveDropdown(null)}
-                            className="group block p-5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all"
+                            className="group block p-5 rounded-2xl border border-slate-200 hover:border-purple-400 hover:bg-purple-50 transition-all"
                           >
                             <div className="flex items-center gap-3 mb-2">
                               <span className="text-2xl">{service.icon}</span>
-                              <span className="font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                              <span className="font-semibold text-slate-900 group-hover:text-purple-600">
                                 {service.title}
                               </span>
                               {service.popular && (
-                                <span className="px-2 py-0.5 text-xs font-medium bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-full">
+                                <span className="px-2 py-0.5 text-xs font-medium bg-gradient-to-r from-purple-500 to-violet-500 text-white rounded-full">
                                   Popular
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm text-slate-500 dark:text-slate-400">
+                            <p className="text-sm text-slate-500">
                               {service.description}
                             </p>
                           </Link>
@@ -179,24 +163,24 @@ export function Navbar() {
                             key={product.href}
                             href={product.href}
                             onClick={() => setActiveDropdown(null)}
-                            className="group block p-5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-violet-500 dark:hover:border-violet-500 hover:bg-violet-50 dark:hover:bg-violet-500/10 transition-all text-center"
+                            className="group block p-5 rounded-2xl border border-slate-200 hover:border-violet-400 hover:bg-violet-50 transition-all text-center"
                           >
                             <span className="text-3xl mb-3 block">{product.icon}</span>
-                            <span className="font-semibold text-slate-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 block">
+                            <span className="font-semibold text-slate-900 group-hover:text-violet-600 block">
                               {product.title}
                             </span>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            <p className="text-xs text-slate-500 mt-1">
                               {product.description}
                             </p>
                           </Link>
                         ))}
                       </div>
                     )}
-                    <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                    <div className="mt-6 pt-6 border-t border-slate-200 flex justify-between items-center">
                       <Link
                         href={activeDropdown === "services" ? "/services" : "/products"}
                         onClick={() => setActiveDropdown(null)}
-                        className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
+                        className="text-purple-600 font-medium hover:underline"
                       >
                         View All {activeDropdown === "services" ? "Services" : "Products"} →
                       </Link>
@@ -210,17 +194,14 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-3">
             {session?.user ? (
               <>
-                <NotificationProvider userType="user">
-                  <NotificationBell />
-                </NotificationProvider>
                 <Link href="/dashboard">
-                  <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 font-semibold">
+                  <Button variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-50 font-medium">
                     <User className="mr-2 h-4 w-4" />
                     Dashboard
                   </Button>
                 </Link>
                 <Link href="/order">
-                  <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold shadow-lg shadow-indigo-500/25 border-2 border-white/20">
+                  <Button className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold shadow-md">
                     Start Project
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -229,12 +210,12 @@ export function Navbar() {
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 font-semibold">
+                  <Button variant="ghost" className="text-slate-700 hover:text-purple-600 hover:bg-purple-50 font-medium">
                     Login
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold shadow-lg shadow-indigo-500/25 border-2 border-white/20">
+                  <Button className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold shadow-md">
                     Get Started
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -244,7 +225,7 @@ export function Navbar() {
           </div>
 
           <button
-            className="lg:hidden p-2 text-white"
+            className="lg:hidden p-2 text-slate-700"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -252,14 +233,13 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-slate-900 border-t border-slate-700"
+            className="lg:hidden bg-white border-t border-slate-200"
           >
             <div className="container mx-auto px-4 py-4 space-y-2">
               {mainNavLinks.map((link) => (
@@ -267,28 +247,28 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block py-3 px-4 text-white hover:bg-slate-800 rounded-lg font-medium"
+                  className="block py-3 px-4 text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg font-medium"
                 >
                   {link.label}
                 </Link>
               ))}
-              <div className="pt-4 space-y-2 border-t border-slate-700">
+              <div className="pt-4 space-y-2 border-t border-slate-200">
                 {session?.user ? (
                   <>
                     <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full">Dashboard</Button>
+                      <Button variant="outline" className="w-full border-purple-300 text-purple-700">Dashboard</Button>
                     </Link>
                     <Link href="/order" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-500">Start Project</Button>
+                      <Button className="w-full bg-gradient-to-r from-purple-600 to-violet-600">Start Project</Button>
                     </Link>
                   </>
                 ) : (
                   <>
                     <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full">Login</Button>
+                      <Button variant="outline" className="w-full border-purple-300 text-purple-700">Login</Button>
                     </Link>
                     <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-500">Get Started</Button>
+                      <Button className="w-full bg-gradient-to-r from-purple-600 to-violet-600">Get Started</Button>
                     </Link>
                   </>
                 )}
