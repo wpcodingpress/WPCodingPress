@@ -40,10 +40,10 @@ const products = [
 function NotificationBell() {
   const { unreadCount } = useNotifications()
   return (
-    <Button variant="ghost" size="icon" className="relative">
+    <Button variant="ghost" size="icon" className="relative text-white hover:bg-white/10">
       <Bell className="w-5 h-5" />
       {unreadCount > 0 && (
-        <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+        <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse">
           {unreadCount > 9 ? "9+" : unreadCount}
         </span>
       )}
@@ -88,10 +88,8 @@ export function Navbar() {
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isScrolled
-          ? "bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-lg border-b border-slate-200/50 dark:border-slate-800/50"
-          : "bg-white dark:bg-slate-900"
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-slate-900/95 backdrop-blur-xl border-b border-slate-800",
+        isScrolled ? "shadow-lg" : ""
       )}
     >
       <div className="container mx-auto px-4 lg:px-8">
@@ -106,10 +104,10 @@ export function Navbar() {
                     onMouseEnter={() => handleDropdownEnter(link.label.toLowerCase())}
                     onMouseLeave={handleDropdownLeave}
                     className={cn(
-                      "flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                      "flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-semibold transition-colors",
                       activeDropdown === link.label.toLowerCase()
-                        ? "text-indigo-600 dark:text-indigo-400"
-                        : "text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400"
+                        ? "text-indigo-400"
+                        : "text-white/90 hover:text-white hover:bg-white/10"
                     )}
                   >
                     {link.label}
@@ -124,8 +122,8 @@ export function Navbar() {
                   <Link
                     href={link.href}
                     className={cn(
-                      "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-                      "text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400"
+                      "px-4 py-2 rounded-lg text-sm font-semibold transition-colors",
+                      "text-white/90 hover:text-white hover:bg-white/10"
                     )}
                   >
                     {link.label}
@@ -144,7 +142,7 @@ export function Navbar() {
                   transition={{ duration: 0.2 }}
                   onMouseEnter={() => handleDropdownEnter(activeDropdown)}
                   onMouseLeave={handleDropdownLeave}
-                  className="absolute top-full left-0 w-full bg-white dark:bg-slate-800 shadow-2xl border-t border-slate-200 dark:border-slate-700"
+                  className="absolute top-full left-0 w-full bg-slate-900/98 backdrop-blur-xl shadow-2xl border-t border-slate-700"
                 >
                   <div className="container mx-auto px-4 py-8">
                     {activeDropdown === "services" && (
@@ -216,13 +214,13 @@ export function Navbar() {
                   <NotificationBell />
                 </NotificationProvider>
                 <Link href="/dashboard">
-                  <Button variant="ghost" className="text-slate-700 dark:text-slate-300">
+                  <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 font-semibold">
                     <User className="mr-2 h-4 w-4" />
                     Dashboard
                   </Button>
                 </Link>
                 <Link href="/order">
-                  <Button className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600">
+                  <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold shadow-lg shadow-indigo-500/25 border-2 border-white/20">
                     Start Project
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -231,12 +229,12 @@ export function Navbar() {
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" className="text-slate-700 dark:text-slate-300">
+                  <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 font-semibold">
                     Login
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600">
+                  <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold shadow-lg shadow-indigo-500/25 border-2 border-white/20">
                     Get Started
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -246,7 +244,7 @@ export function Navbar() {
           </div>
 
           <button
-            className="lg:hidden p-2 text-slate-700 dark:text-slate-300"
+            className="lg:hidden p-2 text-white"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -261,7 +259,7 @@ export function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800"
+            className="lg:hidden bg-slate-900 border-t border-slate-700"
           >
             <div className="container mx-auto px-4 py-4 space-y-2">
               {mainNavLinks.map((link) => (
@@ -269,12 +267,12 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block py-3 px-4 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg font-medium"
+                  className="block py-3 px-4 text-white hover:bg-slate-800 rounded-lg font-medium"
                 >
                   {link.label}
                 </Link>
               ))}
-              <div className="pt-4 space-y-2 border-t border-slate-200 dark:border-slate-800">
+              <div className="pt-4 space-y-2 border-t border-slate-700">
                 {session?.user ? (
                   <>
                     <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>

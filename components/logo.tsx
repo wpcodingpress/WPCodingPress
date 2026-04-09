@@ -64,8 +64,8 @@ export function AnimatedLogo({ className = "", size = "md", showText = true }: L
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <span className="text-slate-800">WPCoding</span>
-            <span className="bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 bg-clip-text text-transparent">
+            <span className="text-white">WPCoding</span>
+            <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent font-extrabold">
               Press
             </span>
           </motion.span>
@@ -136,8 +136,8 @@ export function LogoWithText({ className = "" }: { className?: string }) {
     <Link href="/" className={`flex items-center gap-2 ${className}`}>
       <LogoIcon size={36} />
       <span className="text-xl font-bold">
-        <span className="text-slate-800">WPCoding</span>
-        <span className="bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 bg-clip-text text-transparent">
+        <span className="text-white">WPCoding</span>
+        <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-pink-400 bg-clip-text text-transparent font-extrabold">
           Press
         </span>
       </span>

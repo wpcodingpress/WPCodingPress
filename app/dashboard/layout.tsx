@@ -1,25 +1,39 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
-import Link from "next/link";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react"
+import { useRouter, usePathname } from "next/navigation"
+import { signOut } from "next-auth/react"
+import Link from "next/link"
+import { motion, AnimatePresence } from "framer-motion"
 import { 
   LayoutDashboard, 
-  ShoppingBag, 
-  Download,
+  ShoppingCart, 
+  DownloadCloud,
   Settings, 
   LogOut,
   Loader2,
   User,
   CreditCard,
-  ChevronRight,
-  Globe
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+  Globe,
+  Menu,
+  X,
+  Bell,
+  Zap,
+  ChevronRight
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { FloatingButtons } from "@/components/floating-buttons"
 
-interface User {
+const sidebarLinks = [
+  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { title: "My Orders", href: "/dashboard/orders", icon: ShoppingCart },
+  { title: "Downloads", href: "/dashboard/downloads", icon: DownloadCloud },
+  { title: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
+  { title: "My Sites", href: "/dashboard/sites", icon: Globe },
+  { title: "Settings", href: "/dashboard/settings", icon: Settings },
+]
+
+interface UserType {
   id: string;
   name: string;
   email: string;
@@ -28,154 +42,186 @@ interface User {
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter()
+  const pathname = usePathname()
+  const [user, setUser] = useState<UserType | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
-    checkAuth();
-  }, []);
+    checkAuth()
+  }, [])
 
   const checkAuth = async () => {
     try {
-      const response = await fetch("/api/auth/session");
-      const session = await response.json();
+      const response = await fetch("/api/auth/session")
+      const session = await response.json()
       
       if (!session?.user || session.user.role !== "client") {
-        router.push("/login");
-        return;
+        router.push("/login")
+        return
       }
       
-      setUser(session.user);
+      setUser(session.user)
     } catch (error) {
-      router.push("/login");
+      router.push("/login")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleLogout = async () => {
-    await signOut({ redirect: false });
-    window.location.href = "/";
-  };
+    await signOut({ redirect: false })
+    window.location.href = "/"
+  }
+
+  const getPageTitle = () => {
+    const path = pathname.replace("/dashboard", "") || "/"
+    if (path === "/") return "Dashboard"
+    return path.replace("/", "").replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())
+  }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
       </div>
-    );
+    )
   }
 
-  const navItems = [
-    { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
-    { href: "/dashboard/sites", icon: Globe, label: "My Sites" },
-    { href: "/dashboard/orders", icon: ShoppingBag, label: "My Orders" },
-    { href: "/dashboard/downloads", icon: Download, label: "Downloads" },
-    { href: "/dashboard/subscription", icon: CreditCard, label: "Subscription" },
-    { href: "/services", icon: LayoutDashboard, label: "Services", external: true },
-    { href: "/dashboard/settings", icon: Settings, label: "Settings" },
-  ];
-
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Top Navigation Bar */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3">
-              <Link href="/" className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">WP</span>
-                </div>
-                <span className="text-lg font-bold text-slate-900">WPCodingPress</span>
-              </Link>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                  <User className="h-4 w-4 text-primary" />
-                </div>
-                <div className="hidden sm:block">
-                  <p className="text-sm font-medium text-slate-900">{user?.name}</p>
-                  <p className="text-xs text-slate-500">{user?.email}</p>
+    <div className="min-h-screen bg-slate-900">
+      <FloatingButtons />
+      
+      {/* Mobile Sidebar */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-50 lg:hidden"
+              onClick={() => setSidebarOpen(false)}
+            />
+            <motion.aside
+              initial={{ x: -300 }} animate={{ x: 0 }} exit={{ x: -300 }}
+              className="fixed left-0 top-0 h-full w-72 bg-slate-800 z-50 lg:hidden border-r border-slate-700"
+            >
+              <div className="p-6 border-b border-slate-700">
+                <div className="flex items-center justify-between">
+                  <Link href="/" className="flex items-center gap-2" onClick={() => setSidebarOpen(false)}>
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                      <Zap className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-lg font-bold text-white">WPCodingPress</span>
+                  </Link>
+                  <button onClick={() => setSidebarOpen(false)} className="p-2 hover:bg-slate-700 rounded-lg">
+                    <X className="w-5 h-5 text-slate-400" />
+                  </button>
                 </div>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={handleLogout}
-                className="text-slate-600 hover:text-red-600"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Logout</span>
+              <nav className="p-4 space-y-1">
+                {sidebarLinks.map((link) => (
+                  <Link key={link.href} href={link.href} onClick={() => setSidebarOpen(false)}>
+                    <div className={`
+                      flex items-center gap-3 px-4 py-3 rounded-xl transition-all
+                      ${pathname === link.href 
+                        ? "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30" 
+                        : "text-slate-400 hover:text-white hover:bg-slate-700"
+                      }
+                    `}>
+                      <link.icon className="w-5 h-5" />
+                      <span className="font-medium">{link.title}</span>
+                    </div>
+                  </Link>
+                ))}
+              </nav>
+              <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700">
+                <button 
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 transition-all w-full"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span className="font-medium">Logout</span>
+                </button>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:block fixed left-0 top-0 h-full w-72 bg-slate-800 border-r border-slate-700 z-40">
+        <div className="p-6 border-b border-slate-700">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold text-white">WPCodingPress</span>
+          </Link>
+        </div>
+        <nav className="p-4 space-y-1">
+          {sidebarLinks.map((link) => (
+            <Link key={link.href} href={link.href}>
+              <div className={`
+                flex items-center gap-3 px-4 py-3 rounded-xl transition-all
+                ${pathname === link.href 
+                  ? "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30" 
+                  : "text-slate-400 hover:text-white hover:bg-slate-700"
+                }
+              `}>
+                <link.icon className="w-5 h-5" />
+                <span className="font-medium">{link.title}</span>
+              </div>
+            </Link>
+          ))}
+        </nav>
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700">
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 transition-all w-full"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="font-medium">Logout</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <div className="lg:ml-72">
+        <header className="sticky top-0 z-30 bg-slate-900/80 backdrop-blur-xl border-b border-slate-800">
+          <div className="flex items-center justify-between px-6 py-4">
+            <div className="flex items-center gap-4">
+              <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 hover:bg-slate-800 rounded-lg">
+                <Menu className="w-5 h-5 text-slate-400" />
+              </button>
+              <div>
+                <h1 className="text-xl font-bold text-white">{getPageTitle()}</h1>
+                <p className="text-sm text-slate-400">Welcome back, {user?.name}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" className="relative text-slate-400 hover:text-white">
+                <Bell className="w-5 h-5" />
               </Button>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                <User className="w-5 h-5 text-white" />
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar */}
-          <aside className="w-full lg:w-64 flex-shrink-0">
-            <nav className="bg-white rounded-xl border border-slate-200 p-2">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href;
-                const isExternal = (item as any).external;
-                
-                if (isExternal) {
-                  return (
-                    <a
-                      key={item.href}
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all"
-                    >
-                      <item.icon className="h-5 w-5" />
-                      {item.label}
-                    </a>
-                  );
-                }
-                
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                      isActive
-                        ? "bg-primary text-white"
-                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                    }`}
-                  >
-                    <item.icon className="h-5 w-5" />
-                    {item.label}
-                    {isActive && (
-                      <ChevronRight className="h-4 w-4 ml-auto" />
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
-          </aside>
-
-          {/* Main Content */}
-          <main className="flex-1">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              {children}
-            </motion.div>
-          </main>
-        </div>
+        <main className="p-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {children}
+          </motion.div>
+        </main>
       </div>
     </div>
-  );
+  )
 }

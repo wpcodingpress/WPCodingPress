@@ -10,7 +10,8 @@ import {
   ShoppingCart, Search, Layers, Cloud, Play, Menu, X,
   Bot, TrendingUp, Users, Globe, Sparkles, Layout, Server,
   Lock, Gauge, Headphones, ArrowRightLeft, Eye, ExternalLink,
-  ChevronDown, Rocket, Target, Award, Clock, Code2, Database, Globe2, ArrowUpRight
+  ChevronDown, Rocket, Target, Award, Clock, Code2, Database, Globe2, ArrowUpRight,
+  Terminal, GitBranch, Package, BarChart3, Cpu, Zap as ZapIcon, RefreshCcw, ShieldCheck, SearchCheck, Globe as GlobeIcon, FileCode, Database as DatabaseIcon, Server as ServerIcon, Boxes, Accessibility
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -60,6 +61,31 @@ const testimonials = [
   { name: "Sarah Johnson", role: "CEO, TechStart", content: "WPCodingPress transformed our WP to Next.js. Load times went from 3s to 300ms!" },
   { name: "Michael Chen", role: "Founder, EcomHub", content: "Our WooCommerce redesign increased sales by 40%. Incredible results!" },
   { name: "Emma Williams", role: "Marketing Director", content: "SEO improvements helped us rank #1 within 3 months." },
+]
+
+const techStack = [
+  { name: "Next.js", desc: "React framework with SSG/SSR", icon: "⚛️" },
+  { name: "TypeScript", desc: "Type-safe JavaScript", icon: "📘" },
+  { name: "Tailwind CSS", desc: "Utility-first styling", icon: "🎨" },
+  { name: "Prisma", desc: "Next-gen ORM", icon: "🔷" },
+  { name: "Vercel", desc: "Edge deployment", icon: "▲" },
+  { name: "Sanity CMS", desc: "Headless content", icon: "📦" },
+]
+
+const integrations = [
+  { name: "Vercel", logo: "▲", desc: "Instant deployments with global CDN" },
+  { name: "Sanity", logo: "☁️", desc: "Flexible headless CMS" },
+  { name: "Stripe", logo: "💳", desc: "Payment processing" },
+  { name: "Cloudinary", logo: "🖼️", desc: "Image optimization" },
+  { name: "Algolia", logo: "🔍", desc: "Lightning search" },
+  { name: "Resend", logo: "📧", desc: "Email delivery" },
+]
+
+const faqs = [
+  { q: "How long does a WordPress to Next.js migration take?", a: "Most projects are completed within 24-72 hours depending on site complexity. Our automated tools handle most of the heavy lifting." },
+  { q: "Will my SEO rankings be affected?", a: "No! We preserve all URLs, meta tags, and sitemaps during migration. Many clients actually see improved rankings due to faster load times." },
+  { q: "Can I still use WordPress to manage content?", a: "Yes! We connect your WordPress admin to Next.js using WPGraphQL, so you can continue managing content while enjoying Next.js performance." },
+  { q: "What happens to my existing plugins?", a: "We migrate all essential functionality to modern, faster alternatives. You won't need most WP plugins anymore." },
 ]
 
 export default function HomePage() {
@@ -561,6 +587,346 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Tech Stack Section */}
+      <section className="py-32 px-6 bg-slate-900/50">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 px-4 py-1.5 text-sm font-medium mb-6">
+                Modern Stack
+              </Badge>
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+                Built with <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Industry-Leading</span> Tech
+              </h2>
+              <p className="text-slate-400 text-lg mb-8">
+                We use the most modern and performant technologies to build websites that scale. 
+                Every project benefits from our carefully selected tech stack.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                {techStack.map((tech, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="flex items-center gap-3 p-4 bg-slate-800/50 border border-slate-700/50 rounded-xl"
+                  >
+                    <span className="text-2xl">{tech.icon}</span>
+                    <div>
+                      <div className="font-semibold text-white">{tech.name}</div>
+                      <div className="text-xs text-slate-400">{tech.desc}</div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="relative"
+            >
+              <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-3xl blur-2xl opacity-20" />
+              <div className="relative bg-slate-800/90 backdrop-blur-xl border border-slate-700 rounded-3xl p-6 font-mono text-sm">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                  </div>
+                  <span className="text-sm text-slate-500">package.json</span>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-slate-500">{"{"}</div>
+                  <div className="text-purple-400 pl-4">"dependencies": {"{"}</div>
+                  <div className="text-green-400 pl-8">"next": <span className="text-orange-300">"^14.0.0"</span>,</div>
+                  <div className="text-green-400 pl-8">"react": <span className="text-orange-300">"^18.2.0"</span>,</div>
+                  <div className="text-green-400 pl-8">"typescript": <span className="text-orange-300">"^5.0.0"</span>,</div>
+                  <div className="text-green-400 pl-8">"tailwindcss": <span className="text-orange-300">"^3.4.0"</span>,</div>
+                  <div className="text-green-400 pl-8">"prisma": <span className="text-orange-300">"^5.0.0"</span>,</div>
+                  <div className="text-purple-400 pl-4">{"}"}</div>
+                  <div className="text-slate-500">{"}"}</div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Performance Comparison Section */}
+      <section className="py-32 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <Badge className="bg-green-500/20 text-green-300 border-green-500/30 px-4 py-1.5 text-sm font-medium mb-6">
+              Performance
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              See the <span className="bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">Difference</span>
+            </h2>
+            <p className="text-slate-400 max-w-2xl mx-auto">
+              Our Next.js sites consistently outperform WordPress in every metric that matters.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="bg-red-500/10 border border-red-500/20 rounded-3xl p-8"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center">
+                  <Code className="w-6 h-6 text-red-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">WordPress</h3>
+                  <p className="text-sm text-red-400">Before Migration</p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                {[
+                  { label: "Load Time", value: "3.2s", color: "bg-red-500" },
+                  { label: "PageSpeed Score", value: "52", color: "bg-red-500" },
+                  { label: "TTFB", value: "850ms", color: "bg-red-500" },
+                  { label: "LCP", value: "4.1s", color: "bg-red-500" },
+                ].map((metric, i) => (
+                  <div key={i}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-slate-400">{metric.label}</span>
+                      <span className="text-red-400 font-mono">{metric.value}</span>
+                    </div>
+                    <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+                      <div className={`h-full ${metric.color} w-1/4 rounded-full`} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="bg-green-500/10 border border-green-500/20 rounded-3xl p-8"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
+                  <Zap className="w-6 h-6 text-green-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">Next.js</h3>
+                  <p className="text-sm text-green-400">After Migration</p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                {[
+                  { label: "Load Time", value: "180ms", color: "bg-green-500" },
+                  { label: "PageSpeed Score", value: "98", color: "bg-green-500" },
+                  { label: "TTFB", value: "45ms", color: "bg-green-500" },
+                  { label: "LCP", value: "0.8s", color: "bg-green-500" },
+                ].map((metric, i) => (
+                  <div key={i}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-slate-400">{metric.label}</span>
+                      <span className="text-green-400 font-mono">{metric.value}</span>
+                    </div>
+                    <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+                      <div className={`h-full ${metric.color} w-full rounded-full`} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Code Quality Section */}
+      <section className="py-32 px-6 bg-slate-900/50">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="relative order-2 lg:order-1"
+            >
+              <div className="absolute -inset-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl blur-2xl opacity-20" />
+              <div className="relative bg-slate-800/90 backdrop-blur-xl border border-slate-700 rounded-3xl p-6 font-mono text-sm">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                  </div>
+                  <span className="text-sm text-slate-500">next.config.ts</span>
+                </div>
+                <div className="space-y-3">
+                  <div className="text-purple-400">const nextConfig = {"{"}</div>
+                  <div className="text-cyan-400 pl-4">images: {"{"}</div>
+                  <div className="text-green-400 pl-8">domains: [<span className="text-orange-300">'wpcodingpress.com'</span>],</div>
+                  <div className="text-cyan-400 pl-4">{"}"}</div>
+                  <div className="text-cyan-400 pl-4">compress: <span className="text-orange-300">true</span>,</div>
+                  <div className="text-cyan-400 pl-4">poweredByHeader: <span className="text-orange-300">false</span>,</div>
+                  <div className="text-purple-400">{"}"}</div>
+                  <div className="text-slate-500 mt-4">// Production optimizations</div>
+                  <div className="text-green-400">output: <span className="text-purple-400">'standalone'</span></div>
+                </div>
+              </div>
+            </motion.div>
+            <div className="order-1 lg:order-2">
+              <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30 px-4 py-1.5 text-sm font-medium mb-6">
+                Code Quality
+              </Badge>
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+                Enterprise-Grade <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Code Quality</span>
+              </h2>
+              <p className="text-slate-400 text-lg mb-8">
+                Every project follows industry best practices with strict TypeScript types, 
+                comprehensive testing, and optimized production builds.
+              </p>
+              <div className="space-y-4">
+                {[
+                  { icon: FileCode, title: "TypeScript", desc: "100% type-safe code with zero any" },
+                  { icon: ShieldCheck, title: "Security First", desc: "CSP headers, sanitization, auth" },
+                  { icon: Accessibility, title: "WCAG 2.1", desc: "Accessible to all users" },
+                  { icon: BarChart3, title: "Analytics Ready", desc: "Built-in performance tracking" },
+                ].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="flex items-start gap-4 p-4 bg-slate-800/50 border border-slate-700/50 rounded-xl"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                      <item.icon className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-white">{item.title}</h4>
+                      <p className="text-sm text-slate-400">{item.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Integrations Section */}
+      <section className="py-32 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 px-4 py-1.5 text-sm font-medium mb-6">
+              Integrations
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Seamlessly Connect with <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">Popular Tools</span>
+            </h2>
+            <p className="text-slate-400 max-w-2xl mx-auto">
+              Our solutions integrate with your favorite platforms out of the box.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {integrations.map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className="p-6 bg-slate-800/50 border border-slate-700/50 rounded-2xl text-center hover:border-amber-500/50 transition-all group"
+              >
+                <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">{item.logo}</div>
+                <h4 className="font-semibold text-white mb-1">{item.name}</h4>
+                <p className="text-xs text-slate-400">{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-32 px-6 bg-slate-900/50">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 px-4 py-1.5 text-sm font-medium mb-6">
+              FAQ
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Frequently Asked <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Questions</span>
+            </h2>
+          </div>
+          
+          <div className="space-y-4">
+            {faqs.map((faq, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-slate-800/50 border border-slate-700/50 rounded-2xl overflow-hidden"
+              >
+                <details className="group">
+                  <summary className="flex items-center justify-between p-6 cursor-pointer list-none">
+                    <h3 className="font-semibold text-white pr-4">{faq.q}</h3>
+                    <div className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center flex-shrink-0 group-open:rotate-180 transition-transform">
+                      <ChevronDown className="w-4 h-4 text-slate-400" />
+                    </div>
+                  </summary>
+                  <div className="px-6 pb-6 pt-0">
+                    <p className="text-slate-400">{faq.a}</p>
+                  </div>
+                </details>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Badges Section */}
+      <section className="py-32 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <Badge className="bg-indigo-500/20 text-indigo-300 border-indigo-500/30 px-4 py-1.5 text-sm font-medium mb-6">
+              Trusted By
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Join <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">500+ Businesses</span> Who Trust Us
+            </h2>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { icon: Award, title: "5+ Years Experience", desc: "Decade of expertise in modern web development" },
+              { icon: Shield, title: "99.9% Uptime", desc: "Reliable infrastructure with global CDN" },
+              { icon: Headphones, title: "24/7 Support", desc: "Expert help whenever you need it" },
+            ].map((badge, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-gradient-to-br from-slate-800 to-slate-800/50 border border-slate-700 rounded-3xl p-8 text-center hover:border-indigo-500/50 transition-all"
+              >
+                <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center">
+                  <badge.icon className="w-8 h-8 text-indigo-400" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">{badge.title}</h3>
+                <p className="text-slate-400">{badge.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-32 px-6">
         <div className="max-w-4xl mx-auto text-center">
@@ -585,65 +951,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-slate-950 text-white py-16 border-t border-slate-800">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
-            <div className="lg:col-span-2">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold">
-                  <span className="text-white">WPCoding</span>
-                  <span className="bg-gradient-to-r from-indigo-400 to-pink-400 bg-clip-text text-transparent">Press</span>
-                </span>
-              </div>
-              <p className="text-slate-400 mb-6 max-w-md">
-                Your trusted partner for WordPress to Next.js migrations. Fast, secure, and SEO-optimized websites.
-              </p>
-              <div className="flex gap-4">
-                {["twitter", "github", "linkedin"].map((social) => (
-                  <a key={social} href="#" className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center hover:bg-indigo-500 transition-colors">
-                    <span className="text-sm capitalize">{social[0]}</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Services</h3>
-              <ul className="space-y-2 text-slate-400">
-                <li><Link href="/services/wordpress-to-nextjs" className="hover:text-indigo-400 transition-colors">WordPress to Next.js</Link></li>
-                <li><Link href="/services/elementor-pro-design" className="hover:text-indigo-400 transition-colors">Elementor Design</Link></li>
-                <li><Link href="/services/woocommerce-stores" className="hover:text-indigo-400 transition-colors">WooCommerce</Link></li>
-                <li><Link href="/services/seo-marketing" className="hover:text-indigo-400 transition-colors">SEO Services</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Company</h3>
-              <ul className="space-y-2 text-slate-400">
-                <li><Link href="/about" className="hover:text-indigo-400 transition-colors">About Us</Link></li>
-                <li><Link href="/portfolio" className="hover:text-indigo-400 transition-colors">Portfolio</Link></li>
-                <li><Link href="/contact" className="hover:text-indigo-400 transition-colors">Contact</Link></li>
-                <li><Link href="/pricing" className="hover:text-indigo-400 transition-colors">Pricing</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4">Legal</h3>
-              <ul className="space-y-2 text-slate-400">
-                <li><Link href="/privacy" className="hover:text-indigo-400 transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-indigo-400 transition-colors">Terms of Service</Link></li>
-                <li><Link href="/cookies" className="hover:text-indigo-400 transition-colors">Cookie Policy</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
-            <span>© {new Date().getFullYear()} WPCodingPress. All rights reserved.</span>
-            <span className="mt-4 md:mt-0">Made with ❤️ for the web</span>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }
