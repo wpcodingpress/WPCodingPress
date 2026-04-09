@@ -797,7 +797,7 @@ export default function HomePage() {
               Pricing
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-              Simple, <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Transparent</span> Pricing
+              Choose Your <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Plan</span>
             </h2>
             <p className="text-slate-600 max-w-2xl mx-auto">Start free, upgrade when you're ready. No hidden fees.</p>
           </div>
@@ -806,8 +806,8 @@ export default function HomePage() {
             {plans.map((plan, i) => (
               <motion.div
                 key={i}
-                className={`relative bg-white border rounded-3xl p-8 ${
-                  plan.popular ? 'border-purple-400 shadow-xl shadow-purple-100 ring-2 ring-purple-300' : 'border-slate-200'
+                className={`relative bg-white border-2 rounded-2xl p-8 ${
+                  plan.popular ? 'border-purple-500 shadow-xl' : 'border-slate-200 hover:border-slate-300'
                 }`}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -815,27 +815,51 @@ export default function HomePage() {
                 transition={{ delay: i * 0.1 }}
               >
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-gradient-to-r from-purple-600 to-violet-600 text-white px-4 py-1 shadow-lg">Most Popular</Badge>
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className="bg-purple-600 text-white text-xs font-medium px-3 py-1 rounded-full">Most Popular</span>
                   </div>
                 )}
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{plan.name}</h3>
-                <p className="text-sm text-slate-500 mb-4">{(plan as any).description}</p>
-                <div className="mb-6">
-                  <span className="text-5xl font-bold text-slate-900">{plan.price}</span>
-                  <span className="text-slate-500">{plan.period}</span>
+                
+                <div className="text-center mb-6">
+                  <div className={`inline-flex p-3 rounded-full mb-4 ${
+                    plan.planId === 'pro' ? 'bg-purple-100' :
+                    plan.planId === 'enterprise' ? 'bg-amber-100' :
+                    'bg-slate-100'
+                  }`}>
+                    {plan.planId === 'pro' ? <ZapIcon className="h-6 w-6 text-purple-600" /> :
+                     plan.planId === 'enterprise' ? <StarIcon className="h-6 w-6 text-amber-600" /> :
+                     <Rocket className="h-6 w-6 text-slate-600" />}
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900">{plan.name}</h3>
+                  <p className="text-sm text-slate-500 mt-1">{(plan as any).description}</p>
                 </div>
+
+                <div className="text-center mb-6">
+                  <span className="text-4xl font-bold text-slate-900">{plan.price}</span>
+                  <span className="text-slate-500">/{plan.period}</span>
+                </div>
+
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature, j) => (
-                    <li key={j} className="flex items-center gap-3 text-slate-700">
-                      <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    <li key={j} className="flex items-center gap-3 text-sm text-slate-600">
+                      <div className={`p-1 rounded-full ${
+                        plan.planId === 'pro' ? 'bg-purple-100' :
+                        plan.planId === 'enterprise' ? 'bg-amber-100' :
+                        'bg-slate-100'
+                      }`}>
+                        <CheckCircle2 className={`h-3 w-3 ${
+                          plan.planId === 'pro' ? 'text-purple-600' :
+                          plan.planId === 'enterprise' ? 'text-amber-600' :
+                          'text-slate-600'
+                        }`} />
+                      </div>
                       {feature}
                     </li>
                   ))}
                 </ul>
                 <Link href={plan.href} className="block">
-                  <Button className={`w-full ${plan.popular ? 'bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 shadow-lg' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}>
-                    {plan.cta}
+                  <Button className={`w-full ${plan.popular ? 'bg-purple-600 hover:bg-purple-700' : 'border-2 border-slate-200 hover:border-slate-300 text-slate-700'}`}>
+                    {plan.price === '$0' ? 'Get Started' : 'Subscribe Now'}
                   </Button>
                 </Link>
               </motion.div>
