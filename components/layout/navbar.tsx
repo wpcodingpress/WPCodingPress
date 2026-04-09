@@ -145,7 +145,7 @@ export function Navbar() {
                   transition={{ duration: 0.2 }}
                   onMouseEnter={() => setActiveDropdown(activeDropdown)}
                   onMouseLeave={() => setActiveDropdown(null)}
-                  className="absolute top-full left-0 w-full bg-white/98 backdrop-blur-xl shadow-2xl border-t-2 border-purple-400"
+                  className="absolute top-full left-0 w-full bg-white shadow-2xl border-t-2 border-purple-400"
                   style={{ zIndex: 100 }}
                 >
                   <div className="container mx-auto px-4 py-8">

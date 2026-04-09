@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Head from "next/head"
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState } from "react"
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
@@ -12,7 +12,7 @@ import {
   Bot, TrendingUp, Users, Globe, Sparkles, Layout, Server,
   Lock, Gauge, Headphones, ArrowRightLeft, Eye, ExternalLink,
   ChevronDown, Rocket, Target, Award, Clock, Code2, Database, Globe2, ArrowUpRight,
-  Terminal, GitBranch, Package, BarChart3, Cpu, RefreshCcw, ShieldCheck, SearchCheck, Globe as GlobeIcon, FileCode, Database as DatabaseIcon, Server as ServerIcon, Boxes, Accessibility, Download, Zap as ZapIcon, Clock3, MessageCircle, Star as StarIcon, CheckCircle2, Settings, MousePointer2, Activity, Disc, Dna, Cpu as CpuIcon, Gem, Box, Grid3X3, Sparkle, Move3d, Layers3, Wand2, Heart, ThumbsUp
+  Terminal, GitBranch, Package, BarChart3, Cpu, RefreshCcw, ShieldCheck, SearchCheck, Globe as GlobeIcon, FileCode, Database as DatabaseIcon, Server as ServerIcon, Boxes, Accessibility, Download, Zap as ZapIcon, Clock3, MessageCircle, Star as StarIcon, CheckCircle2, Settings, Move3d, Wand2, Heart, ThumbsUp
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -101,34 +101,12 @@ export default function HomePage() {
   const heroRef = useRef<HTMLDivElement>(null)
   const [selectedPortfolio, setSelectedPortfolio] = useState<typeof portfolioItems[0] | null>(null)
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isGameStarted, setIsGameStarted] = useState(false)
   const [gameScore, setGameScore] = useState(0)
   const [terminalLines, setTerminalLines] = useState<string[]>([])
-  const [hoveredSection, setHoveredSection] = useState<string | null>(null)
 
   const { scrollY } = useScroll()
   const heroOpacity = useTransform(scrollY, [0, 300], [1, 0])
-  const heroScale = useTransform(scrollY, [0, 300], [1, 0.95])
-  const parallaxY = useTransform(scrollY, [0, 500], [0, -100])
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect()
-      setMousePosition({
-        x: ((e.clientX - rect.left) / rect.width) * 2 - 1,
-        y: ((e.clientY - rect.top) / rect.height) * 2 - 1
-      })
-    }
-  }, [])
-
-  useEffect(() => {
-    const container = containerRef.current
-    if (container) {
-      container.addEventListener('mousemove', handleMouseMove)
-      return () => container.removeEventListener('mousemove', handleMouseMove)
-    }
-  }, [handleMouseMove])
 
   const startGame = () => {
     setIsGameStarted(true)
@@ -153,12 +131,12 @@ export default function HomePage() {
 
       gsap.fromTo(".float-element",
         { y: 0 },
-        { y: -20, duration: 2, repeat: -1, yoyo: true, ease: "power1.inOut", stagger: 0.2 }
+        { y: -25, duration: 3, repeat: -1, yoyo: true, ease: "power1.inOut", stagger: 0.3 }
       )
 
       gsap.to(".float-element", {
-        x: (i) => Math.sin(i) * 30,
-        duration: 3,
+        x: (i) => Math.sin(i * 1.5) * 40,
+        duration: 4,
         repeat: -1,
         yoyo: true,
         ease: "power1.inOut"
@@ -219,28 +197,8 @@ export default function HomePage() {
   }, [])
 
   return (
-    <div ref={containerRef} className="relative min-h-screen bg-white cursor-none">
-      <style jsx global>{`
-        .cursor-dot {
-          width: 20px;
-          height: 20px;
-          background: radial-gradient(circle, rgba(139, 92, 246, 0.8) 0%, transparent 70%);
-          border-radius: 50%;
-          position: fixed;
-          pointer-events: none;
-          z-index: 9999;
-          transform: translate(-50%, -50%);
-          transition: transform 0.1s ease-out;
-        }
-        .cursor-dot.active {
-          transform: translate(-50%, -50%) scale(2);
-        }
-      `}</style>
+    <div ref={containerRef} className="relative min-h-screen bg-white">
       <FloatingButtons />
-      <div className="cursor-dot" style={{
-        left: typeof window !== 'undefined' ? window.innerWidth / 2 + mousePosition.x * 100 : '50%',
-        top: typeof window !== 'undefined' ? window.innerHeight / 2 + mousePosition.y * 100 : '50%'
-      }} />
 
       {/* SEO Metadata */}
       <Head>
@@ -257,76 +215,139 @@ export default function HomePage() {
       <section 
         ref={heroRef} 
         className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden bg-gradient-to-br from-purple-50 via-white to-violet-50"
-        onMouseEnter={() => setHoveredSection('hero')}
-        onMouseLeave={() => setHoveredSection(null)}
       >
-        {/* Enhanced Interactive Background */}
+        {/* Enhanced Animated Background */}
         <motion.div 
           className="absolute inset-0 overflow-hidden"
           style={{ opacity: heroOpacity }}
         >
           <motion.div 
-            className="hero-glow absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-gradient-to-r from-purple-300/40 to-violet-300/40 rounded-full blur-[120px]"
-            style={{ 
-              x: mousePosition.x * 50,
-              y: mousePosition.y * 50 
+            className="hero-glow absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-gradient-to-r from-purple-400/50 to-violet-400/50 rounded-full blur-[120px]"
+            animate={{
+              scale: [1, 1.1, 1],
+              x: [0, 20, 0],
+              y: [0, 10, 0],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut"
             }}
           />
           <motion.div 
-            className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-gradient-to-r from-indigo-300/30 to-purple-300/30 rounded-full blur-[100px]"
-            style={{ 
-              x: mousePosition.x * -30,
-              y: mousePosition.y * -30 
+            className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-gradient-to-r from-indigo-400/40 to-purple-400/40 rounded-full blur-[100px]"
+            animate={{
+              scale: [1, 1.15, 1],
+              x: [0, -25, 0],
+              y: [0, -15, 0],
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 0.5
             }}
           />
         </motion.div>
 
-        {/* Floating Background Elements with Mouse Tracking */}
+        {/* Enhanced Floating Background Elements */}
         <motion.div 
-          className="absolute top-32 right-10 w-20 h-20 bg-purple-200/50 rounded-3xl float-element"
-          style={{ 
-            x: mousePosition.x * 20,
-            y: mousePosition.y * 20,
-            opacity: hoveredSection === 'hero' ? 0.8 : 0.6 
+          className="absolute top-32 right-10 w-24 h-24 bg-purple-300/60 rounded-3xl float-element"
+          animate={{
+            y: [-25, 25],
+            rotate: [0, 5, 0],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut"
           }}
         />
         <motion.div 
-          className="absolute top-48 left-20 w-16 h-16 bg-violet-200/50 rounded-2xl float-element"
-          style={{ 
-            x: mousePosition.x * -15,
-            y: mousePosition.y * 15,
-            opacity: hoveredSection === 'hero' ? 0.8 : 0.6 
+          className="absolute top-48 left-20 w-20 h-20 bg-violet-300/60 rounded-2xl float-element"
+          animate={{
+            y: [-25, 25],
+            rotate: [0, -5, 0],
+          }}
+          transition={{
+            duration: 4.5,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.3
           }}
         />
         <motion.div 
-          className="absolute bottom-40 right-1/4 w-12 h-12 bg-pink-200/50 rounded-full float-element"
-          style={{ 
-            x: mousePosition.x * 25,
-            y: mousePosition.y * -25,
-            opacity: hoveredSection === 'hero' ? 0.8 : 0.6 
+          className="absolute bottom-40 right-1/4 w-16 h-16 bg-pink-300/60 rounded-full float-element"
+          animate={{
+            y: [-25, 25],
+            x: [0, 15],
+          }}
+          transition={{
+            duration: 3.5,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.6
           }}
         />
         <motion.div 
-          className="absolute top-1/3 left-10 w-14 h-14 bg-indigo-200/50 rounded-xl float-element"
-          style={{ 
-            x: mousePosition.x * 18,
-            y: mousePosition.y * 18,
-            opacity: hoveredSection === 'hero' ? 0.8 : 0.6 
+          className="absolute top-1/3 left-10 w-18 h-18 bg-indigo-300/60 rounded-xl float-element"
+          animate={{
+            y: [-25, 25],
+            x: [0, -10],
+          }}
+          transition={{
+            duration: 4.2,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.2
           }}
         />
         <motion.div 
-          className="absolute bottom-1/3 right-20 w-10 h-10 bg-purple-300/50 rounded-lg float-element"
-          style={{ 
-            x: mousePosition.x * -22,
-            y: mousePosition.y * 22,
-            opacity: hoveredSection === 'hero' ? 0.8 : 0.6 
+          className="absolute bottom-1/3 right-20 w-14 h-14 bg-purple-400/60 rounded-lg float-element"
+          animate={{
+            y: [-25, 25],
+            rotate: [0, 8, 0],
+          }}
+          transition={{
+            duration: 3.8,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.5
+          }}
+        />
+        <motion.div 
+          className="absolute top-1/2 left-1/3 w-10 h-10 bg-violet-400/50 rounded-full float-element"
+          animate={{
+            y: [-30, 30],
+            x: [0, 20],
+          }}
+          transition={{
+            duration: 5,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.8
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-1/4 left-10 w-8 h-8 bg-indigo-400/50 rounded-full float-element"
+          animate={{
+            y: [-20, 20],
+            x: [0, -15],
+          }}
+          transition={{
+            duration: 3.2,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1
           }}
         />
         
-        {/* Interactive Grid Pattern */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #8b5cf6 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        {/* Animated Grid Pattern */}
+        <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle, #8b5cf6 1.5px, transparent 1.5px)', backgroundSize: '30px 30px' }} />
         
         {/* Blur Circles */}
+        <div className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-purple-300/40 rounded-full blur-[100px]" />
+        <div className="absolute bottom-20 left-1/4 w-[500px] h-[500px] bg-violet-300/40 rounded-full blur-[120px]" />
         <div className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-purple-200/30 rounded-full blur-[100px]" />
         <div className="absolute bottom-20 left-1/4 w-[500px] h-[500px] bg-violet-200/30 rounded-full blur-[120px]" />
 
