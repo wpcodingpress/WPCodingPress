@@ -258,74 +258,6 @@ export default function DashboardLayout({
           </Link>
         </div>
         
-        {/* Notifications Button */}
-        <div className="p-4 border-b border-gray-100" ref={sidebarNotifRef}>
-          <button
-            onClick={() => setNotificationsOpen(!notificationsOpen)}
-            className="w-full flex items-center justify-between px-4 py-3 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors relative"
-          >
-            <div className="flex items-center gap-3">
-              <Bell className="w-5 h-5 text-purple-600" />
-              <span className="text-gray-700 font-medium">Notifications</span>
-            </div>
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
-                {unreadCount > 9 ? "9+" : unreadCount}
-              </span>
-            )}
-          </button>
-
-          {/* Notifications Dropdown */}
-          <AnimatePresence>
-            {notificationsOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute left-4 right-4 mt-2 w-[calc(100%-2rem)] bg-white border border-gray-200 rounded-xl shadow-2xl max-h-80 overflow-y-auto z-50"
-              >
-                <div className="sticky top-0 bg-white p-3 border-b border-gray-100 flex items-center justify-between">
-                  <span className="text-gray-700 font-medium text-sm">Recent Activity</span>
-                  {unreadCount > 0 && (
-                    <button onClick={markAllRead} className="text-xs text-purple-600 hover:text-purple-700 flex items-center gap-1">
-                      <Check className="w-3 h-3" />
-                      Mark all read
-                    </button>
-                  )}
-                </div>
-                {notifications.length === 0 ? (
-                  <div className="p-6 text-center text-gray-500 text-sm">
-                    No new notifications
-                  </div>
-                ) : (
-                  <div className="divide-y divide-gray-100">
-                    {notifications.slice(0, 10).map((notif) => (
-                      <div
-                        key={notif.id}
-                        className={`p-3 hover:bg-gray-50 transition-colors ${!notif.isRead ? "bg-purple-50/50" : ""}`}
-                      >
-                        <div className="flex gap-3">
-                          <div className={`p-1.5 rounded-lg ${getNotificationColor(notif.type)}`}>
-                            {getNotificationIcon(notif.type)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm text-gray-900 font-medium truncate">{notif.title}</p>
-                            <p className="text-xs text-gray-500 truncate">{notif.message}</p>
-                            <p className="text-xs text-gray-400 mt-1">{formatTime(notif.createdAt)}</p>
-                          </div>
-                          {!notif.isRead && (
-                            <div className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0 mt-2" />
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-        
         <nav className="p-4 space-y-1">
           {sidebarLinks.map((link) => (
             <Link key={link.href} href={link.href}>
@@ -433,9 +365,9 @@ export default function DashboardLayout({
                   )}
                 </AnimatePresence>
               </div>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center">
+              <Link href="/dashboard/settings" className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center hover:shadow-lg transition-shadow">
                 <User className="w-5 h-5 text-white" />
-              </div>
+              </Link>
             </div>
           </div>
         </header>

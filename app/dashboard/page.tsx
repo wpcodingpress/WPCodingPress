@@ -69,6 +69,32 @@ export default function DashboardOverview() {
 
   return (
     <div className="space-y-8">
+      {/* Upgrade Banner - Show if not Pro/Enterprise */}
+      {currentPlan !== 'pro' && currentPlan !== 'enterprise' && (
+        <Link href="/dashboard/subscription">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 rounded-2xl p-6 text-white cursor-pointer hover:shadow-xl transition-shadow"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-white/20">
+                  <Zap className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="font-bold text-lg">Upgrade to Pro - $19/month</p>
+                  <p className="text-white/80 text-sm">Unlock 5 WordPress sites, custom domain, analytics & more</p>
+                </div>
+              </div>
+              <Button className="bg-white text-pink-600 hover:bg-pink-50 font-semibold">
+                Upgrade Now
+              </Button>
+            </div>
+          </motion.div>
+        </Link>
+      )}
+
       {/* Welcome Banner */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -132,8 +158,39 @@ export default function DashboardOverview() {
         ))}
       </div>
 
-      {/* Notifications & Quick Actions */}
+      {/* Quick Actions & Notifications */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Quick Actions */}
+        <div className="lg:col-span-1">
+          <Card className="bg-white border-gray-200">
+            <CardHeader className="border-b border-gray-100 pb-4">
+              <CardTitle className="text-lg font-semibold text-gray-900">Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {[
+                { title: "New Order", icon: Plus, href: "/order", color: "from-purple-500 to-violet-500" },
+                { title: "Browse Products", icon: Package, href: "/products", color: "from-violet-500 to-pink-500" },
+                { title: "Browse Services", icon: Zap, href: "/services", color: "from-pink-500 to-rose-500" },
+              ].map((action, i) => (
+                <Link key={i} href={action.href}>
+                  <motion.div
+                    whileHover={{ x: 4 }}
+                    className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-purple-50 transition-colors group"
+                  >
+                    <div className={`p-3 rounded-xl bg-gradient-to-br ${action.color} shadow-lg`}>
+                      <action.icon className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">{action.title}</p>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" />
+                  </motion.div>
+                </Link>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Notifications */}
         <div className="lg:col-span-2">
           <Card className="bg-white border-gray-200">
@@ -175,36 +232,7 @@ export default function DashboardOverview() {
             </CardContent>
           </Card>
         </div>
-
-        {/* Quick Actions */}
-        <div className="space-y-6">
-          <Card className="bg-white border-gray-200">
-            <CardHeader className="border-b border-gray-100 pb-4">
-              <CardTitle className="text-lg font-semibold text-gray-900">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {[
-                { title: "New Order", icon: Plus, href: "/order", color: "from-purple-500 to-violet-500" },
-                { title: "Browse Products", icon: Package, href: "/products", color: "from-violet-500 to-pink-500" },
-                { title: "Browse Services", icon: Zap, href: "/services", color: "from-pink-500 to-rose-500" },
-              ].map((action, i) => (
-                <Link key={i} href={action.href}>
-                  <motion.div
-                    whileHover={{ x: 4 }}
-                    className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-purple-50 transition-colors group"
-                  >
-                    <div className={`p-3 rounded-xl bg-gradient-to-br ${action.color} shadow-lg`}>
-                      <action.icon className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">{action.title}</p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" />
-                  </motion.div>
-                </Link>
-              ))}
-            </CardContent>
-          </Card>
+      </div>
 
           {/* Upgrade Card */}
           <Card className="bg-gradient-to-br from-purple-600 to-violet-600 border-0">
