@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { useSession } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, User, Bell, ArrowRight, ChevronDown } from "lucide-react"
+import { Menu, X, User, Bell, ArrowRight, ChevronDown, ShoppingBag, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { AnimatedLogo } from "@/components/logo"
@@ -40,6 +40,7 @@ function NotificationBell() {
   const [hasNotifications, setHasNotifications] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [notifications, setNotifications] = useState<any[]>([])
+  const dropdownRef = useRef<HTMLDivElement>(null)
   
   useEffect(() => {
     const checkNotifications = async () => {
@@ -47,7 +48,7 @@ function NotificationBell() {
         const res = await fetch("/api/notifications?type=user")
         const data = await res.json()
         setNotifications(data)
-        setHasNotifications(data.length > 0)
+        setHasNotifications(data.filter((n: any) => !n.isRead).length > 0)
       } catch (e) {
         setHasNotifications(false)
       }
@@ -55,6 +56,16 @@ function NotificationBell() {
     checkNotifications()
     const interval = setInterval(checkNotifications, 30000)
     return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setNotificationsOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
   const formatTime = (dateString: string) => {
@@ -67,8 +78,10 @@ function NotificationBell() {
     return `${Math.floor(minutes / 60)}h ago`
   }
 
+  const unreadCount = notifications.filter((n: any) => !n.isRead).length
+
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       <Button 
         variant="ghost" 
         size="icon" 
@@ -76,42 +89,71 @@ function NotificationBell() {
         onClick={() => setNotificationsOpen(!notificationsOpen)}
       >
         <Bell className="w-5 h-5" />
-        {hasNotifications && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse">
-            !
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold animate-pulse px-1">
+            {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </Button>
       
       {/* Notifications Dropdown */}
       {notificationsOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-2xl max-h-96 overflow-y-auto z-50">
-          <div className="sticky top-0 bg-white p-3 border-b border-gray-100 flex items-center justify-between">
-            <span className="text-gray-700 font-semibold text-sm">Notifications</span>
+        <motion.div
+          initial={{ opacity: 0, y: -10, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+          className="absolute right-0 mt-2 w-96 bg-white border border-gray-200 rounded-2xl shadow-2xl max-h-[500px] overflow-hidden z-50"
+        >
+          <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-violet-600 p-4 flex items-center justify-between">
+            <span className="text-white font-bold text-lg">Notifications</span>
+            {unreadCount > 0 && (
+              <span className="bg-white/20 text-white text-xs px-2 py-1 rounded-full">
+                {unreadCount} new
+              </span>
+            )}
           </div>
           {notifications.length === 0 ? (
-            <div className="p-6 text-center text-gray-500 text-sm">
-              No new notifications
+            <div className="p-8 text-center text-gray-500">
+              <Bell className="w-12 h-12 mx-auto mb-3 opacity-30" />
+              <p>No notifications yet</p>
+              <p className="text-xs text-gray-400 mt-1">We'll notify you when something happens</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
-              {notifications.slice(0, 8).map((notif: any) => (
-                <div key={notif.id} className="p-3 hover:bg-gray-50 transition-colors">
+            <div className="max-h-96 overflow-y-auto">
+              {notifications.slice(0, 10).map((notif: any) => (
+                <Link 
+                  key={notif.id} 
+                  href={notif.link || '/dashboard'}
+                  onClick={() => setNotificationsOpen(false)}
+                  className={`block p-4 hover:bg-gray-50 transition-colors border-b border-gray-100 ${!notif.isRead ? 'bg-purple-50/50' : ''}`}
+                >
                   <div className="flex gap-3">
-                    <div className="p-1.5 rounded-lg bg-purple-100 text-purple-600">
-                      <Bell className="w-4 h-4" />
+                    <div className={`p-2 rounded-xl ${notif.type === 'order' ? 'bg-blue-100 text-blue-600' : notif.type === 'subscriber' ? 'bg-green-100 text-green-600' : 'bg-purple-100 text-purple-600'}`}>
+                      {notif.type === 'order' ? <ShoppingBag className="w-4 h-4" /> : notif.type === 'subscriber' ? <Package className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-gray-900 font-medium truncate">{notif.title}</p>
-                      <p className="text-xs text-gray-500 truncate">{notif.message}</p>
-                      <p className="text-xs text-gray-400 mt-1">{formatTime(notif.createdAt)}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-semibold text-gray-900 truncate">{notif.title}</p>
+                        {!notif.isRead && <div className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0" />}
+                      </div>
+                      <p className="text-xs text-gray-500 truncate mt-1">{notif.message}</p>
+                      <p className="text-xs text-gray-400 mt-2">{formatTime(notif.createdAt)}</p>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}
-        </div>
+          <div className="p-3 border-t border-gray-100 bg-gray-50">
+            <Link 
+              href="/dashboard" 
+              onClick={() => setNotificationsOpen(false)}
+              className="block text-center text-sm text-purple-600 font-medium hover:text-purple-700"
+            >
+              View All Notifications →
+            </Link>
+          </div>
+        </motion.div>
       )}
     </div>
   )

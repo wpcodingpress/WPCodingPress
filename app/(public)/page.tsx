@@ -102,6 +102,9 @@ export default function HomePage() {
   const [selectedPortfolio, setSelectedPortfolio] = useState<typeof portfolioItems[0] | null>(null)
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
   const [isDemoStarted, setIsDemoStarted] = useState(false)
+  const [isGameStarted, setIsGameStarted] = useState(false)
+  const [gameScore, setGameScore] = useState(0)
+  const [clicks, setClicks] = useState(0)
 
   const { scrollY } = useScroll()
   const heroOpacity = useTransform(scrollY, [0, 300], [1, 0])
@@ -126,6 +129,28 @@ export default function HomePage() {
   const startDemo = () => {
     setIsDemoStarted(true)
     setTimeout(() => setIsDemoStarted(false), 4000)
+  }
+
+  const startGame = () => {
+    setIsGameStarted(true)
+    setGameScore(0)
+    setClicks(0)
+    const gameInterval = setInterval(() => {
+      setGameScore(prev => {
+        if (prev >= 100) {
+          clearInterval(gameInterval)
+          return 100
+        }
+        return prev + 5
+      })
+    }, 100)
+  }
+
+  const playGame = () => {
+    if (gameScore < 100) {
+      setGameScore(prev => Math.min(prev + 10, 100))
+      setClicks(prev => prev + 1)
+    }
   }
 
   useEffect(() => {
@@ -354,11 +379,20 @@ export default function HomePage() {
         {/* Blur Circles */}
         <div className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-purple-300/40 rounded-full blur-[100px]" />
         <div className="absolute bottom-20 left-1/4 w-[500px] h-[500px] bg-violet-300/40 rounded-full blur-[120px]" />
-        {/* Blur Circles - More Visible */}
         <div className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-purple-400/30 rounded-full blur-[80px]" />
         <div className="absolute bottom-20 left-1/4 w-[500px] h-[500px] bg-violet-400/30 rounded-full blur-[100px]" />
         <div className="absolute top-1/2 left-10 w-[200px] h-[200px] bg-indigo-400/25 rounded-full blur-[60px]" />
         <div className="absolute bottom-1/3 right-10 w-[250px] h-[250px] bg-pink-400/25 rounded-full blur-[70px]" />
+
+        {/* Additional Floating Elements */}
+        <motion.div className="absolute top-40 right-1/3 w-12 h-12 bg-blue-400/40 rounded-2xl" animate={{ y: [-15, 15], rotate: [0, 10] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} />
+        <motion.div className="absolute top-1/3 right-20 w-8 h-8 bg-amber-400/40 rounded-full" animate={{ y: [-20, 20], x: [0, 10] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.2 }} />
+        <motion.div className="absolute bottom-1/2 left-20 w-10 h-10 bg-cyan-400/40 rounded-xl" animate={{ y: [-18, 18], rotate: [0, -8] }} transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }} />
+        <motion.div className="absolute top-2/3 left-1/4 w-14 h-14 bg-orange-400/30 rounded-lg" animate={{ y: [-22, 22], x: [0, -12] }} transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 0.6 }} />
+        <motion.div className="absolute bottom-20 right-1/3 w-6 h-6 bg-teal-400/40 rounded-full" animate={{ y: [-12, 12], x: [0, 8] }} transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", delay: 0.8 }} />
+        <motion.div className="absolute top-1/4 left-1/3 w-16 h-16 bg-rose-400/30 rounded-2xl" animate={{ y: [-25, 25], rotate: [0, 12] }} transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1 }} />
+        <motion.div className="absolute top-60 left-1/2 w-7 h-7 bg-emerald-400/40 rounded-full" animate={{ y: [-14, 14] }} transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }} />
+        <motion.div className="absolute bottom-1/4 right-1/2 w-9 h-9 bg-sky-400/40 rounded-xl" animate={{ y: [-16, 16], rotate: [0, -6] }} transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} />
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           {/* Hero Content - Centered */}
@@ -401,14 +435,15 @@ export default function HomePage() {
               className="hero-animate flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 px-4"
             >
               <Link href="/register">
-                <Button size="xl" className="w-full sm:w-auto min-w-[200px] bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold px-8 py-4 shadow-lg shadow-purple-500/25 text-base sm:text-lg">
-                  Start Free Today
-                  <ArrowRight className="ml-2 w-5 h-5" />
+                <Button size="xl" className="w-full sm:w-auto min-w-[220px] bg-gradient-to-r from-purple-600 via-violet-600 to-purple-600 hover:from-purple-700 hover:via-violet-700 hover:to-purple-700 text-white font-bold px-8 py-4 shadow-xl shadow-purple-500/30 text-base sm:text-lg animate-pulse">
+                  <Zap className="mr-2 w-5 h-5" />
+                  Convert Your Site Free
                 </Button>
               </Link>
-              <Link href="/services/wordpress-to-nextjs">
-                <Button size="xl" variant="outline" className="w-full sm:w-auto min-w-[200px] border-2 border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 px-8 py-4 font-semibold text-base sm:text-lg">
-                  Learn More
+              <Link href="/dashboard/sites">
+                <Button size="xl" variant="outline" className="w-full sm:w-auto min-w-[220px] border-2 border-violet-300 text-violet-700 hover:bg-violet-50 hover:border-violet-400 px-8 py-4 font-semibold text-base sm:text-lg">
+                  <Globe className="mr-2 w-5 h-5" />
+                  View Demo Dashboard
                 </Button>
               </Link>
             </motion.div>
@@ -417,80 +452,151 @@ export default function HomePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
-              className="hero-animate flex items-center gap-6 justify-center text-sm text-slate-500 mb-16"
+              className="hero-animate flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-sm text-slate-500 mb-16"
             >
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-green-500" />
-                <span>No credit card required</span>
+                <span>700+ Sites Migrated</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-green-500" />
-                <span>Free forever plan</span>
+                <span>3-Minute Average</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-green-500" />
+                <span>98 SEO Score</span>
               </div>
             </motion.div>
           </div>
 
-          {/* Terminal Visual */}
+          {/* Terminal Visual - User Dashboard Flow */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 40 }}
+            initial={{ opacity: 0, scale: 0.95, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="relative max-w-3xl mx-auto"
+            transition={{ delay: 0.7, duration: 0.6 }}
+            className="relative max-w-4xl mx-auto mb-16"
           >
-            {/* Floating Elements Around Terminal */}
-            <div className="absolute -top-4 -right-4 bg-white border border-purple-100 rounded-2xl p-4 shadow-lg float-element">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <div className="text-lg font-bold text-slate-900">+40%</div>
-                  <div className="text-xs text-slate-500">Performance</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="absolute -bottom-4 -left-4 bg-white border border-purple-100 rounded-2xl p-4 shadow-lg float-element">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-violet-500 rounded-xl flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <div className="text-lg font-bold text-slate-900">180ms</div>
-                  <div className="text-xs text-slate-500">Load Time</div>
-                </div>
-              </div>
-            </div>
-
+            {/* Terminal Window */}
             <div className="relative">
-              <div className="absolute -inset-2 bg-gradient-to-r from-purple-300 to-violet-300 rounded-3xl blur-xl opacity-30" />
-              <div className="relative bg-white border-2 border-purple-300 rounded-3xl p-6 sm:p-8 shadow-xl shadow-purple-200/30">
-                <div className="flex items-center gap-3 mb-4 sm:mb-6">
-                  <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-400" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                    <div className="w-3 h-3 rounded-full bg-green-400" />
+              <div className="absolute -inset-3 bg-gradient-to-r from-purple-200 via-violet-200 to-purple-200 rounded-2xl blur-xl opacity-50" />
+              <div className="relative bg-white border-2 border-purple-200 rounded-2xl shadow-2xl overflow-hidden">
+                {/* Terminal Header */}
+                <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-purple-600 to-violet-600">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-white/80" />
+                    <div className="w-3 h-3 rounded-full bg-white/80" />
+                    <div className="w-3 h-3 rounded-full bg-white/80" />
                   </div>
-                  <span className="text-sm text-slate-500 font-medium">WPCodingPress Converter</span>
+                  <span className="text-white text-sm font-medium">WPCodingPress Dashboard - Add & Convert Site</span>
+                  <div className="w-20" />
                 </div>
-                <div className="font-mono text-xs sm:text-sm space-y-2">
-                  <div className="text-slate-400"># One-click WordPress to Next.js Migration</div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-green-600">$</span>
-                    <span className="text-slate-800">npx wpcodingpress init</span>
-                  </div>
-                  <div className="text-purple-600">→ Connecting to WordPress site...</div>
-                  <div className="text-green-600">✓ WordPress detected: https://yoursite.com</div>
-                  <div className="text-green-600">✓ Fetching posts, pages, media...</div>
-                  <div className="text-green-600">✓ Converting to Next.js components...</div>
-                  <div className="text-green-600">✓ Setting up WPGraphQL API...</div>
-                  <div className="text-green-600">✓ Optimizing images with Next.js Image...</div>
-                  <div className="text-green-600">✓ Configuring SSG/SSR hybrid rendering...</div>
-                  <div className="text-green-600">✓ Deploying to Vercel edge network...</div>
-                  <div className="mt-4 p-3 sm:p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
-                    <div className="text-green-600 font-bold text-sm sm:text-base">🚀 Live in 3 minutes!</div>
-                    <div className="text-green-500 text-xs sm:text-sm">Your site: 180ms load • 98 SEO score • 10x faster</div>
-                  </div>
+
+                {/* Terminal Content - Dashboard Flow Animation */}
+                <div className="p-4 sm:p-6">
+                  {/* Step 1: My Sites */}
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="mb-4"
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                      <span className="text-sm font-semibold text-slate-700">User Dashboard → My Sites</span>
+                    </div>
+                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center gap-3">
+                      <Globe className="w-8 h-8 text-violet-500" />
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-slate-800">mywordpress.com</span>
+                          <span className="text-xs text-slate-500">WordPress</span>
+                        </div>
+                        <div className="w-full bg-slate-200 rounded-full h-2 mt-2">
+                          <div className="bg-green-500 h-2 rounded-full w-[100%]" />
+                        </div>
+                      </div>
+                      <Button size="sm" className="bg-purple-600 text-white text-xs">Connected</Button>
+                    </div>
+                  </motion.div>
+
+                  {/* Step 2: Add Site Details */}
+                  <motion.div 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 1 }}
+                    className="mb-4"
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                      <span className="text-sm font-semibold text-slate-700">Configure & Select Options</span>
+                    </div>
+                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                      <div className="flex items-center gap-1 text-green-600"><CheckCircle2 className="w-3 h-3" /> WPGraphQL</div>
+                      <div className="flex items-center gap-1 text-green-600"><CheckCircle2 className="w-3 h-3" /> Next.js 14</div>
+                      <div className="flex items-center gap-1 text-green-600"><CheckCircle2 className="w-3 h-3" /> TypeScript</div>
+                      <div className="flex items-center gap-1 text-green-600"><CheckCircle2 className="w-3 h-3" /> Vercel Deploy</div>
+                    </div>
+                  </motion.div>
+
+                  {/* Step 3: Convert Button */}
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 1.5 }}
+                    className="mb-4"
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                      <span className="text-sm font-semibold text-slate-700">Click Convert</span>
+                    </div>
+                    <div className="flex justify-center">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="bg-gradient-to-r from-purple-600 to-violet-600 text-white font-bold px-8 py-3 rounded-xl shadow-lg shadow-purple-500/30 flex items-center gap-2"
+                      >
+                        <Zap className="w-5 h-5" />
+                        CONVERT TO NEXT.JS
+                      </motion.button>
+                    </div>
+                  </motion.div>
+
+                  {/* Step 4: Progress Animation */}
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 2 }}
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
+                      <span className="text-sm font-semibold text-slate-700">Converting...</span>
+                    </div>
+                    <div className="bg-slate-900 rounded-xl p-4 font-mono text-xs space-y-1">
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.2 }} className="text-green-400">→ Fetching WordPress data...</motion.div>
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5 }} className="text-green-400">→ Converting 250 posts, 50 pages...</motion.div>
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.8 }} className="text-green-400">→ Building Next.js components...</motion.div>
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 3.1 }} className="text-green-400">→ Optimizing 450+ images...</motion.div>
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 3.4 }} className="text-green-400">→ Deploying to edge network...</motion.div>
+                    </div>
+                  </motion.div>
+
+                  {/* Step 5: Success */}
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 3.8 }}
+                    className="mt-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                        <CheckCircle2 className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-green-600">🎉 Site Converted Successfully!</div>
+                        <div className="text-xs text-green-500">Live at: mywordpress-next.vercel.app • 180ms • 98 SEO</div>
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
               </div>
             </div>
@@ -534,94 +640,112 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Interactive Demo Terminal */}
+          {/* Advanced Interactive Game - WordPress vs Next.js Battle */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative max-w-3xl mx-auto"
+            className="max-w-4xl mx-auto"
           >
-            {/* Terminal */}
-            <div className="relative">
-              <div className="absolute -inset-2 bg-gradient-to-r from-purple-300 to-violet-300 rounded-xl blur-lg opacity-30" />
-              <div className="relative bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
-                {/* Terminal Header */}
-                <div className="flex items-center justify-between px-4 py-3 bg-slate-800 border-b border-slate-700">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                    <div className="w-3 h-3 rounded-full bg-green-500" />
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-xs text-slate-400">WPCodingPress Converter</span>
-                    <button 
-                      onClick={startDemo}
-                      className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded-md transition-colors"
-                    >
-                      {isDemoStarted ? 'Replay' : 'Start Demo'}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Terminal Content */}
-                <div className="p-4 font-mono text-sm min-h-[280px]">
-                  {demoSteps.map((step, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: isDemoStarted ? 1 : 0, x: isDemoStarted ? 0 : -20 }}
-                      transition={{ delay: isDemoStarted ? index * 0.8 : 0 }}
-                      className="mb-2"
-                    >
-                      {step.type === 'input' && (
-                        <div className="flex items-center gap-2">
-                          <span className="text-green-400">$</span>
-                          <span className="text-slate-200">{step.text}</span>
-                        </div>
-                      )}
-                      {step.type === 'processing' && (
-                        <div className="text-purple-400">{step.text}</div>
-                      )}
-                      {step.type === 'success' && (
-                        <div className="text-green-400">✓ {step.text}</div>
-                      )}
-                      {step.type === 'result' && (
-                        <div className="mt-3 p-3 bg-green-900/30 border border-green-700/50 rounded-lg">
-                          <div className="text-green-400 font-bold">{step.text}</div>
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
-                  
-                  {!isDemoStarted && (
-                    <div className="text-center py-8 text-slate-500">
-                      <Terminal className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                      <p>Click "Start Demo" to see the conversion in action</p>
-                    </div>
-                  )}
-                </div>
+            <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-700 overflow-hidden">
+              {/* Game Background */}
+              <div className="absolute inset-0 opacity-20">
+                <div className="absolute top-0 left-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 50%)' }} />
+                <div className="absolute bottom-0 right-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(circle at 80% 50%, rgba(34, 197, 94, 0.3) 0%, transparent 50%)' }} />
               </div>
-            </div>
+              
+              <div className="relative z-10">
+                {/* Game Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <span className="text-4xl">⚔️</span>
+                    <div>
+                      <h3 className="text-white font-bold text-xl">WP vs Next.js Speed Challenge</h3>
+                      <p className="text-slate-400 text-sm">Click the buttons to race the conversion!</p>
+                    </div>
+                  </div>
+                  <Button 
+                    onClick={startGame}
+                    className="bg-gradient-to-r from-purple-600 to-violet-600 text-white font-bold"
+                  >
+                    {isGameStarted ? 'Restart Race' : 'Start Race'}
+                  </Button>
+                </div>
 
-            {/* Demo Stats */}
-            <div className="grid grid-cols-3 gap-4 mt-8">
-              {[
-                { value: '180ms', label: 'Load Time', icon: Zap },
-                { value: '98', label: 'SEO Score', icon: Search },
-                { value: '10x', label: 'Faster', icon: TrendingUp }
-              ].map((stat, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: isDemoStarted ? 1 : 0.5, y: 0 }}
-                  transition={{ delay: isDemoStarted ? 2.5 + i * 0.1 : 0 }}
-                  className="text-center p-4 bg-white border border-purple-100 rounded-xl"
-                >
-                  <stat.icon className="w-5 h-5 text-purple-600 mx-auto mb-2" />
-                  <div className="text-xl font-bold text-slate-900">{stat.value}</div>
-                  <div className="text-xs text-slate-500">{stat.label}</div>
-                </motion.div>
-              ))}
+                {/* Game Arena */}
+                <div className="grid grid-cols-2 gap-6">
+                  {/* WordPress Lane */}
+                  <div className="bg-slate-800/50 rounded-2xl p-4 border border-slate-700">
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="text-3xl">📝</span>
+                      <span className="text-white font-bold">WordPress</span>
+                    </div>
+                    <div className="relative h-32 bg-slate-700 rounded-xl overflow-hidden">
+                      <motion.div 
+                        className="absolute bottom-0 left-0 h-full bg-gradient-to-r from-yellow-500 to-orange-500"
+                        animate={{ width: isGameStarted ? `${gameScore}%` : '10%' }}
+                        transition={{ duration: 0.5 }}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-white font-bold text-2xl">{gameScore}%</span>
+                      </div>
+                    </div>
+                    <p className="text-slate-400 text-xs mt-2">Loading: 3.2s | PageSpeed: 52</p>
+                  </div>
+
+                  {/* Next.js Lane */}
+                  <div className="bg-slate-800/50 rounded-2xl p-4 border border-slate-700">
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="text-3xl">🚀</span>
+                      <span className="text-white font-bold">Next.js</span>
+                    </div>
+                    <div className="relative h-32 bg-slate-700 rounded-xl overflow-hidden">
+                      <motion.div 
+                        className="absolute bottom-0 left-0 h-full bg-gradient-to-r from-green-500 to-emerald-500"
+                        animate={{ width: isGameStarted ? `${gameScore + 20}%` : '30%' }}
+                        transition={{ duration: 0.3 }}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-white font-bold text-2xl">{Math.min(gameScore + 20, 100)}%</span>
+                      </div>
+                    </div>
+                    <p className="text-slate-400 text-xs mt-2">Loading: 180ms | PageSpeed: 98</p>
+                  </div>
+                </div>
+
+                {/* Game Controls */}
+                <div className="mt-6">
+                  <p className="text-slate-400 text-sm mb-3 text-center">Click rapidly to power the Next.js conversion!</p>
+                  <div className="flex justify-center gap-3">
+                    {isGameStarted ? (
+                      <motion.button
+                        whileTap={{ scale: 0.9 }}
+                        onClick={playGame}
+                        className="px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-green-500/30 text-lg"
+                      >
+                        ⚡ Click to Boost ({clicks} clicks)
+                      </motion.button>
+                    ) : (
+                      <div className="text-center">
+                        <Terminal className="w-10 h-10 text-purple-500 mx-auto mb-2" />
+                        <p className="text-slate-400">Click "Start Race" to begin!</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Winner Announcement */}
+                {gameScore >= 100 && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="mt-6 p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/50 rounded-xl text-center"
+                  >
+                    <p className="text-2xl">🏆 Next.js wins with <span className="text-green-400 font-bold">10x faster</span> performance!</p>
+                    <p className="text-slate-400 text-sm mt-2">That's the power of WordPress to Next.js migration</p>
+                  </motion.div>
+                )}
+              </div>
             </div>
           </motion.div>
         </div>
