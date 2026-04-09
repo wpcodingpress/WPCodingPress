@@ -36,10 +36,10 @@ const services = [
 ]
 
 const stats = [
-  { value: "500+", label: "Happy Clients", icon: Users },
-  { value: "5+", label: "Years Experience", icon: Clock },
-  { value: "4.9", label: "Client Rating", icon: Star },
-  { value: "1000+", label: "Projects Done", icon: TrendingUp },
+  { value: "700+", label: "Happy Clients", icon: Users },
+  { value: "9+", label: "Years Experience", icon: Clock },
+  { value: "5", label: "Star Rating", icon: Star },
+  { value: "1200+", label: "Projects Done", icon: TrendingUp },
 ]
 
 const features = [
@@ -128,147 +128,169 @@ export default function HomePage() {
     <div ref={containerRef} className="relative min-h-screen bg-white">
       <FloatingButtons />
 
-      {/* Hero Section - Light Purple Gradient */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-gradient-to-br from-purple-50 via-white to-violet-50">
-        <div className="absolute top-20 right-20 w-[400px] h-[400px] bg-purple-200/30 rounded-full blur-[100px]" />
-        <div className="absolute bottom-20 left-20 w-[500px] h-[500px] bg-violet-200/30 rounded-full blur-[120px]" />
+      {/* Hero Section - Light Purple Gradient with Centered Text */}
+      <section ref={heroRef} className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden bg-gradient-to-br from-purple-50 via-white to-violet-50">
+        {/* Floating Background Elements */}
+        <div className="absolute top-32 right-10 w-20 h-20 bg-purple-200/50 rounded-3xl float-element animate-float-slow opacity-60" />
+        <div className="absolute top-48 left-20 w-16 h-16 bg-violet-200/50 rounded-2xl float-element animate-float-slow opacity-60" />
+        <div className="absolute bottom-40 right-1/4 w-12 h-12 bg-pink-200/50 rounded-full float-element animate-float-slow opacity-60" />
+        <div className="absolute top-1/3 left-10 w-14 h-14 bg-indigo-200/50 rounded-xl float-element animate-float-slow opacity-60" />
+        <div className="absolute bottom-1/3 right-20 w-10 h-10 bg-purple-300/50 rounded-lg float-element animate-float-slow opacity-60" />
+        
+        {/* Blur Circles */}
+        <div className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-purple-200/30 rounded-full blur-[100px]" />
+        <div className="absolute bottom-20 left-1/4 w-[500px] h-[500px] bg-violet-200/30 rounded-full blur-[120px]" />
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div className="text-center lg:text-left">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="hero-animate inline-flex items-center gap-2 px-4 py-2 bg-purple-100 border border-purple-200 rounded-full text-purple-700 text-sm font-medium mb-8"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  AI-Powered Web Development
-                </motion.div>
+          {/* Hero Content - Centered */}
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="hero-animate inline-flex items-center gap-2 px-5 py-2.5 bg-purple-100 border border-purple-200 rounded-full text-purple-700 text-sm font-semibold mb-8 shadow-sm"
+            >
+              <Sparkles className="w-4 h-4" />
+              AI-Powered Web Development Agency
+            </motion.div>
 
-                <motion.h1
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="hero-animate text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight"
-                >
-                  Transform Your
-                  <span className="block bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 bg-clip-text text-transparent">
-                    WordPress to Next.js
-                  </span>
-                </motion.h1>
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="hero-animate text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight"
+            >
+              Transform Your
+              <span className="block bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 bg-clip-text text-transparent">
+                WordPress to Next.js
+              </span>
+            </motion.h1>
 
-                <motion.p
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="hero-animate text-lg text-slate-600 mb-8 max-w-xl mx-auto lg:mx-0"
-                >
-                  Lightning-fast, SEO-optimized websites that load in milliseconds. 
-                  Convert automatically with our AI-powered platform.
-                </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="hero-animate text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto"
+            >
+              Lightning-fast, SEO-optimized websites that load in milliseconds. 
+              Convert automatically with our AI-powered platform.
+            </motion.p>
 
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 }}
-                  className="hero-animate flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-10"
-                >
-                  <Link href="/register">
-                    <Button size="lg" className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold px-8 py-5 shadow-lg shadow-purple-500/25">
-                      Start Free Today
-                      <ArrowRight className="ml-2 w-4 h-4" />
-                    </Button>
-                  </Link>
-                  <Link href="/services/wordpress-to-nextjs">
-                    <Button size="lg" variant="outline" className="border-2 border-purple-200 text-purple-700 hover:bg-purple-50 px-8 py-5 font-medium">
-                      Learn More
-                    </Button>
-                  </Link>
-                </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="hero-animate flex flex-col sm:flex-row gap-4 justify-center mb-12"
+            >
+              <Link href="/register">
+                <Button size="lg" className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold px-10 py-6 shadow-lg shadow-purple-500/25 text-lg">
+                  Start Free Today
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </Link>
+              <Link href="/services/wordpress-to-nextjs">
+                <Button size="lg" variant="outline" className="border-2 border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 px-10 py-6 font-semibold text-lg">
+                  Learn More
+                </Button>
+              </Link>
+            </motion.div>
 
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8 }}
-                  className="hero-animate flex items-center gap-6 justify-center lg:justify-start text-sm text-slate-500"
-                >
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    <span>No credit card required</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    <span>Free forever plan</span>
-                  </div>
-                </motion.div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+              className="hero-animate flex items-center gap-6 justify-center text-sm text-slate-500 mb-16"
+            >
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-green-500" />
+                <span>No credit card required</span>
               </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-green-500" />
+                <span>Free forever plan</span>
+              </div>
+            </motion.div>
+          </div>
 
-              {/* Hero Terminal Visual */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5 }}
-                className="relative hidden lg:block"
-              >
-                <div className="relative">
-                  <div className="absolute -inset-4 bg-gradient-to-r from-purple-400 to-violet-400 rounded-3xl blur-xl opacity-20" />
-                  <div className="relative bg-white border border-purple-100 rounded-3xl p-8 shadow-2xl shadow-purple-100/50">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="flex gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-red-400" />
-                        <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                        <div className="w-3 h-3 rounded-full bg-green-400" />
-                      </div>
-                      <span className="text-sm text-slate-400 font-medium">Terminal</span>
-                    </div>
-                    <div className="font-mono text-sm space-y-2">
-                      <div className="text-slate-400"># Convert your WordPress site</div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-green-600">$</span>
-                        <span className="text-slate-800">npx wpcodingpress convert</span>
-                      </div>
-                      <div className="text-purple-600 animate-pulse">Converting your site...</div>
-                      <div className="text-green-600">✓ Analyzing content...</div>
-                      <div className="text-green-600">✓ Building pages...</div>
-                      <div className="text-green-600">✓ Optimizing images...</div>
-                      <div className="text-green-600">✓ Deploying to CDN...</div>
-                      <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
-                        <div className="text-green-600 font-bold">🚀 Live in 3 minutes!</div>
-                        <div className="text-green-500 text-sm">Load time: 180ms</div>
-                      </div>
-                    </div>
+          {/* Terminal Visual */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 40 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="relative max-w-3xl mx-auto"
+          >
+            {/* Floating Elements Around Terminal */}
+            <div className="absolute -top-4 -right-4 bg-white border border-purple-100 rounded-2xl p-4 shadow-lg float-element">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-lg font-bold text-slate-900">+40%</div>
+                  <div className="text-xs text-slate-500">Performance</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="absolute -bottom-4 -left-4 bg-white border border-purple-100 rounded-2xl p-4 shadow-lg float-element">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-violet-500 rounded-xl flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-lg font-bold text-slate-900">180ms</div>
+                  <div className="text-xs text-slate-500">Load Time</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="absolute -inset-4 bg-gradient-to-r from-purple-400 to-violet-400 rounded-3xl blur-xl opacity-20" />
+              <div className="relative bg-white border-2 border-purple-200 rounded-3xl p-8 shadow-2xl shadow-purple-200/50">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-400" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                    <div className="w-3 h-3 rounded-full bg-green-400" />
                   </div>
-
-                  <div className="absolute -bottom-6 -left-6 bg-white border border-purple-100 rounded-2xl p-5 shadow-xl">
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
-                        <TrendingUp className="w-7 h-7 text-white" />
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-slate-900">+40%</div>
-                        <div className="text-sm text-slate-500">Performance</div>
-                      </div>
-                    </div>
+                  <span className="text-sm text-slate-500 font-medium">Terminal</span>
+                </div>
+                <div className="font-mono text-sm space-y-2">
+                  <div className="text-slate-400"># Convert your WordPress site to Next.js</div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-600">$</span>
+                    <span className="text-slate-800">npx wpcodingpress convert</span>
+                  </div>
+                  <div className="text-purple-600 animate-pulse">Converting your site...</div>
+                  <div className="text-green-600">✓ Analyzing WordPress content...</div>
+                  <div className="text-green-600">✓ Building Next.js pages...</div>
+                  <div className="text-green-600">✓ Optimizing images & assets...</div>
+                  <div className="text-green-600">✓ Deploying to global CDN...</div>
+                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
+                    <div className="text-green-600 font-bold">🚀 Live in 3 minutes!</div>
+                    <div className="text-green-500 text-sm">Load time: 180ms • SEO Score: 98</div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </div>
+          </motion.div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-20">
-              {stats.map((stat, i) => (
-                <motion.div
-                  key={i}
-                  className="stat-item text-center p-6 bg-white border border-purple-100 rounded-2xl shadow-sm"
-                >
-                  <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent mb-2">
-                    {stat.value}
-                  </div>
-                  <div className="text-slate-600 font-medium">{stat.label}</div>
-                </motion.div>
-              ))}
-            </div>
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 max-w-4xl mx-auto">
+            {stats.map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 + i * 0.1 }}
+                className="text-center p-6 bg-white border border-purple-100 rounded-2xl shadow-sm hover:shadow-lg hover:border-purple-200 transition-all"
+              >
+                <stat.icon className="w-8 h-8 mx-auto mb-3 text-purple-600" />
+                <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-slate-600 font-medium text-sm">{stat.label}</div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>

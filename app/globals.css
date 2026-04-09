@@ -13,27 +13,27 @@
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 239 84% 67%;
-    --primary-dark: 239 84% 57%;
-    --primary-light: 239 84% 77%;
+    --primary: 270 70% 55%;
+    --primary-dark: 270 70% 45%;
+    --primary-light: 270 70% 65%;
     --primary-foreground: 0 0% 100%;
     --secondary: 270 70% 60%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 270 30% 96%;
+    --muted-foreground: 270 10% 35%;
     --accent: 330 81% 60%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 239 84% 67%;
+    --border: 270 20% 91%;
+    --input: 270 20% 91%;
+    --ring: 270 70% 55%;
     --success: 142 76% 46%;
     --warning: 38 92% 50%;
     --radius: 1rem;
     
-    --gradient-from: 239 84% 67%;
-    --gradient-via: 270 70% 60%;
+    --gradient-from: 270 70% 55%;
+    --gradient-via: 270 70% 65%;
     --gradient-to: 330 81% 60%;
   }
 
@@ -103,13 +103,13 @@
   }
 
   .btn-primary {
-    @apply relative overflow-hidden bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300;
+    @apply relative overflow-hidden bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-300;
     background-size: 200% 100%;
     animation: gradient-shift 4s ease infinite;
   }
   
   .btn-primary:hover {
-    @apply shadow-xl shadow-indigo-500/30;
+    @apply shadow-xl shadow-purple-500/30;
     background-position: 100% 0;
     transform: translateY(-2px);
   }
@@ -129,17 +129,17 @@
   }
 
   .btn-secondary {
-    @apply relative overflow-hidden bg-white text-indigo-700 font-semibold px-8 py-4 rounded-xl border-2 border-indigo-200 transition-all duration-300;
+    @apply relative overflow-hidden bg-white text-purple-700 font-semibold px-8 py-4 rounded-xl border-2 border-purple-200 transition-all duration-300;
   }
   
   .btn-secondary:hover {
-    @apply border-indigo-400 bg-indigo-50 shadow-lg;
+    @apply border-purple-400 bg-purple-50 shadow-lg text-purple-800;
     transform: translateY(-2px);
   }
   
   .btn-secondary::before {
     content: '';
-    @apply absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-violet-500/10 translate-y-full transition-transform duration-300;
+    @apply absolute inset-0 bg-gradient-to-r from-purple-500/10 to-violet-500/10 translate-y-full transition-transform duration-300;
   }
   
   .btn-secondary:hover::before {
@@ -147,19 +147,19 @@
   }
 
   .btn-ghost {
-    @apply relative text-indigo-700 font-medium px-6 py-3 rounded-xl transition-all duration-300;
+    @apply relative text-purple-700 font-medium px-6 py-3 rounded-xl transition-all duration-300;
   }
   
   .btn-ghost:hover {
-    @apply bg-indigo-100;
+    @apply bg-purple-100 text-purple-800;
   }
 
   .btn-white {
-    @apply relative overflow-hidden bg-white text-indigo-600 font-semibold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg;
+    @apply relative overflow-hidden bg-white text-purple-600 font-semibold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg;
   }
   
   .btn-white:hover {
-    @apply shadow-xl;
+    @apply shadow-xl text-purple-700;
     transform: translateY(-2px);
   }
 
@@ -182,7 +182,7 @@
   }
 
   .glow-indigo {
-    box-shadow: 0 0 60px -12px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 60px -12px rgba(139, 92, 246, 0.5);
   }
   
   .glow-violet {
@@ -228,8 +228,8 @@
 
 @layer utilities {
   ::selection {
-    background-color: rgba(99, 102, 241, 0.2);
-    color: hsl(239 84% 20%);
+    background-color: rgba(139, 92, 246, 0.2);
+    color: hsl(270 70% 20%);
   }
 
   html {
@@ -247,8 +247,8 @@
   }
 
   @keyframes pulse-glow {
-    0%, 100% { opacity: 0.6; box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
-    50% { opacity: 1; box-shadow: 0 0 40px rgba(99, 102, 241, 0.6); }
+    0%, 100% { opacity: 0.6; box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+    50% { opacity: 1; box-shadow: 0 0 40px rgba(139, 92, 246, 0.6); }
   }
 
   @keyframes gradient-bg {
@@ -306,11 +306,11 @@
 
   @keyframes lightning-pulse {
     0%, 100% { 
-      filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.6));
+      filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6));
       transform: scale(1);
     }
     50% { 
-      filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.9));
+      filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.9));
       transform: scale(1.02);
     }
   }

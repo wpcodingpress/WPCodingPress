@@ -36,6 +36,36 @@ const products = [
   { title: "WordPress Themes", description: "Beautiful designs", icon: "🎨", href: "/products/themes" },
 ]
 
+function NotificationBell() {
+  const [hasNotifications, setHasNotifications] = useState(false)
+  
+  useEffect(() => {
+    const checkNotifications = async () => {
+      try {
+        const res = await fetch("/api/notifications?type=user")
+        const data = await res.json()
+        setHasNotifications(data.length > 0)
+      } catch (e) {
+        setHasNotifications(false)
+      }
+    }
+    checkNotifications()
+    const interval = setInterval(checkNotifications, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <Button variant="ghost" size="icon" className="relative text-slate-700 hover:text-purple-600 hover:bg-purple-50">
+      <Bell className="w-5 h-5" />
+      {hasNotifications && (
+        <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse">
+          !
+        </span>
+      )}
+    </Button>
+  )
+}
+
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
@@ -62,18 +92,10 @@ export function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const handleDropdownEnter = (dropdown: string) => {
-    setActiveDropdown(dropdown)
-  }
-
-  const handleDropdownLeave = () => {
-    setActiveDropdown(null)
-  }
-
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-xl border-b border-slate-200",
+        "fixed top-0 left-0 right-0 z-[60] transition-all duration-300 bg-white/95 backdrop-blur-xl border-b border-slate-200",
         isScrolled ? "shadow-lg" : "shadow-sm"
       )}
     >
@@ -86,12 +108,12 @@ export function Navbar() {
               <div key={link.href} className="relative">
                 {link.label === "Services" || link.label === "Products" ? (
                   <button
-                    onMouseEnter={() => handleDropdownEnter(link.label.toLowerCase())}
-                    onMouseLeave={handleDropdownLeave}
+                    onMouseEnter={() => setActiveDropdown(link.label.toLowerCase())}
+                    onMouseLeave={() => setActiveDropdown(null)}
                     className={cn(
                       "flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-semibold transition-colors",
                       activeDropdown === link.label.toLowerCase()
-                        ? "text-purple-600"
+                        ? "text-purple-600 bg-purple-50"
                         : "text-slate-700 hover:text-purple-600 hover:bg-purple-50"
                     )}
                   >
@@ -106,10 +128,7 @@ export function Navbar() {
                 ) : (
                   <Link
                     href={link.href}
-                    className={cn(
-                      "px-4 py-2 rounded-lg text-sm font-semibold transition-colors",
-                      "text-slate-700 hover:text-purple-600 hover:bg-purple-50"
-                    )}
+                    className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-slate-700 hover:text-purple-600 hover:bg-purple-50"
                   >
                     {link.label}
                   </Link>
@@ -124,9 +143,10 @@ export function Navbar() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  onMouseEnter={() => handleDropdownEnter(activeDropdown)}
-                  onMouseLeave={handleDropdownLeave}
-                  className="absolute top-full left-0 w-full bg-white/98 backdrop-blur-xl shadow-2xl border-t border-purple-200"
+                  onMouseEnter={() => setActiveDropdown(activeDropdown)}
+                  onMouseLeave={() => setActiveDropdown(null)}
+                  className="absolute top-full left-0 w-full bg-white/98 backdrop-blur-xl shadow-2xl border-t-2 border-purple-400"
+                  style={{ zIndex: 100 }}
                 >
                   <div className="container mx-auto px-4 py-8">
                     {activeDropdown === "services" && (
@@ -194,8 +214,9 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-3">
             {session?.user ? (
               <>
+                <NotificationBell />
                 <Link href="/dashboard">
-                  <Button variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-50 font-medium">
+                  <Button variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-50 hover:text-purple-800 hover:border-purple-400 font-medium">
                     <User className="mr-2 h-4 w-4" />
                     Dashboard
                   </Button>
@@ -256,19 +277,19 @@ export function Navbar() {
                 {session?.user ? (
                   <>
                     <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full border-purple-300 text-purple-700">Dashboard</Button>
+                      <Button variant="outline" className="w-full border-purple-300 text-purple-700 hover:bg-purple-50">Dashboard</Button>
                     </Link>
                     <Link href="/order" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full bg-gradient-to-r from-purple-600 to-violet-600">Start Project</Button>
+                      <Button className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700">Start Project</Button>
                     </Link>
                   </>
                 ) : (
                   <>
                     <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full border-purple-300 text-purple-700">Login</Button>
+                      <Button variant="outline" className="w-full border-purple-300 text-purple-700 hover:bg-purple-50">Login</Button>
                     </Link>
                     <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full bg-gradient-to-r from-purple-600 to-violet-600">Get Started</Button>
+                      <Button className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700">Get Started</Button>
                     </Link>
                   </>
                 )}
