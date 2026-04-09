@@ -1,8 +1,9 @@
 "use client"
 
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Check, ArrowRight, Zap, Star, Crown, Rocket } from "lucide-react"
+import { Check, ArrowRight, Zap, Star, Crown, Rocket, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 
@@ -129,6 +130,27 @@ const faqs = [
 ]
 
 export default function PricingPage() {
+  const [userPlan, setUserPlan] = useState<string | null>(null)
+  const [isLoadingPlan, setIsLoadingPlan] = useState(true)
+
+  useEffect(() => {
+    fetchUserPlan()
+  }, [])
+
+  const fetchUserPlan = async () => {
+    try {
+      const res = await fetch('/api/subscriptions')
+      const data = await res.json()
+      if (data.subscription?.plan) {
+        setUserPlan(data.subscription.plan)
+      }
+    } catch (e) {
+      console.error('Error fetching plan:', e)
+    } finally {
+      setIsLoadingPlan(false)
+    }
+  }
+
   return (
     <div className="relative">
       <div className="fixed inset-0 grid-pattern pointer-events-none" />
@@ -193,12 +215,22 @@ export default function PricingPage() {
                     </ul>
                   </CardContent>
                   <CardFooter className="pt-6">
-                    <Link href="/register" className="w-full">
-                      <Button className={`w-full ${sub.popular ? 'bg-white text-slate-900 hover:bg-slate-100' : 'bg-white/20 hover:bg-white/30 text-white'}`}>
-                        {sub.cta}
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </Link>
+                    {(() => {
+                      const isCurrentPlan = userPlan === sub.planId || (!userPlan && sub.planId === 'free')
+                      return isCurrentPlan ? (
+                        <div className="w-full py-3 text-center bg-green-500 text-white font-semibold rounded-xl flex items-center justify-center gap-2">
+                          <CheckCircle2 className="w-5 h-5" />
+                          Current Plan
+                        </div>
+                      ) : (
+                        <Link href={sub.planId === 'free' ? '/register' : '/dashboard/subscription'} className="w-full">
+                          <Button className={`w-full ${sub.popular ? 'bg-white text-slate-900 hover:bg-slate-100' : 'bg-white/20 hover:bg-white/30 text-white'}`}>
+                            {sub.cta}
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </Button>
+                        </Link>
+                      )
+                    })()}
                   </CardFooter>
                 </Card>
               </motion.div>

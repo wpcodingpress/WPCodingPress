@@ -20,6 +20,12 @@ import { FloatingButtons } from "@/components/floating-buttons"
 
 gsap.registerPlugin(ScrollTrigger)
 
+const plansData = [
+  { name: "Free", planId: "free", price: "$0", period: "forever", description: "Perfect for getting started with WordPress to Next.js conversion", features: ["1 WordPress site conversion", "Basic Next.js template", "Community support", "Basic SEO setup"], href: "/register", popular: false },
+  { name: "Pro", planId: "pro", price: "$19", period: "month", description: "Convert up to 5 WordPress sites to headless Next.js", features: ["5 WordPress to Headless conversions", "Live deployed sites (Vercel/Render)", "Advanced Next.js templates", "Priority email support", "Custom domain support", "Analytics dashboard", "Auto content sync"], href: "/register?plan=pro", popular: true },
+  { name: "Enterprise", planId: "enterprise", price: "$99", period: "month", description: "Unlimited conversions for agencies and businesses", features: ["Unlimited conversions", "White-label deployment", "24/7 Dedicated support", "Custom domain included", "API access", "Advanced analytics", "Team collaboration", "Custom integrations"], href: "/contact", popular: false },
+]
+
 const portfolioItems = [
   { id: 1, title: "HomePicks Daily", category: "E-Commerce", client: "Beth Moran", liveUrl: "https://homepicksdaily.com", image: "/portfolio/HomePicksDaily- A Woocommerce Based Dropshipping E-Commerce Website Front Page.jpeg" },
   { id: 2, title: "Trip Monarch", category: "Travel", client: "Trip Monarch", liveUrl: "https://tripmonarch.com", image: "/portfolio/tripmonarch.png" },
@@ -108,6 +114,26 @@ export default function HomePage() {
   const [highestClicks, setHighestClicks] = useState(47)
   const [isConverting, setIsConverting] = useState(false)
   const [conversionStep, setConversionStep] = useState(0)
+  const [userPlan, setUserPlan] = useState<string | null>(null)
+  const [isLoadingPlan, setIsLoadingPlan] = useState(true)
+
+  useEffect(() => {
+    fetchUserPlan()
+  }, [])
+
+  const fetchUserPlan = async () => {
+    try {
+      const res = await fetch('/api/subscriptions')
+      const data = await res.json()
+      if (data.subscription?.plan) {
+        setUserPlan(data.subscription.plan)
+      }
+    } catch (e) {
+      console.error('Error fetching plan:', e)
+    } finally {
+      setIsLoadingPlan(false)
+    }
+  }
 
   const { scrollY } = useScroll()
   const heroOpacity = useTransform(scrollY, [0, 300], [1, 0])
@@ -857,11 +883,21 @@ export default function HomePage() {
                     </li>
                   ))}
                 </ul>
-                <Link href={plan.href} className="block">
-                  <Button className={`w-full ${plan.popular ? 'bg-purple-600 hover:bg-purple-700' : 'border-2 border-slate-200 hover:border-slate-300 text-slate-700'}`}>
-                    {plan.price === '$0' ? 'Get Started' : 'Subscribe Now'}
-                  </Button>
-                </Link>
+                {(() => {
+                  const isCurrentPlan = userPlan === plan.planId || (!userPlan && plan.planId === 'free')
+                  return isCurrentPlan ? (
+                    <div className="w-full py-3 text-center bg-green-100 text-green-700 font-semibold rounded-xl flex items-center justify-center gap-2">
+                      <CheckCircle2 className="w-5 h-5" />
+                      Current Plan
+                    </div>
+                  ) : (
+                    <Link href={plan.href} className="block">
+                      <Button className={`w-full ${plan.popular ? 'bg-purple-600 hover:bg-purple-700' : 'border-2 border-slate-200 hover:border-slate-300 text-slate-700'}`}>
+                        {plan.price === '$0' ? 'Get Started' : 'Subscribe Now'}
+                      </Button>
+                    </Link>
+                  )
+                })()}
               </motion.div>
             ))}
           </div>
