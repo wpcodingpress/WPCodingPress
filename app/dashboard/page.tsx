@@ -12,15 +12,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
 const plans = [
-  { name: "Free", price: "$0/mo", features: ["1 Site", "Basic Template", "Community Support"], current: true },
-  { name: "Pro", price: "$19/mo", features: ["5 Sites", "Advanced Templates", "Priority Support", "Custom Domain"], current: false },
-  { name: "Enterprise", price: "$99/mo", features: ["Unlimited Sites", "White-label", "24/7 Support"], current: false },
+  { name: "Free", planId: "free", price: "Free", period: "forever", features: ["1 WordPress site conversion", "Basic Next.js template", "Community support", "Basic SEO setup"] },
+  { name: "Pro", planId: "pro", price: "$19", period: "/month", features: ["5 WordPress to Headless conversions", "Live deployed sites (Vercel/Render)", "Advanced Next.js templates", "Priority email support", "Custom domain support", "Analytics dashboard", "Auto content sync"] },
+  { name: "Enterprise", planId: "enterprise", price: "$99", period: "/month", features: ["Unlimited conversions", "White-label deployment", "24/7 Dedicated support", "Custom domain included", "API access", "Advanced analytics", "Team collaboration", "Custom integrations"] },
 ]
 
 export default function DashboardOverview() {
   const [stats, setStats] = useState({ total: 0, completed: 0, inProgress: 0, totalSpent: 0 })
   const [notifications, setNotifications] = useState<Array<{id: number, title: string, message: string, time: string, unread: boolean}>>([])
   const [user, setUser] = useState({ name: "User", email: "user@example.com" })
+  const [currentPlan, setCurrentPlan] = useState<string | null>(null)
 
   useEffect(() => {
     fetchDashboardData()
@@ -32,6 +33,13 @@ export default function DashboardOverview() {
       const sessionData = await sessionRes.json()
       if (sessionData?.user) {
         setUser({ name: sessionData.user.name || "User", email: sessionData.user.email || "" })
+      }
+
+      // Fetch subscription
+      const subRes = await fetch("/api/subscriptions")
+      const subData = await subRes.json()
+      if (subData.subscription?.plan) {
+        setCurrentPlan(subData.subscription.plan)
       }
 
       const response = await fetch("/api/orders?userId=" + (sessionData?.user?.id || ""))
@@ -235,38 +243,41 @@ export default function DashboardOverview() {
         </CardHeader>
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {plans.map((plan) => (
+            {plans.map((plan) => {
+              const isCurrent = currentPlan === plan.planId || (!currentPlan && plan.planId === 'free')
+              return (
               <div 
                 key={plan.name}
                 className={`p-6 rounded-2xl border-2 ${
-                  plan.current 
+                  isCurrent 
                     ? 'border-purple-500 bg-purple-50' 
                     : 'border-gray-200 bg-gray-50'
                 }`}
               >
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
-                  {plan.current && (
+                  {isCurrent && (
                     <Badge className="bg-purple-600 text-white">Current</Badge>
                   )}
                 </div>
-                <p className="text-2xl font-bold text-gray-900 mb-4">{plan.price}</p>
+                <p className="text-2xl font-bold text-gray-900 mb-1">{plan.price}<span className="text-sm font-normal text-gray-500">{plan.period}</span></p>
                 <ul className="space-y-2 mb-6">
                   {plan.features.map((feature, i) => (
                     <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
                       {feature}
                     </li>
                   ))}
                 </ul>
-                {!plan.current && (
-                  <Link href="/pricing">
+                {!isCurrent && (
+                  <Link href="/dashboard/subscription">
                     <Button variant="outline" className="w-full border-purple-500 text-purple-600 hover:bg-purple-50">
                       Upgrade
                     </Button>
                   </Link>
                 )}
               </div>
+              )})}
             ))}
           </div>
         </CardContent>

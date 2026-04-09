@@ -9,15 +9,15 @@ const TESTING_MODE = process.env.TESTING_MODE === 'true';
 const PLANS = {
   pro: {
     name: 'Pro Plan',
-    price: 49,
+    price: 19,
     tierName: 'Pro',
-    features: 'Convert 1 WordPress site to headless Next.js, Priority support',
+    features: 'Convert up to 5 WordPress sites to headless Next.js, Priority support, Custom domain, Analytics',
   },
   enterprise: {
     name: 'Enterprise Plan',
-    price: 199,
+    price: 99,
     tierName: 'Enterprise',
-    features: 'Unlimited conversions, Dedicated support, White-label',
+    features: 'Unlimited conversions, Dedicated support, White-label, Custom integrations',
   },
 };
 
