@@ -29,12 +29,12 @@ const portfolioImages = [
 ]
 
 const portfolioItems = [
-  { id: 1, title: "HomePicks Daily", category: "E-Commerce", client: "Beth Moran", liveUrl: "https://homepicksdaily.com" },
-  { id: 2, title: "Trip Monarch", category: "Travel", client: "Trip Monarch", liveUrl: "https://tripmonarch.com" },
-  { id: 3, title: "RankUpper", category: "SEO Agency", client: "RankUpper", liveUrl: "https://rankupper.io" },
-  { id: 4, title: "Pro Consultant", category: "Consulting", client: "Pro Consultant UK", liveUrl: "https://proconsultant.co.uk" },
-  { id: 5, title: "Masjid Press", category: "Non-Profit", client: "Masjid Press", liveUrl: "https://masjidpress.com" },
-  { id: 6, title: "EcomGiantz", category: "E-Commerce", client: "EcomGiantz", liveUrl: "https://ecomgiantz.com" },
+  { id: 1, title: "HomePicks Daily", category: "E-Commerce", client: "Beth Moran", liveUrl: "https://homepicksdaily.com", image: "/images/portfolios/HomePicksDaily- A Woocommerce Based Dropshipping E-Commerce Website Front Page.jpeg" },
+  { id: 2, title: "Trip Monarch", category: "Travel", client: "Trip Monarch", liveUrl: "https://tripmonarch.com", image: "/images/portfolios/tripmonarch.png" },
+  { id: 3, title: "RankUpper", category: "SEO Agency", client: "RankUpper", liveUrl: "https://rankupper.io", image: "/images/portfolios/RankUpper.png" },
+  { id: 4, title: "Pro Consultant", category: "Consulting", client: "Pro Consultant UK", liveUrl: "https://proconsultant.co.uk", image: "/images/portfolios/Pro Consultant.png" },
+  { id: 5, title: "Masjid Press", category: "Non-Profit", client: "Masjid Press", liveUrl: "https://masjidpress.com", image: "/images/portfolios/masjidpress.com.png" },
+  { id: 6, title: "EcomGiantz", category: "E-Commerce", client: "EcomGiantz", liveUrl: "https://ecomgiantz.com", image: "/images/portfolios/ecomgianrtz.png" },
 ]
 
 const services = [
@@ -380,8 +380,13 @@ export default function HomePage() {
                 whileHover={{ y: -8, scale: 1.02 }}
                 onClick={() => setSelectedPortfolio(item)}
               >
-                <div className="aspect-video bg-gradient-to-br from-indigo-900/50 to-purple-900/50 flex items-center justify-center">
-                  <Globe className="w-20 h-20 text-indigo-500/30 group-hover:scale-110 transition-transform" />
+                <div className="aspect-video relative overflow-hidden">
+                  <img 
+                    src={item.image} 
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <div className="p-6">
                   <Badge className="bg-indigo-500/20 text-indigo-300 mb-3">{item.category}</Badge>
@@ -416,8 +421,12 @@ export default function HomePage() {
               className="bg-slate-800 border border-slate-700 rounded-3xl max-w-3xl w-full max-h-[85vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="aspect-video bg-gradient-to-br from-indigo-900/50 to-purple-900/50 flex items-center justify-center relative">
-                <Globe className="w-32 h-32 text-indigo-500/30" />
+              <div className="aspect-video relative overflow-hidden">
+                <img 
+                  src={selectedPortfolio.image} 
+                  alt={selectedPortfolio.title}
+                  className="w-full h-full object-cover"
+                />
                 <button
                   className="absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-700/80 flex items-center justify-center hover:bg-slate-600"
                   onClick={() => setSelectedPortfolio(null)}
