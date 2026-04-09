@@ -261,7 +261,6 @@ export default function DashboardOverview() {
           </Link>
         </CardContent>
       </Card>
-      </div>
 
       {/* Plans */}
       <Card className="bg-white border-gray-200">
