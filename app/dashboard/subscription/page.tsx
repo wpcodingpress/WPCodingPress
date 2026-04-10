@@ -242,53 +242,25 @@ export default function SubscriptionPage() {
         </div>
       )}
 
-      {/* Verification Section */}
-      {(success || showVerify) && !verifySuccess && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl border-2 border-primary p-6 max-w-md mx-auto"
-        >
-          <div className="text-center mb-4">
-            <Mail className="h-8 w-8 mx-auto text-primary mb-2" />
-            <h3 className="text-lg font-semibold">Verify Your Subscription</h3>
-            <p className="text-sm text-slate-500">
-              Enter the email you used on Gumroad to activate your subscription.
-            </p>
+      {/* Success/Error Messages */}
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+          <CheckCircle className="h-5 w-5 text-green-600" />
+          <div>
+            <p className="font-medium text-green-800">Payment received!</p>
+            <p className="text-sm text-green-600">Now verify your subscription below.</p>
           </div>
+        </div>
+      )}
 
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="gumroadEmail">Gumroad Email</Label>
-              <Input
-                id="gumroadEmail"
-                type="email"
-                placeholder="your-email@gmail.com"
-                value={gumroadEmail}
-                onChange={(e) => setGumroadEmail(e.target.value)}
-              />
-            </div>
-
-            {verifyError && (
-              <p className="text-sm text-red-600">{verifyError}</p>
-            )}
-
-            <Button
-              onClick={handleVerifySubscription}
-              disabled={isVerifying}
-              className="w-full"
-            >
-              {isVerifying ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Verifying...
-                </>
-              ) : (
-                'Verify & Activate'
-              )}
-            </Button>
+      {cancelled && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center gap-3">
+          <XCircle className="h-5 w-5 text-yellow-600" />
+          <div>
+            <p className="font-medium text-yellow-800">Payment cancelled</p>
+            <p className="text-sm text-yellow-600">You can subscribe anytime from this page.</p>
           </div>
-        </motion.div>
+        </div>
       )}
 
       {verifySuccess && (
@@ -509,6 +481,89 @@ export default function SubscriptionPage() {
           )}
         </>
       )}
+
+      {/* Verification Modal */}
+      <AnimatePresence>
+        {showVerify && !verifySuccess && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowVerify(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-center mb-6">
+                <div className="p-4 rounded-full bg-primary/10 w-fit mx-auto mb-4">
+                  <Mail className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900">Verify Your Subscription</h3>
+                <p className="text-slate-500 mt-2">
+                  Enter the email you used on Gumroad to activate your subscription.
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="gumroadEmail" className="text-slate-700 font-medium">Gumroad Email</Label>
+                  <Input
+                    id="gumroadEmail"
+                    type="email"
+                    placeholder="your-email@gmail.com"
+                    value={gumroadEmail}
+                    onChange={(e) => setGumroadEmail(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+
+                {verifyError && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600">{verifyError}</p>
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => {
+                      setShowVerify(false);
+                      setGumroadEmail("");
+                      setVerifyError("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="flex-1"
+                    onClick={handleVerifySubscription}
+                    disabled={isVerifying}
+                  >
+                    {isVerifying ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Verifying...
+                      </>
+                    ) : (
+                      'Verify & Activate'
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-400 text-center mt-4">
+                Having trouble? Contact support for assistance.
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

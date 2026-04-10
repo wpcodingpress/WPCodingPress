@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 
+const TESTING_MODE = process.env.TESTING_MODE === 'true';
+
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -27,6 +29,43 @@ export async function POST(request: Request) {
     }
 
     const accessToken = process.env.GUMROAD_ACCESS_TOKEN;
+
+    if (TESTING_MODE) {
+      const existingSub = await prisma.subscription.findFirst({
+        where: { userId: user.id },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      const periodEnd = new Date();
+      periodEnd.setMonth(periodEnd.getMonth() + 1);
+
+      if (existingSub) {
+        await prisma.subscription.update({
+          where: { id: existingSub.id },
+          data: {
+            status: 'active',
+            plan: 'pro',
+            currentPeriodEnd: periodEnd,
+          },
+        });
+      } else {
+        await prisma.subscription.create({
+          data: {
+            userId: user.id,
+            status: 'active',
+            plan: 'pro',
+            currentPeriodStart: new Date(),
+            currentPeriodEnd: periodEnd,
+          },
+        });
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: 'Subscription activated! (TESTING_MODE)',
+        plan: 'pro',
+      });
+    }
 
     if (!accessToken) {
       return NextResponse.json({ error: 'Gumroad not configured' }, { status: 500 });
