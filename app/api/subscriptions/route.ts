@@ -136,3 +136,64 @@ export async function GET() {
     );
   }
 }
+
+export async function DELETE() {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: {
+        subscriptions: {
+          where: { status: 'active' },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
+    });
+
+    const activeSubscription = user?.subscriptions?.[0];
+
+    if (!activeSubscription) {
+      return NextResponse.json({ error: 'No active subscription found' }, { status: 400 });
+    }
+
+    if (TESTING_MODE) {
+      await prisma.subscription.update({
+        where: { id: activeSubscription.id },
+        data: {
+          status: 'cancelled',
+          cancelAtPeriodEnd: true,
+        },
+      });
+
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Subscription cancelled (TESTING_MODE)' 
+      });
+    }
+
+    await prisma.subscription.update({
+      where: { id: activeSubscription.id },
+      data: {
+        status: 'cancelled',
+        cancelAtPeriodEnd: true,
+      },
+    });
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Subscription will be cancelled at the end of billing period' 
+    });
+  } catch (error) {
+    console.error('Cancel subscription error:', error);
+    return NextResponse.json(
+      { error: 'Failed to cancel subscription' },
+      { status: 500 }
+    );
+  }
+}

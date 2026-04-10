@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   CreditCard, 
   Check, 
@@ -12,7 +12,11 @@ import {
   Loader2,
   CheckCircle,
   XCircle,
-  Mail
+  Mail,
+  AlertTriangle,
+  ArrowUpCircle,
+  ArrowDownCircle,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,6 +89,9 @@ export default function SubscriptionPage() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState("");
   const [verifySuccess, setVerifySuccess] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [cancelSuccess, setCancelSuccess] = useState(false);
   
   const success = searchParams.get('success');
   const cancelled = searchParams.get('cancelled');
@@ -172,6 +179,35 @@ export default function SubscriptionPage() {
       setVerifyError('Something went wrong. Please try again.');
     } finally {
       setIsVerifying(false);
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    if (!confirm("Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your billing period.")) {
+      return;
+    }
+
+    setIsCancelling(true);
+
+    try {
+      const response = await fetch('/api/subscriptions', {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setCancelSuccess(true);
+        setCurrentPlan('free');
+        setShowCancelModal(false);
+      } else {
+        alert(data.error || 'Failed to cancel subscription. Please try again.');
+      }
+    } catch (error) {
+      console.error('Cancel subscription error:', error);
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -264,6 +300,103 @@ export default function SubscriptionPage() {
           </div>
         </div>
       )}
+
+      {cancelSuccess && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
+          <AlertTriangle className="h-5 w-5 text-amber-600" />
+          <div>
+            <p className="font-medium text-amber-800">Subscription cancelled!</p>
+            <p className="text-sm text-amber-600">You will have access until the end of your billing period.</p>
+          </div>
+        </div>
+      )}
+
+      {(currentPlan === 'pro' || currentPlan === 'enterprise') && !showVerify && !verifySuccess && (
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className={`p-3 rounded-xl ${
+                currentPlan === 'enterprise' ? 'bg-purple-100' : 'bg-pink-100'
+              }`}>
+                {currentPlan === 'enterprise' ? (
+                  <Rocket className="w-6 h-6 text-purple-600" />
+                ) : (
+                  <Crown className="w-6 h-6 text-pink-600" />
+                )}
+              </div>
+              <div>
+                <p className="font-bold text-lg text-slate-900">
+                  Current Plan: {currentPlan === 'enterprise' ? 'Enterprise' : 'Pro'}
+                </p>
+                <p className="text-sm text-slate-500">
+                  {currentPlan === 'enterprise' ? '$99/month - Unlimited conversions' : '$19/month - 5 WordPress sites'}
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              className="border-red-200 text-red-600 hover:bg-red-50"
+              onClick={() => setShowCancelModal(true)}
+            >
+              <X className="w-4 h-4 mr-2" />
+              Cancel Subscription
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Subscription Modal */}
+      <AnimatePresence>
+        {showCancelModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              className="bg-white rounded-2xl p-6 max-w-md w-full"
+            >
+              <div className="text-center mb-6">
+                <div className="p-3 rounded-full bg-red-100 w-fit mx-auto mb-4">
+                  <AlertTriangle className="w-8 h-8 text-red-600" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900">Cancel Subscription?</h3>
+                <p className="text-slate-500 mt-2">
+                  Are you sure you want to cancel your {currentPlan === 'enterprise' ? 'Enterprise' : 'Pro'} subscription? 
+                  You will lose access to premium features at the end of your billing period.
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="flex-1 border-slate-200"
+                  onClick={() => setShowCancelModal(false)}
+                >
+                  Keep Subscription
+                </Button>
+                <Button
+                  className="flex-1 bg-red-600 hover:bg-red-700"
+                  onClick={handleCancelSubscription}
+                  disabled={isCancelling}
+                >
+                  {isCancelling ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Cancelling...
+                    </>
+                  ) : (
+                    'Cancel Subscription'
+                  )}
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {!showVerify && !verifySuccess && (
         <>
