@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 
 export async function GET() {
   try {
+    console.log('[Admin Products API] Fetching all products...')
     const products = await prisma.product.findMany({
       orderBy: { order: 'asc' },
       select: {
@@ -23,9 +24,10 @@ export async function GET() {
         features: true,
       }
     })
+    console.log('[Admin Products API] Found products:', products.length)
     return NextResponse.json(products)
   } catch (error) {
-    console.error('Error fetching products:', error)
+    console.error('[Admin Products API] Error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch products' },
       { status: 500 }
@@ -52,6 +54,8 @@ export async function POST(request: Request) {
       )
     }
 
+    console.log('[Admin Products API] Creating product with:', { name, slug, type, price, isActive })
+    
     const product = await prisma.product.create({
       data: {
         name: String(name),
@@ -70,6 +74,7 @@ export async function POST(request: Request) {
         order: order || 0,
       }
     })
+    console.log('[Admin Products API] Product created:', product.id, product.name, product.slug)
 
     return NextResponse.json(product, { status: 201 })
 

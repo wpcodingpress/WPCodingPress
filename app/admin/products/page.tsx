@@ -128,7 +128,16 @@ export default function AdminProductsPage() {
       }
 
       alert('Product saved successfully!');
+      console.log('Product saved, refreshing list...');
       setShowModal(false);
+      setEditingProduct(null);
+      resetForm();
+      
+      // Force refresh after a short delay
+      setTimeout(() => {
+        console.log('Refreshing products list...');
+        fetchProducts();
+      }, 500);
       setEditingProduct(null);
       resetForm();
       fetchProducts();
