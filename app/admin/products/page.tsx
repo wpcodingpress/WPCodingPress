@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Plus, 
   Loader2, 
@@ -14,11 +14,26 @@ import {
   ExternalLink,
   Upload,
   X,
-  Image as ImageIcon
+  Search,
+  Filter,
+  Grid3X3,
+  List,
+  MoreVertical,
+  Copy,
+  Check,
+  ChevronDown,
+  DollarSign,
+  Download,
+  Tags,
+  Clock,
+  LayoutDashboard,
+  CheckCircle,
+  AlertCircle,
+  Upload
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Product {
   id: string;
@@ -44,6 +59,12 @@ export default function AdminProductsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [activeTab, setActiveTab] = useState<"all" | "active" | "inactive" | "featured">("all");
+  const [productType, setProductType] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -59,6 +80,47 @@ export default function AdminProductsPage() {
     isFeatured: false,
     order: 0
   });
+
+  const productTypes = [
+    { value: "all", label: "All Types" },
+    { value: "plugin", label: "Plugins" },
+    { value: "theme", label: "Themes" },
+    { value: "template", label: "Templates" },
+    { value: "mcp_server", label: "MCP Servers" },
+    { value: "ai_agent", label: "AI Agents" },
+  ];
+
+  const filteredProducts = products.filter((product) => {
+    if (activeTab === "active" && !product.isActive) return false;
+    if (activeTab === "inactive" && product.isActive) return false;
+    if (activeTab === "featured" && !product.isFeatured) return false;
+    if (productType !== "all" && product.type !== productType) return false;
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        product.name.toLowerCase().includes(query) ||
+        product.slug.toLowerCase().includes(query) ||
+        product.shortDesc?.toLowerCase().includes(query)
+      );
+    }
+    return true;
+  });
+
+  const stats = {
+    total: products.length,
+    active: products.filter((p) => p.isActive).length,
+    inactive: products.filter((p) => !p.isActive).length,
+    featured: products.filter((p) => p.isFeatured).length,
+    free: products.filter((p) => p.price === 0).length,
+    paid: products.filter((p) => p.price > 0).length,
+  };
+
+  const copyProductUrl = (slug: string) => {
+    const url = `${window.location.origin}/products/${slug}`;
+    navigator.clipboard.writeText(url);
+    setCopiedId(slug);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -128,22 +190,20 @@ export default function AdminProductsPage() {
         return;
       }
 
-      alert('Product saved successfully!');
-      console.log('Product saved, refreshing list...');
+      // Close modal and refresh
       setShowModal(false);
       setEditingProduct(null);
       resetForm();
       
-      // Force refresh after a short delay
-      setTimeout(() => {
-        console.log('Refreshing products list...');
-        fetchProducts();
-      }, 500);
-      setEditingProduct(null);
-      resetForm();
-      fetchProducts();
+      // Refresh products list
+      setIsLoading(true);
+      await fetchProducts();
+      
+      // Show success message
+      alert(editingProduct ? 'Product updated successfully!' : 'Product created successfully!');
     } catch (error) {
       console.error("Error saving product:", error);
+      alert("Failed to save product. Please try again.");
     }
   };
 
@@ -235,10 +295,10 @@ export default function AdminProductsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Products</h1>
-          <p className="text-slate-500 mt-1">Manage your products (plugins, themes, templates)</p>
+          <p className="text-slate-500 mt-1">Manage your products, plugins, themes, and templates</p>
         </div>
         <Button
           onClick={() => {
@@ -246,11 +306,171 @@ export default function AdminProductsPage() {
             setEditingProduct(null);
             setShowModal(true);
           }}
-          className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white"
+          className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white shadow-lg shadow-violet-500/25"
         >
           <Plus className="mr-2 h-4 w-4" />
           Add Product
         </Button>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+              <Package className="w-5 h-5 text-slate-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
+              <p className="text-xs text-slate-500">Total</p>
+            </div>
+          </div>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+              <Check className="w-5 h-5 text-emerald-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">{stats.active}</p>
+              <p className="text-xs text-slate-500">Active</p>
+            </div>
+          </div>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+              <Star className="w-5 h-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">{stats.featured}</p>
+              <p className="text-xs text-slate-500">Featured</p>
+            </div>
+          </div>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+              <DollarSign className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">{stats.paid}</p>
+              <p className="text-xs text-slate-500">Paid</p>
+            </div>
+          </div>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+              <Download className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">{stats.free}</p>
+              <p className="text-xs text-slate-500">Free</p>
+            </div>
+          </div>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+              <EyeOff className="w-5 h-5 text-red-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">{stats.inactive}</p>
+              <p className="text-xs text-slate-500">Inactive</p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            {(["all", "active", "inactive", "featured"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  activeTab === tab
+                    ? "bg-violet-100 text-violet-700"
+                    : "text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {tab === "all" && ` (${stats.total})`}
+                {tab === "active" && ` (${stats.active})`}
+                {tab === "inactive" && ` (${stats.inactive})`}
+                {tab === "featured" && ` (${stats.featured})`}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 w-64 bg-slate-50 border-slate-200"
+              />
+            </div>
+            <select
+              value={productType}
+              onChange={(e) => setProductType(e.target.value)}
+              className="h-10 px-3 rounded-lg border border-slate-200 bg-slate-50 text-sm focus:ring-2 focus:ring-violet-500/20"
+            >
+              {productTypes.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </select>
+            <div className="flex items-center border border-slate-200 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setViewMode("grid")}
+                className={`p-2 ${viewMode === "grid" ? "bg-violet-100 text-violet-700" : "text-slate-600 hover:bg-slate-100"}`}
+              >
+                <Grid3X3 className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setViewMode("table")}
+                className={`p-2 ${viewMode === "table" ? "bg-violet-100 text-violet-700" : "text-slate-600 hover:bg-slate-100"}`}
+              >
+                <List className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {products.length === 0 ? (
@@ -264,6 +484,188 @@ export default function AdminProductsPage() {
             </Button>
           </CardContent>
         </Card>
+      ) : filteredProducts.length === 0 ? (
+        <Card className="bg-white border-slate-200">
+          <CardContent className="p-12 text-center">
+            <Package className="h-12 w-12 mx-auto text-slate-400 mb-4" />
+            <p className="text-slate-500 mb-4">No products found</p>
+            <Button 
+              onClick={() => {
+                setActiveTab("all");
+                setProductType("all");
+                setSearchQuery("");
+              }} 
+              className="bg-gradient-to-r from-violet-500 to-purple-500 text-white"
+            >
+              Clear Filters
+            </Button>
+          </CardContent>
+        </Card>
+      ) : viewMode === "grid" ? (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <AnimatePresence>
+            {filteredProducts.map((product) => {
+              const images = product.images as { featuredImage?: string } | null;
+              return (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className={`bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg hover:border-violet-300 transition-all group ${
+                    !product.isActive ? "opacity-60" : ""
+                  }`}
+                >
+                  <div className="aspect-video bg-slate-100 relative overflow-hidden">
+                    {images?.featuredImage ? (
+                      <img
+                        src={images.featuredImage}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Package className="w-12 h-12 text-slate-300" />
+                      </div>
+                    )}
+                    {product.isFeatured && (
+                      <div className="absolute top-3 left-3">
+                        <span className="px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded-full flex items-center gap-1">
+                          <Star className="w-3 h-3 fill-current" />
+                          Featured
+                        </span>
+                      </div>
+                    )}
+                    <div className="absolute top-3 right-3">
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          product.isActive
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {product.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <span className="text-xs font-medium px-2 py-0.5 bg-violet-100 text-violet-700 rounded-full capitalize">
+                        {product.type === "plugin"
+                          ? "Plugin"
+                          : product.type === "theme"
+                          ? "Theme"
+                          : product.type === "template"
+                          ? "Template"
+                          : product.type === "mcp_server"
+                          ? "MCP"
+                          : product.type === "ai_agent"
+                          ? "AI Agent"
+                          : product.type}
+                      </span>
+                      <span
+                        className={`text-sm font-semibold ${
+                          product.price === 0 ? "text-emerald-600" : "text-slate-900"
+                        }`}
+                      >
+                        {product.price === 0
+                          ? "Free"
+                          : `$${
+                              product.price >= 100
+                                ? (product.price / 100).toFixed(2)
+                                : product.price.toFixed(2)
+                            }`}
+                      </span>
+                    </div>
+                    <h3 className="font-semibold text-slate-900 mb-1 line-clamp-1">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-slate-500 line-clamp-2 mb-3">
+                      {product.shortDesc || product.description}
+                    </p>
+                    <div className="flex items-center gap-2 pt-3 border-t border-slate-100">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        asChild
+                        className="flex-1 text-slate-600 hover:text-violet-600 hover:bg-violet-50"
+                      >
+                        <a href={`/products/${product.slug}`} target="_blank">
+                          <ExternalLink className="w-4 h-4 mr-1" />
+                          View
+                        </a>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyProductUrl(product.slug)}
+                        className="text-slate-600 hover:text-violet-600 hover:bg-violet-50"
+                      >
+                        {copiedId === product.slug ? (
+                          <Check className="w-4 h-4 text-emerald-500" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleToggleActive(product)}
+                        className="text-slate-600 hover:text-violet-600 hover:bg-violet-50"
+                      >
+                        {product.isActive ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
+                      </Button>
+                      <div className="relative">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            setOpenMenuId(openMenuId === product.id ? null : product.id)
+                          }
+                          className="text-slate-600 hover:text-violet-600 hover:bg-violet-50"
+                        >
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                        {openMenuId === product.id && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="absolute right-0 top-full mt-1 w-32 bg-white border border-slate-200 rounded-lg shadow-lg z-10 overflow-hidden"
+                          >
+                            <button
+                              onClick={() => {
+                                handleEdit(product);
+                                setOpenMenuId(null);
+                              }}
+                              className="w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 flex items-center gap-2"
+                            >
+                              <Edit className="w-4 h-4" />
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => {
+                                handleDelete(product.id);
+                                setOpenMenuId(null);
+                              }}
+                              className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              Delete
+                            </button>
+                          </motion.div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </div>
       ) : (
         <Card className="bg-white border-slate-200 overflow-hidden">
           <CardContent className="p-0">
@@ -279,15 +681,30 @@ export default function AdminProductsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {products.map((product) => (
+                  {filteredProducts.map((product) => (
                     <motion.tr
                       key={product.id}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="hover:bg-slate-50 transition-colors"
+                      className={`hover:bg-slate-50 transition-colors ${
+                        !product.isActive ? "opacity-60" : ""
+                      }`}
                     >
                       <td className="p-4">
                         <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-lg bg-slate-100 overflow-hidden flex-shrink-0">
+                            {(product.images as { featuredImage?: string })?.featuredImage ? (
+                              <img
+                                src={(product.images as { featuredImage?: string })?.featuredImage}
+                                alt={product.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Package className="w-6 h-6 text-slate-400" />
+                              </div>
+                            )}
+                          </div>
                           <div>
                             <p className="font-medium text-slate-900">{product.name}</p>
                             <p className="text-sm text-slate-500">{product.slug}</p>
@@ -299,7 +716,17 @@ export default function AdminProductsPage() {
                       </td>
                       <td className="p-4">
                         <span className="px-3 py-1 bg-violet-100 text-violet-700 text-xs rounded-full capitalize font-medium">
-                          {product.type === 'plugin' ? 'Plugin' : product.type === 'theme' ? 'Theme' : product.type === 'template' ? 'Template' : product.type === 'mcp_server' ? 'MCP Server' : product.type === 'ai_agent' ? 'AI Agent' : product.type}
+                          {product.type === "plugin"
+                            ? "Plugin"
+                            : product.type === "theme"
+                            ? "Theme"
+                            : product.type === "template"
+                            ? "Template"
+                            : product.type === "mcp_server"
+                            ? "MCP Server"
+                            : product.type === "ai_agent"
+                            ? "AI Agent"
+                            : product.type}
                         </span>
                       </td>
                       <td className="p-4">
@@ -307,7 +734,10 @@ export default function AdminProductsPage() {
                           <span className="text-emerald-600 font-medium">Free</span>
                         ) : (
                           <span className="text-slate-900 font-medium">
-                            ${product.price >= 100 ? (product.price / 100).toFixed(2) : product.price.toFixed(2)}
+                            $
+                            {product.price >= 100
+                              ? (product.price / 100).toFixed(2)
+                              : product.price.toFixed(2)}
                           </span>
                         )}
                       </td>
@@ -323,7 +753,7 @@ export default function AdminProductsPage() {
                         </span>
                       </td>
                       <td className="p-4">
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="flex items-center justify-end gap-1">
                           <Button
                             variant="ghost"
                             size="icon"
@@ -337,13 +767,25 @@ export default function AdminProductsPage() {
                           <Button
                             variant="ghost"
                             size="icon"
+                            onClick={() => copyProductUrl(product.slug)}
+                            className="text-slate-500 hover:text-violet-600 hover:bg-violet-50"
+                          >
+                            {copiedId === product.slug ? (
+                              <Check className="h-4 w-4 text-emerald-500" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => handleToggleActive(product)}
                             className="text-slate-500 hover:text-violet-600 hover:bg-violet-50"
                           >
                             {product.isActive ? (
-                              <Eye className="h-4 w-4" />
-                            ) : (
                               <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
                             )}
                           </Button>
                           <Button
@@ -374,22 +816,33 @@ export default function AdminProductsPage() {
       )}
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             className="bg-white border border-slate-200 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden shadow-2xl"
           >
-            <div className="p-4 sm:p-6 border-b border-slate-200 bg-gradient-to-r from-violet-500 to-purple-500">
+            <div className="p-6 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500">
               <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-white">
-                    {editingProduct ? "Edit Product" : "Add New Product"}
-                  </h2>
-                  <p className="text-sm text-white/80 mt-1 hidden sm:block">
-                    {editingProduct ? "Update product details below" : "Create a new product for your store"}
-                  </p>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                    {editingProduct ? (
+                      <Edit className="w-6 h-6 text-white" />
+                    ) : (
+                      <Plus className="w-6 h-6 text-white" />
+                    )}
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">
+                      {editingProduct ? "Edit Product" : "Add New Product"}
+                    </h2>
+                    <p className="text-sm text-white/80">
+                      {editingProduct
+                        ? "Update product details below"
+                        : "Create a new product for your store"}
+                    </p>
+                  </div>
                 </div>
                 <button
                   onClick={() => {

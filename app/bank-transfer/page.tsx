@@ -2,10 +2,10 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { Building2, CheckCircle, Copy, ArrowLeft, Loader2, CreditCard } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Building2, CheckCircle, Copy, ArrowLeft, Loader2, CreditCard, Banknote, Globe, Info, Shield, Clock, QrCode, Wallet, ArrowRightLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface BankDetails {
   bankName: string;
@@ -111,23 +111,29 @@ function BankTransferContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-violet-400 mx-auto mb-4" />
+          <p className="text-slate-400">Loading payment details...</p>
+        </div>
       </div>
     );
   }
 
   if (!bankDetails) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="max-w-md">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 px-4">
+        <Card className="max-w-md bg-white/10 backdrop-blur-xl border-slate-700/50">
           <CardContent className="p-8 text-center">
-            <CreditCard className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-xl font-bold mb-2">No Bank Details Available</h2>
-            <p className="text-muted-foreground mb-4">
-              Bank transfer details are not configured yet. Please contact support.
+            <div className="w-20 h-20 bg-slate-700/50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <CreditCard className="h-10 w-10 text-slate-500" />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">Payment Not Available</h2>
+            <p className="text-slate-400 mb-6">
+              Bank transfer details are not configured yet. Please contact support for alternative payment methods.
             </p>
-            <Button onClick={() => router.push("/products")}>
+            <Button onClick={() => router.push("/products")} className="bg-gradient-to-r from-violet-500 to-purple-500 text-white">
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Products
             </Button>
           </CardContent>
@@ -137,203 +143,234 @@ function BankTransferContent() {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4">
+    <div className="min-h-screen py-12 px-4 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <div className="max-w-2xl mx-auto">
         <Button 
           variant="ghost" 
           onClick={() => router.back()}
-          className="mb-6"
+          className="mb-6 text-slate-300 hover:text-white hover:bg-white/10"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
+          Back to Product
         </Button>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Card>
-            <CardContent className="p-8">
+          <Card className="bg-white/10 backdrop-blur-xl border-slate-700/50">
+            <div className="p-6 sm:p-8">
               <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Building2 className="h-8 w-8 text-primary" />
+                <div className="w-20 h-20 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-violet-500/30">
+                  <Building2 className="h-10 w-10 text-white" />
                 </div>
-                <h1 className="text-2xl font-bold">Bank Transfer Details</h1>
-                <p className="text-muted-foreground mt-2">
-                  Please transfer the amount below to complete your purchase
+                <h1 className="text-2xl sm:text-3xl font-bold text-white">
+                  Bank Transfer Payment
+                </h1>
+                <p className="text-slate-400 mt-2">
+                  Transfer the amount below to complete your purchase
                 </p>
               </div>
 
-              {/* Product Info */}
-              <div className="bg-muted rounded-lg p-4 mb-6">
+              {/* Product Info Card */}
+              <div className="bg-gradient-to-r from-violet-500/20 to-purple-500/20 border border-violet-500/30 rounded-2xl p-5 mb-6">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-sm text-muted-foreground">Product</p>
-                    <p className="font-semibold">{productName || "Premium Product"}</p>
+                    <p className="text-sm text-slate-400">Product</p>
+                    <p className="font-semibold text-white text-lg">{productName || "Premium Product"}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-muted-foreground">Amount</p>
-                    <p className="text-2xl font-bold text-primary">${productPrice || 0}</p>
+                    <p className="text-sm text-slate-400">Total Amount</p>
+                    <p className="text-3xl font-bold bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+                      ${productPrice || 0}
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Bank Details */}
-              <div className="space-y-4 mb-8">
-                <div className="flex justify-between items-center py-3 border-b">
-                  <span className="text-muted-foreground">Bank Name</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold">{bankDetails.bankName}</span>
-                    <button
-                      onClick={() => copyToClipboard(bankDetails.bankName, "bankName")}
-                      className="p-1 hover:bg-muted rounded"
-                    >
-                      {copiedField === "bankName" ? (
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <Copy className="h-4 w-4 text-muted-foreground" />
-                      )}
-                    </button>
-                  </div>
+              <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-5 mb-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Banknote className="w-5 h-5 text-violet-400" />
+                  <h3 className="text-lg font-semibold text-white">Bank Details</h3>
                 </div>
-
-                <div className="flex justify-between items-center py-3 border-b">
-                  <span className="text-muted-foreground">Account Name</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold">{bankDetails.accountName}</span>
-                    <button
-                      onClick={() => copyToClipboard(bankDetails.accountName, "accountName")}
-                      className="p-1 hover:bg-muted rounded"
-                    >
-                      {copiedField === "accountName" ? (
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <Copy className="h-4 w-4 text-muted-foreground" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center py-3 border-b">
-                  <span className="text-muted-foreground">Account Number</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-semibold">{bankDetails.accountNumber}</span>
-                    <button
-                      onClick={() => copyToClipboard(bankDetails.accountNumber, "accountNumber")}
-                      className="p-1 hover:bg-muted rounded"
-                    >
-                      {copiedField === "accountNumber" ? (
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <Copy className="h-4 w-4 text-muted-foreground" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {bankDetails.sortCode && (
-                  <div className="flex justify-between items-center py-3 border-b">
-                    <span className="text-muted-foreground">Sort Code</span>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center py-2 border-b border-slate-700/50">
+                    <span className="text-slate-400">Bank Name</span>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-semibold">{bankDetails.sortCode}</span>
+                      <span className="font-semibold text-white">{bankDetails.bankName}</span>
                       <button
-                        onClick={() => copyToClipboard(bankDetails.sortCode!, "sortCode")}
-                        className="p-1 hover:bg-muted rounded"
+                        onClick={() => copyToClipboard(bankDetails.bankName, "bankName")}
+                        className="p-1.5 hover:bg-slate-700 rounded-lg transition-colors"
                       >
-                        {copiedField === "sortCode" ? (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        {copiedField === "bankName" ? (
+                          <CheckCircle className="h-4 w-4 text-emerald-400" />
                         ) : (
-                          <Copy className="h-4 w-4 text-muted-foreground" />
+                          <Copy className="h-4 w-4 text-slate-400" />
                         )}
                       </button>
                     </div>
                   </div>
-                )}
 
-                {bankDetails.iban && (
-                  <div className="flex justify-between items-center py-3 border-b">
-                    <span className="text-muted-foreground">IBAN</span>
+                  <div className="flex justify-between items-center py-2 border-b border-slate-700/50">
+                    <span className="text-slate-400">Account Name</span>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-semibold text-sm">{bankDetails.iban}</span>
+                      <span className="font-semibold text-white">{bankDetails.accountName}</span>
                       <button
-                        onClick={() => copyToClipboard(bankDetails.iban!, "iban")}
-                        className="p-1 hover:bg-muted rounded"
+                        onClick={() => copyToClipboard(bankDetails.accountName, "accountName")}
+                        className="p-1.5 hover:bg-slate-700 rounded-lg transition-colors"
                       >
-                        {copiedField === "iban" ? (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        {copiedField === "accountName" ? (
+                          <CheckCircle className="h-4 w-4 text-emerald-400" />
                         ) : (
-                          <Copy className="h-4 w-4 text-muted-foreground" />
+                          <Copy className="h-4 w-4 text-slate-400" />
                         )}
                       </button>
                     </div>
                   </div>
-                )}
 
-                {bankDetails.swift && (
-                  <div className="flex justify-between items-center py-3 border-b">
-                    <span className="text-muted-foreground">SWIFT/BIC</span>
+                  <div className="flex justify-between items-center py-2 border-b border-slate-700/50">
+                    <span className="text-slate-400">Account Number</span>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-semibold">{bankDetails.swift}</span>
+                      <span className="font-mono font-semibold text-white">{bankDetails.accountNumber}</span>
                       <button
-                        onClick={() => copyToClipboard(bankDetails.swift!, "swift")}
-                        className="p-1 hover:bg-muted rounded"
+                        onClick={() => copyToClipboard(bankDetails.accountNumber, "accountNumber")}
+                        className="p-1.5 hover:bg-slate-700 rounded-lg transition-colors"
                       >
-                        {copiedField === "swift" ? (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        {copiedField === "accountNumber" ? (
+                          <CheckCircle className="h-4 w-4 text-emerald-400" />
                         ) : (
-                          <Copy className="h-4 w-4 text-muted-foreground" />
+                          <Copy className="h-4 w-4 text-slate-400" />
                         )}
                       </button>
                     </div>
                   </div>
-                )}
 
-                {bankDetails.country && (
-                  <div className="flex justify-between items-center py-3 border-b">
-                    <span className="text-muted-foreground">Country</span>
-                    <span className="font-semibold">{bankDetails.country}</span>
-                  </div>
-                )}
+                  {bankDetails.sortCode && (
+                    <div className="flex justify-between items-center py-2 border-b border-slate-700/50">
+                      <span className="text-slate-400">Sort Code</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-semibold text-white">{bankDetails.sortCode}</span>
+                        <button
+                          onClick={() => copyToClipboard(bankDetails.sortCode!, "sortCode")}
+                          className="p-1.5 hover:bg-slate-700 rounded-lg transition-colors"
+                        >
+                          {copiedField === "sortCode" ? (
+                            <CheckCircle className="h-4 w-4 text-emerald-400" />
+                          ) : (
+                            <Copy className="h-4 w-4 text-slate-400" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {bankDetails.iban && (
+                    <div className="flex justify-between items-center py-2 border-b border-slate-700/50">
+                      <span className="text-slate-400">IBAN</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-semibold text-white text-sm">{bankDetails.iban}</span>
+                        <button
+                          onClick={() => copyToClipboard(bankDetails.iban!, "iban")}
+                          className="p-1.5 hover:bg-slate-700 rounded-lg transition-colors"
+                        >
+                          {copiedField === "iban" ? (
+                            <CheckCircle className="h-4 w-4 text-emerald-400" />
+                          ) : (
+                            <Copy className="h-4 w-4 text-slate-400" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {bankDetails.swift && (
+                    <div className="flex justify-between items-center py-2 border-b border-slate-700/50">
+                      <span className="text-slate-400">SWIFT/BIC</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-semibold text-white">{bankDetails.swift}</span>
+                        <button
+                          onClick={() => copyToClipboard(bankDetails.swift!, "swift")}
+                          className="p-1.5 hover:bg-slate-700 rounded-lg transition-colors"
+                        >
+                          {copiedField === "swift" ? (
+                            <CheckCircle className="h-4 w-4 text-emerald-400" />
+                          ) : (
+                            <Copy className="h-4 w-4 text-slate-400" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {bankDetails.country && (
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-slate-400">Country</span>
+                      <span className="font-semibold text-white">{bankDetails.country}</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
+              {/* Instructions */}
               {bankDetails.instructions && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                  <h4 className="font-semibold text-yellow-800 mb-2">Payment Instructions</h4>
-                  <p className="text-yellow-700 text-sm">{bankDetails.instructions}</p>
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-5 mb-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Info className="w-5 h-5 text-amber-400" />
+                    <h4 className="font-semibold text-amber-400">Payment Instructions</h4>
+                  </div>
+                  <p className="text-amber-200/80 text-sm">{bankDetails.instructions}</p>
                 </div>
               )}
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <h4 className="font-semibold text-blue-800 mb-2">Important</h4>
-                <ul className="text-blue-700 text-sm space-y-1">
-                  <li>• Please include your email as payment reference</li>
-                  <li>• Transfer the exact amount shown above</li>
-                  <li>• Take a screenshot of your payment confirmation</li>
-                  <li>• Your order will be processed after payment confirmation</li>
+              {/* Important Info */}
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-5 mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Shield className="w-5 h-5 text-blue-400" />
+                  <h4 className="font-semibold text-blue-400">Important Notes</h4>
+                </div>
+                <ul className="text-blue-200/80 text-sm space-y-2">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                    <span>Include your email address as payment reference</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                    <span>Transfer the exact amount shown above</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                    <span>Save your payment confirmation receipt</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Clock className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                    <span>Your order will be processed after payment verification</span>
+                  </li>
                 </ul>
               </div>
 
+              {/* CTA Button */}
               <Button 
                 onClick={handleConfirmTransfer}
                 disabled={isSubmitting}
-                className="w-full"
-                size="lg"
+                className="w-full h-14 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 hover:from-violet-600 hover:via-purple-500 hover:to-fuchsia-600 text-white text-lg font-semibold shadow-lg shadow-violet-500/25"
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     Processing...
                   </>
                 ) : (
                   <>
-                    <CheckCircle className="mr-2 h-4 w-4" />
+                    <CheckCircle className="mr-2 h-5 w-5" />
                     I Have Made the Transfer
                   </>
                 )}
               </Button>
 
-              <p className="text-center text-sm text-muted-foreground mt-4">
-                By clicking above, you confirm that you have made the bank transfer
+              <p className="text-center text-sm text-slate-500 mt-4">
+                By clicking above, you confirm that you have completed the bank transfer
               </p>
             </CardContent>
           </Card>
@@ -345,8 +382,11 @@ function BankTransferContent() {
 
 function BankTransferLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="text-center">
+        <Loader2 className="h-12 w-12 animate-spin text-violet-400 mx-auto mb-4" />
+        <p className="text-slate-400">Loading payment details...</p>
+      </div>
     </div>
   );
 }
