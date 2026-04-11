@@ -29,11 +29,11 @@ const services = [
 ]
 
 const products = [
-  { title: "WordPress Plugins", description: "Premium tools", icon: "🔌", href: "/products/plugins" },
-  { title: "Next.js Templates", description: "Ready-to-launch", icon: "⚛️", href: "/products/templates" },
+  { title: "WordPress Plugins", description: "Premium tools for your site", icon: "🔌", href: "/products/plugins" },
+  { title: "WordPress Themes", description: "Beautiful & responsive", icon: "🎨", href: "/products/themes" },
+  { title: "Next.js Templates", description: "Production-ready", icon: "⚛️", href: "/products/templates" },
   { title: "MCP Servers", description: "AI integration", icon: "🤖", href: "/products/mcp-servers" },
   { title: "AI Agents", description: "Smart automation", icon: "🧠", href: "/products/ai-agents" },
-  { title: "WordPress Themes", description: "Beautiful designs", icon: "🎨", href: "/products/themes" },
 ]
 
 function NotificationBell() {

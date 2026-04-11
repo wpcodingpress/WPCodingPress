@@ -83,38 +83,38 @@ const services = [
 const products = [
   {
     title: "WordPress Plugins",
-    description: "Premium development tools",
+    description: "Premium development tools for your site",
     icon: Package,
     href: "/products/plugins",
-    color: "from-indigo-400 to-violet-500",
+    color: "from-blue-500 to-cyan-400",
+  },
+  {
+    title: "WordPress Themes",
+    description: "Beautiful & responsive themes",
+    icon: ThemesIcon,
+    href: "/products/themes",
+    color: "from-green-500 to-emerald-400",
   },
   {
     title: "Next.js Templates",
-    description: "Ready-to-launch templates",
+    description: "Production-ready templates",
     icon: Layers,
     href: "/products/templates",
-    color: "from-violet-400 to-pink-500",
+    color: "from-violet-400 to-purple-500",
   },
   {
     title: "MCP Servers",
-    description: "Model Context Protocol",
+    description: "AI integration tools",
     icon: Server,
     href: "/products/mcp-servers",
     color: "from-pink-400 to-rose-500",
   },
   {
     title: "AI Agents",
-    description: "Intelligent automation",
+    description: "Smart automation solutions",
     icon: Bot,
     href: "/products/ai-agents",
-    color: "from-cyan-400 to-blue-500",
-  },
-  {
-    title: "WordPress Themes",
-    description: "Beautiful WordPress themes",
-    icon: ThemesIcon,
-    href: "/products/themes",
-    color: "from-emerald-400 to-teal-500",
+    color: "from-orange-400 to-amber-500",
   },
 ]
 
