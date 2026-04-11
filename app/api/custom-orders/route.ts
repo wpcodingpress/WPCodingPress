@@ -30,7 +30,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
+    console.log("Creating custom order with body:", body)
+    
     const { clientName, clientEmail, clientPhone, projectName, projectDescription, serviceType, totalAmount, advanceAmount, remainingAmount, notes } = body
+
+    if (!clientName || !clientEmail || !projectName || !totalAmount) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    }
 
     const order = await prisma.customOrder.create({
       data: {
@@ -40,9 +46,9 @@ export async function POST(request: NextRequest) {
         projectName,
         projectDescription: projectDescription || "",
         serviceType: serviceType || "",
-        totalAmount,
-        advanceAmount,
-        remainingAmount,
+        totalAmount: Number(totalAmount),
+        advanceAmount: Number(advanceAmount) || 0,
+        remainingAmount: Number(remainingAmount) || 0,
         advancePaid: false,
         remainingPaid: false,
         status: "pending",
@@ -50,9 +56,10 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    console.log("Custom order created successfully:", order.id)
     return NextResponse.json(order, { status: 201 })
-  } catch (error) {
-    console.error("Error creating custom order:", error)
-    return NextResponse.json({ error: "Failed to create order" }, { status: 500 })
+  } catch (error: any) {
+    console.error("Error creating custom order:", error.message)
+    return NextResponse.json({ error: "Failed to create order: " + error.message }, { status: 500 })
   }
 }

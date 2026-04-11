@@ -73,6 +73,8 @@ export default function AdminCustomOrdersPage() {
     notes: "",
   })
 
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   useEffect(() => {
     fetchCustomOrders()
   }, [])
@@ -83,6 +85,8 @@ export default function AdminCustomOrdersPage() {
       if (res.ok) {
         const data = await res.json()
         setOrders(data)
+      } else {
+        console.error("Failed to fetch orders, status:", res.status)
       }
     } catch (error) {
       console.error("Error fetching custom orders:", error)
@@ -102,10 +106,13 @@ export default function AdminCustomOrdersPage() {
       return
     }
 
+    setIsSubmitting(true)
     const advanceAmount = formData.advanceAmount || 0
     const remainingAmount = formData.totalAmount - advanceAmount
 
     try {
+      console.log("Submitting custom order...", { ...formData, advanceAmount, remainingAmount })
+      
       const res = await fetch("/api/custom-orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -123,8 +130,11 @@ export default function AdminCustomOrdersPage() {
         })
       })
 
+      console.log("Response status:", res.status)
+      
       if (res.ok) {
         const data = await res.json()
+        console.log("Order created successfully:", data)
         setIsDialogOpen(false)
         setFormData({
           clientName: "",
@@ -140,11 +150,14 @@ export default function AdminCustomOrdersPage() {
         fetchCustomOrders()
       } else {
         const errorData = await res.json()
+        console.error("Error response:", errorData)
         alert("Error: " + (errorData.error || "Failed to create order"))
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating custom order:", error)
-      alert("Failed to create order. Please try again.")
+      alert("Failed to create order: " + error.message)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -587,8 +600,12 @@ export default function AdminCustomOrdersPage() {
               <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-2 border-slate-300 text-slate-700 font-medium hover:bg-slate-100">
                 Cancel
               </Button>
-              <Button onClick={handleSubmit} className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 font-semibold px-6">
-                Create Order
+              <Button 
+                onClick={handleSubmit} 
+                disabled={isSubmitting}
+                className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 font-semibold px-6"
+              >
+                {isSubmitting ? "Creating..." : "Create Order"}
               </Button>
             </div>
           </div>
