@@ -91,38 +91,55 @@ export default async function ThemesPage() {
       <section className="py-16 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {themes.map((theme) => (
-              <Link
-                key={theme.id}
-                href={`/products/${theme.slug}`}
-                className="group bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 hover:bg-slate-800/80 hover:border-green-500/30 transition-all duration-300"
-              >
-                <div className="relative mb-4 overflow-hidden rounded-xl aspect-video bg-slate-700">
-                  <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-emerald-600/20 group-hover:from-green-500/30 group-hover:to-emerald-600/30 transition-all"></div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-green-400/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-                    </svg>
+            {themes.map((theme) => {
+              const images = theme.images as { featuredImage?: string } | null;
+              const featuredImage = images?.featuredImage;
+              
+              return (
+                <Link
+                  key={theme.id}
+                  href={`/products/${theme.slug}`}
+                  className="group bg-slate-800/50 border border-slate-700/50 rounded-2xl overflow-hidden hover:bg-slate-800/80 hover:border-green-500/30 transition-all duration-300"
+                >
+                  <div className="relative mb-4 overflow-hidden rounded-xl aspect-video bg-slate-700">
+                    {featuredImage ? (
+                      <img 
+                        src={featuredImage} 
+                        alt={theme.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <>
+                        <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-emerald-600/20 group-hover:from-green-500/30 group-hover:to-emerald-600/30 transition-all"></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <svg className="w-16 h-16 text-green-400/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                          </svg>
+                        </div>
+                      </>
+                    )}
                   </div>
-                </div>
-                <h3 className="text-xl font-bold text-white group-hover:text-green-400 transition-colors">
-                  {theme.name}
-                </h3>
-                {theme.shortDesc && (
-                  <p className="text-slate-400 mt-2 text-sm">{theme.shortDesc}</p>
-                )}
-                <div className="mt-4 flex items-center justify-between">
-                  {theme.price === 0 ? (
-                    <span className="text-green-400 font-semibold">Free</span>
-                  ) : (
-                    <span className="text-white font-semibold">${(theme.price / 100).toFixed(2)}</span>
-                  )}
-                  <span className="text-slate-500 text-sm group-hover:text-green-400 transition-colors">
-                    View Details →
-                  </span>
-                </div>
-              </Link>
-            ))}
+                  <div className="p-6 pt-0">
+                    <h3 className="text-xl font-bold text-white group-hover:text-green-400 transition-colors">
+                      {theme.name}
+                    </h3>
+                    {theme.shortDesc && (
+                      <p className="text-slate-400 mt-2 text-sm">{theme.shortDesc}</p>
+                    )}
+                    <div className="mt-4 flex items-center justify-between">
+                      {theme.price === 0 ? (
+                        <span className="text-green-400 font-semibold">Free</span>
+                      ) : (
+                        <span className="text-white font-semibold">${(theme.price / 100).toFixed(2)}</span>
+                      )}
+                      <span className="text-slate-500 text-sm group-hover:text-green-400 transition-colors">
+                        View Details →
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

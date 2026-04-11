@@ -91,38 +91,55 @@ export default async function PluginsPage() {
       <section className="py-16 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {plugins.map((plugin) => (
-              <Link
-                key={plugin.id}
-                href={`/products/${plugin.slug}`}
-                className="group bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 hover:bg-slate-800/80 hover:border-blue-500/30 transition-all duration-300"
-              >
-                <div className="relative mb-4 overflow-hidden rounded-xl aspect-video bg-slate-700">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-indigo-600/20 group-hover:from-blue-500/30 group-hover:to-indigo-600/30 transition-all"></div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <svg className="w-16 h-16 text-blue-400/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                    </svg>
+            {plugins.map((plugin) => {
+              const images = plugin.images as { featuredImage?: string } | null;
+              const featuredImage = images?.featuredImage;
+              
+              return (
+                <Link
+                  key={plugin.id}
+                  href={`/products/${plugin.slug}`}
+                  className="group bg-slate-800/50 border border-slate-700/50 rounded-2xl overflow-hidden hover:bg-slate-800/80 hover:border-blue-500/30 transition-all duration-300"
+                >
+                  <div className="relative mb-4 overflow-hidden rounded-xl aspect-video bg-slate-700">
+                    {featuredImage ? (
+                      <img 
+                        src={featuredImage} 
+                        alt={plugin.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <>
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-indigo-600/20 group-hover:from-blue-500/30 group-hover:to-indigo-600/30 transition-all"></div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <svg className="w-16 h-16 text-blue-400/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                          </svg>
+                        </div>
+                      </>
+                    )}
                   </div>
-                </div>
-                <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">
-                  {plugin.name}
-                </h3>
-                {plugin.shortDesc && (
-                  <p className="text-slate-400 mt-2 text-sm">{plugin.shortDesc}</p>
-                )}
-                <div className="mt-4 flex items-center justify-between">
-                  {plugin.price === 0 ? (
-                    <span className="text-green-400 font-semibold">Free</span>
-                  ) : (
-                    <span className="text-white font-semibold">${(plugin.price / 100).toFixed(2)}</span>
-                  )}
-                  <span className="text-slate-500 text-sm group-hover:text-blue-400 transition-colors">
-                    View Details →
-                  </span>
-                </div>
-              </Link>
-            ))}
+                  <div className="p-6 pt-0">
+                    <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">
+                      {plugin.name}
+                    </h3>
+                    {plugin.shortDesc && (
+                      <p className="text-slate-400 mt-2 text-sm">{plugin.shortDesc}</p>
+                    )}
+                    <div className="mt-4 flex items-center justify-between">
+                      {plugin.price === 0 ? (
+                        <span className="text-green-400 font-semibold">Free</span>
+                      ) : (
+                        <span className="text-white font-semibold">${(plugin.price / 100).toFixed(2)}</span>
+                      )}
+                      <span className="text-slate-500 text-sm group-hover:text-blue-400 transition-colors">
+                        View Details →
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
