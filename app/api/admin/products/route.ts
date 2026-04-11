@@ -34,8 +34,10 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  let body: any = null;
+  
   try {
-    const body = await request.json()
+    body = await request.json()
     console.log('Creating product with body:', JSON.stringify(body, null, 2))
     
     const { 
@@ -74,15 +76,16 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error('Error creating product:', error)
     
-    if (error.code === 'P2002') {
+    if (error.code === 'P2002' && body) {
+      const slugValue = String(body.slug).toLowerCase().replace(/\s+/g, '-')
       await prisma.product.delete({
-        where: { slug: String(body.slug).toLowerCase().replace(/\s+/g, '-') }
+        where: { slug: slugValue }
       })
       
       const retryProduct = await prisma.product.create({
         data: {
           name: String(body.name),
-          slug: String(body.slug).toLowerCase().replace(/\s+/g, '-'),
+          slug: slugValue,
           description: String(body.description),
           shortDesc: body.shortDesc || null,
           type: body.type || 'plugin',
