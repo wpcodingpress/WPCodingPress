@@ -3,6 +3,27 @@ import prisma from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    const bankSettings = await prisma.bankSettings.findUnique({
+      where: { id }
+    })
+    
+    if (!bankSettings) {
+      return NextResponse.json({ error: "Bank settings not found" }, { status: 404 })
+    }
+    
+    return NextResponse.json(bankSettings)
+  } catch (error) {
+    console.error("Error fetching bank settings:", error)
+    return NextResponse.json({ error: "Failed to fetch bank settings" }, { status: 500 })
+  }
+}
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

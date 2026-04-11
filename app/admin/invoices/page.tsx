@@ -1,11 +1,10 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
-import { Eye, Send, Download, DollarSign, CheckCircle, Clock, FileText, Printer, X } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Eye, Send, Download, DollarSign, CheckCircle, Clock, FileText, Edit2, Trash2 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import {
   Dialog,
   DialogContent,
@@ -37,6 +36,8 @@ interface Invoice {
   createdAt: string
   receiptSent: boolean
   receiptSentAt: string | null
+  notes: string | null
+  bankAccountId: string | null
 }
 
 export default function AdminInvoicesPage() {
@@ -44,7 +45,7 @@ export default function AdminInvoicesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [filter, setFilter] = useState("all")
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
-  const receiptRef = useRef<HTMLDivElement>(null)
+  const [isDownloading, setIsDownloading] = useState(false)
 
   useEffect(() => {
     fetchInvoices()
@@ -89,119 +90,401 @@ export default function AdminInvoicesPage() {
       })
       if (res.ok) {
         fetchInvoices()
-        if (selectedInvoice?.id === id) {
-          const updated = invoices.find(inv => inv.id === id)
-          if (updated) setSelectedInvoice(updated)
-        }
       }
     } catch (error) {
       console.error("Error marking payment:", error)
     }
   }
 
+  const revertPayment = async (id: string, type: "advance" | "remaining") => {
+    try {
+      const res = await fetch(`/api/custom-orders/${id}/revert-payment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type })
+      })
+      if (res.ok) {
+        fetchInvoices()
+      }
+    } catch (error) {
+      console.error("Error reverting payment:", error)
+    }
+  }
+
+  const deleteOrder = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this invoice?")) return
+    try {
+      const res = await fetch(`/api/custom-orders/${id}`, { method: "DELETE" })
+      if (res.ok) {
+        fetchInvoices()
+        setSelectedInvoice(null)
+      }
+    } catch (error) {
+      console.error("Error deleting invoice:", error)
+    }
+  }
+
+  const updateStatus = async (id: string, status: string) => {
+    try {
+      const res = await fetch(`/api/custom-orders/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status })
+      })
+      if (res.ok) {
+        fetchInvoices()
+      }
+    } catch (error) {
+      console.error("Error updating status:", error)
+    }
+  }
+
+  const handleDownloadPDF = async (invoice: Invoice) => {
+    if (isDownloading) return
+    setIsDownloading(true)
+    await downloadPDF(invoice)
+    setIsDownloading(false)
+  }
+
   const downloadPDF = async (invoice: Invoice) => {
     try {
-      const bankRes = await fetch("/api/public/bank-settings")
-      const bankSettings = await bankRes.json()
+      let bankSettings = null
+      if (invoice.bankAccountId) {
+        const bankRes = await fetch(`/api/bank-settings/${invoice.bankAccountId}`)
+        if (bankRes.ok) {
+          bankSettings = await bankRes.json()
+        }
+      }
+      if (!bankSettings) {
+        const bankRes = await fetch("/api/public/bank-settings")
+        bankSettings = await bankRes.json()
+      }
 
       const advancePercent = invoice.advanceAmount > 0 ? Math.round((invoice.advanceAmount / invoice.totalAmount) * 100) : 0
       const remainingPercent = invoice.remainingAmount > 0 ? Math.round((invoice.remainingAmount / invoice.totalAmount) * 100) : 0
+      
+      const isPaid = invoice.advancePaid && invoice.remainingPaid
+      const isPartial = invoice.advanceAmount > 0 && invoice.advancePaid && !invoice.remainingPaid
 
       const receiptContent = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Invoice - ${invoice.projectName}</title>
+  <title>Invoice #${invoice.id.slice(0, 8).toUpperCase()} - WPCodingPress</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Helvetica Neue', Arial, sans-serif; padding: 40px; background: #f8fafc; }
-    .invoice { max-width: 800px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .header { background: linear(135deg, #7c3aed, #8b5cf6); padding: 30px; border-radius: 12px 12px 0 0; color: white; text-align: center; }
-    .header h1 { font-size: 28px; margin-bottom: 5px; }
-    .header p { opacity: 0.9; }
-    .content { padding: 30px; }
-    h2 { color: #1e293b; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
-    .label { color: #64748b; width: 40%; }
-    .value { color: #1e293b; font-weight: 500; }
-    .amount-section { background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 20px 0; }
-    .amount-row { display: flex; justify-content: space-between; padding: 10px 0; }
-    .total { font-size: 24px; font-weight: bold; color: #1e293b; }
-    .advance { color: #059669; }
-    .remaining { color: ${invoice.remainingPaid ? '#059669' : '#1e293b'}; }
-    .bank-section { background: #ecfdf5; border: 2px solid #10b981; border-radius: 8px; padding: 20px; margin-top: 20px; }
-    .footer { text-align: center; padding: 20px; color: #64748b; font-size: 14px; border-top: 1px solid #e2e8f0; }
-    .status-paid { color: #059669; }
-    .status-pending { color: #f59e0b; }
-    @media print { body { padding: 0; } .invoice { box-shadow: none; } }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 0; background: #f8fafc; }
+    .invoice { max-width: 800px; margin: 0 auto; background: white; }
+    .header { 
+      background: linear(135deg, #7c3aed 0%, #8b5cf6 50%, #a78bfa 100%); 
+      padding: 40px 50px; 
+      color: white; 
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 400px;
+      height: 400px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -30%;
+      left: -10%;
+      width: 300px;
+      height: 300px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+    .header-content { position: relative; z-index: 1; }
+    .header h1 { 
+      font-size: 32px; 
+      font-weight: 800; 
+      letter-spacing: -0.5px; 
+      margin-bottom: 8px; 
+    }
+    .header .subtitle { 
+      font-size: 14px; 
+      opacity: 0.9; 
+      font-weight: 400;
+    }
+    .invoice-info { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: flex-start;
+      margin-top: 30px;
+    }
+    .invoice-badge {
+      background: ${isPaid ? '#10b981' : isPartial ? '#f59e0b' : '#ef4444'};
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .invoice-number {
+      background: rgba(255,255,255,0.2);
+      padding: 10px 20px;
+      border-radius: 8px;
+    }
+    .invoice-number span { font-size: 12px; opacity: 0.8; display: block; }
+    .invoice-number strong { font-size: 18px; display: block; margin-top: 2px; }
+    
+    .content { padding: 40px 50px; }
+    
+    .section { margin-bottom: 30px; }
+    .section-title {
+      color: #7c3aed;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #ede9fe;
+    }
+    
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .info-item { }
+    .info-label { color: #64748b; font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+    .info-value { color: #1e293b; font-size: 14px; font-weight: 600; }
+    
+    .client-box {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .client-name { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+    .client-details { color: #64748b; font-size: 13px; }
+    .client-details div { margin-bottom: 4px; }
+    
+    .amount-section { 
+      background: ${isPaid ? 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)' : isPartial ? 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)' : 'linear-gradient(135deg, #fef2f2 0%, #fecaca 100%)'};
+      border: 2px solid ${isPaid ? '#10b981' : isPartial ? '#f59e0b' : '#ef4444'};
+      border-radius: 16px; 
+      padding: 30px; 
+      margin: 25px 0;
+    }
+    .amount-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px dashed ${isPaid ? '#6ee7b7' : isPartial ? '#fcd34d' : '#fca5a5'};
+    }
+    .amount-main-label { font-size: 16px; font-weight: 600; color: #1e293b; }
+    .amount-main-value { font-size: 36px; font-weight: 800; color: #1e293b; }
+    
+    .amount-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .amount-item {
+      background: rgba(255,255,255,0.7);
+      border-radius: 10px;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .amount-item-label { font-size: 13px; color: #64748b; }
+    .amount-item-value { 
+      font-size: 16px; 
+      font-weight: 700; 
+      color: ${isPaid ? '#059669' : '#1e293b'};
+    }
+    .amount-item-value.pending { color: #d97706; }
+    .amount-item-value.paid { color: #059669; }
+    
+    .payment-terms {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      color: #64748b;
+      font-size: 13px;
+    }
+    
+    .bank-section { 
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border: 2px solid #10b981;
+      border-radius: 16px; 
+      padding: 25px;
+      margin-top: 25px;
+    }
+    .bank-title { 
+      color: #059669; 
+      font-size: 14px; 
+      font-weight: 700; 
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .bank-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .bank-item { background: rgba(255,255,255,0.8); border-radius: 8px; padding: 12px; }
+    .bank-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .bank-value { font-size: 14px; font-weight: 600; color: #1e293b; margin-top: 2px; }
+    
+    .footer { 
+      background: #1e293b; 
+      color: white; 
+      padding: 30px 50px;
+      text-align: center;
+    }
+    .footer-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .footer-subtitle { font-size: 13px; opacity: 0.7; margin-bottom: 20px; }
+    .footer-contact { font-size: 12px; opacity: 0.6; }
+    
+    .watermark {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      opacity: 0.1;
+      font-size: 10px;
+      color: #7c3aed;
+    }
+    
+    @media print { 
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .invoice { box-shadow: none; }
+      .watermark { display: none; }
+    }
   </style>
 </head>
 <body>
   <div class="invoice">
     <div class="header">
-      <h1>WPCodingPress</h1>
-      <p>Professional Web Development Services</p>
-    </div>
-    <div class="content">
-      <h2>Invoice Details</h2>
-      <table>
-        <tr><td class="label">Invoice ID:</td><td class="value">${invoice.id.slice(0, 8).toUpperCase()}</td></tr>
-        <tr><td class="label">Date:</td><td class="value">${new Date(invoice.createdAt).toLocaleDateString()}</td></tr>
-        <tr><td class="label">Project:</td><td class="value">${invoice.projectName}</td></tr>
-        <tr><td class="label">Service:</td><td class="value">${invoice.serviceType || 'Custom Project'}</td></tr>
-      </table>
-
-      <h2>Client Information</h2>
-      <table>
-        <tr><td class="label">Name:</td><td class="value">${invoice.clientName}</td></tr>
-        <tr><td class="label">Email:</td><td class="value">${invoice.clientEmail}</td></tr>
-        ${invoice.clientPhone ? `<tr><td class="label">Phone:</td><td class="value">${invoice.clientPhone}</td></tr>` : ''}
-      </table>
-
-      <div class="amount-section">
-        <div class="amount-row">
-          <span><strong>Total Project Cost:</strong></span>
-          <span class="total">$${invoice.totalAmount}</span>
+      <div class="header-content">
+        <h1>⚡ WPCodingPress</h1>
+        <p class="subtitle">Professional Web Development & Digital Solutions</p>
+        
+        <div class="invoice-info">
+          <div class="invoice-number">
+            <span>Invoice Number</span>
+            <strong>#${invoice.id.slice(0, 8).toUpperCase()}</strong>
+          </div>
+          <div class="invoice-badge">
+            ${isPaid ? '✓ PAID' : isPartial ? '⚠ PARTIAL' : '✕ UNPAID'}
+          </div>
         </div>
-        ${invoice.advanceAmount > 0 ? `
-        <div class="amount-row">
-          <span class="advance">Advance Payment (${advancePercent}%):</span>
-          <span class="advance">$${invoice.advanceAmount} ${invoice.advancePaid ? '✓ PAID' : ''}</span>
-        </div>
-        <div class="amount-row">
-          <span class="remaining">Remaining Payment (${remainingPercent}%):</span>
-          <span class="remaining">$${invoice.remainingAmount} ${invoice.remainingPaid ? '✓ PAID' : '(Due)'}</span>
-        </div>
-        ` : `
-        <div class="amount-row">
-          <span>Payment Terms:</span>
-          <span>Full payment after completion</span>
-        </div>
-        `}
       </div>
-
+    </div>
+    
+    <div class="content">
+      <div class="section">
+        <div class="section-title">Project Details</div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Project Name</div>
+            <div class="info-value">${invoice.projectName}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Service Type</div>
+            <div class="info-value">${invoice.serviceType || 'Custom Project'}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Invoice Date</div>
+            <div class="info-value">${new Date(invoice.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Project Status</div>
+            <div class="info-value" style="text-transform: capitalize;">${invoice.status.replace('_', ' ')}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">Client Information</div>
+        <div class="client-box">
+          <div class="client-name">${invoice.clientName}</div>
+          <div class="client-details">
+            <div>📧 ${invoice.clientEmail}</div>
+            ${invoice.clientPhone ? `<div>📞 ${invoice.clientPhone}</div>` : ''}
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">Payment Summary</div>
+        <div class="amount-section">
+          <div class="amount-main">
+            <span class="amount-main-label">Total Project Cost</span>
+            <span class="amount-main-value">$${invoice.totalAmount.toLocaleString()}</span>
+          </div>
+          
+          ${invoice.advanceAmount > 0 ? `
+          <div class="amount-breakdown">
+            <div class="amount-item">
+              <span class="amount-item-label">Advance (${advancePercent}%)</span>
+              <span class="amount-item-value ${invoice.advancePaid ? 'paid' : 'pending'}">
+                $${invoice.advanceAmount.toLocaleString()} ${invoice.advancePaid ? '✓' : ''}
+              </span>
+            </div>
+            <div class="amount-item">
+              <span class="amount-item-label">Remaining (${remainingPercent}%)</span>
+              <span class="amount-item-value ${invoice.remainingPaid ? 'paid' : 'pending'}">
+                $${invoice.remainingAmount.toLocaleString()} ${invoice.remainingPaid ? '✓' : '(Due)'}
+              </span>
+            </div>
+          </div>
+          ` : `
+          <div class="payment-terms">
+            💰 Payment terms: Full payment after project completion
+          </div>
+          `}
+        </div>
+      </div>
+      
       ${bankSettings ? `
-      <div class="bank-section">
-        <h2>Payment Details</h2>
-        <p style="color: #64748b; margin-bottom: 15px;">Please make payment to:</p>
-        <table>
-          <tr><td class="label">Bank Name:</td><td class="value">${bankSettings.bankName}</td></tr>
-          <tr><td class="label">Account Name:</td><td class="value">${bankSettings.accountName}</td></tr>
-          <tr><td class="label">Account Number:</td><td class="value">${bankSettings.accountNumber}</td></tr>
-          ${bankSettings.swift ? `<tr><td class="label">SWIFT:</td><td class="value">${bankSettings.swift}</td></tr>` : ''}
-        </table>
-        ${bankSettings.instructions ? `<p style="margin-top: 10px; font-style: italic;">${bankSettings.instructions}</p>` : ''}
+      <div class="section">
+        <div class="section-title">Payment Details</div>
+        <div class="bank-section">
+          <div class="bank-title">🏦 Bank Account Information</div>
+          <div class="bank-grid">
+            <div class="bank-item">
+              <div class="bank-label">Bank Name</div>
+              <div class="bank-value">${bankSettings.bankName}</div>
+            </div>
+            <div class="bank-item">
+              <div class="bank-label">Account Name</div>
+              <div class="bank-value">${bankSettings.accountName}</div>
+            </div>
+            <div class="bank-item">
+              <div class="bank-label">Account Number</div>
+              <div class="bank-value">${bankSettings.accountNumber}</div>
+            </div>
+            ${bankSettings.swift ? `
+            <div class="bank-item">
+              <div class="bank-label">SWIFT Code</div>
+              <div class="bank-value">${bankSettings.swift}</div>
+            </div>
+            ` : ''}
+          </div>
+          ${bankSettings.instructions ? `<p style="margin-top: 15px; font-size: 12px; color: #059669; font-style: italic;">${bankSettings.instructions}</p>` : ''}
+        </div>
       </div>
       ` : ''}
-
-      <div class="footer">
-        <p>Thank you for choosing WPCodingPress!</p>
-        <p>Email: contact@wpcodingpress.com</p>
+    </div>
+    
+    <div class="footer">
+      <div class="footer-title">Thank You for Your Business! 🚀</div>
+      <div class="footer-subtitle">We appreciate your trust in WPCodingPress</div>
+      <div class="footer-contact">
+        📧 contact@wpcodingpress.com | 🌐 wpcodingpress.com
       </div>
     </div>
   </div>
+  <div class="watermark">Generated by WPCodingPress</div>
   <script>window.print()</script>
 </body>
 </html>
@@ -223,10 +506,14 @@ export default function AdminInvoicesPage() {
   }
 
   const getPaymentStatus = (invoice: Invoice) => {
-    if (!invoice.advancePaid && !invoice.remainingPaid) return { status: "unpaid", label: "Unpaid", color: "bg-red-500" }
-    if (invoice.advancePaid && !invoice.remainingPaid && invoice.remainingAmount > 0) return { status: "partial", label: "Partial", color: "bg-yellow-500" }
+    const hasAdvance = invoice.advanceAmount > 0
+    if (!hasAdvance) {
+      if (!invoice.advancePaid && !invoice.remainingPaid) return { status: "unpaid", label: "Unpaid", color: "bg-red-500" }
+      if (invoice.remainingPaid) return { status: "paid", label: "Paid", color: "bg-green-500" }
+      return { status: "unpaid", label: "Unpaid", color: "bg-red-500" }
+    }
     if (invoice.advancePaid && invoice.remainingPaid) return { status: "paid", label: "Paid", color: "bg-green-500" }
-    if (!invoice.advancePaid && invoice.remainingPaid && invoice.advanceAmount === 0) return { status: "paid", label: "Paid", color: "bg-green-500" }
+    if (invoice.advancePaid && !invoice.remainingPaid) return { status: "partial", label: "Partial", color: "bg-yellow-500" }
     return { status: "unpaid", label: "Unpaid", color: "bg-red-500" }
   }
 
@@ -309,7 +596,7 @@ export default function AdminInvoicesPage() {
               <div>
                 <p className="text-sm text-slate-500">Total Revenue</p>
                 <p className="text-2xl font-bold text-slate-900">
-                  ${invoices.reduce((acc, i) => acc + (i.advancePaid ? i.advanceAmount : 0) + (i.remainingPaid ? i.remainingAmount : 0), 0)}
+                  ${invoices.reduce((acc, i) => acc + (i.advancePaid ? i.advanceAmount : 0) + (i.remainingPaid ? i.remainingAmount : 0), 0).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -375,12 +662,12 @@ export default function AdminInvoicesPage() {
                           {invoice.projectName}
                         </td>
                         <td className="p-4 text-slate-900 font-bold">
-                          ${invoice.totalAmount}
+                          ${invoice.totalAmount.toLocaleString()}
                         </td>
                         <td className="p-4">
                           <div className="flex items-center gap-2">
                             <span className={`text-sm font-medium ${invoice.advancePaid ? "text-green-600" : "text-yellow-600"}`}>
-                              ${invoice.advanceAmount}
+                              ${invoice.advanceAmount.toLocaleString()}
                             </span>
                             {invoice.advancePaid ? (
                               <CheckCircle className="h-4 w-4 text-green-600" />
@@ -394,7 +681,7 @@ export default function AdminInvoicesPage() {
                         <td className="p-4">
                           <div className="flex items-center gap-2">
                             <span className={`text-sm font-medium ${invoice.remainingPaid ? "text-green-600" : "text-slate-500"}`}>
-                              ${invoice.remainingAmount}
+                              ${invoice.remainingAmount.toLocaleString()}
                             </span>
                             {invoice.remainingPaid ? (
                               <CheckCircle className="h-4 w-4 text-green-600" />
@@ -438,7 +725,7 @@ export default function AdminInvoicesPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => downloadPDF(invoice)}
+                              onClick={() => handleDownloadPDF(invoice)}
                               className="text-slate-500 hover:text-blue-600 hover:bg-blue-50"
                             >
                               <Download className="h-4 w-4" />
@@ -450,6 +737,14 @@ export default function AdminInvoicesPage() {
                               className="text-slate-500 hover:text-green-600 hover:bg-green-50"
                             >
                               <Send className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => deleteOrder(invoice.id)}
+                              className="text-slate-500 hover:text-red-600 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </td>
@@ -473,77 +768,196 @@ export default function AdminInvoicesPage() {
           </DialogHeader>
           
           {selectedInvoice && (
-            <div ref={receiptRef} className="space-y-6">
-              <div className="bg-gradient-to-r from-purple-600 to-violet-600 text-white p-6 rounded-lg text-center">
-                <h2 className="text-2xl font-bold">WPCodingPress</h2>
-                <p className="opacity-90">Professional Web Development Services</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-lg">
-                <div>
-                  <p className="text-sm text-slate-500">Invoice ID</p>
-                  <p className="font-medium text-slate-900">{selectedInvoice.id.slice(0, 8).toUpperCase()}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Date</p>
-                  <p className="font-medium text-slate-900">{new Date(selectedInvoice.createdAt).toLocaleDateString()}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Project</p>
-                  <p className="font-medium text-slate-900">{selectedInvoice.projectName}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Service</p>
-                  <p className="font-medium text-slate-900">{selectedInvoice.serviceType || "Custom Project"}</p>
-                </div>
-              </div>
-
-              <div className="p-4 bg-slate-50 rounded-lg">
-                <p className="text-sm text-slate-500 mb-2">Client Information</p>
-                <p className="font-medium text-slate-900">{selectedInvoice.clientName}</p>
-                <p className="text-slate-600">{selectedInvoice.clientEmail}</p>
-                {selectedInvoice.clientPhone && <p className="text-slate-600">{selectedInvoice.clientPhone}</p>}
-              </div>
-
-              <div className="border-2 border-amber-400 bg-amber-50 p-6 rounded-lg">
-                <h3 className="font-bold text-slate-900 mb-4">Payment Summary</h3>
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-lg font-semibold">Total Project Cost</span>
-                  <span className="text-2xl font-bold text-slate-900">${selectedInvoice.totalAmount}</span>
-                </div>
-                {selectedInvoice.advanceAmount > 0 ? (
-                  <>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-green-700">Advance ({Math.round((selectedInvoice.advanceAmount / selectedInvoice.totalAmount) * 100)}%)</span>
-                      <span className={`font-semibold ${selectedInvoice.advancePaid ? "text-green-600" : "text-yellow-600"}`}>
-                        ${selectedInvoice.advanceAmount} {selectedInvoice.advancePaid ? "✓ Paid" : ""}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className={selectedInvoice.remainingPaid ? "text-green-700" : "text-slate-600"}>
-                        Remaining ({Math.round((selectedInvoice.remainingAmount / selectedInvoice.totalAmount) * 100)}%)
-                      </span>
-                      <span className={`font-semibold ${selectedInvoice.remainingPaid ? "text-green-600" : "text-slate-900"}`}>
-                        ${selectedInvoice.remainingAmount} {selectedInvoice.remainingPaid ? "✓ Paid" : "(Due)"}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600">Payment Terms</span>
-                    <span className="font-medium text-slate-900">Full payment after completion</span>
+            <div className="space-y-6">
+              <div className={`p-5 rounded-lg border-2 ${
+                selectedInvoice.advancePaid && selectedInvoice.remainingPaid 
+                  ? "bg-green-100 border-green-400" 
+                  : selectedInvoice.advancePaid && selectedInvoice.advanceAmount > 0
+                    ? "bg-yellow-100 border-yellow-400"
+                    : "bg-red-100 border-red-400"
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className={`font-bold text-2xl ${
+                      selectedInvoice.advancePaid && selectedInvoice.remainingPaid 
+                        ? "text-green-800" 
+                        : selectedInvoice.advancePaid && selectedInvoice.advanceAmount > 0
+                          ? "text-yellow-800"
+                          : "text-red-800"
+                    }`}>
+                      {selectedInvoice.advancePaid && selectedInvoice.remainingPaid 
+                        ? "✓ PAYMENT COMPLETE"
+                        : selectedInvoice.advancePaid && selectedInvoice.advanceAmount > 0
+                          ? "⚠ PARTIAL PAYMENT"
+                          : "✕ UNPAID"
+                      }
+                    </p>
+                    <p className="text-base font-semibold text-slate-800 mt-2">
+                      Total Project Cost: <span className="font-bold text-xl">${selectedInvoice.totalAmount.toLocaleString()}</span>
+                    </p>
+                    {selectedInvoice.advanceAmount > 0 && (
+                      <p className="text-sm text-slate-700 mt-1">
+                        Advance: ${selectedInvoice.advanceAmount.toLocaleString()} | Remaining: ${selectedInvoice.remainingAmount.toLocaleString()}
+                      </p>
+                    )}
                   </div>
-                )}
+                  <Button 
+                    onClick={() => handleDownloadPDF(selectedInvoice)} 
+                    disabled={isDownloading}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2"
+                  >
+                    <Download className="h-5 w-5 mr-2" />
+                    {isDownloading ? "Generating..." : "Download Invoice"}
+                  </Button>
+                </div>
               </div>
 
-              <div className="flex gap-3">
-                <Button onClick={() => downloadPDF(selectedInvoice)} className="bg-blue-600 hover:bg-blue-700">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-slate-500">Client Name</label>
+                  <p className="text-slate-900 font-medium">{selectedInvoice.clientName}</p>
+                </div>
+                <div>
+                  <label className="text-sm text-slate-500">Email</label>
+                  <p className="text-slate-900">{selectedInvoice.clientEmail}</p>
+                </div>
+                <div>
+                  <label className="text-sm text-slate-500">Phone</label>
+                  <p className="text-slate-900">{selectedInvoice.clientPhone || "N/A"}</p>
+                </div>
+                <div>
+                  <label className="text-sm text-slate-500">Project Name</label>
+                  <p className="text-slate-900">{selectedInvoice.projectName}</p>
+                </div>
+                <div>
+                  <label className="text-sm text-slate-500">Service Type</label>
+                  <p className="text-slate-900">{selectedInvoice.serviceType || "Custom Project"}</p>
+                </div>
+                <div>
+                  <label className="text-sm text-slate-500">Created Date</label>
+                  <p className="text-slate-900">{new Date(selectedInvoice.createdAt).toLocaleDateString()}</p>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm text-slate-500">Project Description</label>
+                <p className="text-slate-900 mt-1 p-3 rounded-lg bg-slate-50">
+                  {selectedInvoice.projectDescription || "No description"}
+                </p>
+              </div>
+
+              <div className="border-2 border-slate-300 rounded-lg p-5 bg-slate-50">
+                <h3 className="font-bold text-slate-900 text-lg mb-4">💰 Payment Management</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-white rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-semibold text-slate-800">Advance Payment</span>
+                      <span className={`font-bold px-3 py-1 rounded-full text-sm ${
+                        selectedInvoice.advancePaid ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                      }`}>
+                        ${selectedInvoice.advanceAmount.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className={`font-bold ${selectedInvoice.advancePaid ? "text-green-600" : "text-yellow-600"}`}>
+                        {selectedInvoice.advancePaid ? "✓ PAID" : "⏳ PENDING"}
+                      </span>
+                      {selectedInvoice.advanceAmount > 0 && (
+                        <Button 
+                          size="sm" 
+                          variant={selectedInvoice.advancePaid ? "outline" : "default"}
+                          className={selectedInvoice.advancePaid 
+                            ? "text-red-600 border-red-300 hover:bg-red-50 font-semibold" 
+                            : "bg-green-600 hover:bg-green-700 text-white font-semibold"
+                          }
+                          onClick={() => {
+                            if (selectedInvoice.advancePaid) {
+                              revertPayment(selectedInvoice.id, "advance")
+                            } else {
+                              markPayment(selectedInvoice.id, "advance")
+                            }
+                          }}
+                        >
+                          {selectedInvoice.advancePaid ? "↩ Undo" : "✓ Mark Paid"}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="p-4 bg-white rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-semibold text-slate-800">Remaining Payment</span>
+                      <span className={`font-bold px-3 py-1 rounded-full text-sm ${
+                        selectedInvoice.remainingPaid ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"
+                      }`}>
+                        ${selectedInvoice.remainingAmount.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className={`font-bold ${selectedInvoice.remainingPaid ? "text-green-600" : "text-slate-500"}`}>
+                        {selectedInvoice.remainingPaid ? "✓ PAID" : "⏳ DUE"}
+                      </span>
+                      {selectedInvoice.remainingAmount > 0 && selectedInvoice.advancePaid && (
+                        <Button 
+                          size="sm" 
+                          variant={selectedInvoice.remainingPaid ? "outline" : "default"}
+                          className={selectedInvoice.remainingPaid 
+                            ? "text-red-600 border-red-300 hover:bg-red-50 font-semibold" 
+                            : "bg-green-600 hover:bg-green-700 text-white font-semibold"
+                          }
+                          onClick={() => {
+                            if (selectedInvoice.remainingPaid) {
+                              revertPayment(selectedInvoice.id, "remaining")
+                            } else {
+                              markPayment(selectedInvoice.id, "remaining")
+                            }
+                          }}
+                        >
+                          {selectedInvoice.remainingPaid ? "↩ Undo" : "✓ Mark Paid"}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-base font-bold text-slate-800 mb-3 block">📋 Project Status</label>
+                <div className="flex flex-wrap gap-2">
+                  {["pending", "in_progress", "completed", "cancelled"].map((status) => (
+                    <Button
+                      key={status}
+                      variant={selectedInvoice.status === status ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => updateStatus(selectedInvoice.id, status)}
+                      className="capitalize font-semibold"
+                    >
+                      {status.replace("_", " ")}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {selectedInvoice.notes && (
+                <div>
+                  <label className="text-sm text-slate-500">Notes</label>
+                  <p className="text-slate-900 mt-1 p-3 rounded-lg bg-slate-50">
+                    {selectedInvoice.notes}
+                  </p>
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-4 border-t border-slate-300">
+                <Button onClick={() => handleDownloadPDF(selectedInvoice)} variant="outline" className="border-slate-300 font-semibold">
                   <Download className="h-4 w-4 mr-2" />
                   Download PDF
                 </Button>
                 <Button onClick={() => sendReceipt(selectedInvoice.id)} className="bg-green-600 hover:bg-green-700">
                   <Send className="h-4 w-4 mr-2" />
-                  Send to Client
+                  {selectedInvoice.receiptSent ? "Resend Receipt" : "Send Receipt"}
+                </Button>
+                <Button variant="destructive" onClick={() => deleteOrder(selectedInvoice.id)}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
                 </Button>
               </div>
             </div>
