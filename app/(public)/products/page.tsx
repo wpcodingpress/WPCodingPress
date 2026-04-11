@@ -91,6 +91,14 @@ const benefits = [
   },
 ];
 
+const typeConfig: Record<string, { label: string; icon: string; color: string; gradient: string; slug: string }> = {
+  plugin: { label: 'WordPress Plugins', icon: '🔌', color: 'blue', gradient: 'from-blue-500 to-cyan-400', slug: 'plugins' },
+  theme: { label: 'WordPress Themes', icon: '🎨', color: 'green', gradient: 'from-green-500 to-emerald-400', slug: 'themes' },
+  template: { label: 'Next.js Templates', icon: '⚛️', color: 'violet', gradient: 'from-violet-500 to-purple-400', slug: 'templates' },
+  mcp_server: { label: 'MCP Servers', icon: '🤖', color: 'pink', gradient: 'from-pink-500 to-rose-400', slug: 'mcp-servers' },
+  ai_agent: { label: 'AI Agents', icon: '🧠', color: 'orange', gradient: 'from-orange-500 to-amber-400', slug: 'ai-agents' },
+};
+
 async function getAllActiveProducts() {
   try {
     return await prisma.product.findMany({
@@ -103,8 +111,14 @@ async function getAllActiveProducts() {
   }
 }
 
+function getUniqueTypes(products: any[]) {
+  const types = [...new Set(products.map(p => p.type))];
+  return types.filter(t => t && typeConfig[t]).map(t => typeConfig[t!]);
+}
+
 export default async function ProductsPage() {
   const products = await getAllActiveProducts();
+  const productTypes = getUniqueTypes(products);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -161,35 +175,44 @@ export default async function ProductsPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((category, index) => (
+            {productTypes.length > 0 ? productTypes.map((cat) => (
               <Link
-                key={category.name}
-                href={category.href}
+                key={cat.slug}
+                href={`/products/${cat.slug}`}
                 className="group relative bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6 hover:border-indigo-500/50 hover:bg-slate-800/60 transition-all hover:-translate-y-1"
               >
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${category.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
-                  <category.icon className="w-7 h-7 text-white" />
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
+                  <span className="text-3xl">{cat.icon}</span>
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2 group-hover:text-indigo-400 transition-colors">
-                  {category.name}
+                  {cat.label}
                 </h3>
                 <p className="text-slate-400 mb-4">
-                  {category.description}
+                  Browse our {cat.label.toLowerCase()}
                 </p>
                 <ul className="space-y-2 mb-6">
-                  {category.features.slice(0, 2).map((feature) => (
-                    <li key={feature} className="flex items-center gap-2 text-sm text-slate-500">
-                      <Check className="w-4 h-4 text-green-400" />
-                      {feature}
-                    </li>
-                  ))}
+                  <li className="flex items-center gap-2 text-sm text-slate-500">
+                    <Check className="w-4 h-4 text-green-400" />
+                    Premium quality
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-slate-500">
+                    <Check className="w-4 h-4 text-green-400" />
+                    Regular updates
+                  </li>
                 </ul>
                 <div className="flex items-center gap-2 text-indigo-400 font-medium group-hover:gap-3 transition-all">
                   <span>Explore</span>
                   <ArrowRight className="w-4 h-4" />
                 </div>
               </Link>
-            ))}
+            )) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-slate-400">No products available yet.</p>
+                <Link href="/admin/products" className="text-indigo-400 hover:text-indigo-300 mt-2 inline-block">
+                  Add products in admin →
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </section>
