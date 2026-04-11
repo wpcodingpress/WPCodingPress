@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { 
   Plus, 
@@ -11,7 +11,10 @@ import {
   EyeOff,
   Star,
   Package,
-  ExternalLink
+  ExternalLink,
+  Upload,
+  X,
+  Image as ImageIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -135,7 +138,7 @@ export default function AdminProductsPage() {
       description: product.description,
       shortDesc: product.shortDesc || "",
       type: product.type,
-      price: (product.price || 0) / 100,
+      price: product.price < 100 ? product.price : product.price / 100,
       featuredImage: (product.images as any)?.featuredImage || "",
       freeDownloadUrl: freeUrl,
       proDownloadUrl: proUrl,
@@ -402,14 +405,63 @@ export default function AdminProductsPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Featured Image URL</label>
-                <Input
-                  value={formData.featuredImage}
-                  onChange={(e) => setFormData({ ...formData, featuredImage: e.target.value })}
-                  className="border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                  placeholder="https://example.com/image.jpg"
-                />
-                <p className="text-xs text-gray-500">Paste the URL of the product image (recommended size: 800x600px)</p>
+                <label className="text-sm font-medium text-gray-700">Featured Image</label>
+                {formData.featuredImage ? (
+                  <div className="relative inline-block">
+                    <div className="relative w-40 h-28 rounded-xl overflow-hidden border border-gray-200">
+                      <img 
+                        src={formData.featuredImage} 
+                        alt="Preview" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, featuredImage: "" })}
+                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const file = e.dataTransfer.files[0];
+                      if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          setFormData({ ...formData, featuredImage: event.target?.result as string });
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-purple-400 hover:bg-purple-50/50 transition-all"
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            setFormData({ ...formData, featuredImage: event.target?.result as string });
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="hidden"
+                      id="featured-image-upload"
+                    />
+                    <label htmlFor="featured-image-upload" className="cursor-pointer">
+                      <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-600">Drag & drop or click to upload</p>
+                      <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</p>
+                    </label>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
