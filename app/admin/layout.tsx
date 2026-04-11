@@ -54,12 +54,13 @@ interface Notification {
 const navItems: NavItem[] = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
+  { href: "/admin/custom-orders", icon: DollarSign, label: "Custom Orders" },
   { href: "/admin/contacts", icon: MessageSquare, label: "Contacts" },
   { href: "/admin/services", icon: Settings, label: "Services" },
   { href: "/admin/products", icon: Image, label: "Products" },
   { href: "/admin/users", icon: Users, label: "Users" },
   { href: "/admin/subscribers", icon: SubscribersIcon, label: "Subscribers" },
-  { href: "/admin/revenue", icon: DollarSign, label: "Revenue" },
+  { href: "/admin/revenue", icon: BarChart3, label: "Revenue" },
   { href: "/admin/portfolio", icon: BarChart3, label: "Portfolio" },
   { href: "/admin/bank", icon: Building2, label: "Bank Settings" },
 ]

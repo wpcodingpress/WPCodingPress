@@ -1,25 +1,61 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { Mail, MapPin, Clock, Send, CheckCircle2, MessageSquare, Headphones, Zap } from "lucide-react"
+import { Mail, MapPin, Clock, Send, CheckCircle2, MessageSquare, Headphones, Zap, FileText, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+interface Service {
+  id: string
+  name: string
+  slug: string
+}
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const [formData, setFormData] = useState({
+  const [services, setServices] = useState<Service[]>([])
+  const [formType, setFormType] = useState<"query" | "order">("query")
+  const [queryForm, setQueryForm] = useState({
     name: "",
     email: "",
     phone: "",
+    subject: "",
     message: ""
   })
+  const [orderForm, setOrderForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    service: "",
+    projectName: "",
+    projectDescription: "",
+    budget: ""
+  })
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchServices()
+  }, [])
+
+  const fetchServices = async () => {
+    try {
+      const res = await fetch("/api/public/services")
+      if (res.ok) {
+        const data = await res.json()
+        setServices(data)
+      }
+    } catch (error) {
+      console.error("Error fetching services:", error)
+    }
+  }
+
+  const handleQuerySubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     
@@ -27,12 +63,12 @@ export default function ContactPage() {
       const response = await fetch("/api/contacts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(queryForm)
       })
       
       if (response.ok) {
         setIsSubmitted(true)
-        setFormData({ name: "", email: "", phone: "", message: "" })
+        setQueryForm({ name: "", email: "", phone: "", subject: "", message: "" })
       }
     } catch (error) {
       console.error("Error submitting form:", error)
@@ -41,8 +77,30 @@ export default function ContactPage() {
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  const handleOrderSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...orderForm,
+          service: orderForm.service,
+          message: `Project: ${orderForm.projectName}\n\n${orderForm.projectDescription}\n\nBudget: ${orderForm.budget}`
+        })
+      })
+      
+      if (response.ok) {
+        setIsSubmitted(true)
+        setOrderForm({ name: "", email: "", phone: "", service: "", projectName: "", projectDescription: "", budget: "" })
+      }
+    } catch (error) {
+      console.error("Error submitting order:", error)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const contactInfo = [
@@ -71,7 +129,6 @@ export default function ContactPage() {
 
   return (
     <div className="relative">
-      {/* Hero */}
       <section className="relative py-32 overflow-hidden">
         <div className="absolute inset-0">
           <Image 
@@ -101,13 +158,11 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Contact Section */}
       <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-indigo-950/30 to-slate-950" />
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12">
-            {/* Contact Form */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -122,91 +177,240 @@ export default function ContactPage() {
                       <MessageSquare className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold text-white">Send us a message</h2>
-                      <p className="text-slate-400 text-sm">We typically reply within 24 hours</p>
+                      <h2 className="text-2xl font-bold text-white">How can we help?</h2>
+                      <p className="text-slate-400 text-sm">Choose an option below</p>
                     </div>
                   </div>
-                  
+
                   {isSubmitted ? (
                     <div className="text-center py-12">
                       <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-6">
                         <CheckCircle2 className="h-10 w-10 text-white" />
                       </div>
-                      <h3 className="text-2xl font-bold text-white mb-2">Message Sent!</h3>
+                      <h3 className="text-2xl font-bold text-white mb-2">
+                        {formType === "order" ? "Order Submitted!" : "Message Sent!"}
+                      </h3>
                       <p className="text-slate-400">
-                        Thank you for reaching out. We'll get back to you within 24 hours.
+                        Thank you! We'll get back to you within 24 hours.
                       </p>
+                      <Button 
+                        onClick={() => setIsSubmitted(false)}
+                        className="mt-6 bg-gradient-to-r from-blue-600 to-purple-600"
+                      >
+                        Send Another
+                      </Button>
                     </div>
                   ) : (
-                    <form onSubmit={handleSubmit} className="space-y-5">
-                      <div className="grid md:grid-cols-2 gap-5">
-                        <div>
-                          <label className="block text-sm font-medium text-slate-300 mb-2">Your Name</label>
-                          <Input
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            placeholder="John Smith"
-                            required
-                            className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-slate-300 mb-2">Email Address</label>
-                          <Input
-                            name="email"
-                            type="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            placeholder="john@example.com"
-                            required
-                            className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Phone Number</label>
-                        <Input
-                          name="phone"
-                          type="tel"
-                          value={formData.phone}
-                          onChange={handleChange}
-                          placeholder="+880 1XXX XXXXXX"
-                          className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-2">Your Message</label>
-                        <Textarea
-                          name="message"
-                          value={formData.message}
-                          onChange={handleChange}
-                          placeholder="Tell us about your project..."
-                          required
-                          className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[150px] focus:border-blue-500 focus:ring-blue-500"
-                        />
-                      </div>
-                      <Button 
-                        type="submit" 
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 shadow-lg shadow-blue-500/25"
-                        disabled={isSubmitting}
-                      >
-                        {isSubmitting ? (
-                          "Sending..."
-                        ) : (
-                          <>
-                            Send Message
-                            <Send className="ml-2 h-4 w-4" />
-                          </>
-                        )}
-                      </Button>
-                    </form>
+                    <Tabs value={formType} onValueChange={(v) => setFormType(v as "query" | "order")}>
+                      <TabsList className="grid grid-cols-2 bg-slate-800 mb-6">
+                        <TabsTrigger value="query" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white">
+                          <MessageSquare className="w-4 h-4 mr-2" />
+                          Send Query
+                        </TabsTrigger>
+                        <TabsTrigger value="order" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white">
+                          <FileText className="w-4 h-4 mr-2" />
+                          Start Project
+                        </TabsTrigger>
+                      </TabsList>
+
+                      <TabsContent value="query">
+                        <form onSubmit={handleQuerySubmit} className="space-y-5">
+                          <div className="grid md:grid-cols-2 gap-5">
+                            <div>
+                              <label className="block text-sm font-medium text-slate-300 mb-2">Your Name *</label>
+                              <Input
+                                name="name"
+                                value={queryForm.name}
+                                onChange={(e) => setQueryForm({ ...queryForm, name: e.target.value })}
+                                placeholder="John Smith"
+                                required
+                                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-slate-300 mb-2">Email Address *</label>
+                              <Input
+                                name="email"
+                                type="email"
+                                value={queryForm.email}
+                                onChange={(e) => setQueryForm({ ...queryForm, email: e.target.value })}
+                                placeholder="john@example.com"
+                                required
+                                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
+                              />
+                            </div>
+                          </div>
+                          <div className="grid md:grid-cols-2 gap-5">
+                            <div>
+                              <label className="block text-sm font-medium text-slate-300 mb-2">Phone</label>
+                              <Input
+                                name="phone"
+                                type="tel"
+                                value={queryForm.phone}
+                                onChange={(e) => setQueryForm({ ...queryForm, phone: e.target.value })}
+                                placeholder="+880 1XXX XXXXXX"
+                                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-slate-300 mb-2">Subject *</label>
+                              <Select value={queryForm.subject} onValueChange={(v) => setQueryForm({ ...queryForm, subject: v })}>
+                                <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                                  <SelectValue placeholder="Select subject" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="general">General Inquiry</SelectItem>
+                                  <SelectItem value="quote">Get a Quote</SelectItem>
+                                  <SelectItem value="support">Technical Support</SelectItem>
+                                  <SelectItem value="partnership">Partnership</SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-2">Your Message *</label>
+                            <Textarea
+                              name="message"
+                              value={queryForm.message}
+                              onChange={(e) => setQueryForm({ ...queryForm, message: e.target.value })}
+                              placeholder="Tell us about your project or question..."
+                              required
+                              className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[150px] focus:border-blue-500 focus:ring-blue-500"
+                            />
+                          </div>
+                          <Button 
+                            type="submit" 
+                            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 shadow-lg shadow-blue-500/25"
+                            disabled={isSubmitting}
+                          >
+                            {isSubmitting ? (
+                              "Sending..."
+                            ) : (
+                              <>
+                                Send Message
+                                <Send className="ml-2 h-4 w-4" />
+                              </>
+                            )}
+                          </Button>
+                        </form>
+                      </TabsContent>
+
+                      <TabsContent value="order">
+                        <form onSubmit={handleOrderSubmit} className="space-y-5">
+                          <div className="grid md:grid-cols-2 gap-5">
+                            <div>
+                              <label className="block text-sm font-medium text-slate-300 mb-2">Your Name *</label>
+                              <Input
+                                name="name"
+                                value={orderForm.name}
+                                onChange={(e) => setOrderForm({ ...orderForm, name: e.target.value })}
+                                placeholder="John Smith"
+                                required
+                                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-slate-300 mb-2">Email Address *</label>
+                              <Input
+                                name="email"
+                                type="email"
+                                value={orderForm.email}
+                                onChange={(e) => setOrderForm({ ...orderForm, email: e.target.value })}
+                                placeholder="john@example.com"
+                                required
+                                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
+                              />
+                            </div>
+                          </div>
+                          <div className="grid md:grid-cols-2 gap-5">
+                            <div>
+                              <label className="block text-sm font-medium text-slate-300 mb-2">Phone</label>
+                              <Input
+                                name="phone"
+                                type="tel"
+                                value={orderForm.phone}
+                                onChange={(e) => setOrderForm({ ...orderForm, phone: e.target.value })}
+                                placeholder="+880 1XXX XXXXXX"
+                                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-slate-300 mb-2">Service Type *</label>
+                              <Select value={orderForm.service} onValueChange={(v) => setOrderForm({ ...orderForm, service: v })}>
+                                <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                                  <SelectValue placeholder="Select a service" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {services.map((service) => (
+                                    <SelectItem key={service.id} value={service.slug}>
+                                      {service.name}
+                                    </SelectItem>
+                                  ))}
+                                  <SelectItem value="custom">Custom Project</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-2">Project Name *</label>
+                            <Input
+                              name="projectName"
+                              value={orderForm.projectName}
+                              onChange={(e) => setOrderForm({ ...orderForm, projectName: e.target.value })}
+                              placeholder="My Awesome Project"
+                              required
+                              className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-2">Project Description *</label>
+                            <Textarea
+                              name="projectDescription"
+                              value={orderForm.projectDescription}
+                              onChange={(e) => setOrderForm({ ...orderForm, projectDescription: e.target.value })}
+                              placeholder="Describe your project requirements in detail..."
+                              required
+                              className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[120px] focus:border-blue-500 focus:ring-blue-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-2">Estimated Budget</label>
+                            <Select value={orderForm.budget} onValueChange={(v) => setOrderForm({ ...orderForm, budget: v })}>
+                              <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                                <SelectValue placeholder="Select budget range" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="under_500">Under $500</SelectItem>
+                                <SelectItem value="500_1000">$500 - $1,000</SelectItem>
+                                <SelectItem value="1000_2500">$1,000 - $2,500</SelectItem>
+                                <SelectItem value="2500_5000">$2,500 - $5,000</SelectItem>
+                                <SelectItem value="5000_plus">$5,000+</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <Button 
+                            type="submit" 
+                            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 shadow-lg shadow-green-500/25"
+                            disabled={isSubmitting}
+                          >
+                            {isSubmitting ? (
+                              "Submitting..."
+                            ) : (
+                              <>
+                                Submit Project Request
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                              </>
+                            )}
+                          </Button>
+                        </form>
+                      </TabsContent>
+                    </Tabs>
                   )}
                 </CardContent>
               </Card>
             </motion.div>
 
-            {/* Contact Info */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -237,7 +441,6 @@ export default function ContactPage() {
                 </motion.div>
               ))}
 
-              {/* Support Feature */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -259,7 +462,6 @@ export default function ContactPage() {
                 </Card>
               </motion.div>
 
-              {/* Quick Response */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
