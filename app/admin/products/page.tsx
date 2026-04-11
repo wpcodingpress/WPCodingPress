@@ -129,20 +129,29 @@ export default function AdminProductsPage() {
   }, []);
 
   const fetchProducts = async () => {
+    setIsLoading(true);
     try {
-      console.log('Fetching products from /api/admin/products...');
-      const response = await fetch("/api/admin/products");
-      console.log('Response status:', response.status);
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Products fetched:', data);
+      const response = await fetch(`/api/admin/products?t=${Date.now()}`, { 
+        cache: 'no-store' 
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (Array.isArray(data)) {
         setProducts(data);
+      } else if (data && Array.isArray(data.products)) {
+        setProducts(data.products);
       } else {
-        const error = await response.json();
-        console.error('Error fetching products:', error);
+        console.error('Invalid response format:', data);
+        setProducts([]);
       }
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error('Fetch error:', error);
+      setProducts([]);
     } finally {
       setIsLoading(false);
     }
@@ -252,21 +261,33 @@ export default function AdminProductsPage() {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
-      fetchProducts();
+      const res = await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setProducts(products.filter(p => p.id !== id));
+        setToast({ message: 'Product deleted', type: 'success' });
+      } else {
+        const err = await res.json();
+        setToast({ message: err.error || 'Failed to delete', type: 'error' });
+      }
     } catch (error) {
       console.error("Error deleting product:", error);
+      setToast({ message: 'Failed to delete product', type: 'error' });
     }
   };
 
   const handleToggleActive = async (product: Product) => {
     try {
-      await fetch(`/api/admin/products/${product.id}`, {
+      const res = await fetch(`/api/admin/products/${product.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive: !product.isActive })
       });
-      fetchProducts();
+      if (res.ok) {
+        setProducts(products.map(p => p.id === product.id ? { ...p, isActive: !p.isActive } : p));
+      } else {
+        const err = await res.json();
+        setToast({ message: err.error || 'Failed to update', type: 'error' });
+      }
     } catch (error) {
       console.error("Error toggling product:", error);
     }
