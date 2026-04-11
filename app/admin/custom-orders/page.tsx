@@ -81,6 +81,14 @@ export default function AdminCustomOrdersPage() {
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
+
+  const handleDownloadPDF = async (invoice: CustomOrder) => {
+    if (isDownloading) return
+    setIsDownloading(true)
+    await downloadPDF(invoice)
+    setIsDownloading(false)
+  }
 
   useEffect(() => {
     fetchCustomOrders()
@@ -978,31 +986,45 @@ export default function AdminCustomOrdersPage() {
           {selectedOrder && (
             <div className="space-y-6">
               {/* Payment Status Banner */}
-              <div className={`p-4 rounded-lg border-2 ${
+              <div className={`p-5 rounded-lg border-2 ${
                 selectedOrder.advancePaid && selectedOrder.remainingPaid 
-                  ? "bg-green-50 border-green-300" 
-                  : selectedOrder.advancePaid 
-                    ? "bg-yellow-50 border-yellow-300"
-                    : "bg-red-50 border-red-300"
+                  ? "bg-green-100 border-green-400" 
+                  : selectedOrder.advancePaid && selectedOrder.advanceAmount > 0
+                    ? "bg-yellow-100 border-yellow-400"
+                    : "bg-red-100 border-red-400"
               }`}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-semibold text-lg">
-                      Payment Status: {
-                        selectedOrder.advancePaid && selectedOrder.remainingPaid 
-                          ? "PAID"
-                          : selectedOrder.advancePaid 
-                            ? "PARTIAL"
-                            : "UNPAID"
+                    <p className={`font-bold text-2xl ${
+                      selectedOrder.advancePaid && selectedOrder.remainingPaid 
+                        ? "text-green-800" 
+                        : selectedOrder.advancePaid && selectedOrder.advanceAmount > 0
+                          ? "text-yellow-800"
+                          : "text-red-800"
+                    }`}>
+                      {selectedOrder.advancePaid && selectedOrder.remainingPaid 
+                        ? "✓ PAYMENT COMPLETE"
+                        : selectedOrder.advancePaid && selectedOrder.advanceAmount > 0
+                          ? "⚠ PARTIAL PAYMENT"
+                          : "✕ UNPAID"
                       }
                     </p>
-                    <p className="text-sm text-slate-600">
-                      Total: ${selectedOrder.totalAmount} | Advance: ${selectedOrder.advanceAmount} | Remaining: ${selectedOrder.remainingAmount}
+                    <p className="text-base font-semibold text-slate-800 mt-2">
+                      Total Project Cost: <span className="font-bold text-xl">${selectedOrder.totalAmount}</span>
                     </p>
+                    {selectedOrder.advanceAmount > 0 && (
+                      <p className="text-sm text-slate-700 mt-1">
+                        Advance: ${selectedOrder.advanceAmount} | Remaining: ${selectedOrder.remainingAmount}
+                      </p>
+                    )}
                   </div>
-                  <Button onClick={() => downloadPDF(selectedOrder)} className="bg-blue-600 hover:bg-blue-700">
-                    <Download className="h-4 w-4 mr-2" />
-                    Download PDF
+                  <Button 
+                    onClick={() => handleDownloadPDF(selectedOrder)} 
+                    disabled={isDownloading}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 disabled:opacity-50"
+                  >
+                    <Download className="h-5 w-5 mr-2" />
+                    {isDownloading ? "Generating..." : "Download Invoice"}
                   </Button>
                 </div>
               </div>
@@ -1042,63 +1064,82 @@ export default function AdminCustomOrdersPage() {
               </div>
 
               {/* Payment Management */}
-              <div className="border-2 border-slate-200 rounded-lg p-4">
-                <h3 className="font-bold text-slate-900 mb-4">Payment Management</h3>
+              <div className="border-2 border-slate-300 rounded-lg p-5 bg-slate-50">
+                <h3 className="font-bold text-slate-900 text-lg mb-4">💰 Payment Management</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-slate-50 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-slate-600">Advance Payment (${selectedOrder.advanceAmount})</span>
-                      {selectedOrder.advancePaid ? (
-                        <span className="text-green-600 font-bold">PAID ✓</span>
-                      ) : (
-                        <span className="text-yellow-600 font-bold">PENDING</span>
+                  <div className="p-4 bg-white rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-semibold text-slate-800">Advance Payment</span>
+                      <span className={`font-bold px-3 py-1 rounded-full text-sm ${
+                        selectedOrder.advancePaid ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                      }`}>
+                        ${selectedOrder.advanceAmount}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className={`font-bold ${selectedOrder.advancePaid ? "text-green-600" : "text-yellow-600"}`}>
+                        {selectedOrder.advancePaid ? "✓ PAID" : "⏳ PENDING"}
+                      </span>
+                      {selectedOrder.advanceAmount > 0 && (
+                        <Button 
+                          size="sm" 
+                          variant={selectedOrder.advancePaid ? "outline" : "default"}
+                          className={selectedOrder.advancePaid 
+                            ? "text-red-600 border-red-300 hover:bg-red-50 font-semibold" 
+                            : "bg-green-600 hover:bg-green-700 text-white font-semibold"
+                          }
+                          onClick={() => {
+                            if (selectedOrder.advancePaid) {
+                              revertPayment(selectedOrder.id, "advance")
+                            } else {
+                              markPayment(selectedOrder.id, "advance")
+                            }
+                          }}
+                        >
+                          {selectedOrder.advancePaid ? "↩ Undo" : "✓ Mark Paid"}
+                        </Button>
                       )}
                     </div>
-                    {selectedOrder.advanceAmount > 0 && (
-                      <Button 
-                        size="sm" 
-                        variant={selectedOrder.advancePaid ? "outline" : "default"}
-                        className={selectedOrder.advancePaid ? "text-red-600 border-red-300 hover:bg-red-50" : "bg-green-600 hover:bg-green-700"}
-                        onClick={() => {
-                          if (selectedOrder.advancePaid) {
-                            revertPayment(selectedOrder.id, "advance")
-                          } else {
-                            markPayment(selectedOrder.id, "advance")
-                          }
-                        }}
-                      >
-                        {selectedOrder.advancePaid ? "Mark Unpaid" : "Mark Paid"}
-                      </Button>
-                    )}
                   </div>
-                  <div className="p-3 bg-slate-50 rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-slate-600">Remaining Payment (${selectedOrder.remainingAmount})</span>
-                      {selectedOrder.remainingPaid ? (
-                        <span className="text-green-600 font-bold">PAID ✓</span>
-                      ) : (
-                        <span className="text-yellow-600 font-bold">DUE</span>
+                  <div className="p-4 bg-white rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-semibold text-slate-800">Remaining Payment</span>
+                      <span className={`font-bold px-3 py-1 rounded-full text-sm ${
+                        selectedOrder.remainingPaid ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"
+                      }`}>
+                        ${selectedOrder.remainingAmount}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className={`font-bold ${selectedOrder.remainingPaid ? "text-green-600" : "text-slate-500"}`}>
+                        {selectedOrder.remainingPaid ? "✓ PAID" : "⏳ DUE"}
+                      </span>
+                      {selectedOrder.remainingAmount > 0 && selectedOrder.advancePaid && (
+                        <Button 
+                          size="sm" 
+                          variant={selectedOrder.remainingPaid ? "outline" : "default"}
+                          className={selectedOrder.remainingPaid 
+                            ? "text-red-600 border-red-300 hover:bg-red-50 font-semibold" 
+                            : "bg-green-600 hover:bg-green-700 text-white font-semibold"
+                          }
+                          onClick={() => {
+                            if (selectedOrder.remainingPaid) {
+                              revertPayment(selectedOrder.id, "remaining")
+                            } else {
+                              markPayment(selectedOrder.id, "remaining")
+                            }
+                          }}
+                        >
+                          {selectedOrder.remainingPaid ? "↩ Undo" : "✓ Mark Paid"}
+                        </Button>
                       )}
                     </div>
-                    {selectedOrder.remainingAmount > 0 && (
-                      <Button 
-                        size="sm" 
-                        variant={selectedOrder.remainingPaid ? "outline" : "default"}
-                        className={selectedOrder.remainingPaid ? "text-red-600 border-red-300 hover:bg-red-50" : "bg-green-600 hover:bg-green-700"}
-                        onClick={() => {
-                          if (selectedOrder.remainingPaid) {
-                            revertPayment(selectedOrder.id, "remaining")
-                          } else {
-                            markPayment(selectedOrder.id, "remaining")
-                          }
-                        }}
-                      >
-                        {selectedOrder.remainingPaid ? "Mark Unpaid" : "Mark Paid"}
-                      </Button>
-                    )}
                   </div>
                 </div>
               </div>
+
+              <div>
+                <label className="text-base font-bold text-slate-800 mb-3 block">📋 Project Status</label>
 
               <div>
                 <label className="text-sm text-slate-600 mb-2 block">Project Status</label>
