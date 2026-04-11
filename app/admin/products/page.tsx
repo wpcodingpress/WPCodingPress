@@ -131,30 +131,13 @@ export default function AdminProductsPage() {
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/admin/products`, { 
-        cache: 'no-store',
-        next: { revalidate: 0 }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
-      }
-      
-      const data = await response.json();
-      console.log('[Products] Raw API response:', data);
-      
+      const res = await fetch('/api/admin/products');
+      const data = await res.json();
       if (Array.isArray(data)) {
         setProducts(data);
-      } else if (data && Array.isArray(data.products)) {
-        setProducts(data.products);
-      } else {
-        console.error('[Products] Invalid response format:', data);
-        setProducts([]);
       }
     } catch (error) {
-      console.error('[Products] Fetch error:', error);
-      setToast({ message: 'Failed to load products', type: 'error' });
-      setProducts([]);
+      console.error('Fetch error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -205,16 +188,20 @@ export default function AdminProductsPage() {
         return;
       }
 
-      // Close modal and refresh
+      // Add to list immediately for snappy feel
+      if (editingProduct) {
+        setProducts(products.map(p => p.id === editingProduct.id ? { ...p, ...result } : p));
+      } else {
+        setProducts([result, ...products]);
+      }
+      
+      // Close modal
       setShowModal(false);
       setEditingProduct(null);
       resetForm();
       
       // Show success toast
       setToast({ message: editingProduct ? 'Product updated!' : 'Product created successfully!', type: 'success' });
-      
-      // Force refresh - reload window to get fresh data
-      window.location.reload();
     } catch (error) {
       console.error("Error saving product:", error);
       setToast({ message: 'Failed to save product. Please try again.', type: 'error' });
@@ -263,8 +250,8 @@ export default function AdminProductsPage() {
     try {
       const res = await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
       if (res.ok) {
+        setProducts(products.filter(p => p.id !== id));
         setToast({ message: 'Product deleted', type: 'success' });
-        window.location.reload();
       } else {
         const err = await res.json();
         setToast({ message: err.error || 'Failed to delete', type: 'error' });
@@ -283,7 +270,7 @@ export default function AdminProductsPage() {
         body: JSON.stringify({ isActive: !product.isActive })
       });
       if (res.ok) {
-        setProducts(products.map(p => p.id === product.id ? { ...p, isActive: !p.isActive } : p));
+        setProducts(products.map(p => p.id === product.id ? { ...p, isActive: !product.isActive } : p));
       } else {
         const err = await res.json();
         setToast({ message: err.error || 'Failed to update', type: 'error' });
