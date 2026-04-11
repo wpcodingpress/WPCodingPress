@@ -111,6 +111,18 @@ async function getAllActiveProducts() {
   }
 }
 
+async function getFeaturedProducts() {
+  try {
+    return await prisma.product.findMany({
+      where: { isActive: true, isFeatured: true },
+      take: 6,
+    });
+  } catch (error) {
+    console.error('Error fetching featured products:', error);
+    return [];
+  }
+}
+
 function getUniqueTypes(products: any[]) {
   const types = [...new Set(products.map(p => p.type))];
   return types.filter(t => t && typeConfig[t]).map(t => typeConfig[t!]);
@@ -118,6 +130,7 @@ function getUniqueTypes(products: any[]) {
 
 export default async function ProductsPage() {
   const products = await getAllActiveProducts();
+  const featuredProducts = await getFeaturedProducts();
   const productTypes = getUniqueTypes(products);
 
   return (
@@ -217,65 +230,86 @@ export default async function ProductsPage() {
         </div>
       </section>
 
-      {/* Featured Products */}
-      {products.length > 0 && (
-        <section className="py-16 px-4 bg-slate-900/30">
+      {/* Featured Products - Only show if there are featured products */}
+      {featuredProducts.length > 0 && (
+        <section className="py-20 px-4 bg-gradient-to-b from-slate-900/50 to-transparent">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-white mb-4">
-                Featured Products
-              </h2>
-              <p className="text-slate-400">
-                Check out our most popular products
-              </p>
+            <div className="flex items-center justify-between mb-12">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Star className="w-5 h-5 text-amber-400 fill-current" />
+                  <span className="text-amber-400 text-sm font-medium">Featured</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold text-white">
+                  Premium Products
+                </h2>
+                <p className="text-slate-400 mt-2">
+                  Hand-picked products for maximum value
+                </p>
+              </div>
+              <Link 
+                href="/products"
+                className="hidden md:inline-flex items-center gap-2 px-5 py-3 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-all"
+              >
+                View All <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.map((product) => {
+              {featuredProducts.map((product) => {
                 const type = product.type;
-                const categorySlug = type === 'plugin' ? 'plugins' : type === 'theme' ? 'themes' : type === 'template' ? 'templates' : type === 'mcp_server' ? 'mcp-servers' : 'ai-agents';
                 const images = product.images as { featuredImage?: string } | null;
+                const typeInfo = typeConfig[type];
                 
                 return (
                   <Link
                     key={product.id}
                     href={`/products/${product.slug}`}
-                    className="group bg-slate-800/40 border border-slate-700/50 rounded-2xl overflow-hidden hover:border-purple-500/50 hover:bg-slate-800/60 transition-all"
+                    className="group relative bg-gradient-to-br from-slate-800/60 to-slate-800/30 border border-slate-700/50 rounded-2xl overflow-hidden hover:border-amber-500/50 hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-300"
                   >
+                    {/* Featured Badge */}
+                    <div className="absolute top-4 left-4 z-10">
+                      <span className="flex items-center gap-1 px-3 py-1 bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-medium rounded-full">
+                        <Star className="w-3 h-3 fill-current" />
+                        Featured
+                      </span>
+                    </div>
+                    
+                    {/* Image */}
                     <div className="aspect-video bg-slate-700/50 relative overflow-hidden">
                       {images?.featuredImage ? (
                         <img 
                           src={images.featuredImage} 
                           alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <BoxIcon className="w-16 h-16 text-slate-600" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-5">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs font-medium px-2 py-1 bg-purple-500/20 text-purple-300 rounded-full capitalize">
-                          {type}
-                        </span>
-                        {product.isFeatured && (
-                          <Star className="w-4 h-4 text-amber-400 fill-current" />
-                        )}
+                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
+                        <span className="text-5xl">{typeInfo?.icon || '📦'}</span>
                       </div>
-                      <h3 className="text-lg font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">
+                      {/* Gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="p-5 relative">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-xs font-medium px-2 py-1 bg-white/10 text-slate-300 rounded-full capitalize">
+                          {typeInfo?.label || type}
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">
                         {product.name}
                       </h3>
                       <p className="text-sm text-slate-400 mb-4 line-clamp-2">
                         {product.shortDesc || product.description}
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className={`font-semibold ${product.price === 0 ? 'text-green-400' : 'text-white'}`}>
+                        <span className={`text-lg font-bold ${product.price === 0 ? 'text-green-400' : 'text-white'}`}>
                           {product.price === 0 ? 'Free' : `$${product.price >= 100 ? (product.price / 100).toFixed(2) : product.price.toFixed(2)}`}
                         </span>
-                        <span className="text-sm text-purple-400 group-hover:text-purple-300">
-                          View Details →
+                        <span className="text-sm text-amber-400 group-hover:text-amber-300 flex items-center gap-1">
+                          View <ArrowRight className="w-4 h-4" />
                         </span>
                       </div>
                     </div>
@@ -284,12 +318,12 @@ export default async function ProductsPage() {
               })}
             </div>
 
-            <div className="text-center mt-10">
+            <div className="text-center mt-10 md:hidden">
               <Link 
-                href="/admin/products" 
-                className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+                href="/products"
+                className="inline-flex items-center gap-2 px-5 py-3 bg-white/10 border border-white/20 text-white rounded-xl hover:bg-white/20 transition-all"
               >
-                View all products on admin
+                View All Products <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
