@@ -269,7 +269,9 @@ export default function AdminProductsPage() {
                     {product.price === 0 ? (
                       <span className="text-green-600 font-medium">Free</span>
                     ) : (
-                      <span className="text-gray-900 font-medium">${(product.price / 100).toFixed(2)}</span>
+                      <span className="text-gray-900 font-medium">
+                        ${product.price >= 100 ? (product.price / 100).toFixed(2) : product.price.toFixed(2)}
+                      </span>
                     )}
                   </td>
                   <td className="p-4">
@@ -340,13 +342,13 @@ export default function AdminProductsPage() {
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             className="bg-white border border-gray-200 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden shadow-2xl"
           >
-            <div className="p-6 border-b border-gray-200 bg-gray-50">
+            <div className="p-4 sm:p-6 border-b border-gray-200 bg-gray-50">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                     {editingProduct ? "Edit Product" : "Add New Product"}
                   </h2>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-500 mt-1 hidden sm:block">
                     {editingProduct ? "Update product details below" : "Create a new product for your store"}
                   </p>
                 </div>
@@ -364,8 +366,8 @@ export default function AdminProductsPage() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-y-auto max-h-[calc(90vh-180px)]">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-5 sm:space-y-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
                     <span>Name</span>
