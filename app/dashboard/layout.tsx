@@ -24,6 +24,7 @@ import {
   Package,
   ShoppingBag,
   MessageSquare,
+  FileText,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { FloatingButtons } from "@/components/floating-buttons"
@@ -41,6 +42,7 @@ interface Notification {
 const sidebarLinks = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { title: "My Orders", href: "/dashboard/orders", icon: ShoppingCart },
+  { title: "Invoices", href: "/dashboard/invoices", icon: FileText },
   { title: "Downloads", href: "/dashboard/downloads", icon: DownloadCloud },
   { title: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
   { title: "My Sites", href: "/dashboard/sites", icon: Globe },
