@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, CheckCircle, Copy, ArrowLeft, Loader2, CreditCard, Banknote, Globe, Info, Shield, Clock, QrCode, Wallet, ArrowRightLeft } from "lucide-react";
+import { Building2, CheckCircle, Copy, ArrowLeft, Loader2, CreditCard, Banknote, Globe, Info, Shield, Clock, QrCode, Wallet, ArrowRightLeft, Hash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -33,6 +33,8 @@ function BankTransferContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [transactionId, setTransactionId] = useState("");
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const productSlug = searchParams.get("product");
   const productName = searchParams.get("name");
@@ -67,6 +69,10 @@ function BankTransferContent() {
   };
 
   const handleConfirmTransfer = async () => {
+    setShowConfirmModal(true);
+  };
+
+  const handleSubmitOrder = async () => {
     if (!productSlug || !productPrice) return;
 
     setIsSubmitting(true);
@@ -90,7 +96,8 @@ function BankTransferContent() {
           clientPhone: sessionData.user.phone || "",
           userId: sessionData.user.id,
           amount: parseInt(productPrice) || 0,
-          paymentMethod: "bank_transfer"
+          paymentMethod: "bank_transfer",
+          transactionId: transactionId || null
         })
       });
 
@@ -106,6 +113,7 @@ function BankTransferContent() {
       alert("Failed to create order. Please try again.");
     } finally {
       setIsSubmitting(false);
+      setShowConfirmModal(false);
     }
   };
 
@@ -363,14 +371,29 @@ function BankTransferContent() {
                 ) : (
                   <>
                     <CheckCircle className="mr-2 h-5 w-5" />
-                    I Have Made the Transfer
+                    Confirm Transfer
                   </>
                 )}
               </Button>
 
               <p className="text-center text-sm text-slate-500 mt-4">
-                By clicking above, you confirm that you have completed the bank transfer
+                Enter your transaction ID after making the payment
               </p>
+
+              {/* Transaction ID Input */}
+              <div className="mt-4 bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
+                <label className="flex items-center gap-2 text-sm text-slate-400 mb-2">
+                  <Hash className="w-4 h-4" />
+                  Transaction ID / Reference Number
+                </label>
+                <input
+                  type="text"
+                  value={transactionId}
+                  onChange={(e) => setTransactionId(e.target.value)}
+                  placeholder="Enter your bank transaction ID"
+                  className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-violet-500 focus:outline-none"
+                />
+              </div>
             </div>
         </motion.div>
       </div>
@@ -379,6 +402,15 @@ function BankTransferContent() {
 }
 
 function BankTransferLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="text-center">
+        <Loader2 className="h-12 w-12 animate-spin text-violet-400 mx-auto mb-4" />
+        <p className="text-slate-400">Loading payment details...</p>
+      </div>
+    </div>
+  );
+}
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <div className="text-center">
