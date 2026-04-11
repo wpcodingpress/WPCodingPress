@@ -13,7 +13,8 @@ export async function GET(
         OR: [
           { id },
           { slug: id }
-        ]
+        ],
+        isActive: true
       }
     })
 
