@@ -61,7 +61,7 @@ export default function AdminUsersPage() {
         }
       } else {
         const data = await response.json();
-        setUsers(data);
+        setUsers(data.users || data);
       }
     } catch (error) {
       console.error("Error fetching users:", error);
