@@ -415,9 +415,34 @@ export default function AdminCustomOrdersPage() {
       })
       if (res.ok) {
         fetchCustomOrders()
+        // Refresh selected order data
+        if (selectedOrder && selectedOrder.id === id) {
+          const updated = orders.find(o => o.id === id)
+          if (updated) setSelectedOrder({...updated})
+        }
       }
     } catch (error) {
       console.error("Error marking payment:", error)
+    }
+  }
+
+  const revertPayment = async (id: string, type: "advance" | "remaining") => {
+    try {
+      const res = await fetch(`/api/custom-orders/${id}/revert-payment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type })
+      })
+      if (res.ok) {
+        fetchCustomOrders()
+        // Refresh selected order data
+        if (selectedOrder && selectedOrder.id === id) {
+          const updated = orders.find(o => o.id === id)
+          if (updated) setSelectedOrder({...updated})
+        }
+      }
+    } catch (error) {
+      console.error("Error reverting payment:", error)
     }
   }
 
@@ -903,13 +928,43 @@ export default function AdminCustomOrdersPage() {
 
       {/* Order Detail Dialog */}
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
-        <DialogContent className="max-w-2xl bg-white">
+        <DialogContent className="max-w-3xl bg-white">
           <DialogHeader>
-            <DialogTitle className="text-slate-900">Order Details</DialogTitle>
+            <DialogTitle className="text-slate-900 text-xl font-bold">Order Details</DialogTitle>
           </DialogHeader>
           
           {selectedOrder && (
             <div className="space-y-6">
+              {/* Payment Status Banner */}
+              <div className={`p-4 rounded-lg border-2 ${
+                selectedOrder.advancePaid && selectedOrder.remainingPaid 
+                  ? "bg-green-50 border-green-300" 
+                  : selectedOrder.advancePaid 
+                    ? "bg-yellow-50 border-yellow-300"
+                    : "bg-red-50 border-red-300"
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-lg">
+                      Payment Status: {
+                        selectedOrder.advancePaid && selectedOrder.remainingPaid 
+                          ? "PAID"
+                          : selectedOrder.advancePaid 
+                            ? "PARTIAL"
+                            : "UNPAID"
+                      }
+                    </p>
+                    <p className="text-sm text-slate-600">
+                      Total: ${selectedOrder.totalAmount} | Advance: ${selectedOrder.advanceAmount} | Remaining: ${selectedOrder.remainingAmount}
+                    </p>
+                  </div>
+                  <Button onClick={() => downloadPDF(selectedOrder)} className="bg-blue-600 hover:bg-blue-700">
+                    <Download className="h-4 w-4 mr-2" />
+                    Download PDF
+                  </Button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm text-slate-500">Client Name</label>
@@ -927,6 +982,14 @@ export default function AdminCustomOrdersPage() {
                   <label className="text-sm text-slate-500">Project Name</label>
                   <p className="text-slate-900">{selectedOrder.projectName}</p>
                 </div>
+                <div>
+                  <label className="text-sm text-slate-500">Service Type</label>
+                  <p className="text-slate-900">{selectedOrder.serviceType || "Custom Project"}</p>
+                </div>
+                <div>
+                  <label className="text-sm text-slate-500">Created Date</label>
+                  <p className="text-slate-900">{new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
+                </div>
               </div>
 
               <div>
@@ -936,27 +999,67 @@ export default function AdminCustomOrdersPage() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 p-4 bg-slate-50 rounded-lg">
-                <div className="text-center">
-                  <p className="text-sm text-slate-500">Total</p>
-                  <p className="text-2xl font-bold text-slate-900">${selectedOrder.totalAmount}</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm text-slate-500">Advance (50%)</p>
-                  <p className={`text-2xl font-bold ${selectedOrder.advancePaid ? "text-green-600" : "text-yellow-600"}`}>
-                    ${selectedOrder.advanceAmount}
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm text-slate-500">Remaining</p>
-                  <p className={`text-2xl font-bold ${selectedOrder.remainingPaid ? "text-green-600" : "text-slate-400"}`}>
-                    ${selectedOrder.remainingAmount}
-                  </p>
+              {/* Payment Management */}
+              <div className="border-2 border-slate-200 rounded-lg p-4">
+                <h3 className="font-bold text-slate-900 mb-4">Payment Management</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-slate-50 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-slate-600">Advance Payment (${selectedOrder.advanceAmount})</span>
+                      {selectedOrder.advancePaid ? (
+                        <span className="text-green-600 font-bold">PAID ✓</span>
+                      ) : (
+                        <span className="text-yellow-600 font-bold">PENDING</span>
+                      )}
+                    </div>
+                    {selectedOrder.advanceAmount > 0 && (
+                      <Button 
+                        size="sm" 
+                        variant={selectedOrder.advancePaid ? "outline" : "default"}
+                        className={selectedOrder.advancePaid ? "text-red-600 border-red-300 hover:bg-red-50" : "bg-green-600 hover:bg-green-700"}
+                        onClick={() => {
+                          if (selectedOrder.advancePaid) {
+                            revertPayment(selectedOrder.id, "advance")
+                          } else {
+                            markPayment(selectedOrder.id, "advance")
+                          }
+                        }}
+                      >
+                        {selectedOrder.advancePaid ? "Mark Unpaid" : "Mark Paid"}
+                      </Button>
+                    )}
+                  </div>
+                  <div className="p-3 bg-slate-50 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-slate-600">Remaining Payment (${selectedOrder.remainingAmount})</span>
+                      {selectedOrder.remainingPaid ? (
+                        <span className="text-green-600 font-bold">PAID ✓</span>
+                      ) : (
+                        <span className="text-yellow-600 font-bold">DUE</span>
+                      )}
+                    </div>
+                    {selectedOrder.remainingAmount > 0 && (
+                      <Button 
+                        size="sm" 
+                        variant={selectedOrder.remainingPaid ? "outline" : "default"}
+                        className={selectedOrder.remainingPaid ? "text-red-600 border-red-300 hover:bg-red-50" : "bg-green-600 hover:bg-green-700"}
+                        onClick={() => {
+                          if (selectedOrder.remainingPaid) {
+                            revertPayment(selectedOrder.id, "remaining")
+                          } else {
+                            markPayment(selectedOrder.id, "remaining")
+                          }
+                        }}
+                      >
+                        {selectedOrder.remainingPaid ? "Mark Unpaid" : "Mark Paid"}
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
 
               <div>
-                <label className="text-sm text-slate-600 mb-2 block">Update Status</label>
+                <label className="text-sm text-slate-600 mb-2 block">Project Status</label>
                 <div className="flex flex-wrap gap-2">
                   {["pending", "in_progress", "completed", "cancelled"].map((status) => (
                     <Button
@@ -972,8 +1075,21 @@ export default function AdminCustomOrdersPage() {
                 </div>
               </div>
 
+              {selectedOrder.notes && (
+                <div>
+                  <label className="text-sm text-slate-500">Notes</label>
+                  <p className="text-slate-900 mt-1 p-3 rounded-lg bg-slate-50">
+                    {selectedOrder.notes}
+                  </p>
+                </div>
+              )}
+
               <div className="flex gap-3 pt-4 border-t border-slate-200">
-                <Button onClick={() => sendReceipt(selectedOrder.id)} className="bg-blue-600 hover:bg-blue-700">
+                <Button onClick={() => downloadPDF(selectedOrder)} variant="outline" className="border-slate-300">
+                  <Download className="h-4 w-4 mr-2" />
+                  Download PDF
+                </Button>
+                <Button onClick={() => sendReceipt(selectedOrder.id)} className="bg-green-600 hover:bg-green-700">
                   <Send className="h-4 w-4 mr-2" />
                   {selectedOrder.receiptSent ? "Resend Receipt" : "Send Receipt"}
                 </Button>
