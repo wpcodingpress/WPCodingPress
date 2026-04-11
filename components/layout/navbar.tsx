@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { useSession } from "next-auth/react"
+import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X, User, Bell, ArrowRight, ChevronDown, ShoppingBag, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -166,6 +167,12 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const { data: session } = useSession()
+  const pathname = usePathname()
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/"
+    return pathname.startsWith(href)
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -205,9 +212,9 @@ export function Navbar() {
                     onMouseLeave={() => setActiveDropdown(null)}
                     className={cn(
                       "flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-semibold transition-colors",
-                      activeDropdown === link.label.toLowerCase()
-                        ? "text-purple-600 bg-purple-50"
-                        : "text-slate-700 hover:text-purple-600 hover:bg-purple-50"
+                      activeDropdown === link.label.toLowerCase() || isActive(link.href)
+                        ? "text-violet-600 bg-violet-50"
+                        : "text-slate-700 hover:text-violet-600 hover:bg-violet-50"
                     )}
                   >
                     {link.label}
@@ -221,7 +228,12 @@ export function Navbar() {
                 ) : (
                   <Link
                     href={link.href}
-                    className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-slate-700 hover:text-purple-600 hover:bg-purple-50"
+                    className={cn(
+                      "px-4 py-2 rounded-lg text-sm font-semibold transition-colors",
+                      isActive(link.href)
+                        ? "text-violet-600 bg-violet-50"
+                        : "text-slate-700 hover:text-violet-600 hover:bg-violet-50"
+                    )}
                   >
                     {link.label}
                   </Link>

@@ -156,19 +156,22 @@ export default function AdminServicesPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-pulse text-primary">Loading...</div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-4 border-violet-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-slate-500">Loading services...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Services</h1>
-          <p className="text-muted-foreground">Manage your service offerings</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Services</h1>
+          <p className="text-slate-500">Manage your service offerings</p>
         </div>
-        <Button onClick={openCreateDialog}>
+        <Button onClick={openCreateDialog} className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white">
           <Plus className="h-4 w-4 mr-2" />
           Add Service
         </Button>
@@ -176,46 +179,46 @@ export default function AdminServicesPage() {
 
       <div className="grid gap-6">
         {services.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center text-muted-foreground">
+          <Card className="bg-white border-slate-200">
+            <CardContent className="p-8 text-center text-slate-500">
               No services found. Create your first service to get started.
             </CardContent>
           </Card>
         ) : (
           services.map((service) => (
-            <Card key={service.id}>
+            <Card key={service.id} className="bg-white border-slate-200 hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-white">{service.name}</h3>
-                      <Badge variant={service.isActive ? "success" : "outline"}>
+                      <h3 className="text-lg font-semibold text-slate-900">{service.name}</h3>
+                      <Badge variant={service.isActive ? "default" : "outline"} className={service.isActive ? "bg-emerald-100 text-emerald-700 border-emerald-200" : ""}>
                         {service.isActive ? "Active" : "Inactive"}
                       </Badge>
                     </div>
-                    <p className="text-muted-foreground text-sm mb-4 max-w-2xl">
+                    <p className="text-slate-500 text-sm mb-4 max-w-2xl">
                       {service.description}
                     </p>
                     <div className="flex gap-6">
                       <div>
-                        <span className="text-xs text-muted-foreground">Basic</span>
-                        <p className="text-lg font-bold text-white">${service.basicPrice}</p>
+                        <span className="text-xs text-slate-500">Basic</span>
+                        <p className="text-lg font-bold text-slate-900">${service.basicPrice}</p>
                       </div>
                       <div>
-                        <span className="text-xs text-muted-foreground">Standard</span>
-                        <p className="text-lg font-bold gradient-text">${service.standardPrice}</p>
+                        <span className="text-xs text-slate-500">Standard</span>
+                        <p className="text-lg font-bold text-violet-600">${service.standardPrice}</p>
                       </div>
                       <div>
-                        <span className="text-xs text-muted-foreground">Premium</span>
-                        <p className="text-lg font-bold text-white">${service.premiumPrice}</p>
+                        <span className="text-xs text-slate-500">Premium</span>
+                        <p className="text-lg font-bold text-slate-900">${service.premiumPrice}</p>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => openEditDialog(service)}>
+                    <Button variant="ghost" size="icon" onClick={() => openEditDialog(service)} className="text-slate-500 hover:text-violet-600 hover:bg-violet-50">
                       <Edit className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => deleteService(service.id)} className="hover:text-destructive">
+                    <Button variant="ghost" size="icon" onClick={() => deleteService(service.id)} className="text-slate-500 hover:text-red-600 hover:bg-red-50">
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -228,78 +231,78 @@ export default function AdminServicesPage() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white">
           <DialogHeader>
-            <DialogTitle>Add New Service</DialogTitle>
+            <DialogTitle className="text-slate-900">Add New Service</DialogTitle>
           </DialogHeader>
           
           {editingService && (
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-white mb-2 block">Service Name</label>
+                  <label className="text-sm font-medium text-slate-700 mb-2 block">Service Name</label>
                   <Input 
                     value={editingService.name}
                     onChange={(e) => setEditingService({ ...editingService, name: e.target.value })}
                     placeholder="WordPress Development"
-                    className="bg-white/5 border-white/10"
+                    className="bg-slate-50 border-slate-200"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-white mb-2 block">Slug</label>
+                  <label className="text-sm font-medium text-slate-700 mb-2 block">Slug</label>
                   <Input 
                     value={editingService.slug}
                     onChange={(e) => setEditingService({ ...editingService, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
                     placeholder="wordpress-development"
-                    className="bg-white/5 border-white/10"
+                    className="bg-slate-50 border-slate-200"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-white mb-2 block">Description</label>
+                <label className="text-sm font-medium text-slate-700 mb-2 block">Description</label>
                 <Textarea 
                   value={editingService.description}
                   onChange={(e) => setEditingService({ ...editingService, description: e.target.value })}
                   placeholder="Describe your service..."
-                  className="bg-white/5 border-white/10 min-h-[100px]"
+                  className="bg-slate-50 border-slate-200 min-h-[100px]"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-white mb-2 block">Basic Price ($)</label>
+                  <label className="text-sm font-medium text-slate-700 mb-2 block">Basic Price ($)</label>
                   <Input 
                     type="number"
                     value={editingService.basicPrice}
                     onChange={(e) => setEditingService({ ...editingService, basicPrice: parseInt(e.target.value) || 0 })}
-                    className="bg-white/5 border-white/10"
+                    className="bg-slate-50 border-slate-200"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-white mb-2 block">Standard Price ($)</label>
+                  <label className="text-sm font-medium text-slate-700 mb-2 block">Standard Price ($)</label>
                   <Input 
                     type="number"
                     value={editingService.standardPrice}
                     onChange={(e) => setEditingService({ ...editingService, standardPrice: parseInt(e.target.value) || 0 })}
-                    className="bg-white/5 border-white/10"
+                    className="bg-slate-50 border-slate-200"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-white mb-2 block">Premium Price ($)</label>
+                  <label className="text-sm font-medium text-slate-700 mb-2 block">Premium Price ($)</label>
                   <Input 
                     type="number"
                     value={editingService.premiumPrice}
                     onChange={(e) => setEditingService({ ...editingService, premiumPrice: parseInt(e.target.value) || 0 })}
-                    className="bg-white/5 border-white/10"
+                    className="bg-slate-50 border-slate-200"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-white mb-2 block">Icon</label>
+                <label className="text-sm font-medium text-slate-700 mb-2 block">Icon</label>
                 <Select value={editingService.icon} onValueChange={(v) => setEditingService({ ...editingService, icon: v })}>
-                  <SelectTrigger className="bg-white/5 border-white/10">
+                  <SelectTrigger className="bg-slate-50 border-slate-200">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -315,7 +318,7 @@ export default function AdminServicesPage() {
               <div className="grid grid-cols-3 gap-4">
                 {(["basic", "standard", "premium"] as const).map((tier) => (
                   <div key={tier}>
-                    <label className="text-sm font-medium text-white mb-2 block capitalize">{tier} Features</label>
+                    <label className="text-sm font-medium text-slate-700 mb-2 block capitalize">{tier} Features</label>
                     <div className="space-y-2">
                       {(editingService[`${tier}Features`] as string[]).map((feature, index) => (
                         <Input
@@ -323,7 +326,7 @@ export default function AdminServicesPage() {
                           value={feature}
                           onChange={(e) => updateFeature(tier, index, e.target.value)}
                           placeholder={`Feature ${index + 1}`}
-                          className="bg-white/5 border-white/10 h-9"
+                          className="bg-slate-50 border-slate-200 h-9"
                         />
                       ))}
                     </div>
@@ -332,10 +335,10 @@ export default function AdminServicesPage() {
               </div>
 
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-slate-200">
                   Cancel
                 </Button>
-                <Button onClick={handleSave} disabled={isSaving}>
+                <Button onClick={handleSave} disabled={isSaving} className="bg-gradient-to-r from-violet-500 to-purple-500">
                   {isSaving ? "Saving..." : "Save Service"}
                 </Button>
               </DialogFooter>

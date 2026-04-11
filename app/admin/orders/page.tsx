@@ -123,14 +123,14 @@ export default function AdminOrdersPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Orders</h1>
-          <p className="text-muted-foreground">Manage and track all your orders</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Orders</h1>
+          <p className="text-slate-500">Manage and track all your orders</p>
         </div>
         <Select value={filter} onValueChange={setFilter}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px] bg-white border-slate-200">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
@@ -144,38 +144,38 @@ export default function AdminOrdersPage() {
         </Select>
       </div>
 
-      <Card>
+      <Card className="bg-white border-slate-200">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Client</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Type</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Product/Service</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Package</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Amount</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Payment</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Downloads</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">Date</th>
-                  <th className="text-right p-4 text-sm font-medium text-muted-foreground">Actions</th>
+              <thead className="bg-slate-50 border-b border-slate-200">
+                <tr>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Client</th>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Type</th>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Product/Service</th>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Package</th>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Amount</th>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Payment</th>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Downloads</th>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Status</th>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Date</th>
+                  <th className="text-right p-4 text-sm font-semibold text-slate-600">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-100">
                 {filteredOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="p-8 text-center text-muted-foreground">
+                    <td colSpan={10} className="p-8 text-center text-slate-500">
                       No orders found
                     </td>
                   </tr>
                 ) : (
                   filteredOrders.map((order) => (
-                    <tr key={order.id} className="border-b border-border hover:bg-white/5">
+                    <tr key={order.id} className="hover:bg-slate-50 transition-colors">
                       <td className="p-4">
                         <div>
-                          <p className="font-medium text-white">{order.clientName}</p>
-                          <p className="text-sm text-muted-foreground">{order.clientEmail}</p>
+                          <p className="font-medium text-slate-900">{order.clientName}</p>
+                          <p className="text-sm text-slate-500">{order.clientEmail}</p>
                         </div>
                       </td>
                       <td className="p-4">
@@ -183,7 +183,7 @@ export default function AdminOrdersPage() {
                           {order.service ? "Service" : "Product"}
                         </Badge>
                       </td>
-                      <td className="p-4 text-muted-foreground">
+                      <td className="p-4 text-slate-600">
                         {order.product?.name || order.service?.name || "N/A"}
                       </td>
                       <td className="p-4">
@@ -191,7 +191,7 @@ export default function AdminOrdersPage() {
                           {order.packageType || "standard"}
                         </Badge>
                       </td>
-                      <td className="p-4 text-white font-medium">
+                      <td className="p-4 text-slate-900 font-medium">
                         ${order.amount || 0}
                       </td>
                       <td className="p-4">
@@ -201,11 +201,11 @@ export default function AdminOrdersPage() {
                       </td>
                       <td className="p-4">
                         {order.product ? (
-                          <span className={`text-sm font-medium ${order.downloadCount >= order.downloadLimit ? 'text-red-400' : 'text-green-400'}`}>
+                          <span className={`text-sm font-medium ${order.downloadCount >= order.downloadLimit ? 'text-red-600' : 'text-emerald-600'}`}>
                             {order.downloadCount}/{order.downloadLimit}
                           </span>
                         ) : (
-                          <span className="text-muted-foreground">-</span>
+                          <span className="text-slate-500">-</span>
                         )}
                       </td>
                       <td className="p-4">
@@ -213,7 +213,7 @@ export default function AdminOrdersPage() {
                           {order.status.replace("_", " ")}
                         </span>
                       </td>
-                      <td className="p-4 text-muted-foreground text-sm">
+                      <td className="p-4 text-slate-500 text-sm">
                         {new Date(order.createdAt).toLocaleDateString()}
                       </td>
                       <td className="p-4 text-right">
@@ -222,6 +222,7 @@ export default function AdminOrdersPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => setSelectedOrder(order)}
+                            className="text-slate-500 hover:text-violet-600 hover:bg-violet-50"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -229,7 +230,7 @@ export default function AdminOrdersPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => deleteOrder(order.id)}
-                            className="hover:text-destructive"
+                            className="text-slate-500 hover:text-red-600 hover:bg-red-50"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -246,10 +247,10 @@ export default function AdminOrdersPage() {
 
       {/* Order Detail Dialog */}
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl bg-white">
           <DialogHeader>
-            <DialogTitle>Order Details</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-slate-900">Order Details</DialogTitle>
+            <DialogDescription className="text-slate-500">
               View and update order status
             </DialogDescription>
           </DialogHeader>
@@ -258,26 +259,26 @@ export default function AdminOrdersPage() {
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm text-muted-foreground">Client Name</label>
-                  <p className="text-white font-medium">{selectedOrder.clientName}</p>
+                  <label className="text-sm text-slate-500">Client Name</label>
+                  <p className="text-slate-900 font-medium">{selectedOrder.clientName}</p>
                 </div>
                 <div>
-                  <label className="text-sm text-muted-foreground">Email</label>
-                  <p className="text-white">{selectedOrder.clientEmail}</p>
+                  <label className="text-sm text-slate-500">Email</label>
+                  <p className="text-slate-900">{selectedOrder.clientEmail}</p>
                 </div>
                 <div>
-                  <label className="text-sm text-muted-foreground">Phone</label>
-                  <p className="text-white">{selectedOrder.clientPhone}</p>
+                  <label className="text-sm text-slate-500">Phone</label>
+                  <p className="text-slate-900">{selectedOrder.clientPhone}</p>
                 </div>
                 <div>
-                  <label className="text-sm text-muted-foreground">Service</label>
-                  <p className="text-white">{selectedOrder.service?.name || selectedOrder.product?.name || "N/A"}</p>
+                  <label className="text-sm text-slate-500">Service</label>
+                  <p className="text-slate-900">{selectedOrder.service?.name || selectedOrder.product?.name || "N/A"}</p>
                 </div>
                 
                 {selectedOrder.product && (
                   <div>
-                    <label className="text-sm text-muted-foreground">Downloads</label>
-                    <p className={`text-white font-medium ${selectedOrder.downloadCount >= selectedOrder.downloadLimit ? 'text-red-400' : 'text-green-400'}`}>
+                    <label className="text-sm text-slate-500">Downloads</label>
+                    <p className={`text-slate-900 font-medium ${selectedOrder.downloadCount >= selectedOrder.downloadLimit ? 'text-red-600' : 'text-emerald-600'}`}>
                       {selectedOrder.downloadCount} / {selectedOrder.downloadLimit} downloads used
                     </p>
                   </div>
@@ -285,14 +286,14 @@ export default function AdminOrdersPage() {
               </div>
 
               <div>
-                <label className="text-sm text-muted-foreground">Message</label>
-                <p className="text-white mt-1 p-3 rounded-lg bg-white/5">
+                <label className="text-sm text-slate-500">Message</label>
+                <p className="text-slate-900 mt-1 p-3 rounded-lg bg-slate-50">
                   {selectedOrder.message || "No message provided"}
                 </p>
               </div>
 
               <div>
-                <label className="text-sm text-muted-foreground mb-2 block">Update Status</label>
+                <label className="text-sm text-slate-600 mb-2 block">Update Status</label>
                 <div className="flex flex-wrap gap-2">
                   {["pending", "approved", "in_progress", "completed", "rejected"].map((status) => (
                     <Button
@@ -311,7 +312,7 @@ export default function AdminOrdersPage() {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-border">
+              <div className="pt-4 border-t border-slate-200">
                 <Button
                   variant="destructive"
                   onClick={() => deleteOrder(selectedOrder.id)}

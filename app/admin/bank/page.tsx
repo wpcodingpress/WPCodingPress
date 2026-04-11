@@ -174,24 +174,27 @@ export default function BankSettingsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Bank Settings</h1>
-          <p className="text-muted-foreground">Manage bank accounts for payment transfers</p>
+          <h1 className="text-3xl font-bold text-slate-900">Bank Settings</h1>
+          <p className="text-slate-500">Manage bank accounts for payment transfers</p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)}>
+        <Button onClick={() => setIsModalOpen(true)} className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white">
           <Plus className="h-4 w-4 mr-2" />
           Add Bank Account
         </Button>
       </div>
 
       {isLoading ? (
-        <div className="text-center py-12">Loading...</div>
+        <div className="text-center py-12">
+          <div className="w-10 h-10 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-slate-500 mt-4">Loading...</p>
+        </div>
       ) : settings.length === 0 ? (
-        <Card>
+        <Card className="bg-white border-slate-200">
           <CardContent className="py-12 text-center">
-            <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">No Bank Accounts</h3>
-            <p className="text-muted-foreground mb-4">Add bank accounts to receive payments</p>
-            <Button onClick={() => setIsModalOpen(true)}>
+            <Building2 className="h-12 w-12 mx-auto text-slate-400 mb-4" />
+            <h3 className="text-lg font-medium text-slate-900 mb-2">No Bank Accounts</h3>
+            <p className="text-slate-500 mb-4">Add bank accounts to receive payments</p>
+            <Button onClick={() => setIsModalOpen(true)} className="bg-gradient-to-r from-violet-500 to-purple-500 text-white">
               <Plus className="h-4 w-4 mr-2" />
               Add First Bank Account
             </Button>
@@ -200,42 +203,42 @@ export default function BankSettingsPage() {
       ) : (
         <div className="grid gap-4">
           {settings.map((item) => (
-            <Card key={item.id} className={item.isActive ? "" : "opacity-60"}>
+            <Card key={item.id} className={`bg-white border-slate-200 ${item.isActive ? "" : "opacity-60"}`}>
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <Building2 className="h-5 w-5 text-primary" />
-                      <h3 className="font-semibold text-lg">{item.bankName}</h3>
-                      <Badge variant={item.isActive ? "default" : "secondary"}>
+                      <Building2 className="h-5 w-5 text-violet-500" />
+                      <h3 className="font-semibold text-lg text-slate-900">{item.bankName}</h3>
+                      <Badge variant={item.isActive ? "default" : "secondary"} className={item.isActive ? "bg-emerald-100 text-emerald-700 border border-emerald-200" : ""}>
                         {item.isActive ? "Active" : "Inactive"}
                       </Badge>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
-                        <p className="text-muted-foreground">Account Name</p>
-                        <p className="text-white">{item.accountName}</p>
+                        <p className="text-slate-500">Account Name</p>
+                        <p className="text-slate-900">{item.accountName}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Account Number</p>
-                        <p className="text-white font-mono">{item.accountNumber}</p>
+                        <p className="text-slate-500">Account Number</p>
+                        <p className="text-slate-900 font-mono">{item.accountNumber}</p>
                       </div>
                       {item.sortCode && (
                         <div>
-                          <p className="text-muted-foreground">Sort Code</p>
-                          <p className="text-white font-mono">{item.sortCode}</p>
+                          <p className="text-slate-500">Sort Code</p>
+                          <p className="text-slate-900 font-mono">{item.sortCode}</p>
                         </div>
                       )}
                       {item.country && (
                         <div>
-                          <p className="text-muted-foreground">Country</p>
-                          <p className="text-white">{item.country}</p>
+                          <p className="text-slate-500">Country</p>
+                          <p className="text-slate-900">{item.country}</p>
                         </div>
                       )}
                     </div>
                     {item.instructions && (
-                      <div className="mt-2 p-3 bg-muted rounded-lg">
-                        <p className="text-sm text-muted-foreground">{item.instructions}</p>
+                      <div className="mt-2 p-3 bg-slate-50 rounded-lg">
+                        <p className="text-sm text-slate-600">{item.instructions}</p>
                       </div>
                     )}
                   </div>
@@ -243,6 +246,7 @@ export default function BankSettingsPage() {
                     <Button 
                       variant="outline" 
                       size="sm"
+                      className="border-slate-200"
                       onClick={() => handleToggleActive(item.id, item.isActive)}
                     >
                       {item.isActive ? "Disable" : "Enable"}
@@ -250,6 +254,7 @@ export default function BankSettingsPage() {
                     <Button 
                       variant="outline" 
                       size="sm"
+                      className="border-slate-200 text-slate-700 hover:bg-violet-50 hover:text-violet-600 hover:border-violet-300"
                       onClick={() => openEditModal(item)}
                     >
                       <Edit className="h-4 w-4" />
@@ -257,7 +262,7 @@ export default function BankSettingsPage() {
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      className="text-red-500 hover:text-red-600"
+                      className="text-red-500 hover:text-red-600 hover:bg-red-50"
                       onClick={() => handleDelete(item.id)}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -272,71 +277,77 @@ export default function BankSettingsPage() {
 
       {/* Add/Edit Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl bg-white">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-slate-900">
               {editingId ? "Edit Bank Account" : "Add Bank Account"}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium mb-1 block">Bank Name</label>
+                <label className="text-sm font-medium text-slate-700 mb-1 block">Bank Name</label>
                 <Input
                   value={formData.bankName}
                   onChange={(e) => setFormData({...formData, bankName: e.target.value})}
                   placeholder="e.g., Chase Bank"
                   required
+                  className="border-slate-200"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Account Name</label>
+                <label className="text-sm font-medium text-slate-700 mb-1 block">Account Name</label>
                 <Input
                   value={formData.accountName}
                   onChange={(e) => setFormData({...formData, accountName: e.target.value})}
                   placeholder="e.g., WPCodingPress LLC"
                   required
+                  className="border-slate-200"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Account Number</label>
+                <label className="text-sm font-medium text-slate-700 mb-1 block">Account Number</label>
                 <Input
                   value={formData.accountNumber}
                   onChange={(e) => setFormData({...formData, accountNumber: e.target.value})}
                   placeholder="e.g., 12345678"
                   required
+                  className="border-slate-200"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Sort Code (UK)</label>
+                <label className="text-sm font-medium text-slate-700 mb-1 block">Sort Code (UK)</label>
                 <Input
                   value={formData.sortCode}
                   onChange={(e) => setFormData({...formData, sortCode: e.target.value})}
                   placeholder="e.g., 123456"
+                  className="border-slate-200"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">IBAN</label>
+                <label className="text-sm font-medium text-slate-700 mb-1 block">IBAN</label>
                 <Input
                   value={formData.iban}
                   onChange={(e) => setFormData({...formData, iban: e.target.value})}
                   placeholder="e.g., GB82WEST12345698765432"
+                  className="border-slate-200"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">SWIFT/BIC</label>
+                <label className="text-sm font-medium text-slate-700 mb-1 block">SWIFT/BIC</label>
                 <Input
                   value={formData.swift}
                   onChange={(e) => setFormData({...formData, swift: e.target.value})}
                   placeholder="e.g., CHASEGB2L"
+                  className="border-slate-200"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Country</label>
+                <label className="text-sm font-medium text-slate-700 mb-1 block">Country</label>
                 <select
                   value={formData.country}
                   onChange={(e) => setFormData({...formData, country: e.target.value})}
-                  className="w-full h-10 rounded-md border border-input bg-background px-3 py-2"
+                  className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-slate-900"
                 >
                   <option value="">Select Country</option>
                   {countries.map((c) => (
@@ -345,11 +356,11 @@ export default function BankSettingsPage() {
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Currency</label>
+                <label className="text-sm font-medium text-slate-700 mb-1 block">Currency</label>
                 <select
                   value={formData.currency}
                   onChange={(e) => setFormData({...formData, currency: e.target.value})}
-                  className="w-full h-10 rounded-md border border-input bg-background px-3 py-2"
+                  className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-slate-900"
                 >
                   {currencies.map((c) => (
                     <option key={c} value={c}>{c}</option>
@@ -358,27 +369,29 @@ export default function BankSettingsPage() {
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Bank Address</label>
+              <label className="text-sm font-medium text-slate-700 mb-1 block">Bank Address</label>
               <Input
                 value={formData.bankAddress}
                 onChange={(e) => setFormData({...formData, bankAddress: e.target.value})}
                 placeholder="e.g., 123 Main Street, City, State, ZIP"
+                className="border-slate-200"
               />
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Payment Instructions</label>
+              <label className="text-sm font-medium text-slate-700 mb-1 block">Payment Instructions</label>
               <Textarea
                 value={formData.instructions}
                 onChange={(e) => setFormData({...formData, instructions: e.target.value})}
                 placeholder="e.g., Please include your order number in the payment reference"
                 rows={3}
+                className="border-slate-200"
               />
             </div>
-            <div className="flex justify-end gap-3">
-              <Button type="button" variant="outline" onClick={closeModal}>
+            <div className="flex justify-end gap-3 pt-2">
+              <Button type="button" variant="outline" onClick={closeModal} className="border-slate-200">
                 Cancel
               </Button>
-              <Button type="submit">
+              <Button type="submit" className="bg-gradient-to-r from-violet-500 to-purple-500 text-white">
                 <Save className="h-4 w-4 mr-2" />
                 {editingId ? "Update" : "Save"}
               </Button>

@@ -95,12 +95,107 @@ export default function AdminContactsPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Contact Messages</h1>
-          <p className="text-muted-foreground">Manage inquiries from potential clients</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Contact Messages</h1>
+          <p className="text-slate-500">Manage inquiries from potential clients</p>
         </div>
+        <div className="flex gap-2">
+          <Button
+            variant={filter === "all" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilter("all")}
+            className={filter === "all" ? "bg-violet-500 text-white" : "border-slate-200"}
+          >
+            All ({contacts.length})
+          </Button>
+          <Button
+            variant={filter === "unread" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilter("unread")}
+            className={filter === "unread" ? "bg-violet-500 text-white" : "border-slate-200"}
+          >
+            Unread ({contacts.filter(c => !c.isRead).length})
+          </Button>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {filteredContacts.length === 0 ? (
+          <Card className="bg-white border-slate-200">
+            <CardContent className="p-8 text-center text-slate-500">
+              No messages found
+            </CardContent>
+          </Card>
+        ) : (
+          filteredContacts.map((contact) => (
+            <Card 
+              key={contact.id} 
+              className={`bg-white border-slate-200 hover:shadow-lg transition-all cursor-pointer ${!contact.isRead ? "border-l-4 border-l-violet-500" : ""}`}
+              onClick={() => {
+                setSelectedContact(contact);
+                if (!contact.isRead) markAsRead(contact.id);
+              }}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-semibold text-slate-900">{contact.name}</h3>
+                      {!contact.isRead && (
+                        <Badge className="bg-violet-100 text-violet-700 border border-violet-200 text-xs">New</Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-slate-500 mb-3">
+                      <span className="flex items-center gap-1">
+                        <Mail className="h-4 w-4" />
+                        {contact.email}
+                      </span>
+                      {contact.phone && (
+                        <span className="flex items-center gap-1">
+                          <Phone className="h-4 w-4" />
+                          {contact.phone}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-slate-600 line-clamp-2">
+                      {contact.message}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 ml-4">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedContact(contact);
+                      }}
+                      className="text-slate-500 hover:text-violet-600 hover:bg-violet-50"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteContact(contact.id);
+                      }}
+                      className="text-slate-500 hover:text-red-600 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                <div className="mt-3 text-xs text-slate-400">
+                  {new Date(contact.createdAt).toLocaleString()}
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
+      </div>
         <div className="flex gap-2">
           <Button
             variant={filter === "all" ? "default" : "outline"}
@@ -196,10 +291,10 @@ export default function AdminContactsPage() {
 
       {/* Contact Detail Dialog */}
       <Dialog open={!!selectedContact} onOpenChange={() => setSelectedContact(null)}>
-        <DialogContent>
+        <DialogContent className="bg-white">
           <DialogHeader>
-            <DialogTitle>Message Details</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-slate-900">Message Details</DialogTitle>
+            <DialogDescription className="text-slate-500">
               From {selectedContact?.name}
             </DialogDescription>
           </DialogHeader>
@@ -208,24 +303,24 @@ export default function AdminContactsPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm text-muted-foreground">Email</label>
-                  <p className="text-white">{selectedContact.email}</p>
+                  <label className="text-sm text-slate-500">Email</label>
+                  <p className="text-slate-900">{selectedContact.email}</p>
                 </div>
                 <div>
-                  <label className="text-sm text-muted-foreground">Phone</label>
-                  <p className="text-white">{selectedContact.phone || "Not provided"}</p>
+                  <label className="text-sm text-slate-500">Phone</label>
+                  <p className="text-slate-900">{selectedContact.phone || "Not provided"}</p>
                 </div>
               </div>
               
               <div>
-                <label className="text-sm text-muted-foreground">Message</label>
-                <p className="text-white mt-1 p-4 rounded-lg bg-white/5 whitespace-pre-wrap">
+                <label className="text-sm text-slate-500">Message</label>
+                <p className="text-slate-900 mt-1 p-4 rounded-lg bg-slate-50 whitespace-pre-wrap">
                   {selectedContact.message}
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-border flex justify-between">
-                <span className="text-sm text-muted-foreground">
+              <div className="pt-4 border-t border-slate-200 flex justify-between">
+                <span className="text-sm text-slate-500">
                   Received: {new Date(selectedContact.createdAt).toLocaleString()}
                 </span>
                 <Button

@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { ShoppingCart, MessageSquare, TrendingUp, Clock, ArrowRight, CheckCircle2, XCircle } from "lucide-react"
+import { ShoppingCart, MessageSquare, TrendingUp, Clock, ArrowRight, Users, DollarSign, Package, BarChart3, Settings, Mail } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 
 interface DashboardStats {
   totalOrders: number
@@ -68,40 +69,46 @@ export default function AdminDashboardPage() {
   }, [])
 
   const statCards = [
-    { title: "Total Orders", value: stats.totalOrders, icon: ShoppingCart, color: "text-primary" },
-    { title: "Pending Orders", value: stats.pendingOrders, icon: Clock, color: "text-yellow-400" },
-    { title: "Total Contacts", value: stats.totalContacts, icon: MessageSquare, color: "text-blue-400" },
-    { title: "Unread Messages", value: stats.unreadContacts, icon: TrendingUp, color: "text-green-400" },
+    { title: "Total Orders", value: stats.totalOrders, icon: ShoppingCart, color: "from-violet-500 to-purple-500", href: "/admin/orders" },
+    { title: "Pending Orders", value: stats.pendingOrders, icon: Clock, color: "from-amber-400 to-orange-500", href: "/admin/orders" },
+    { title: "Total Contacts", value: stats.totalContacts, icon: MessageSquare, color: "from-blue-400 to-cyan-500", href: "/admin/contacts" },
+    { title: "Unread Messages", value: stats.unreadContacts, icon: Mail, color: "from-emerald-400 to-teal-500", href: "/admin/contacts" },
   ]
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending": return "bg-yellow-400/20 text-yellow-400"
-      case "approved": return "bg-blue-400/20 text-blue-400"
-      case "in_progress": return "bg-purple-400/20 text-purple-400"
-      case "completed": return "bg-green-400/20 text-green-400"
-      case "rejected": return "bg-red-400/20 text-red-400"
-      default: return "bg-gray-400/20 text-gray-400"
+      case "pending": return "bg-amber-500/20 text-amber-600 border-amber-200"
+      case "approved": return "bg-blue-500/20 text-blue-600 border-blue-200"
+      case "in_progress": return "bg-violet-500/20 text-violet-600 border-violet-200"
+      case "completed": return "bg-emerald-500/20 text-emerald-600 border-emerald-200"
+      case "rejected": return "bg-red-500/20 text-red-600 border-red-200"
+      default: return "bg-slate-500/20 text-slate-600 border-slate-200"
     }
   }
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-pulse text-primary">Loading...</div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-4 border-violet-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-slate-500">Loading dashboard...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back! Here's an overview of your business.</p>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
+          <p className="text-slate-500 mt-1">Welcome back! Here's an overview of your business.</p>
+        </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((stat, index) => (
           <motion.div
             key={stat.title}
@@ -109,19 +116,21 @@ export default function AdminDashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">{stat.title}</p>
-                    <p className="text-3xl font-bold text-white">{stat.value}</p>
+            <Link href={stat.href}>
+              <Card className="bg-white border-slate-200 hover:shadow-lg hover:shadow-violet-500/10 transition-all cursor-pointer group">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-slate-500 mb-1">{stat.title}</p>
+                      <p className="text-3xl font-bold text-slate-900">{stat.value}</p>
+                    </div>
+                    <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} shadow-lg group-hover:scale-110 transition-transform`}>
+                      <stat.icon className="h-6 w-6 text-white" />
+                    </div>
                   </div>
-                  <div className={`p-3 rounded-xl bg-white/5 ${stat.color}`}>
-                    <stat.icon className="h-6 w-6" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           </motion.div>
         ))}
       </div>
@@ -132,31 +141,31 @@ export default function AdminDashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
       >
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-xl">Recent Orders</CardTitle>
-            <Link href="/admin/orders" className="text-sm text-primary hover:underline flex items-center gap-1">
+        <Card className="bg-white border-slate-200">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 pb-4">
+            <CardTitle className="text-xl font-semibold text-slate-900">Recent Orders</CardTitle>
+            <Link href="/admin/orders" className="text-sm text-violet-600 hover:text-violet-700 flex items-center gap-1">
               View All <ArrowRight className="h-4 w-4" />
             </Link>
           </CardHeader>
           <CardContent>
             {recentOrders.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="text-center py-8 text-slate-500">
                 No orders yet
               </div>
             ) : (
               <div className="space-y-4">
                 {recentOrders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-4 rounded-lg bg-white/5">
+                  <div key={order.id} className="flex items-center justify-between p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
                     <div>
-                      <p className="font-medium text-white">{order.clientName}</p>
-                      <p className="text-sm text-muted-foreground">{order.service?.name} - {order.packageType}</p>
+                      <p className="font-medium text-slate-900">{order.clientName}</p>
+                      <p className="text-sm text-slate-500">{order.service?.name} - {order.packageType}</p>
                     </div>
                     <div className="text-right">
-                      <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                      <Badge className={getStatusColor(order.status)}>
                         {order.status.replace("_", " ")}
-                      </span>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      </Badge>
+                      <p className="text-xs text-slate-400 mt-1">
                         {new Date(order.createdAt).toLocaleDateString()}
                       </p>
                     </div>
@@ -169,54 +178,39 @@ export default function AdminDashboardPage() {
       </motion.div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <Card className="h-full">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="p-3 rounded-xl bg-primary/10">
-                  <ShoppingCart className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-white">Manage Orders</h3>
-                  <p className="text-sm text-muted-foreground">View and update order status</p>
-                </div>
-              </div>
-              <Link href="/admin/orders">
-                <span className="text-sm text-primary hover:underline">Go to Orders →</span>
-              </Link>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          <Card className="h-full">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="p-3 rounded-xl bg-green-500/10">
-                  <MessageSquare className="h-6 w-6 text-green-400" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-white">Contact Messages</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {stats.unreadContacts} unread messages
-                  </p>
-                </div>
-              </div>
-              <Link href="/admin/contacts">
-                <span className="text-sm text-primary hover:underline">View Messages →</span>
-              </Link>
-            </CardContent>
-          </Card>
-        </motion.div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          { title: "Manage Orders", description: "View and update order status", icon: ShoppingCart, href: "/admin/orders", color: "from-violet-500 to-purple-500" },
+          { title: "Contact Messages", description: `${stats.unreadContacts} unread messages`, icon: MessageSquare, href: "/admin/contacts", color: "from-blue-400 to-cyan-500" },
+          { title: "Services", description: "Manage service offerings", icon: Settings, href: "/admin/services", color: "from-emerald-400 to-teal-500" },
+          { title: "Revenue", description: "Track your earnings", icon: DollarSign, href: "/admin/revenue", color: "from-amber-400 to-orange-500" },
+        ].map((item, index) => (
+          <motion.div
+            key={item.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 + index * 0.1 }}
+          >
+            <Link href={item.href}>
+              <Card className="bg-white border-slate-200 hover:shadow-lg hover:shadow-violet-500/10 transition-all cursor-pointer group h-full">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className={`p-3 rounded-xl bg-gradient-to-br ${item.color} shadow-lg group-hover:scale-110 transition-transform`}>
+                      <item.icon className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-slate-900">{item.title}</h3>
+                      <p className="text-sm text-slate-500">{item.description}</p>
+                    </div>
+                  </div>
+                  <span className="text-sm text-violet-600 hover:text-violet-700 flex items-center gap-1">
+                    Go to {item.title} →
+                  </span>
+                </CardContent>
+              </Card>
+            </Link>
+          </motion.div>
+        ))}
       </div>
     </div>
   )

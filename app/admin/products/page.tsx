@@ -233,11 +233,11 @@ export default function AdminProductsPage() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Products</h1>
-          <p className="text-gray-500 mt-1">Manage your products (plugins, themes, templates)</p>
+          <h1 className="text-3xl font-bold text-slate-900">Products</h1>
+          <p className="text-slate-500 mt-1">Manage your products (plugins, themes, templates)</p>
         </div>
         <Button
           onClick={() => {
@@ -245,7 +245,7 @@ export default function AdminProductsPage() {
             setEditingProduct(null);
             setShowModal(true);
           }}
-          className="bg-gradient-to-r from-purple-600 to-violet-600 text-white hover:from-purple-700 hover:to-violet-700"
+          className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white"
         >
           <Plus className="mr-2 h-4 w-4" />
           Add Product
@@ -253,117 +253,123 @@ export default function AdminProductsPage() {
       </div>
 
       {products.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
-          <Package className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-          <p className="text-gray-500 mb-4">No products yet</p>
-          <Button onClick={() => setShowModal(true)} className="bg-gradient-to-r from-purple-600 to-violet-600 text-white">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Your First Product
-          </Button>
-        </div>
+        <Card className="bg-white border-slate-200">
+          <CardContent className="p-12 text-center">
+            <Package className="h-12 w-12 mx-auto text-slate-400 mb-4" />
+            <p className="text-slate-500 mb-4">No products yet</p>
+            <Button onClick={() => setShowModal(true)} className="bg-gradient-to-r from-violet-500 to-purple-500 text-white">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Your First Product
+            </Button>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="text-left p-4 text-sm font-medium text-gray-600">Product</th>
-                <th className="text-left p-4 text-sm font-medium text-gray-600">Type</th>
-                <th className="text-left p-4 text-sm font-medium text-gray-600">Price</th>
-                <th className="text-left p-4 text-sm font-medium text-gray-600">Status</th>
-                <th className="text-right p-4 text-sm font-medium text-gray-600">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((product) => (
-                <motion.tr
-                  key={product.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="border-b border-gray-100 hover:bg-gray-50"
-                >
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <p className="font-medium text-gray-900">{product.name}</p>
-                        <p className="text-sm text-gray-500">{product.slug}</p>
-                      </div>
-                      {product.isFeatured && (
-                        <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                      )}
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full capitalize font-medium">
-                      {product.type === 'plugin' ? 'Plugin' : product.type === 'theme' ? 'Theme' : product.type === 'template' ? 'Template' : product.type === 'mcp_server' ? 'MCP Server' : product.type === 'ai_agent' ? 'AI Agent' : product.type}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    {product.price === 0 ? (
-                      <span className="text-green-600 font-medium">Free</span>
-                    ) : (
-                      <span className="text-gray-900 font-medium">
-                        ${product.price >= 100 ? (product.price / 100).toFixed(2) : product.price.toFixed(2)}
-                      </span>
-                    )}
-                  </td>
-                  <td className="p-4">
-                    <span
-                      className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                        product.isActive
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
+        <Card className="bg-white border-slate-200 overflow-hidden">
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th className="text-left p-4 text-sm font-semibold text-slate-600">Product</th>
+                    <th className="text-left p-4 text-sm font-semibold text-slate-600">Type</th>
+                    <th className="text-left p-4 text-sm font-semibold text-slate-600">Price</th>
+                    <th className="text-left p-4 text-sm font-semibold text-slate-600">Status</th>
+                    <th className="text-right p-4 text-sm font-semibold text-slate-600">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {products.map((product) => (
+                    <motion.tr
+                      key={product.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="hover:bg-slate-50 transition-colors"
                     >
-                      {product.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        asChild
-                        className="text-gray-500 hover:text-purple-600 hover:bg-purple-50"
-                      >
-                        <a href={`/products/${product.slug}`} target="_blank">
-                          <ExternalLink className="h-4 w-4" />
-                        </a>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleToggleActive(product)}
-                        className="text-gray-500 hover:text-purple-600 hover:bg-purple-50"
-                      >
-                        {product.isActive ? (
-                          <Eye className="h-4 w-4" />
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div>
+                            <p className="font-medium text-slate-900">{product.name}</p>
+                            <p className="text-sm text-slate-500">{product.slug}</p>
+                          </div>
+                          {product.isFeatured && (
+                            <Star className="h-4 w-4 text-amber-500 fill-current" />
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <span className="px-3 py-1 bg-violet-100 text-violet-700 text-xs rounded-full capitalize font-medium">
+                          {product.type === 'plugin' ? 'Plugin' : product.type === 'theme' ? 'Theme' : product.type === 'template' ? 'Template' : product.type === 'mcp_server' ? 'MCP Server' : product.type === 'ai_agent' ? 'AI Agent' : product.type}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        {product.price === 0 ? (
+                          <span className="text-emerald-600 font-medium">Free</span>
                         ) : (
-                          <EyeOff className="h-4 w-4" />
+                          <span className="text-slate-900 font-medium">
+                            ${product.price >= 100 ? (product.price / 100).toFixed(2) : product.price.toFixed(2)}
+                          </span>
                         )}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEdit(product)}
-                        className="text-gray-500 hover:text-purple-600 hover:bg-purple-50"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(product.id)}
-                        className="text-gray-500 hover:text-red-600 hover:bg-red-50"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      </td>
+                      <td className="p-4">
+                        <span
+                          className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                            product.isActive
+                              ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                              : "bg-red-100 text-red-700 border border-red-200"
+                          }`}
+                        >
+                          {product.isActive ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            asChild
+                            className="text-slate-500 hover:text-violet-600 hover:bg-violet-50"
+                          >
+                            <a href={`/products/${product.slug}`} target="_blank">
+                              <ExternalLink className="h-4 w-4" />
+                            </a>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleToggleActive(product)}
+                            className="text-slate-500 hover:text-violet-600 hover:bg-violet-50"
+                          >
+                            {product.isActive ? (
+                              <Eye className="h-4 w-4" />
+                            ) : (
+                              <EyeOff className="h-4 w-4" />
+                            )}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEdit(product)}
+                            className="text-slate-500 hover:text-violet-600 hover:bg-violet-50"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(product.id)}
+                            className="text-slate-500 hover:text-red-600 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {showModal && (
@@ -372,15 +378,15 @@ export default function AdminProductsPage() {
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="bg-white border border-gray-200 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden shadow-2xl"
+            className="bg-white border border-slate-200 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden shadow-2xl"
           >
-            <div className="p-4 sm:p-6 border-b border-gray-200 bg-gray-50">
+            <div className="p-4 sm:p-6 border-b border-slate-200 bg-gradient-to-r from-violet-500 to-purple-500">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white">
                     {editingProduct ? "Edit Product" : "Add New Product"}
                   </h2>
-                  <p className="text-sm text-gray-500 mt-1 hidden sm:block">
+                  <p className="text-sm text-white/80 mt-1 hidden sm:block">
                     {editingProduct ? "Update product details below" : "Create a new product for your store"}
                   </p>
                 </div>
@@ -389,57 +395,55 @@ export default function AdminProductsPage() {
                     setShowModal(false);
                     setEditingProduct(null);
                   }}
-                  className="p-2 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors"
                 >
-                  <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <X className="w-5 h-5 text-white" />
                 </button>
               </div>
             </div>
 
             <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-5 sm:space-y-6 overflow-y-auto max-h-[calc(90vh-180px)]">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                    <span>Name</span>
-                    <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                    className="border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                    placeholder="Enter product name"
-                    required
-                  />
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-1">
+                      <span>Name</span>
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
+                      className="border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                      placeholder="Enter product name"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-1">
+                      <span>Slug</span>
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      value={formData.slug}
+                      onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                      className="border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                      placeholder="product-slug"
+                      required
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                    <span>Slug</span>
-                    <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    value={formData.slug}
-                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                    className="border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                    placeholder="product-slug"
-                    required
-                  />
-                </div>
-              </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Short Description</label>
+                <label className="text-sm font-medium text-slate-700">Short Description</label>
                 <Input
                   value={formData.shortDesc}
                   onChange={(e) => setFormData({ ...formData, shortDesc: e.target.value })}
-                  className="border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                  className="border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
                   placeholder="Brief description for product cards (optional)"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Featured Image</label>
+                <label className="text-sm font-medium text-slate-700">Featured Image</label>
                 {formData.featuredImage ? (
                   <div className="relative inline-block">
                     <div className="relative w-40 h-28 rounded-xl overflow-hidden border border-gray-200">
@@ -471,7 +475,7 @@ export default function AdminProductsPage() {
                         reader.readAsDataURL(file);
                       }
                     }}
-                    className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-purple-400 hover:bg-purple-50/50 transition-all"
+                    className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer hover:border-violet-400 hover:bg-violet-50/50 transition-all"
                   >
                     <input
                       type="file"
@@ -499,14 +503,14 @@ export default function AdminProductsPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                <label className="text-sm font-medium text-slate-700 flex items-center gap-1">
                   <span>Description</span>
                   <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full h-32 border border-gray-300 rounded-xl p-4 text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 resize-none"
+                  className="w-full h-32 border border-slate-300 rounded-xl p-4 text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 resize-none"
                   placeholder="Detailed product description"
                   required
                 />
@@ -514,11 +518,11 @@ export default function AdminProductsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Product Type</label>
+                  <label className="text-sm font-medium text-slate-700">Product Type</label>
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="w-full border border-gray-300 rounded-xl p-3 text-gray-900 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 appearance-none cursor-pointer bg-white"
+                    className="w-full border border-slate-300 rounded-xl p-3 text-slate-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 appearance-none cursor-pointer bg-white"
                     style={{
                       backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
                       backgroundPosition: "right 0.75rem center",
@@ -534,13 +538,13 @@ export default function AdminProductsPage() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Display Order</label>
+                  <label className="text-sm font-medium text-slate-700">Display Order</label>
                   <div className="flex items-center">
                     <Input
                       type="number"
                       value={formData.order}
                       onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
-                      className="border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                      className="border-slate-300 text-slate-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
                       placeholder="0"
                     />
                     <div className="group relative inline-block ml-2">
@@ -558,21 +562,21 @@ export default function AdminProductsPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Free Download URL</label>
-                  <div className="flex gap-2">
-                    <Input
-                      value={formData.freeDownloadUrl}
-                      onChange={(e) => setFormData({ ...formData, freeDownloadUrl: e.target.value })}
-                      className="border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                      placeholder="https://drive.google.com/uc?export=download&id=..."
-                    />
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      size="sm"
-                      className="border-gray-300 text-gray-700 hover:bg-purple-50 hover:text-purple-600 hover:border-purple-300 whitespace-nowrap"
-                      onClick={() => {
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">Free Download URL</label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={formData.freeDownloadUrl}
+                        onChange={(e) => setFormData({ ...formData, freeDownloadUrl: e.target.value })}
+                        className="border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
+                        placeholder="https://drive.google.com/uc?export=download&id=..."
+                      />
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        className="border-slate-300 text-slate-700 hover:bg-violet-50 hover:text-violet-600 hover:border-violet-300 whitespace-nowrap"
+                        onClick={() => {
                         const link = formData.freeDownloadUrl;
                         if (link.includes('drive.google.com')) {
                           const match = link.match(/\/d\/([a-zA-Z0-9_-]+)/);
@@ -587,22 +591,22 @@ export default function AdminProductsPage() {
                       Convert
                     </Button>
                   </div>
-                  <p className="text-xs text-gray-500">Paste Google Drive share link and click Convert</p>
+                  <p className="text-xs text-slate-500">Paste Google Drive share link and click Convert</p>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Pro Download URL</label>
+                  <label className="text-sm font-medium text-slate-700">Pro Download URL</label>
                   <div className="flex gap-2">
                     <Input
                       value={formData.proDownloadUrl}
                       onChange={(e) => setFormData({ ...formData, proDownloadUrl: e.target.value })}
-                      className="border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                      className="border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
                       placeholder="https://drive.google.com/uc?export=download&id=..."
                     />
                     <Button 
                       type="button" 
                       variant="outline" 
                       size="sm"
-                      className="border-gray-300 text-gray-700 hover:bg-purple-50 hover:text-purple-600 hover:border-purple-300 whitespace-nowrap"
+                      className="border-slate-300 text-slate-700 hover:bg-violet-50 hover:text-violet-600 hover:border-violet-300 whitespace-nowrap"
                       onClick={() => {
                         const link = formData.proDownloadUrl;
                         if (link.includes('drive.google.com')) {
@@ -623,31 +627,31 @@ export default function AdminProductsPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Price (USD)</label>
+                <label className="text-sm font-medium text-slate-700">Price (USD)</label>
                 <Input
                   type="number"
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
-                  className="border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                  className="border-slate-300 text-slate-900 focus:border-violet-500 focus:ring-1 focus:ring-violet-500"
                   placeholder="0"
                   min="0"
                   step="0.01"
                 />
-                <p className="text-xs text-gray-500">Set 0 for free products, any amount for paid products</p>
+                <p className="text-xs text-slate-500">Set 0 for free products, any amount for paid products</p>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Features (one per line)</label>
+                <label className="text-sm font-medium text-slate-700">Features (one per line)</label>
                 <textarea
                   value={formData.features}
                   onChange={(e) => setFormData({ ...formData, features: e.target.value })}
-                  className="w-full h-28 border border-gray-300 rounded-xl p-4 text-gray-900 text-sm placeholder:text-gray-400 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 resize-none"
+                  className="w-full h-28 border border-slate-300 rounded-xl p-4 text-slate-900 text-sm placeholder:text-slate-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 resize-none"
                   placeholder="Feature 1&#10;Feature 2&#10;Feature 3"
                 />
               </div>
 
               <div className="flex flex-wrap gap-6 pt-2">
-                <label className="flex items-center gap-3 text-sm text-gray-700 cursor-pointer group">
+                <label className="flex items-center gap-3 text-sm text-slate-700 cursor-pointer group">
                   <div className="relative">
                     <input
                       type="checkbox"
@@ -655,14 +659,14 @@ export default function AdminProductsPage() {
                       onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                       className="peer sr-only"
                     />
-                    <div className="w-5 h-5 border-2 border-gray-300 rounded-md peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-all"></div>
+                    <div className="w-5 h-5 border-2 border-slate-300 rounded-md peer-checked:bg-violet-500 peer-checked:border-violet-500 transition-all"></div>
                     <svg className="absolute top-0.5 left-0.5 w-4 h-4 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="group-hover:text-gray-900 transition-colors">Active</span>
+                  <span className="group-hover:text-slate-900 transition-colors">Active</span>
                 </label>
-                <label className="flex items-center gap-3 text-sm text-gray-700 cursor-pointer group">
+                <label className="flex items-center gap-3 text-sm text-slate-700 cursor-pointer group">
                   <div className="relative">
                     <input
                       type="checkbox"
@@ -670,20 +674,20 @@ export default function AdminProductsPage() {
                       onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
                       className="peer sr-only"
                     />
-                    <div className="w-5 h-5 border-2 border-gray-300 rounded-md peer-checked:bg-amber-500 peer-checked:border-amber-500 transition-all"></div>
+                    <div className="w-5 h-5 border-2 border-slate-300 rounded-md peer-checked:bg-amber-500 peer-checked:border-amber-500 transition-all"></div>
                     <svg className="absolute top-0.5 left-0.5 w-4 h-4 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="group-hover:text-gray-900 transition-colors">Featured</span>
+                  <span className="group-hover:text-slate-900 transition-colors">Featured</span>
                 </label>
               </div>
 
-              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-slate-200">
                 <Button
                   type="button"
                   variant="ghost"
-                  className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  className="text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   onClick={() => {
                     setShowModal(false);
                     setEditingProduct(null);
@@ -691,7 +695,7 @@ export default function AdminProductsPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-gradient-to-r from-purple-600 to-violet-600 text-white hover:from-purple-700 hover:to-violet-700">
+                <Button type="submit" className="bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600">
                   {editingProduct ? "Update Product" : "Create Product"}
                 </Button>
               </div>
