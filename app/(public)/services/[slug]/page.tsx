@@ -61,9 +61,9 @@ export default async function ServiceDetailPage({ params }: Props) {
   }
 
   const IconComponent = iconMap[service.icon] || Code2
-  const basicFeatures = Array.isArray(service.basicFeatures) ? service.basicFeatures : []
-  const standardFeatures = Array.isArray(service.standardFeatures) ? service.standardFeatures : []
-  const premiumFeatures = Array.isArray(service.premiumFeatures) ? service.premiumFeatures : []
+  const basicFeatures = (service.basicFeatures as unknown as string[]) || []
+  const standardFeatures = (service.standardFeatures as unknown as string[]) || []
+  const premiumFeatures = (service.premiumFeatures as unknown as string[]) || []
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
