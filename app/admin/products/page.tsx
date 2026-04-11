@@ -65,10 +65,16 @@ export default function AdminProductsPage() {
 
   const fetchProducts = async () => {
     try {
+      console.log('Fetching products from /api/admin/products...');
       const response = await fetch("/api/admin/products");
+      console.log('Response status:', response.status);
       if (response.ok) {
         const data = await response.json();
+        console.log('Products fetched:', data);
         setProducts(data);
+      } else {
+        const error = await response.json();
+        console.error('Error fetching products:', error);
       }
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -81,6 +87,8 @@ export default function AdminProductsPage() {
     e.preventDefault();
     
     try {
+      console.log('Submitting product with formData:', formData);
+      
       const featuresArray = formData.features 
         ? formData.features.split('\n').filter(f => f.trim()) 
         : [];
@@ -92,6 +100,8 @@ export default function AdminProductsPage() {
         images: formData.featuredImage ? { featuredImage: formData.featuredImage } : null,
         features: featuresArray
       };
+
+      console.log('Payload to send:', payload);
 
       let response;
       if (editingProduct) {
@@ -108,7 +118,9 @@ export default function AdminProductsPage() {
         });
       }
 
+      console.log('Response status:', response.status);
       const result = await response.json();
+      console.log('Response result:', result);
       
       if (!response.ok) {
         alert(result.error || 'Failed to save product');
