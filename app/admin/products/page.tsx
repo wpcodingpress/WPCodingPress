@@ -322,97 +322,139 @@ export default function AdminProductsPage() {
       )}
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white/10 border border-white/20 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-white/10 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden shadow-2xl"
           >
-            <h2 className="text-xl font-bold text-white mb-6">
-              {editingProduct ? "Edit Product" : "Add New Product"}
-            </h2>
+            <div className="p-6 border-b border-white/10 bg-white/5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold text-white">
+                    {editingProduct ? "Edit Product" : "Add New Product"}
+                  </h2>
+                  <p className="text-sm text-slate-400 mt-1">
+                    {editingProduct ? "Update product details below" : "Create a new product for your store"}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditingProduct(null);
+                  }}
+                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                >
+                  <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className="text-sm text-slate-300">Name *</label>
+                  <label className="text-sm font-medium text-slate-300 flex items-center gap-1">
+                    <span>Name</span>
+                    <span className="text-red-400">*</span>
+                  </label>
                   <Input
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                    className="bg-white/5 border-white/10"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    placeholder="Enter product name"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-slate-300">Slug *</label>
+                  <label className="text-sm font-medium text-slate-300 flex items-center gap-1">
+                    <span>Slug</span>
+                    <span className="text-red-400">*</span>
+                  </label>
                   <Input
                     value={formData.slug}
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                    className="bg-white/5 border-white/10"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    placeholder="product-slug"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm text-slate-300">Short Description</label>
+                <label className="text-sm font-medium text-slate-300">Short Description</label>
                 <Input
                   value={formData.shortDesc}
                   onChange={(e) => setFormData({ ...formData, shortDesc: e.target.value })}
-                  className="bg-white/5 border-white/10"
-                  placeholder="Brief description for product cards"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  placeholder="Brief description for product cards (optional)"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm text-slate-300">Description *</label>
+                <label className="text-sm font-medium text-slate-300 flex items-center gap-1">
+                  <span>Description</span>
+                  <span className="text-red-400">*</span>
+                </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full h-32 bg-white/5 border border-white/10 rounded-lg p-3 text-white"
+                  className="w-full h-32 bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none"
+                  placeholder="Detailed product description"
                   required
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className="text-sm text-slate-300">Type</label>
+                  <label className="text-sm font-medium text-slate-300">Product Type</label>
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 appearance-none cursor-pointer"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                      backgroundPosition: "right 0.75rem center",
+                      backgroundRepeat: "no-repeat",
+                      backgroundSize: "1.5em 1.5em",
+                    }}
                   >
-                    <option value="plugin">WordPress Plugin</option>
-                    <option value="mcp_server">MCP Server</option>
-                    <option value="service">Service</option>
-                    <option value="subscription">Subscription</option>
+                    <option value="plugin" className="bg-slate-800">WordPress Plugins</option>
+                    <option value="theme" className="bg-slate-800">WordPress Themes</option>
+                    <option value="template" className="bg-slate-800">Next.js Templates</option>
+                    <option value="mcp_server" className="bg-slate-800">MCP Servers</option>
+                    <option value="ai_agent" className="bg-slate-800">AI Agents</option>
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-slate-300">Order</label>
+                  <label className="text-sm font-medium text-slate-300">Display Order</label>
                   <Input
                     type="number"
                     value={formData.order}
                     onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
-                    className="bg-white/5 border-white/10"
+                    className="bg-white/5 border-white/10 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    placeholder="0"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className="text-sm text-slate-300">Free Download URL</label>
+                  <label className="text-sm font-medium text-slate-300">Free Download URL</label>
                   <div className="flex gap-2">
                     <Input
                       value={formData.freeDownloadUrl}
                       onChange={(e) => setFormData({ ...formData, freeDownloadUrl: e.target.value })}
-                      className="bg-white/5 border-white/10"
+                      className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       placeholder="https://drive.google.com/uc?export=download&id=..."
                     />
                     <Button 
                       type="button" 
                       variant="outline" 
                       size="sm"
+                      className="border-white/20 text-slate-300 hover:bg-white/10 hover:text-white whitespace-nowrap"
                       onClick={() => {
                         const link = formData.freeDownloadUrl;
                         if (link.includes('drive.google.com')) {
@@ -429,21 +471,22 @@ export default function AdminProductsPage() {
                       Convert
                     </Button>
                   </div>
-                  <p className="text-xs text-slate-400">Paste Google Drive share link and click Convert</p>
+                  <p className="text-xs text-slate-500">Paste Google Drive share link and click Convert</p>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-slate-300">Pro Download URL</label>
+                  <label className="text-sm font-medium text-slate-300">Pro Download URL</label>
                   <div className="flex gap-2">
                     <Input
                       value={formData.proDownloadUrl}
                       onChange={(e) => setFormData({ ...formData, proDownloadUrl: e.target.value })}
-                      className="bg-white/5 border-white/10"
+                      className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       placeholder="https://drive.google.com/uc?export=download&id=..."
                     />
                     <Button 
                       type="button" 
                       variant="outline" 
                       size="sm"
+                      className="border-white/20 text-slate-300 hover:bg-white/10 hover:text-white whitespace-nowrap"
                       onClick={() => {
                         const link = formData.proDownloadUrl;
                         if (link.includes('drive.google.com')) {
@@ -460,59 +503,72 @@ export default function AdminProductsPage() {
                       Convert
                     </Button>
                   </div>
-                  <p className="text-xs text-slate-400">For pro products (price greater than $0)</p>
+                  <p className="text-xs text-slate-500">For pro products (price greater than $0)</p>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm text-slate-300">Price (USD)</label>
+                <label className="text-sm font-medium text-slate-300">Price (USD)</label>
                 <Input
                   type="number"
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
-                  className="bg-white/5 border-white/10"
+                  className="bg-white/5 border-white/10 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                   placeholder="0"
                   min="0"
                   step="0.01"
                 />
-                <p className="text-xs text-slate-400">Set 0 for free products, any amount for paid products</p>
+                <p className="text-xs text-slate-500">Set 0 for free products, any amount for paid products</p>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm text-slate-300">Features (one per line)</label>
+                <label className="text-sm font-medium text-slate-300">Features (one per line)</label>
                 <textarea
                   value={formData.features}
                   onChange={(e) => setFormData({ ...formData, features: e.target.value })}
-                  className="w-full h-32 bg-white/5 border border-white/10 rounded-lg p-3 text-white text-sm"
+                  className="w-full h-28 bg-white/5 border border-white/10 rounded-xl p-4 text-white text-sm placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none"
                   placeholder="Feature 1&#10;Feature 2&#10;Feature 3"
                 />
               </div>
 
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2 text-sm text-slate-300">
-                  <input
-                    type="checkbox"
-                    checked={formData.isActive}
-                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                    className="rounded"
-                  />
-                  Active
+              <div className="flex flex-wrap gap-6 pt-2">
+                <label className="flex items-center gap-3 text-sm text-slate-300 cursor-pointer group">
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      checked={formData.isActive}
+                      onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                      className="peer sr-only"
+                    />
+                    <div className="w-5 h-5 border-2 border-white/30 rounded-md peer-checked:bg-indigo-500 peer-checked:border-indigo-500 transition-all"></div>
+                    <svg className="absolute top-0.5 left-0.5 w-4 h-4 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="group-hover:text-white transition-colors">Active</span>
                 </label>
-                <label className="flex items-center gap-2 text-sm text-slate-300">
-                  <input
-                    type="checkbox"
-                    checked={formData.isFeatured}
-                    onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
-                    className="rounded"
-                  />
-                  Featured
+                <label className="flex items-center gap-3 text-sm text-slate-300 cursor-pointer group">
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      checked={formData.isFeatured}
+                      onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+                      className="peer sr-only"
+                    />
+                    <div className="w-5 h-5 border-2 border-white/30 rounded-md peer-checked:bg-amber-500 peer-checked:border-amber-500 transition-all"></div>
+                    <svg className="absolute top-0.5 left-0.5 w-4 h-4 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="group-hover:text-white transition-colors">Featured</span>
                 </label>
               </div>
 
-              <div className="flex justify-end gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-white/10">
                 <Button
                   type="button"
                   variant="ghost"
+                  className="text-slate-400 hover:text-white hover:bg-white/10"
                   onClick={() => {
                     setShowModal(false);
                     setEditingProduct(null);
@@ -520,7 +576,7 @@ export default function AdminProductsPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="glow">
+                <Button type="submit" className="bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white border-0">
                   {editingProduct ? "Update Product" : "Create Product"}
                 </Button>
               </div>
