@@ -65,9 +65,11 @@ export default function AdminProductsPage() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch("/api/products");
-      const data = await response.json();
-      setProducts(data);
+      const response = await fetch("/api/admin/products");
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data);
+      }
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
@@ -92,13 +94,13 @@ export default function AdminProductsPage() {
       };
 
       if (editingProduct) {
-        await fetch(`/api/products/${editingProduct.id}`, {
+        await fetch(`/api/admin/products/${editingProduct.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
       } else {
-        await fetch("/api/products", {
+        await fetch("/api/admin/products", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
@@ -154,7 +156,7 @@ export default function AdminProductsPage() {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      await fetch(`/api/products/${id}`, { method: "DELETE" });
+      await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
       fetchProducts();
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -163,7 +165,7 @@ export default function AdminProductsPage() {
 
   const handleToggleActive = async (product: Product) => {
     try {
-      await fetch(`/api/products/${product.id}`, {
+      await fetch(`/api/admin/products/${product.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive: !product.isActive })
