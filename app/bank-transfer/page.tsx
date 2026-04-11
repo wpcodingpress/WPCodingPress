@@ -79,11 +79,7 @@ function BankTransferContent() {
   };
 
   const handleConfirmTransfer = async () => {
-    setShowConfirmModal(true);
-  };
-
-  const handleSubmitOrder = async () => {
-    if (!productSlug || !productPrice) return;
+    if (!productSlug || priceInCents === 0) return;
 
     setIsSubmitting(true);
     try {
@@ -122,7 +118,6 @@ function BankTransferContent() {
       alert("Failed to create order. Please try again.");
     } finally {
       setIsSubmitting(false);
-      setShowConfirmModal(false);
     }
   };
 
