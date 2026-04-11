@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Users, CreditCard, Calendar, Search, Filter, Download, Mail, MoreVertical } from "lucide-react"
+import { Users, CreditCard, Calendar, Search, Filter, Download, Mail, MoreVertical, DollarSign } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
