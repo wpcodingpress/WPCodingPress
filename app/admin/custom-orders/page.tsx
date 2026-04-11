@@ -92,27 +92,39 @@ export default function AdminCustomOrdersPage() {
   }
 
   const handleSubmit = async () => {
-    if (!formData.clientName || !formData.clientEmail || !formData.totalAmount || !formData.advanceAmount) {
-      alert("Please fill in client name, email, total amount and advance amount")
+    if (!formData.clientName || !formData.clientEmail || !formData.totalAmount) {
+      alert("Please fill in client name, email and total amount")
       return
     }
 
-    if (formData.advanceAmount > formData.totalAmount) {
+    if (formData.advanceAmount && formData.advanceAmount > formData.totalAmount) {
       alert("Advance amount cannot be greater than total amount")
       return
     }
+
+    const advanceAmount = formData.advanceAmount || 0
+    const remainingAmount = formData.totalAmount - advanceAmount
 
     try {
       const res = await fetch("/api/custom-orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
-          remainingAmount: formData.totalAmount - formData.advanceAmount,
+          clientName: formData.clientName,
+          clientEmail: formData.clientEmail,
+          clientPhone: formData.clientPhone,
+          projectName: formData.projectName,
+          projectDescription: formData.projectDescription,
+          serviceType: formData.serviceType,
+          totalAmount: formData.totalAmount,
+          advanceAmount: advanceAmount,
+          remainingAmount: remainingAmount,
+          notes: formData.notes,
         })
       })
 
       if (res.ok) {
+        const data = await res.json()
         setIsDialogOpen(false)
         setFormData({
           clientName: "",
@@ -126,9 +138,13 @@ export default function AdminCustomOrdersPage() {
           notes: "",
         })
         fetchCustomOrders()
+      } else {
+        const errorData = await res.json()
+        alert("Error: " + (errorData.error || "Failed to create order"))
       }
     } catch (error) {
       console.error("Error creating custom order:", error)
+      alert("Failed to create order. Please try again.")
     }
   }
 
@@ -519,32 +535,40 @@ export default function AdminCustomOrdersPage() {
                 />
               </div>
               <div>
-                <label className="text-sm font-bold text-green-700 mb-2 block">Advance Amount ($) *</label>
+                <label className="text-sm font-bold text-green-700 mb-2 block">Advance Amount ($)</label>
                 <Input 
                   type="number"
                   value={formData.advanceAmount || ""}
                   onChange={(e) => setFormData({ ...formData, advanceAmount: parseInt(e.target.value) || 0 })}
-                  placeholder="200"
+                  placeholder="Optional"
                   className="bg-green-50 border-2 border-green-300 text-green-900 font-bold text-lg placeholder:text-green-400 focus:border-green-500 focus:ring-green-200"
                 />
+                <p className="text-xs text-green-600 mt-1">Leave empty if no advance required</p>
               </div>
             </div>
 
-            {formData.totalAmount > 0 && formData.advanceAmount > 0 && (
+            {formData.totalAmount > 0 && (
               <div className="bg-slate-100 border-2 border-slate-200 rounded-lg p-4">
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-sm text-slate-600">Remaining Amount</p>
                     <p className="text-2xl font-bold text-slate-900">
-                      ${formData.totalAmount - formData.advanceAmount}
+                      ${formData.totalAmount - (formData.advanceAmount || 0)}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm text-slate-500">Advance Paid</p>
-                    <p className="text-lg font-semibold text-green-600">
-                      {Math.round((formData.advanceAmount / formData.totalAmount) * 100)}%
-                    </p>
-                  </div>
+                  {formData.advanceAmount > 0 ? (
+                    <div className="text-right">
+                      <p className="text-sm text-slate-500">Advance Paid</p>
+                      <p className="text-lg font-semibold text-green-600">
+                        {Math.round((formData.advanceAmount / formData.totalAmount) * 100)}%
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="text-right">
+                      <p className="text-sm text-slate-500">Advance</p>
+                      <p className="text-lg font-semibold text-slate-400">No advance</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
