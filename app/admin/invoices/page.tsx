@@ -178,7 +178,7 @@ export default function AdminInvoicesPage() {
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 0; background: #f8fafc; }
     .invoice { max-width: 800px; margin: 0 auto; background: white; }
     .header { 
-      background: linear(135deg, #7c3aed 0%, #8b5cf6 50%, #a78bfa 100%); 
+      background: linear(135deg, #581c87 0%, #7c3aed 50%, #9333ea 100%); 
       padding: 40px 50px; 
       color: white; 
       position: relative;
@@ -211,11 +211,11 @@ export default function AdminInvoicesPage() {
       letter-spacing: -0.5px; 
       margin-bottom: 8px; 
       color: #ffffff;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.3);
     }
     .header .subtitle { 
       font-size: 14px; 
-      opacity: 0.95; 
+      opacity: 1; 
       font-weight: 500;
       color: #ffffff;
       text-shadow: 0 1px 3px rgba(0,0,0,0.2);
