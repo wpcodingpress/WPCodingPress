@@ -1140,9 +1140,6 @@ export default function AdminCustomOrdersPage() {
 
               <div>
                 <label className="text-base font-bold text-slate-800 mb-3 block">📋 Project Status</label>
-
-              <div>
-                <label className="text-sm text-slate-600 mb-2 block">Project Status</label>
                 <div className="flex flex-wrap gap-2">
                   {["pending", "in_progress", "completed", "cancelled"].map((status) => (
                     <Button
@@ -1150,7 +1147,7 @@ export default function AdminCustomOrdersPage() {
                       variant={selectedOrder.status === status ? "default" : "outline"}
                       size="sm"
                       onClick={() => updateStatus(selectedOrder.id, status)}
-                      className="capitalize"
+                      className="capitalize font-semibold"
                     >
                       {status.replace("_", " ")}
                     </Button>
@@ -1167,8 +1164,8 @@ export default function AdminCustomOrdersPage() {
                 </div>
               )}
 
-              <div className="flex gap-3 pt-4 border-t border-slate-200">
-                <Button onClick={() => downloadPDF(selectedOrder)} variant="outline" className="border-slate-300">
+              <div className="flex gap-3 pt-4 border-t border-slate-300">
+                <Button onClick={() => handleDownloadPDF(selectedOrder)} variant="outline" className="border-slate-300 font-semibold">
                   <Download className="h-4 w-4 mr-2" />
                   Download PDF
                 </Button>
