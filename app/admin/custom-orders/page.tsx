@@ -700,7 +700,7 @@ export default function AdminCustomOrdersPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => deleteOrder(order.id)}}
+                            onClick={() => deleteOrder(order.id)}
                             className="text-slate-500 hover:text-red-600 hover:bg-red-50"
                           >
                             <Trash2 className="h-4 w-4" />
