@@ -26,9 +26,9 @@ export async function GET(
 
     return NextResponse.json(product)
   } catch (error) {
-    console.error('Error fetching product:', error)
+    console.error('[Admin Product API] Error fetching product:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch product' },
+      { error: 'Failed to fetch product', details: String(error) },
       { status: 500 }
     )
   }
@@ -41,32 +41,44 @@ export async function PUT(
   try {
     const { id } = await params
     const body = await request.json()
-    console.log('Updating product:', id, body)
+    console.log('[Admin Product API] Updating product:', id, body)
+
+    const existingProduct = await prisma.product.findUnique({
+      where: { id }
+    })
+
+    if (!existingProduct) {
+      return NextResponse.json(
+        { error: 'Product not found' },
+        { status: 404 }
+      )
+    }
 
     const product = await prisma.product.update({
       where: { id },
       data: {
-        name: body.name,
-        slug: body.slug,
-        description: body.description,
-        shortDesc: body.shortDesc || null,
-        type: body.type,
-        images: body.images || null,
-        price: body.price ? Number(body.price) : 0,
-        features: body.features || null,
-        freeDownloadUrl: body.freeDownloadUrl || null,
-        proDownloadUrl: body.proDownloadUrl || null,
-        isActive: body.isActive ?? true,
-        isFeatured: body.isFeatured ?? false,
-        order: body.order || 0,
+        name: body.name ?? existingProduct.name,
+        slug: body.slug ? String(body.slug).toLowerCase().replace(/\s+/g, '-') : existingProduct.slug,
+        description: body.description ?? existingProduct.description,
+        shortDesc: body.shortDesc !== undefined ? (body.shortDesc || null) : existingProduct.shortDesc,
+        type: body.type ?? existingProduct.type,
+        images: body.images !== undefined ? (body.images || null) : existingProduct.images,
+        price: body.price !== undefined ? (body.price ? Number(body.price) : 0) : existingProduct.price,
+        features: body.features !== undefined ? (body.features || null) : existingProduct.features,
+        freeDownloadUrl: body.freeDownloadUrl !== undefined ? (body.freeDownloadUrl || null) : existingProduct.freeDownloadUrl,
+        proDownloadUrl: body.proDownloadUrl !== undefined ? (body.proDownloadUrl || null) : existingProduct.proDownloadUrl,
+        isActive: body.isActive !== undefined ? body.isActive : existingProduct.isActive,
+        isFeatured: body.isFeatured !== undefined ? body.isFeatured : existingProduct.isFeatured,
+        order: body.order !== undefined ? body.order : existingProduct.order,
       }
     })
 
+    console.log('[Admin Product API] Product updated:', product.id, product.name)
     return NextResponse.json(product)
   } catch (error) {
-    console.error('Error updating product:', error)
+    console.error('[Admin Product API] Error updating product:', error)
     return NextResponse.json(
-      { error: 'Failed to update product: ' + String(error) },
+      { error: 'Failed to update product', details: String(error) },
       { status: 500 }
     )
   }
@@ -78,16 +90,29 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
+    console.log('[Admin Product API] Deleting product:', id)
+
+    const existingProduct = await prisma.product.findUnique({
+      where: { id }
+    })
+
+    if (!existingProduct) {
+      return NextResponse.json(
+        { error: 'Product not found' },
+        { status: 404 }
+      )
+    }
 
     await prisma.product.delete({
       where: { id }
     })
 
+    console.log('[Admin Product API] Product deleted:', id)
     return NextResponse.json({ message: 'Product deleted successfully' })
   } catch (error) {
-    console.error('Error deleting product:', error)
+    console.error('[Admin Product API] Error deleting product:', error)
     return NextResponse.json(
-      { error: 'Failed to delete product' },
+      { error: 'Failed to delete product', details: String(error) },
       { status: 500 }
     )
   }

@@ -5,31 +5,14 @@ export async function GET() {
   try {
     console.log('[Admin Products API] Fetching all products...')
     const products = await prisma.product.findMany({
-      orderBy: { order: 'asc' },
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        description: true,
-        shortDesc: true,
-        type: true,
-        price: true,
-        images: true,
-        isActive: true,
-        isFeatured: true,
-        order: true,
-        createdAt: true,
-        freeDownloadUrl: true,
-        proDownloadUrl: true,
-        features: true,
-      }
+      orderBy: { order: 'asc' }
     })
     console.log('[Admin Products API] Found products:', products.length)
     return NextResponse.json(products)
   } catch (error) {
     console.error('[Admin Products API] Error:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch products' },
+      { error: 'Failed to fetch products', details: String(error) },
       { status: 500 }
     )
   }
@@ -44,22 +27,24 @@ export async function POST(request: Request) {
     
     const { 
       name, slug, description, shortDesc, type, images, price,
-      features, freeDownloadUrl, proDownloadUrl, documentation, isActive, isFeatured, order 
+      features, freeDownloadUrl, proDownloadUrl, isActive, isFeatured, order 
     } = body
 
     if (!name || !slug || !description) {
+      console.log('[Admin Products API] Validation failed: missing required fields')
       return NextResponse.json(
         { error: 'Name, slug, and description are required' },
         { status: 400 }
       )
     }
 
-    console.log('[Admin Products API] Creating product with:', { name, slug, type, price, isActive })
+    const slugValue = String(slug).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+    console.log('[Admin Products API] Creating product with:', { name, slug: slugValue, type, price })
     
     const product = await prisma.product.create({
       data: {
         name: String(name),
-        slug: String(slug).toLowerCase().replace(/\s+/g, '-'),
+        slug: slugValue,
         description: String(description),
         shortDesc: shortDesc || null,
         type: type || 'plugin',
@@ -68,47 +53,52 @@ export async function POST(request: Request) {
         features: features || null,
         freeDownloadUrl: freeDownloadUrl || null,
         proDownloadUrl: proDownloadUrl || null,
-        documentation: documentation || null,
         isActive: isActive ?? true,
         isFeatured: isFeatured ?? false,
         order: order || 0,
       }
     })
-    console.log('[Admin Products API] Product created:', product.id, product.name, product.slug)
+    console.log('[Admin Products API] Product created successfully:', product.id, product.name, product.slug)
 
     return NextResponse.json(product, { status: 201 })
 
   } catch (error: any) {
-    console.error('Error creating product:', error)
+    console.error('[Admin Products API] Error creating product:', error)
+    console.error('[Admin Products API] Error code:', error.code)
+    console.error('[Admin Products API] Error message:', error.message)
     
-    if (error.code === 'P2002' && body) {
-      const slugValue = String(body.slug).toLowerCase().replace(/\s+/g, '-')
-      await prisma.product.delete({
-        where: { slug: slugValue }
-      })
-      
-      const retryProduct = await prisma.product.create({
-        data: {
-          name: String(body.name),
-          slug: slugValue,
-          description: String(body.description),
-          shortDesc: body.shortDesc || null,
-          type: body.type || 'plugin',
-          images: body.images || null,
-          price: body.price ? Number(body.price) : 0,
-          features: body.features || null,
-          freeDownloadUrl: body.freeDownloadUrl || null,
-          proDownloadUrl: body.proDownloadUrl || null,
-          isActive: body.isActive ?? true,
-          isFeatured: body.isFeatured ?? false,
-          order: body.order || 0,
+    if (error.code === 'P2002') {
+      console.log('[Admin Products API] Duplicate slug error, trying with new slug...')
+      if (body?.name) {
+        try {
+          const newSlug = `${body.slug}-${Date.now()}`.toLowerCase().replace(/\s+/g, '-')
+          const retryProduct = await prisma.product.create({
+            data: {
+              name: String(body.name),
+              slug: newSlug,
+              description: String(body.description),
+              shortDesc: body.shortDesc || null,
+              type: body.type || 'plugin',
+              images: body.images || null,
+              price: body.price ? Number(body.price) : 0,
+              features: body.features || null,
+              freeDownloadUrl: body.freeDownloadUrl || null,
+              proDownloadUrl: body.proDownloadUrl || null,
+              isActive: body.isActive ?? true,
+              isFeatured: body.isFeatured ?? false,
+              order: body.order || 0,
+            }
+          })
+          console.log('[Admin Products API] Retry product created:', retryProduct.id)
+          return NextResponse.json(retryProduct, { status: 201 })
+        } catch (retryError) {
+          console.error('[Admin Products API] Retry also failed:', retryError)
         }
-      })
-      return NextResponse.json(retryProduct, { status: 201 })
+      }
     }
     
     return NextResponse.json(
-      { error: 'Failed to create product: ' + String(error) },
+      { error: 'Failed to create product', details: error.message || String(error), code: error.code },
       { status: 500 }
     )
   }
