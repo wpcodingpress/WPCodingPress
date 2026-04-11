@@ -401,6 +401,17 @@ function BankTransferContent() {
 );
 }
 
+function BankTransferLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="text-center">
+        <Loader2 className="h-12 w-12 animate-spin text-violet-400 mx-auto mb-4" />
+        <p className="text-slate-400">Loading payment details...</p>
+      </div>
+    </div>
+  );
+}
+
 export default function BankTransferPage() {
   return (
     <Suspense fallback={<BankTransferLoading />}>
