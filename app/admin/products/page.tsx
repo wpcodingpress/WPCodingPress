@@ -127,6 +127,7 @@ export default function AdminProductsPage() {
         return;
       }
 
+      alert('Product saved successfully!');
       setShowModal(false);
       setEditingProduct(null);
       resetForm();
@@ -687,6 +688,13 @@ export default function AdminProductsPage() {
               </div>
             </form>
           </motion.div>
+        </div>
+      )}
+
+      {/* Debug info - remove in production */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-4 right-4 bg-gray-800 text-white p-2 rounded text-xs">
+          Products: {products.length}
         </div>
       )}
     </div>
