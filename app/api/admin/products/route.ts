@@ -3,14 +3,15 @@ import prisma from '@/lib/prisma'
 
 export async function GET() {
   try {
+    // Use simpler query without orderBy to avoid sort memory issues
     const products = await prisma.product.findMany({
-      orderBy: { order: 'asc' }
+      take: 100
     })
     return NextResponse.json(products)
-  } catch (error) {
-    console.error('[Admin Products API] Error:', error)
+  } catch (error: any) {
+    console.error('[Admin Products API] Error:', error?.message || error)
     return NextResponse.json(
-      { error: 'Failed to fetch products', details: String(error) },
+      { error: 'Database error', details: error?.message || String(error) },
       { status: 500 }
     )
   }

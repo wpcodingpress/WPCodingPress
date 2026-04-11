@@ -19,7 +19,7 @@ async function getProductsByType(type: string) {
   try {
     return await prisma.product.findMany({
       where: { type, isActive: true },
-      orderBy: { order: 'asc' },
+      take: 50,
     });
   } catch (error) {
     console.error('Error fetching products:', error);
