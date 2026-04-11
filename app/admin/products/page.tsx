@@ -28,7 +28,9 @@ import {
   Clock,
   LayoutDashboard,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  CheckCircle2,
+  XCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,6 +66,7 @@ export default function AdminProductsPage() {
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{message: string; type: "success" | "error"} | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -185,7 +188,8 @@ export default function AdminProductsPage() {
       console.log('Response result:', result);
       
       if (!response.ok) {
-        alert(result.error || 'Failed to save product');
+        setToast({ message: result.error || 'Failed to save product', type: 'error' });
+        setTimeout(() => setToast(null), 4000);
         return;
       }
 
@@ -194,15 +198,17 @@ export default function AdminProductsPage() {
       setEditingProduct(null);
       resetForm();
       
+      // Show success toast
+      setToast({ message: editingProduct ? 'Product updated successfully!' : 'Product created successfully!', type: 'success' });
+      setTimeout(() => setToast(null), 4000);
+      
       // Refresh products list
       setIsLoading(true);
       await fetchProducts();
-      
-      // Show success message
-      alert(editingProduct ? 'Product updated successfully!' : 'Product created successfully!');
     } catch (error) {
       console.error("Error saving product:", error);
-      alert("Failed to save product. Please try again.");
+      setToast({ message: 'Failed to save product. Please try again.', type: 'error' });
+      setTimeout(() => setToast(null), 4000);
     }
   };
 
@@ -1157,12 +1163,34 @@ export default function AdminProductsPage() {
         </div>
       )}
 
-      {/* Debug info - remove in production */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="fixed bottom-4 right-4 bg-gray-800 text-white p-2 rounded text-xs">
-          Products: {products.length}
-        </div>
-      )}
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, y: 50, x: "-50%" }}
+            className={`fixed bottom-6 left-1/2 px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-50 ${
+              toast.type === "success" 
+                ? "bg-emerald-500 text-white" 
+                : "bg-red-500 text-white"
+            }`}
+          >
+            {toast.type === "success" ? (
+              <CheckCircle2 className="w-5 h-5" />
+            ) : (
+              <XCircle className="w-5 h-5" />
+            )}
+            <span className="font-medium">{toast.message}</span>
+            <button
+              onClick={() => setToast(null)}
+              className="ml-2 p-1 hover:bg-white/20 rounded-lg transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
