@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Plus, Eye, Trash2, Send, FileText, DollarSign, CheckCircle, Clock, XCircle, Copy, Mail, Printer } from "lucide-react"
+import { useEffect, useState, useRef } from "react"
+import { Plus, Eye, Trash2, Send, FileText, DollarSign, CheckCircle, Clock, XCircle, Copy, Mail, Printer, Edit2, Download } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -58,6 +58,8 @@ export default function AdminCustomOrdersPage() {
   const [orders, setOrders] = useState<CustomOrder[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editingOrderId, setEditingOrderId] = useState<string | null>(null)
   const [selectedOrder, setSelectedOrder] = useState<CustomOrder | null>(null)
   const [isReceiptDialogOpen, setIsReceiptDialogOpen] = useState(false)
   const [filter, setFilter] = useState("all")
@@ -156,8 +158,218 @@ export default function AdminCustomOrdersPage() {
     } catch (error: any) {
       console.error("Error creating custom order:", error)
       alert("Failed to create order: " + error.message)
+      } finally {
+        setIsSubmitting(false)
+      }
+  }
+
+  const handleEdit = (order: CustomOrder) => {
+    setIsEditMode(true)
+    setEditingOrderId(order.id)
+    setFormData({
+      clientName: order.clientName,
+      clientEmail: order.clientEmail,
+      clientPhone: order.clientPhone,
+      projectName: order.projectName,
+      projectDescription: order.projectDescription,
+      serviceType: order.serviceType,
+      totalAmount: order.totalAmount,
+      advanceAmount: order.advanceAmount,
+      notes: order.notes || "",
+    })
+    setIsDialogOpen(true)
+  }
+
+  const handleUpdateOrder = async () => {
+    if (!formData.clientName || !formData.clientEmail || !formData.totalAmount) {
+      alert("Please fill in client name, email and total amount")
+      return
+    }
+
+    if (formData.advanceAmount && formData.advanceAmount > formData.totalAmount) {
+      alert("Advance amount cannot be greater than total amount")
+      return
+    }
+
+    setIsSubmitting(true)
+    const advanceAmount = formData.advanceAmount || 0
+    const remainingAmount = formData.totalAmount - advanceAmount
+
+    try {
+      const res = await fetch(`/api/custom-orders/${editingOrderId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientName: formData.clientName,
+          clientEmail: formData.clientEmail,
+          clientPhone: formData.clientPhone,
+          projectName: formData.projectName,
+          projectDescription: formData.projectDescription,
+          serviceType: formData.serviceType,
+          totalAmount: formData.totalAmount,
+          advanceAmount: advanceAmount,
+          remainingAmount: remainingAmount,
+          notes: formData.notes,
+        })
+      })
+
+      if (res.ok) {
+        setIsDialogOpen(false)
+        setIsEditMode(false)
+        setEditingOrderId(null)
+        setFormData({
+          clientName: "",
+          clientEmail: "",
+          clientPhone: "",
+          projectName: "",
+          projectDescription: "",
+          serviceType: "",
+          totalAmount: 0,
+          advanceAmount: 0,
+          notes: "",
+        })
+        fetchCustomOrders()
+      } else {
+        const errorData = await res.json()
+        alert("Error: " + (errorData.error || "Failed to update order"))
+      }
+    } catch (error: any) {
+      console.error("Error updating order:", error)
+      alert("Failed to update order: " + error.message)
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  const downloadPDF = async (invoice: CustomOrder) => {
+    try {
+      const bankRes = await fetch("/api/public/bank-settings")
+      const bankSettings = await bankRes.json()
+
+      const advancePercent = invoice.advanceAmount > 0 ? Math.round((invoice.advanceAmount / invoice.totalAmount) * 100) : 0
+      const remainingPercent = invoice.remainingAmount > 0 ? Math.round((invoice.remainingAmount / invoice.totalAmount) * 100) : 0
+
+      const receiptContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Invoice - ${invoice.projectName}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; padding: 40px; background: #f8fafc; }
+    .invoice { max-width: 800px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .header { background: linear(135deg, #7c3aed, #8b5cf6); padding: 30px; border-radius: 12px 12px 0 0; color: white; text-align: center; }
+    .header h1 { font-size: 28px; margin-bottom: 5px; }
+    .header p { opacity: 0.9; }
+    .content { padding: 30px; }
+    h2 { color: #1e293b; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
+    .label { color: #64748b; width: 40%; }
+    .value { color: #1e293b; font-weight: 500; }
+    .amount-section { background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 20px 0; }
+    .amount-row { display: flex; justify-content: space-between; padding: 10px 0; }
+    .total { font-size: 24px; font-weight: bold; color: #1e293b; }
+    .advance { color: #059669; }
+    .remaining { color: ${invoice.remainingPaid ? '#059669' : '#1e293b'}; }
+    .paid { color: #059669; font-weight: bold; }
+    .due { color: #f59e0b; font-weight: bold; }
+    .bank-section { background: #ecfdf5; border: 2px solid #10b981; border-radius: 8px; padding: 20px; margin-top: 20px; }
+    .footer { text-align: center; padding: 20px; color: #64748b; font-size: 14px; border-top: 1px solid #e2e8f0; }
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+    .status-paid { background: #d1fae5; color: #059669; }
+    .status-partial { background: #fef3c7; color: #d97706; }
+    .status-unpaid { background: #fee2e2; color: #dc2626; }
+    @media print { body { padding: 0; } .invoice { box-shadow: none; } }
+  </style>
+</head>
+<body>
+  <div class="invoice">
+    <div class="header">
+      <h1>WPCodingPress</h1>
+      <p>Professional Web Development Services</p>
+    </div>
+    <div class="content">
+      <h2>Invoice Details</h2>
+      <table>
+        <tr><td class="label">Invoice ID:</td><td class="value">${invoice.id.slice(0, 8).toUpperCase()}</td></tr>
+        <tr><td class="label">Date:</td><td class="value">${new Date(invoice.createdAt).toLocaleDateString()}</td></tr>
+        <tr><td class="label">Project:</td><td class="value">${invoice.projectName}</td></tr>
+        <tr><td class="label">Service:</td><td class="value">${invoice.serviceType || 'Custom Project'}</td></tr>
+        <tr><td class="label">Status:</td><td class="value">
+          <span class="status-badge ${invoice.advancePaid && invoice.remainingPaid ? 'status-paid' : invoice.advancePaid ? 'status-partial' : 'status-unpaid'}">
+            ${invoice.advancePaid && invoice.remainingPaid ? 'PAID' : invoice.advancePaid ? 'PARTIAL' : 'UNPAID'}
+          </span>
+        </td></tr>
+      </table>
+
+      <h2>Client Information</h2>
+      <table>
+        <tr><td class="label">Name:</td><td class="value">${invoice.clientName}</td></tr>
+        <tr><td class="label">Email:</td><td class="value">${invoice.clientEmail}</td></tr>
+        ${invoice.clientPhone ? `<tr><td class="label">Phone:</td><td class="value">${invoice.clientPhone}</td></tr>` : ''}
+      </table>
+
+      <div class="amount-section">
+        <div class="amount-row">
+          <span><strong>Total Project Cost:</strong></span>
+          <span class="total">$${invoice.totalAmount}</span>
+        </div>
+        ${invoice.advanceAmount > 0 ? `
+        <div class="amount-row">
+          <span class="advance">Advance Payment (${advancePercent}%):</span>
+          <span class="${invoice.advancePaid ? 'paid' : 'due'}">$${invoice.advanceAmount} ${invoice.advancePaid ? 'PAID' : 'PENDING'}</span>
+        </div>
+        <div class="amount-row">
+          <span class="remaining">Remaining Payment (${remainingPercent}%):</span>
+          <span class="${invoice.remainingPaid ? 'paid' : 'due'}">$${invoice.remainingAmount} ${invoice.remainingPaid ? 'PAID' : 'DUE'}</span>
+        </div>
+        ` : `
+        <div class="amount-row">
+          <span>Payment Terms:</span>
+          <span>Full payment after completion</span>
+        </div>
+        `}
+      </div>
+
+      ${bankSettings ? `
+      <div class="bank-section">
+        <h2>Payment Details</h2>
+        <p style="color: #64748b; margin-bottom: 15px;">Please make payment to:</p>
+        <table>
+          <tr><td class="label">Bank Name:</td><td class="value">${bankSettings.bankName}</td></tr>
+          <tr><td class="label">Account Name:</td><td class="value">${bankSettings.accountName}</td></tr>
+          <tr><td class="label">Account Number:</td><td class="value">${bankSettings.accountNumber}</td></tr>
+          ${bankSettings.swift ? `<tr><td class="label">SWIFT:</td><td class="value">${bankSettings.swift}</td></tr>` : ''}
+        </table>
+        ${bankSettings.instructions ? `<p style="margin-top: 10px; font-style: italic;">${bankSettings.instructions}</p>` : ''}
+      </div>
+      ` : ''}
+
+      <div class="footer">
+        <p>Thank you for choosing WPCodingPress!</p>
+        <p>Email: contact@wpcodingpress.com</p>
+      </div>
+    </div>
+  </div>
+  <script>window.print()</script>
+</body>
+</html>
+      `
+
+      const printWindow = window.open('', '_blank')
+      if (printWindow) {
+        printWindow.document.write(receiptContent)
+        printWindow.document.close()
+        printWindow.focus()
+        setTimeout(() => {
+          printWindow.print()
+        }, 500)
+      }
+    } catch (error) {
+      console.error("Error generating PDF:", error)
+      alert("Failed to generate PDF")
     }
   }
 
@@ -249,7 +461,25 @@ export default function AdminCustomOrdersPage() {
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Custom Orders</h1>
           <p className="text-slate-500">Manage custom project orders with advance payments</p>
         </div>
-        <Button onClick={() => setIsDialogOpen(true)} className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600">
+        <Button 
+          onClick={() => {
+            setIsEditMode(false)
+            setEditingOrderId(null)
+            setFormData({
+              clientName: "",
+              clientEmail: "",
+              clientPhone: "",
+              projectName: "",
+              projectDescription: "",
+              serviceType: "",
+              totalAmount: 0,
+              advanceAmount: 0,
+              notes: "",
+            })
+            setIsDialogOpen(true)
+          }} 
+          className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600"
+        >
           <Plus className="h-4 w-4 mr-2" />
           Create Custom Order
         </Button>
@@ -334,6 +564,7 @@ export default function AdminCustomOrdersPage() {
                   <th className="text-left p-4 text-sm font-semibold text-slate-600">Total</th>
                   <th className="text-left p-4 text-sm font-semibold text-slate-600">Advance</th>
                   <th className="text-left p-4 text-sm font-semibold text-slate-600">Remaining</th>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Payment Status</th>
                   <th className="text-left p-4 text-sm font-semibold text-slate-600">Receipt</th>
                   <th className="text-left p-4 text-sm font-semibold text-slate-600">Status</th>
                   <th className="text-left p-4 text-sm font-semibold text-slate-600">Date</th>
@@ -394,6 +625,21 @@ export default function AdminCustomOrdersPage() {
                         </div>
                       </td>
                       <td className="p-4">
+                        {(() => {
+                          const isPaid = order.advancePaid && order.remainingPaid
+                          const isPartial = order.advancePaid && !order.remainingPaid && order.remainingAmount > 0
+                          const isUnpaid = !order.advancePaid && !order.remainingPaid
+                          
+                          if (isPaid) {
+                            return <Badge className="bg-green-500 text-white">Paid</Badge>
+                          } else if (isPartial) {
+                            return <Badge className="bg-yellow-500 text-white">Partial</Badge>
+                          } else {
+                            return <Badge className="bg-red-500 text-white">Unpaid</Badge>
+                          }
+                        })()}
+                      </td>
+                      <td className="p-4">
                         {order.receiptSent ? (
                           <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
                             Sent
@@ -418,8 +664,27 @@ export default function AdminCustomOrdersPage() {
                           <Button
                             variant="ghost"
                             size="icon"
+                            onClick={() => downloadPDF(order)}
+                            className="text-slate-500 hover:text-blue-600 hover:bg-blue-50"
+                            title="Download PDF"
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEdit(order)}
+                            className="text-slate-500 hover:text-violet-600 hover:bg-violet-50"
+                            title="Edit Order"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => setSelectedOrder(order)}
                             className="text-slate-500 hover:text-violet-600 hover:bg-violet-50"
+                            title="View Details"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -427,14 +692,15 @@ export default function AdminCustomOrdersPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => sendReceipt(order.id)}
-                            className="text-slate-500 hover:text-blue-600 hover:bg-blue-50"
+                            className="text-slate-500 hover:text-green-600 hover:bg-green-50"
+                            title="Send Receipt"
                           >
                             <Mail className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => deleteOrder(order.id)}
+                            onClick={() => deleteOrder(order.id)}}
                             className="text-slate-500 hover:text-red-600 hover:bg-red-50"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -450,13 +716,15 @@ export default function AdminCustomOrdersPage() {
         </CardContent>
       </Card>
 
-      {/* Create Order Dialog */}
+      {/* Create/Edit Order Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white">
           <DialogHeader>
-            <DialogTitle className="text-slate-900 text-xl font-bold">Create Custom Order</DialogTitle>
+            <DialogTitle className="text-slate-900 text-xl font-bold">
+              {isEditMode ? "Edit Custom Order" : "Create Custom Order"}
+            </DialogTitle>
             <DialogDescription className="text-slate-600">
-              Create a custom project order with flexible advance payment
+              {isEditMode ? "Update the order details and payment information" : "Create a custom project order with flexible advance payment"}
             </DialogDescription>
           </DialogHeader>
           
@@ -597,15 +865,34 @@ export default function AdminCustomOrdersPage() {
             </div>
 
             <div className="flex justify-end gap-3 pt-4">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-2 border-slate-300 text-slate-700 font-medium hover:bg-slate-100">
+              <Button 
+                variant="outline" 
+                onClick={() => { 
+                  setIsDialogOpen(false)
+                  setIsEditMode(false)
+                  setEditingOrderId(null)
+                  setFormData({
+                    clientName: "",
+                    clientEmail: "",
+                    clientPhone: "",
+                    projectName: "",
+                    projectDescription: "",
+                    serviceType: "",
+                    totalAmount: 0,
+                    advanceAmount: 0,
+                    notes: "",
+                  })
+                }} 
+                className="border-2 border-slate-300 text-slate-700 font-medium hover:bg-slate-100"
+              >
                 Cancel
               </Button>
               <Button 
-                onClick={handleSubmit} 
+                onClick={isEditMode ? handleUpdateOrder : handleSubmit} 
                 disabled={isSubmitting}
                 className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 font-semibold px-6"
               >
-                {isSubmitting ? "Creating..." : "Create Order"}
+                {isSubmitting ? (isEditMode ? "Updating..." : "Creating...") : (isEditMode ? "Update Order" : "Create Order")}
               </Button>
             </div>
           </div>
