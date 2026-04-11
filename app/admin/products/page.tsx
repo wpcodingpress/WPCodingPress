@@ -28,8 +28,7 @@ import {
   Clock,
   LayoutDashboard,
   CheckCircle,
-  AlertCircle,
-  Upload
+  AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

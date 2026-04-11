@@ -158,8 +158,7 @@ function BankTransferContent() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Card className="bg-white/10 backdrop-blur-xl border-slate-700/50">
-            <div className="p-6 sm:p-8">
+          <div className="bg-white/10 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-6 sm:p-8">
               <div className="text-center mb-8">
                 <div className="w-20 h-20 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-violet-500/30">
                   <Building2 className="h-10 w-10 text-white" />
@@ -372,8 +371,7 @@ function BankTransferContent() {
               <p className="text-center text-sm text-slate-500 mt-4">
                 By clicking above, you confirm that you have completed the bank transfer
               </p>
-            </CardContent>
-          </Card>
+            </div>
         </motion.div>
       </div>
     </div>
