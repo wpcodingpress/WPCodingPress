@@ -50,21 +50,10 @@ export async function POST(request: Request) {
       )
     }
 
-    const existingProduct = await prisma.product.findUnique({
-      where: { slug }
-    })
-
-    if (existingProduct) {
-      return NextResponse.json(
-        { error: 'Product with this slug already exists' },
-        { status: 400 }
-      )
-    }
-
     const product = await prisma.product.create({
       data: {
         name: String(name),
-        slug: String(slug),
+        slug: String(slug).toLowerCase().replace(/\s+/g, '-'),
         description: String(description),
         shortDesc: shortDesc || null,
         type: type || 'plugin',
@@ -82,8 +71,34 @@ export async function POST(request: Request) {
 
     return NextResponse.json(product, { status: 201 })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating product:', error)
+    
+    if (error.code === 'P2002') {
+      await prisma.product.delete({
+        where: { slug: String(body.slug).toLowerCase().replace(/\s+/g, '-') }
+      })
+      
+      const retryProduct = await prisma.product.create({
+        data: {
+          name: String(body.name),
+          slug: String(body.slug).toLowerCase().replace(/\s+/g, '-'),
+          description: String(body.description),
+          shortDesc: body.shortDesc || null,
+          type: body.type || 'plugin',
+          images: body.images || null,
+          price: body.price ? Number(body.price) : 0,
+          features: body.features || null,
+          freeDownloadUrl: body.freeDownloadUrl || null,
+          proDownloadUrl: body.proDownloadUrl || null,
+          isActive: body.isActive ?? true,
+          isFeatured: body.isFeatured ?? false,
+          order: body.order || 0,
+        }
+      })
+      return NextResponse.json(retryProduct, { status: 201 })
+    }
+    
     return NextResponse.json(
       { error: 'Failed to create product: ' + String(error) },
       { status: 500 }
