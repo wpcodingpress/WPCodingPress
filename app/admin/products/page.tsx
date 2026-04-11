@@ -80,13 +80,13 @@ export default function AdminProductsPage() {
         ? formData.features.split('\n').filter(f => f.trim()) 
         : [];
         
+      const { featuredImage, ...restFormData } = formData;
       const payload = {
-        ...formData,
+        ...restFormData,
         price: Math.round(formData.price * 100),
         images: formData.featuredImage ? { featuredImage: formData.featuredImage } : null,
         features: featuresArray
       };
-      delete payload.featuredImage;
 
       if (editingProduct) {
         await fetch(`/api/products/${editingProduct.id}`, {
