@@ -19,23 +19,20 @@ const mainNavLinks = [
   { href: "/contact", label: "Contact" },
 ]
 
-const services = [
-  { title: "WordPress to Next.js", description: "Lightning-fast conversion", icon: "⚡", href: "/services/wordpress-to-nextjs", popular: true },
-  { title: "Elementor Pro Design", description: "Stunning custom designs", icon: "🎨", href: "/services/elementor-pro-design", popular: false },
-  { title: "WooCommerce Stores", description: "Full e-commerce solutions", icon: "🛒", href: "/services/woocommerce-stores", popular: false },
-  { title: "SEO & Marketing", description: "Dominate search rankings", icon: "📈", href: "/services/seo-marketing", popular: false },
-  { title: "Web Applications", description: "Custom React/Next.js apps", icon: "💻", href: "/services/web-applications", popular: false },
-  { title: "Cloud & DevOps", description: "Modern infrastructure", icon: "☁️", href: "/services/cloud-devops", popular: false },
-  { title: "Domain & Hosting", description: "Setup & ongoing support", icon: "🌐", href: "/services/domain-hosting", popular: false },
-]
+interface ServiceItem {
+  title: string
+  description: string
+  icon: string
+  href: string
+  popular?: boolean
+}
 
-const products = [
-  { title: "WordPress Plugins", description: "Premium tools for your site", icon: "🔌", href: "/products/plugins" },
-  { title: "WordPress Themes", description: "Beautiful & responsive", icon: "🎨", href: "/products/themes" },
-  { title: "Next.js Templates", description: "Production-ready", icon: "⚛️", href: "/products/templates" },
-  { title: "MCP Servers", description: "AI integration", icon: "🤖", href: "/products/mcp-servers" },
-  { title: "AI Agents", description: "Smart automation", icon: "🧠", href: "/products/ai-agents" },
-]
+interface ProductItem {
+  title: string
+  description: string
+  icon: string
+  href: string
+}
 
 function NotificationBell() {
   const [hasNotifications, setHasNotifications] = useState(false)
@@ -169,6 +166,24 @@ export function Navbar() {
   const { data: session } = useSession()
   const pathname = usePathname()
 
+  const [services, setServices] = useState<ServiceItem[]>([
+    { title: "WordPress to Next.js", description: "Lightning-fast conversion", icon: "⚡", href: "/services/wordpress-to-nextjs", popular: true },
+    { title: "Elementor Pro Design", description: "Stunning custom designs", icon: "🎨", href: "/services/elementor-pro-design", popular: false },
+    { title: "WooCommerce Stores", description: "Full e-commerce solutions", icon: "🛒", href: "/services/woocommerce-stores", popular: false },
+    { title: "SEO & Marketing", description: "Dominate search rankings", icon: "📈", href: "/services/seo-marketing", popular: false },
+    { title: "Web Applications", description: "Custom React/Next.js apps", icon: "💻", href: "/services/web-applications", popular: false },
+    { title: "Cloud & DevOps", description: "Modern infrastructure", icon: "☁️", href: "/services/cloud-devops", popular: false },
+    { title: "Domain & Hosting", description: "Setup & ongoing support", icon: "🌐", href: "/services/domain-hosting", popular: false },
+  ])
+
+  const [products, setProducts] = useState<ProductItem[]>([
+    { title: "WordPress Plugins", description: "Premium tools for your site", icon: "🔌", href: "/products/plugins" },
+    { title: "WordPress Themes", description: "Beautiful & responsive", icon: "🎨", href: "/products/themes" },
+    { title: "Next.js Templates", description: "Production-ready", icon: "⚛️", href: "/products/templates" },
+    { title: "MCP Servers", description: "AI integration", icon: "🤖", href: "/products/mcp-servers" },
+    { title: "AI Agents", description: "Smart automation", icon: "🧠", href: "/products/ai-agents" },
+  ])
+
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/"
     return pathname.startsWith(href)
@@ -190,6 +205,78 @@ export function Navbar() {
     }
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  // Fetch services from database
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const res = await fetch("/api/services?active=true")
+        if (res.ok) {
+          const data = await res.json()
+          if (data.length > 0) {
+            const mappedServices: ServiceItem[] = data.map((s: any) => ({
+              title: s.name,
+              description: s.description?.substring(0, 60) || "",
+              icon: "⚡",
+              href: `/services/${s.slug}`,
+              popular: s.isActive
+            }))
+            setServices(mappedServices)
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching services:", error)
+      }
+    }
+    fetchServices()
+  }, [])
+
+  // Fetch products from database
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch("/api/products")
+        if (res.ok) {
+          const data = await res.json()
+          if (data.length > 0) {
+            // Get unique types
+            const types = [...new Set(data.map((p: any) => p.type))]
+            const typeLabels: Record<string, string> = {
+              plugin: "WordPress Plugins",
+              theme: "WordPress Themes", 
+              template: "Next.js Templates",
+              mcp_server: "MCP Servers",
+              ai_agent: "AI Agents"
+            }
+            const typeIcons: Record<string, string> = {
+              plugin: "🔌",
+              theme: "🎨",
+              template: "⚛️",
+              mcp_server: "🤖",
+              ai_agent: "🧠"
+            }
+            const typeHrefs: Record<string, string> = {
+              plugin: "/products/plugins",
+              theme: "/products/themes",
+              template: "/products/templates",
+              mcp_server: "/products/mcp-servers",
+              ai_agent: "/products/ai-agents"
+            }
+            const mappedProducts: ProductItem[] = types.map((type: string) => ({
+              title: typeLabels[type] || type,
+              description: `Browse our ${typeLabels[type] || type}`,
+              icon: typeIcons[type] || "📦",
+              href: typeHrefs[type] || "/products"
+            }))
+            setProducts(mappedProducts)
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error)
+      }
+    }
+    fetchProducts()
   }, [])
 
   return (

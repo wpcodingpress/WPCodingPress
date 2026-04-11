@@ -3,11 +3,9 @@ import prisma from '@/lib/prisma'
 
 export async function GET() {
   try {
-    console.log('[Admin Products API] Fetching all products...')
     const products = await prisma.product.findMany({
       orderBy: { order: 'asc' }
     })
-    console.log('[Admin Products API] Found products:', products.length)
     return NextResponse.json(products)
   } catch (error) {
     console.error('[Admin Products API] Error:', error)
