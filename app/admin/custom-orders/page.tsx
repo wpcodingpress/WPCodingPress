@@ -275,116 +275,343 @@ export default function AdminCustomOrdersPage() {
 
   const downloadPDF = async (invoice: CustomOrder) => {
     try {
-      const bankRes = await fetch("/api/public/bank-settings")
-      const bankSettings = await bankRes.json()
+      let bankSettings = null
+      if (invoice.bankAccountId) {
+        const bankRes = await fetch(`/api/bank-settings/${invoice.bankAccountId}`)
+        if (bankRes.ok) {
+          bankSettings = await bankRes.json()
+        }
+      }
+      if (!bankSettings) {
+        const bankRes = await fetch("/api/public/bank-settings")
+        bankSettings = await bankRes.json()
+      }
 
       const advancePercent = invoice.advanceAmount > 0 ? Math.round((invoice.advanceAmount / invoice.totalAmount) * 100) : 0
       const remainingPercent = invoice.remainingAmount > 0 ? Math.round((invoice.remainingAmount / invoice.totalAmount) * 100) : 0
+      
+      const isPaid = invoice.advancePaid && invoice.remainingPaid
+      const isPartial = invoice.advanceAmount > 0 && invoice.advancePaid && !invoice.remainingPaid
 
       const receiptContent = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Invoice - ${invoice.projectName}</title>
+  <title>Invoice #${invoice.id.slice(0, 8).toUpperCase()} - WPCodingPress</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Helvetica Neue', Arial, sans-serif; padding: 40px; background: #f8fafc; }
-    .invoice { max-width: 800px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .header { background: linear(135deg, #7c3aed, #8b5cf6); padding: 30px; border-radius: 12px 12px 0 0; color: white; text-align: center; }
-    .header h1 { font-size: 28px; margin-bottom: 5px; }
-    .header p { opacity: 0.9; }
-    .content { padding: 30px; }
-    h2 { color: #1e293b; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
-    .label { color: #64748b; width: 40%; }
-    .value { color: #1e293b; font-weight: 500; }
-    .amount-section { background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 20px 0; }
-    .amount-row { display: flex; justify-content: space-between; padding: 10px 0; }
-    .total { font-size: 24px; font-weight: bold; color: #1e293b; }
-    .advance { color: #059669; }
-    .remaining { color: ${invoice.remainingPaid ? '#059669' : '#1e293b'}; }
-    .paid { color: #059669; font-weight: bold; }
-    .due { color: #f59e0b; font-weight: bold; }
-    .bank-section { background: #ecfdf5; border: 2px solid #10b981; border-radius: 8px; padding: 20px; margin-top: 20px; }
-    .footer { text-align: center; padding: 20px; color: #64748b; font-size: 14px; border-top: 1px solid #e2e8f0; }
-    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-    .status-paid { background: #d1fae5; color: #059669; }
-    .status-partial { background: #fef3c7; color: #d97706; }
-    .status-unpaid { background: #fee2e2; color: #dc2626; }
-    @media print { body { padding: 0; } .invoice { box-shadow: none; } }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 0; background: #f8fafc; }
+    .invoice { max-width: 800px; margin: 0 auto; background: white; }
+    .header { 
+      background: linear(135deg, #7c3aed 0%, #8b5cf6 50%, #a78bfa 100%); 
+      padding: 40px 50px; 
+      color: white; 
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 400px;
+      height: 400px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -30%;
+      left: -10%;
+      width: 300px;
+      height: 300px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+    .header-content { position: relative; z-index: 1; }
+    .header h1 { 
+      font-size: 32px; 
+      font-weight: 800; 
+      letter-spacing: -0.5px; 
+      margin-bottom: 8px; 
+    }
+    .header .subtitle { 
+      font-size: 14px; 
+      opacity: 0.9; 
+      font-weight: 400;
+    }
+    .invoice-info { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: flex-start;
+      margin-top: 30px;
+    }
+    .invoice-badge {
+      background: ${isPaid ? '#10b981' : isPartial ? '#f59e0b' : '#ef4444'};
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .invoice-number {
+      background: rgba(255,255,255,0.2);
+      padding: 10px 20px;
+      border-radius: 8px;
+    }
+    .invoice-number span { font-size: 12px; opacity: 0.8; display: block; }
+    .invoice-number strong { font-size: 18px; display: block; margin-top: 2px; }
+    
+    .content { padding: 40px 50px; }
+    
+    .section { margin-bottom: 30px; }
+    .section-title {
+      color: #7c3aed;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #ede9fe;
+    }
+    
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .info-item { }
+    .info-label { color: #64748b; font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+    .info-value { color: #1e293b; font-size: 14px; font-weight: 600; }
+    
+    .client-box {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .client-name { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+    .client-details { color: #64748b; font-size: 13px; }
+    .client-details div { margin-bottom: 4px; }
+    
+    .amount-section { 
+      background: ${isPaid ? 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)' : isPartial ? 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)' : 'linear-gradient(135deg, #fef2f2 0%, #fecaca 100%)'};
+      border: 2px solid ${isPaid ? '#10b981' : isPartial ? '#f59e0b' : '#ef4444'};
+      border-radius: 16px; 
+      padding: 30px; 
+      margin: 25px 0;
+    }
+    .amount-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px dashed ${isPaid ? '#6ee7b7' : isPartial ? '#fcd34d' : '#fca5a5'};
+    }
+    .amount-main-label { font-size: 16px; font-weight: 600; color: #1e293b; }
+    .amount-main-value { font-size: 36px; font-weight: 800; color: #1e293b; }
+    
+    .amount-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .amount-item {
+      background: rgba(255,255,255,0.7);
+      border-radius: 10px;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .amount-item-label { font-size: 13px; color: #64748b; }
+    .amount-item-value { 
+      font-size: 16px; 
+      font-weight: 700; 
+      color: ${isPaid ? '#059669' : '#1e293b'};
+    }
+    .amount-item-value.pending { color: #d97706; }
+    .amount-item-value.paid { color: #059669; }
+    
+    .payment-terms {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      color: #64748b;
+      font-size: 13px;
+    }
+    
+    .bank-section { 
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border: 2px solid #10b981;
+      border-radius: 16px; 
+      padding: 25px;
+      margin-top: 25px;
+    }
+    .bank-title { 
+      color: #059669; 
+      font-size: 14px; 
+      font-weight: 700; 
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .bank-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .bank-item { background: rgba(255,255,255,0.8); border-radius: 8px; padding: 12px; }
+    .bank-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .bank-value { font-size: 14px; font-weight: 600; color: #1e293b; margin-top: 2px; }
+    
+    .footer { 
+      background: #1e293b; 
+      color: white; 
+      padding: 30px 50px;
+      text-align: center;
+    }
+    .footer-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .footer-subtitle { font-size: 13px; opacity: 0.7; margin-bottom: 20px; }
+    .footer-contact { font-size: 12px; opacity: 0.6; }
+    
+    .watermark {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      opacity: 0.1;
+      font-size: 10px;
+      color: #7c3aed;
+    }
+    
+    @media print { 
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .invoice { box-shadow: none; }
+      .watermark { display: none; }
+    }
   </style>
 </head>
 <body>
   <div class="invoice">
     <div class="header">
-      <h1>WPCodingPress</h1>
-      <p>Professional Web Development Services</p>
-    </div>
-    <div class="content">
-      <h2>Invoice Details</h2>
-      <table>
-        <tr><td class="label">Invoice ID:</td><td class="value">${invoice.id.slice(0, 8).toUpperCase()}</td></tr>
-        <tr><td class="label">Date:</td><td class="value">${new Date(invoice.createdAt).toLocaleDateString()}</td></tr>
-        <tr><td class="label">Project:</td><td class="value">${invoice.projectName}</td></tr>
-        <tr><td class="label">Service:</td><td class="value">${invoice.serviceType || 'Custom Project'}</td></tr>
-        <tr><td class="label">Status:</td><td class="value">
-          <span class="status-badge ${invoice.advancePaid && invoice.remainingPaid ? 'status-paid' : invoice.advancePaid ? 'status-partial' : 'status-unpaid'}">
-            ${invoice.advancePaid && invoice.remainingPaid ? 'PAID' : invoice.advancePaid ? 'PARTIAL' : 'UNPAID'}
-          </span>
-        </td></tr>
-      </table>
-
-      <h2>Client Information</h2>
-      <table>
-        <tr><td class="label">Name:</td><td class="value">${invoice.clientName}</td></tr>
-        <tr><td class="label">Email:</td><td class="value">${invoice.clientEmail}</td></tr>
-        ${invoice.clientPhone ? `<tr><td class="label">Phone:</td><td class="value">${invoice.clientPhone}</td></tr>` : ''}
-      </table>
-
-      <div class="amount-section">
-        <div class="amount-row">
-          <span><strong>Total Project Cost:</strong></span>
-          <span class="total">$${invoice.totalAmount}</span>
+      <div class="header-content">
+        <h1>⚡ WPCodingPress</h1>
+        <p class="subtitle">Professional Web Development & Digital Solutions</p>
+        
+        <div class="invoice-info">
+          <div class="invoice-number">
+            <span>Invoice Number</span>
+            <strong>#${invoice.id.slice(0, 8).toUpperCase()}</strong>
+          </div>
+          <div class="invoice-badge">
+            ${isPaid ? '✓ PAID' : isPartial ? '⚠ PARTIAL' : '✕ UNPAID'}
+          </div>
         </div>
-        ${invoice.advanceAmount > 0 ? `
-        <div class="amount-row">
-          <span class="advance">Advance Payment (${advancePercent}%):</span>
-          <span class="${invoice.advancePaid ? 'paid' : 'due'}">$${invoice.advanceAmount} ${invoice.advancePaid ? 'PAID' : 'PENDING'}</span>
-        </div>
-        <div class="amount-row">
-          <span class="remaining">Remaining Payment (${remainingPercent}%):</span>
-          <span class="${invoice.remainingPaid ? 'paid' : 'due'}">$${invoice.remainingAmount} ${invoice.remainingPaid ? 'PAID' : 'DUE'}</span>
-        </div>
-        ` : `
-        <div class="amount-row">
-          <span>Payment Terms:</span>
-          <span>Full payment after completion</span>
-        </div>
-        `}
       </div>
-
+    </div>
+    
+    <div class="content">
+      <div class="section">
+        <div class="section-title">Project Details</div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Project Name</div>
+            <div class="info-value">${invoice.projectName}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Service Type</div>
+            <div class="info-value">${invoice.serviceType || 'Custom Project'}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Invoice Date</div>
+            <div class="info-value">${new Date(invoice.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Project Status</div>
+            <div class="info-value" style="text-transform: capitalize;">${invoice.status.replace('_', ' ')}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">Client Information</div>
+        <div class="client-box">
+          <div class="client-name">${invoice.clientName}</div>
+          <div class="client-details">
+            <div>📧 ${invoice.clientEmail}</div>
+            ${invoice.clientPhone ? `<div>📞 ${invoice.clientPhone}</div>` : ''}
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">Payment Summary</div>
+        <div class="amount-section">
+          <div class="amount-main">
+            <span class="amount-main-label">Total Project Cost</span>
+            <span class="amount-main-value">$${invoice.totalAmount.toLocaleString()}</span>
+          </div>
+          
+          ${invoice.advanceAmount > 0 ? `
+          <div class="amount-breakdown">
+            <div class="amount-item">
+              <span class="amount-item-label">Advance (${advancePercent}%)</span>
+              <span class="amount-item-value ${invoice.advancePaid ? 'paid' : 'pending'}">
+                $${invoice.advanceAmount.toLocaleString()} ${invoice.advancePaid ? '✓' : ''}
+              </span>
+            </div>
+            <div class="amount-item">
+              <span class="amount-item-label">Remaining (${remainingPercent}%)</span>
+              <span class="amount-item-value ${invoice.remainingPaid ? 'paid' : 'pending'}">
+                $${invoice.remainingAmount.toLocaleString()} ${invoice.remainingPaid ? '✓' : '(Due)'}
+              </span>
+            </div>
+          </div>
+          ` : `
+          <div class="payment-terms">
+            💰 Payment terms: Full payment after project completion
+          </div>
+          `}
+        </div>
+      </div>
+      
       ${bankSettings ? `
-      <div class="bank-section">
-        <h2>Payment Details</h2>
-        <p style="color: #64748b; margin-bottom: 15px;">Please make payment to:</p>
-        <table>
-          <tr><td class="label">Bank Name:</td><td class="value">${bankSettings.bankName}</td></tr>
-          <tr><td class="label">Account Name:</td><td class="value">${bankSettings.accountName}</td></tr>
-          <tr><td class="label">Account Number:</td><td class="value">${bankSettings.accountNumber}</td></tr>
-          ${bankSettings.swift ? `<tr><td class="label">SWIFT:</td><td class="value">${bankSettings.swift}</td></tr>` : ''}
-        </table>
-        ${bankSettings.instructions ? `<p style="margin-top: 10px; font-style: italic;">${bankSettings.instructions}</p>` : ''}
+      <div class="section">
+        <div class="section-title">Payment Details</div>
+        <div class="bank-section">
+          <div class="bank-title">🏦 Bank Account Information</div>
+          <div class="bank-grid">
+            <div class="bank-item">
+              <div class="bank-label">Bank Name</div>
+              <div class="bank-value">${bankSettings.bankName}</div>
+            </div>
+            <div class="bank-item">
+              <div class="bank-label">Account Name</div>
+              <div class="bank-value">${bankSettings.accountName}</div>
+            </div>
+            <div class="bank-item">
+              <div class="bank-label">Account Number</div>
+              <div class="bank-value">${bankSettings.accountNumber}</div>
+            </div>
+            ${bankSettings.swift ? `
+            <div class="bank-item">
+              <div class="bank-label">SWIFT Code</div>
+              <div class="bank-value">${bankSettings.swift}</div>
+            </div>
+            ` : ''}
+          </div>
+          ${bankSettings.instructions ? `<p style="margin-top: 15px; font-size: 12px; color: #059669; font-style: italic;">${bankSettings.instructions}</p>` : ''}
+        </div>
       </div>
       ` : ''}
-
-      <div class="footer">
-        <p>Thank you for choosing WPCodingPress!</p>
-        <p>Email: contact@wpcodingpress.com</p>
+    </div>
+    
+    <div class="footer">
+      <div class="footer-title">Thank You for Your Business! 🚀</div>
+      <div class="footer-subtitle">We appreciate your trust in WPCodingPress</div>
+      <div class="footer-contact">
+        📧 contact@wpcodingpress.com | 🌐 wpcodingpress.com
       </div>
     </div>
   </div>
+  <div class="watermark">Generated by WPCodingPress</div>
   <script>window.print()</script>
 </body>
 </html>
