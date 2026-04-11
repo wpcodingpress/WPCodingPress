@@ -93,18 +93,26 @@ export default function AdminProductsPage() {
         features: featuresArray
       };
 
+      let response;
       if (editingProduct) {
-        await fetch(`/api/admin/products/${editingProduct.id}`, {
+        response = await fetch(`/api/admin/products/${editingProduct.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
       } else {
-        await fetch("/api/admin/products", {
+        response = await fetch("/api/admin/products", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
+      }
+
+      const result = await response.json();
+      
+      if (!response.ok) {
+        alert(result.error || 'Failed to save product');
+        return;
       }
 
       setShowModal(false);
