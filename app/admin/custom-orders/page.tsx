@@ -546,12 +546,17 @@ export default function AdminCustomOrdersPage() {
         <Card className="bg-white border-slate-200">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-yellow-100 flex items-center justify-center">
-                <Clock className="h-5 w-5 text-yellow-600" />
+              <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+                <Clock className="h-5 w-5 text-red-600" />
               </div>
               <div>
-                <p className="text-sm text-slate-500">Pending</p>
-                <p className="text-2xl font-bold text-slate-900">{orders.filter(o => o.status === "pending").length}</p>
+                <p className="text-sm text-slate-500">Unpaid</p>
+                <p className="text-2xl font-bold text-slate-900">
+                  {orders.filter(o => {
+                    const hasAdvance = o.advanceAmount > 0
+                    return !o.advancePaid && !o.remainingPaid
+                  }).length}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -559,12 +564,17 @@ export default function AdminCustomOrdersPage() {
         <Card className="bg-white border-slate-200">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                <FileText className="h-5 w-5 text-blue-600" />
+              <div className="w-10 h-10 rounded-lg bg-yellow-100 flex items-center justify-center">
+                <FileText className="h-5 w-5 text-yellow-600" />
               </div>
               <div>
-                <p className="text-sm text-slate-500">In Progress</p>
-                <p className="text-2xl font-bold text-slate-900">{orders.filter(o => o.status === "in_progress").length}</p>
+                <p className="text-sm text-slate-500">Partial</p>
+                <p className="text-2xl font-bold text-slate-900">
+                  {orders.filter(o => {
+                    const hasAdvance = o.advanceAmount > 0
+                    return hasAdvance && o.advancePaid && !o.remainingPaid
+                  }).length}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -576,8 +586,12 @@ export default function AdminCustomOrdersPage() {
                 <DollarSign className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-slate-500">Revenue</p>
-                <p className="text-2xl font-bold text-slate-900">${orders.reduce((acc, o) => acc + (o.advancePaid ? o.advanceAmount : 0), 0)}</p>
+                <p className="text-sm text-slate-500">Paid</p>
+                <p className="text-2xl font-bold text-slate-900">
+                  {orders.filter(o => {
+                    return o.advancePaid && o.remainingPaid
+                  }).length}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -586,11 +600,17 @@ export default function AdminCustomOrdersPage() {
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 text-purple-600" />
+                <DollarSign className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-slate-500">Completed</p>
-                <p className="text-2xl font-bold text-slate-900">{orders.filter(o => o.status === "completed").length}</p>
+                <p className="text-sm text-slate-500">Total Revenue</p>
+                <p className="text-2xl font-bold text-slate-900">
+                  ${orders.reduce((acc, o) => {
+                    const advancePaid = o.advancePaid === true
+                    const remainingPaid = o.remainingPaid === true
+                    return acc + (advancePaid ? Number(o.advanceAmount) : 0) + (remainingPaid ? Number(o.remainingAmount) : 0)
+                  }, 0).toLocaleString()}
+                </p>
               </div>
             </div>
           </CardContent>
