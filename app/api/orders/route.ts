@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     console.log("DEBUG: Full request body:", JSON.stringify(body))
     const { 
       service, product, packageType, clientName, clientEmail, 
-      clientPhone, message, userId, amount, transactionId 
+      clientPhone, message, userId, amount 
     } = body
 
     console.log("DEBUG: service=", service, "product=", product, "amount=", amount)
@@ -149,7 +149,6 @@ export async function POST(request: NextRequest) {
           amount: orderAmount,
           packageType: packageType || 'basic',
           paymentMethod: body.paymentMethod || null,
-          transactionId: transactionId || null,
           downloadCount: 0,
           downloadLimit: 3,
         }

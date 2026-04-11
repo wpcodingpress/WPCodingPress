@@ -144,7 +144,6 @@ model Order {
   status          String   @default("pending")
   paymentStatus   String   @default("unpaid")
   paymentMethod   String?
-  transactionId  String?
   amount          Int      @default(0)
   currency        String   @default("USD")
   downloadCount   Int      @default(0)

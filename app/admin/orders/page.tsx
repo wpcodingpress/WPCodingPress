@@ -25,7 +25,6 @@ interface Order {
   amount: number
   paymentStatus: string
   paymentMethod: string | null
-  transactionId: string | null
   downloadCount: number
   downloadLimit: number
   createdAt: string
@@ -281,15 +280,6 @@ export default function AdminOrdersPage() {
                   <div>
                     <label className="text-sm text-slate-500">Payment Method</label>
                     <p className="text-slate-900 font-medium capitalize">{selectedOrder.paymentMethod.replace("_", " ")}</p>
-                  </div>
-                )}
-                
-                {selectedOrder.transactionId && (
-                  <div>
-                    <label className="text-sm text-slate-500">Transaction ID</label>
-                    <p className="text-slate-900 font-mono bg-slate-100 px-3 py-2 rounded-lg inline-block">
-                      {selectedOrder.transactionId}
-                    </p>
                   </div>
                 )}
                 

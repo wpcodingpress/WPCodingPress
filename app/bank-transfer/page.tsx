@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, CheckCircle, Copy, ArrowLeft, Loader2, CreditCard, Banknote, Globe, Info, Shield, Clock, QrCode, Wallet, ArrowRightLeft, Hash } from "lucide-react";
+import { Building2, CheckCircle, Copy, ArrowLeft, Loader2, CreditCard, Banknote, Globe, Info, Shield, Clock, QrCode, Wallet, ArrowRightLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -33,12 +33,22 @@ function BankTransferContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [transactionId, setTransactionId] = useState("");
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const productSlug = searchParams.get("product");
   const productName = searchParams.get("name");
-  const productPrice = searchParams.get("price");
+  const rawPrice = searchParams.get("price");
+  
+  const formatPrice = (price: string | null) => {
+    if (!price) return "$0";
+    const num = parseInt(price) || 0;
+    if (num >= 100) {
+      return `$${(num / 100).toFixed(2)}`;
+    }
+    return `$${num.toFixed(2)}`;
+  };
+  
+  const productPrice = formatPrice(rawPrice);
+  const priceInCents = parseInt(rawPrice || "0") || 0;
 
   useEffect(() => {
     if (!productSlug) {
@@ -81,7 +91,7 @@ function BankTransferContent() {
       const sessionData = await sessionRes.json();
 
       if (!sessionData?.user) {
-        router.push(`/login?redirect=/bank-transfer?product=${productSlug}&name=${productName}&price=${productPrice}`);
+        router.push(`/login?redirect=/bank-transfer?product=${productSlug}&name=${productName}&price=${rawPrice}`);
         return;
       }
 
@@ -95,9 +105,8 @@ function BankTransferContent() {
           clientEmail: sessionData.user.email,
           clientPhone: sessionData.user.phone || "",
           userId: sessionData.user.id,
-          amount: parseInt(productPrice) || 0,
-          paymentMethod: "bank_transfer",
-          transactionId: transactionId || null
+          amount: priceInCents,
+          paymentMethod: "bank_transfer"
         })
       });
 
@@ -377,23 +386,8 @@ function BankTransferContent() {
               </Button>
 
               <p className="text-center text-sm text-slate-500 mt-4">
-                Enter your transaction ID after making the payment
+                Complete your bank transfer and the order will be processed after payment verification
               </p>
-
-              {/* Transaction ID Input */}
-              <div className="mt-4 bg-slate-800/50 border border-slate-700/50 rounded-xl p-4">
-                <label className="flex items-center gap-2 text-sm text-slate-400 mb-2">
-                  <Hash className="w-4 h-4" />
-                  Transaction ID / Reference Number
-                </label>
-                <input
-                  type="text"
-                  value={transactionId}
-                  onChange={(e) => setTransactionId(e.target.value)}
-                  placeholder="Enter your bank transaction ID"
-                  className="w-full bg-slate-700/50 border border-slate-600/50 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:border-violet-500 focus:outline-none"
-                />
-              </div>
             </div>
         </motion.div>
       </div>
