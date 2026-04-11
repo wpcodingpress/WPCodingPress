@@ -210,11 +210,15 @@ export default function AdminInvoicesPage() {
       font-weight: 800; 
       letter-spacing: -0.5px; 
       margin-bottom: 8px; 
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     .header .subtitle { 
       font-size: 14px; 
-      opacity: 0.9; 
-      font-weight: 400;
+      opacity: 0.95; 
+      font-weight: 500;
+      color: #ffffff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
     .invoice-info { 
       display: flex; 
