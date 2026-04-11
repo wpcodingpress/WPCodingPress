@@ -287,17 +287,19 @@ export default async function ProductsPage() {
                     {/* Image */}
                     <div className="aspect-video bg-slate-700/50 relative overflow-hidden">
                       {images?.featuredImage ? (
-                        <img 
-                          src={images.featuredImage} 
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
+                        <>
+                          <img 
+                            src={images.featuredImage} 
+                            alt={product.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
+                        </>
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
-                        <span className="text-5xl">{typeInfo?.icon || '📦'}</span>
-                      </div>
-                      {/* Gradient overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
+                          <span className="text-5xl">{typeInfo?.icon || '📦'}</span>
+                        </div>
+                      )}
                     </div>
                     
                     {/* Content */}
