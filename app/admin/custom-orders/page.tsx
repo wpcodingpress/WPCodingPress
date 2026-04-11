@@ -689,10 +689,6 @@ export default function AdminCustomOrdersPage() {
                           }
                         })()}
                       </td>
-                            return <Badge className="bg-red-500 text-white">Unpaid</Badge>
-                          }
-                        })()}
-                      </td>
                       <td className="p-4">
                         {order.receiptSent ? (
                           <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
