@@ -29,6 +29,7 @@ interface CustomOrder {
   clientPhone: string
   projectName: string
   projectDescription: string
+  serviceType: string
   totalAmount: number
   advanceAmount: number
   remainingAmount: number
@@ -38,6 +39,7 @@ interface CustomOrder {
   createdAt: string
   receiptSent: boolean
   receiptSentAt: string | null
+  notes: string | null
 }
 
 const serviceTypes = [
