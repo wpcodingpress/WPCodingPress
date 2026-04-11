@@ -124,8 +124,12 @@ async function getFeaturedProducts() {
 }
 
 function getUniqueTypes(products: any[]) {
+  const typeCounts: Record<string, number> = {};
+  products.forEach(p => {
+    typeCounts[p.type] = (typeCounts[p.type] || 0) + 1;
+  });
   const types = [...new Set(products.map(p => p.type))];
-  return types.filter(t => t && typeConfig[t]).map(t => typeConfig[t!]);
+  return types.filter(t => t && typeConfig[t]).map(t => ({ ...typeConfig[t!], count: typeCounts[t] || 0 }));
 }
 
 export default async function ProductsPage() {
@@ -194,6 +198,11 @@ export default async function ProductsPage() {
                 href={`/products/${cat.slug}`}
                 className="group relative bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6 hover:border-indigo-500/50 hover:bg-slate-800/60 transition-all hover:-translate-y-1"
               >
+                <div className="absolute top-4 right-4">
+                  <span className="px-3 py-1 bg-white/10 text-slate-300 text-xs font-medium rounded-full">
+                    {cat.count} {cat.count === 1 ? 'product' : 'products'}
+                  </span>
+                </div>
                 <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
                   <span className="text-3xl">{cat.icon}</span>
                 </div>
