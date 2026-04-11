@@ -241,7 +241,7 @@ export function Navbar() {
           const data = await res.json()
           if (data.length > 0) {
             // Get unique types
-            const types = [...new Set(data.map((p: any) => p.type))]
+            const types: string[] = [...new Set(data.map((p: any) => p.type))]
             const typeLabels: Record<string, string> = {
               plugin: "WordPress Plugins",
               theme: "WordPress Themes", 
