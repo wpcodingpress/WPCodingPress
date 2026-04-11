@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     console.log("Creating custom order with body:", body)
     
-    const { clientName, clientEmail, clientPhone, projectName, projectDescription, serviceType, totalAmount, advanceAmount, remainingAmount, notes } = body
+    const { clientName, clientEmail, clientPhone, projectName, projectDescription, serviceType, totalAmount, advanceAmount, remainingAmount, notes, bankAccountId } = body
 
     if (!clientName || !clientEmail || !projectName || !totalAmount) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
         remainingPaid: false,
         status: "pending",
         notes: notes || "",
+        bankAccountId: bankAccountId || "",
       }
     })
 

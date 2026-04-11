@@ -170,6 +170,7 @@ model CustomOrder {
   notes              String?  @db.Text
   receiptSent        Boolean  @default(false)
   receiptSentAt      DateTime?
+  bankAccountId      String?  @default("")
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 }

@@ -40,6 +40,7 @@ interface CustomOrder {
   receiptSent: boolean
   receiptSentAt: string | null
   notes: string | null
+  bankAccountId: string | null
 }
 
 const serviceTypes = [
@@ -65,6 +66,8 @@ export default function AdminCustomOrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<CustomOrder | null>(null)
   const [isReceiptDialogOpen, setIsReceiptDialogOpen] = useState(false)
   const [filter, setFilter] = useState("all")
+  const [bankAccounts, setBankAccounts] = useState<{id: string, bankName: string, accountName: string, isActive: boolean}[]>([])
+  const [selectedBankId, setSelectedBankId] = useState<string>("")
   const [formData, setFormData] = useState({
     clientName: "",
     clientEmail: "",
@@ -81,7 +84,24 @@ export default function AdminCustomOrdersPage() {
 
   useEffect(() => {
     fetchCustomOrders()
+    fetchBankAccounts()
   }, [])
+
+  const fetchBankAccounts = async () => {
+    try {
+      const res = await fetch("/api/bank-settings")
+      if (res.ok) {
+        const data = await res.json()
+        const activeBanks = data.filter((b: any) => b.isActive)
+        setBankAccounts(activeBanks)
+        if (activeBanks.length > 0) {
+          setSelectedBankId(activeBanks[0].id)
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching bank accounts:", error)
+    }
+  }
 
   const fetchCustomOrders = async () => {
     try {
@@ -115,7 +135,7 @@ export default function AdminCustomOrdersPage() {
     const remainingAmount = formData.totalAmount - advanceAmount
 
     try {
-      console.log("Submitting custom order...", { ...formData, advanceAmount, remainingAmount })
+      console.log("Submitting custom order...", { ...formData, advanceAmount, remainingAmount, bankAccountId: selectedBankId })
       
       const res = await fetch("/api/custom-orders", {
         method: "POST",
@@ -131,6 +151,7 @@ export default function AdminCustomOrdersPage() {
           advanceAmount: advanceAmount,
           remainingAmount: remainingAmount,
           notes: formData.notes,
+          bankAccountId: selectedBankId || null,
         })
       })
 
@@ -212,6 +233,7 @@ export default function AdminCustomOrdersPage() {
           advanceAmount: advanceAmount,
           remainingAmount: remainingAmount,
           notes: formData.notes,
+          bankAccountId: selectedBankId || null,
         })
       })
 
@@ -653,8 +675,9 @@ export default function AdminCustomOrdersPage() {
                       </td>
                       <td className="p-4">
                         {(() => {
+                          const hasAdvance = order.advanceAmount > 0
                           const isPaid = order.advancePaid && order.remainingPaid
-                          const isPartial = order.advancePaid && !order.remainingPaid && order.remainingAmount > 0
+                          const isPartial = hasAdvance && order.advancePaid && !order.remainingPaid && order.remainingAmount > 0
                           const isUnpaid = !order.advancePaid && !order.remainingPaid
                           
                           if (isPaid) {
@@ -662,6 +685,10 @@ export default function AdminCustomOrdersPage() {
                           } else if (isPartial) {
                             return <Badge className="bg-yellow-500 text-white">Partial</Badge>
                           } else {
+                            return <Badge className="bg-red-500 text-white">Unpaid</Badge>
+                          }
+                        })()}
+                      </td>
                             return <Badge className="bg-red-500 text-white">Unpaid</Badge>
                           }
                         })()}
@@ -750,7 +777,7 @@ export default function AdminCustomOrdersPage() {
             <DialogTitle className="text-slate-900 text-xl font-bold">
               {isEditMode ? "Edit Custom Order" : "Create Custom Order"}
             </DialogTitle>
-            <DialogDescription className="text-slate-600">
+            <DialogDescription className="text-slate-700 font-medium">
               {isEditMode ? "Update the order details and payment information" : "Create a custom project order with flexible advance payment"}
             </DialogDescription>
           </DialogHeader>
@@ -890,6 +917,25 @@ export default function AdminCustomOrdersPage() {
                 className="bg-white border-2 border-slate-300 text-slate-900 font-medium placeholder:text-slate-400 focus:border-violet-500 focus:ring-violet-200"
               />
             </div>
+
+            {bankAccounts.length > 0 && (
+              <div>
+                <label className="text-sm font-bold text-slate-900 mb-2 block">Bank Account for Invoice</label>
+                <Select value={selectedBankId} onValueChange={setSelectedBankId}>
+                  <SelectTrigger className="bg-white border-2 border-slate-300 text-slate-900 font-medium">
+                    <SelectValue placeholder="Select bank account" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {bankAccounts.map((bank) => (
+                      <SelectItem key={bank.id} value={bank.id} className="text-slate-900">
+                        {bank.bankName} - {bank.accountName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-slate-500 mt-1">This bank account will be shown in the invoice sent to client</p>
+              </div>
+            )}
 
             <div className="flex justify-end gap-3 pt-4">
               <Button 
