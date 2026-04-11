@@ -10,18 +10,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-const services = [
-  { value: "wordpress-development", label: "WordPress Development", minPrice: 150 },
-  { value: "elementor-pro", label: "Elementor Pro Design", minPrice: 100 },
-  { value: "woocommerce", label: "WooCommerce Store", minPrice: 250 },
-  { value: "website-redesign", label: "Website Redesign", minPrice: 200 },
-]
-
-const packages = [
-  { value: "basic", label: "Basic", priceNote: "Starting from" },
-  { value: "standard", label: "Standard", priceNote: "Most Popular" },
-  { value: "premium", label: "Premium", priceNote: "Full Solution" },
-]
+interface Service {
+  id: string
+  name: string
+  slug: string
+  basicPrice: number
+  standardPrice: number
+  premiumPrice: number
+}
 
 function OrderForm() {
   const searchParams = useSearchParams()
@@ -32,6 +28,8 @@ function OrderForm() {
   const [error, setError] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [services, setServices] = useState<Service[]>([])
+  const [isLoadingServices, setIsLoadingServices] = useState(true)
   const [formData, setFormData] = useState({
     service: searchParams.get("service") || "",
     packageType: searchParams.get("package") || "",
@@ -40,6 +38,23 @@ function OrderForm() {
     clientPhone: "",
     message: ""
   })
+
+  useEffect(() => {
+    async function fetchServices() {
+      try {
+        const res = await fetch("/api/public/services")
+        if (res.ok) {
+          const data = await res.json()
+          setServices(data)
+        }
+      } catch (err) {
+        console.error("Error fetching services:", err)
+      } finally {
+        setIsLoadingServices(false)
+      }
+    }
+    fetchServices()
+  }, [])
 
   useEffect(() => {
     async function checkSession() {
@@ -108,12 +123,12 @@ function OrderForm() {
       {[1, 2, 3].map((s) => (
         <div key={s} className="flex items-center">
           <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-            s < step ? "bg-primary text-white" : s === step ? "bg-primary text-white" : "bg-white/10 text-muted-foreground"
+            s < step ? "bg-indigo-500 text-white" : s === step ? "bg-indigo-500 text-white" : "bg-slate-200 text-slate-500"
           }`}>
             {s < step ? <CheckCircle2 className="h-5 w-5" /> : s}
           </div>
           {s < 3 && (
-            <div className={`w-16 md:w-32 h-1 mx-2 ${s < step ? "bg-primary" : "bg-white/10"}`} />
+            <div className={`w-16 md:w-32 h-1 mx-2 ${s < step ? "bg-indigo-500" : "bg-slate-200"}`} />
           )}
         </div>
       ))}
@@ -122,23 +137,22 @@ function OrderForm() {
 
   if (isComplete) {
     return (
-      <div className="relative min-h-[80vh] flex items-center">
-        <div className="fixed inset-0 grid-pattern pointer-events-none" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="max-w-xl mx-auto text-center"
           >
-            <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
-              <CheckCircle2 className="h-10 w-10 text-green-500" />
+            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+              <CheckCircle2 className="h-10 w-10 text-green-600" />
             </div>
-            <h1 className="text-3xl font-bold text-white mb-4">Order Submitted!</h1>
-            <p className="text-muted-foreground mb-8">
+            <h1 className="text-3xl font-bold text-slate-900 mb-4">Order Submitted!</h1>
+            <p className="text-slate-600 mb-8">
               Thank you for your order! We've received your request and will review it shortly. 
               You'll receive a confirmation email with next steps within 24 hours.
             </p>
-            <Button onClick={() => router.push("/")}>
+            <Button onClick={() => router.push("/")} className="bg-indigo-500 hover:bg-indigo-600">
               Back to Home
             </Button>
           </motion.div>
@@ -148,36 +162,33 @@ function OrderForm() {
   }
 
   return (
-    <div className="relative">
-      <div className="fixed inset-0 grid-pattern pointer-events-none" />
-      <div className="fixed top-1/4 right-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[150px] opacity-20 pointer-events-none" />
-      
-      <section className="relative py-16">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+      <section className="py-16 px-6">
         <div className="container mx-auto px-4">
           <motion.div 
             className="text-center max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Start Your <span className="gradient-text">Project</span>
+            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              Start Your <span className="text-indigo-600">Project</span>
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg text-slate-600">
               Fill out the form below and we'll get back to you within 24 hours with a custom quote.
             </p>
           </motion.div>
         </div>
       </section>
 
-      <section className="pb-24">
+      <section className="pb-24 px-6">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto">
-            <Card>
+            <Card className="border-slate-200 shadow-xl">
               <CardContent className="p-8">
                 {renderStepIndicator()}
                 
                 {isLoggedIn && (
-                  <div className="flex items-center gap-2 text-sm text-green-400 bg-green-500/10 border border-green-500/20 rounded-lg px-4 py-2 mb-6">
+                  <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 border border-green-200 rounded-lg px-4 py-2 mb-6">
                     <User className="h-4 w-4" />
                     Logged in as {formData.clientEmail}
                   </div>
@@ -191,43 +202,47 @@ function OrderForm() {
                       className="space-y-6"
                     >
                       <CardHeader className="p-0 mb-6">
-                        <CardTitle className="text-xl text-white">Select a Service</CardTitle>
+                        <CardTitle className="text-xl text-slate-900">Select a Service</CardTitle>
                       </CardHeader>
                       
                       <div>
-                        <label className="block text-sm font-medium text-white mb-2">Service Type</label>
-                        <Select value={formData.service} onValueChange={(v) => handleSelectChange("service", v)}>
-                          <SelectTrigger className="bg-white/5 border-white/10">
-                            <SelectValue placeholder="Choose a service" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {services.map((service) => (
-                              <SelectItem key={service.value} value={service.value}>
-                                {service.label} (From ${service.minPrice})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Service Type</label>
+                        {isLoadingServices ? (
+                          <div className="flex items-center justify-center py-4 text-slate-500">
+                            Loading services...
+                          </div>
+                        ) : (
+                          <Select value={formData.service} onValueChange={(v) => handleSelectChange("service", v)}>
+                            <SelectTrigger className="bg-white border-slate-200">
+                              <SelectValue placeholder="Choose a service" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {services.map((service) => (
+                                <SelectItem key={service.id} value={service.slug}>
+                                  {service.name} (From ${service.basicPrice})
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-white mb-2">Package Type</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Package Type</label>
                         <Select value={formData.packageType} onValueChange={(v) => handleSelectChange("packageType", v)}>
-                          <SelectTrigger className="bg-white/5 border-white/10">
+                          <SelectTrigger className="bg-white border-slate-200">
                             <SelectValue placeholder="Choose a package" />
                           </SelectTrigger>
                           <SelectContent>
-                            {packages.map((pkg) => (
-                              <SelectItem key={pkg.value} value={pkg.value}>
-                                {pkg.label} - {pkg.priceNote}
-                              </SelectItem>
-                            ))}
+                            <SelectItem value="basic">Basic - Starting</SelectItem>
+                            <SelectItem value="standard">Standard - Most Popular</SelectItem>
+                            <SelectItem value="premium">Premium - Full Solution</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
                       <div className="flex justify-end">
-                        <Button type="button" onClick={() => setStep(2)} disabled={!formData.service || !formData.packageType}>
+                        <Button type="button" onClick={() => setStep(2)} disabled={!formData.service || !formData.packageType} className="bg-indigo-500 hover:bg-indigo-600">
                           Next Step
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
@@ -242,23 +257,23 @@ function OrderForm() {
                       className="space-y-6"
                     >
                       <CardHeader className="p-0 mb-6">
-                        <CardTitle className="text-xl text-white">Your Information</CardTitle>
+                        <CardTitle className="text-xl text-slate-900">Your Information</CardTitle>
                       </CardHeader>
                       
                       <div>
-                        <label className="block text-sm font-medium text-white mb-2">Full Name</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
                         <Input
                           name="clientName"
                           value={formData.clientName}
                           onChange={handleInputChange}
                           placeholder="John Smith"
                           required
-                          className="bg-white/5 border-white/10"
+                          className="bg-white border-slate-200"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-white mb-2">Email Address</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
                         <Input
                           name="clientEmail"
                           type="email"
@@ -266,12 +281,12 @@ function OrderForm() {
                           onChange={handleInputChange}
                           placeholder="john@example.com"
                           required
-                          className="bg-white/5 border-white/10"
+                          className="bg-white border-slate-200"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-white mb-2">Phone Number</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
                         <Input
                           name="clientPhone"
                           type="tel"
@@ -279,16 +294,16 @@ function OrderForm() {
                           onChange={handleInputChange}
                           placeholder="+1 (555) 123-4567"
                           required
-                          className="bg-white/5 border-white/10"
+                          className="bg-white border-slate-200"
                         />
                       </div>
 
                       <div className="flex justify-between">
-                        <Button type="button" variant="outline" onClick={() => setStep(1)}>
+                        <Button type="button" variant="outline" onClick={() => setStep(1)} className="border-slate-300">
                           <ArrowLeft className="mr-2 h-4 w-4" />
                           Back
                         </Button>
-                        <Button type="button" onClick={() => setStep(3)} disabled={!formData.clientName || !formData.clientEmail || !formData.clientPhone}>
+                        <Button type="button" onClick={() => setStep(3)} disabled={!formData.clientName || !formData.clientEmail || !formData.clientPhone} className="bg-indigo-500 hover:bg-indigo-600">
                           Next Step
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
@@ -303,43 +318,43 @@ function OrderForm() {
                       className="space-y-6"
                     >
                       <CardHeader className="p-0 mb-6">
-                        <CardTitle className="text-xl text-white">Project Details</CardTitle>
+                        <CardTitle className="text-xl text-slate-900">Project Details</CardTitle>
                       </CardHeader>
                       
                       <div>
-                        <label className="block text-sm font-medium text-white mb-2">Project Description</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Project Description</label>
                         <Textarea
                           name="message"
                           value={formData.message}
                           onChange={handleInputChange}
                           placeholder="Tell us about your project, requirements, and any specific features you need..."
                           required
-                          className="bg-white/5 border-white/10 min-h-[150px]"
+                          className="bg-white border-slate-200 min-h-[150px]"
                         />
                       </div>
 
-                      <Card className="bg-white/5 border-white/10">
+                      <Card className="bg-slate-50 border-slate-200">
                         <CardContent className="p-4">
-                          <h4 className="font-semibold text-white mb-3">Order Summary</h4>
+                          <h4 className="font-semibold text-slate-900 mb-3">Order Summary</h4>
                           <div className="space-y-2 text-sm">
                             <div className="flex justify-between">
-                              <span className="text-muted-foreground">Service:</span>
-                              <span className="text-white">{services.find(s => s.value === formData.service)?.label}</span>
+                              <span className="text-slate-600">Service:</span>
+                              <span className="text-slate-900">{services.find(s => s.slug === formData.service)?.name}</span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-muted-foreground">Package:</span>
-                              <span className="text-white capitalize">{formData.packageType}</span>
+                              <span className="text-slate-600">Package:</span>
+                              <span className="text-slate-900 capitalize">{formData.packageType}</span>
                             </div>
                           </div>
                         </CardContent>
                       </Card>
 
                       <div className="flex justify-between">
-                        <Button type="button" variant="outline" onClick={() => setStep(2)}>
+                        <Button type="button" variant="outline" onClick={() => setStep(2)} className="border-slate-300">
                           <ArrowLeft className="mr-2 h-4 w-4" />
                           Back
                         </Button>
-                        <Button type="submit" disabled={isSubmitting}>
+                        <Button type="submit" disabled={isSubmitting} className="bg-indigo-500 hover:bg-indigo-600">
                           {isSubmitting ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -355,7 +370,7 @@ function OrderForm() {
                       </div>
                       
                       {error && (
-                        <div className="mt-4 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-sm">
+                        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
                           {error}
                         </div>
                       )}
@@ -373,8 +388,8 @@ function OrderForm() {
 
 function OrderLoading() {
   return (
-    <div className="relative min-h-[80vh] flex items-center justify-center">
-      <div className="text-primary">Loading...</div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 flex items-center justify-center">
+      <div className="text-indigo-600">Loading...</div>
     </div>
   )
 }

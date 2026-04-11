@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import prisma from '@/lib/prisma';
 
 export const metadata: Metadata = {
   title: 'Services | WPCodingPress',
@@ -7,60 +8,39 @@ export const metadata: Metadata = {
   keywords: 'web development services, wordpress to nextjs, elementor design, woocommerce, seo marketing, web applications',
 };
 
-const services = [
-  {
-    name: 'WordPress to Next.js',
-    description: 'Automate your WordPress to modern Next.js conversion. Lightning-fast, SEO-optimized sites.',
-    icon: '⚡',
-    href: '/services/wordpress-to-nextjs',
-    color: 'from-indigo-500 to-purple-500',
-    popular: true,
-  },
-  {
-    name: 'Elementor Pro Design',
-    description: 'Stunning, conversion-focused designs using Elementor page builder.',
-    icon: '🎨',
-    href: '/services/elementor-pro-design',
-    color: 'from-pink-500 to-rose-500',
-  },
-  {
-    name: 'WooCommerce Stores',
-    description: 'Full-featured e-commerce solutions with seamless payment integration.',
-    icon: '🛒',
-    href: '/services/woocommerce-stores',
-    color: 'from-green-500 to-emerald-500',
-  },
-  {
-    name: 'SEO & Marketing',
-    description: 'Advanced SEO strategies and digital marketing to grow your online presence.',
-    icon: '📈',
-    href: '/services/seo-marketing',
-    color: 'from-orange-500 to-amber-500',
-  },
-  {
-    name: 'Web Applications',
-    description: 'Custom web applications built with modern frameworks and best practices.',
-    icon: '💻',
-    href: '/services/web-applications',
-    color: 'from-blue-500 to-cyan-500',
-  },
-  {
-    name: 'Cloud & DevOps',
-    description: 'Enterprise-grade cloud infrastructure and automated deployment pipelines.',
-    icon: '☁️',
-    href: '/services/cloud-devops',
-    color: 'from-slate-500 to-gray-500',
-  },
-  {
-    name: 'Domain & Hosting',
-    description: 'Professional domain registration, hosting setup, and 24/7 support.',
-    icon: '🌐',
-    href: '/services/domain-hosting',
-    color: 'from-violet-500 to-purple-500',
-  },
-];
+const iconMap: Record<string, string> = {
+  code: '⚡',
+  palette: '🎨',
+  'shopping-cart': '🛒',
+  zap: '📈',
+  globe: '🌐',
+  settings: '☁️',
+};
 
-export default function ServicesPage() {
+const colorMap: Record<string, string> = {
+  code: 'from-indigo-500 to-purple-500',
+  palette: 'from-pink-500 to-rose-500',
+  'shopping-cart': 'from-green-500 to-emerald-500',
+  zap: 'from-orange-500 to-amber-500',
+  globe: 'from-blue-500 to-cyan-500',
+  settings: 'from-slate-500 to-gray-500',
+};
+
+async function getServices() {
+  try {
+    const services = await prisma.service.findMany({
+      where: { isActive: true },
+      orderBy: { order: 'asc' }
+    });
+    return services;
+  } catch (error) {
+    console.error('Error fetching services:', error);
+    return [];
+  }
+}
+
+export default async function ServicesPage() {
+  const services = await getServices();
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Hero */}
@@ -89,17 +69,17 @@ export default function ServicesPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service, index) => (
               <Link
-                key={index}
-                href={service.href}
+                key={service.id}
+                href={`/services/${service.slug}`}
                 className="group relative bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8 hover:border-indigo-500/50 transition-all hover:-translate-y-1"
               >
-                {service.popular && (
+                {index === 0 && (
                   <div className="absolute -top-3 -right-3 px-3 py-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full text-white text-xs font-semibold">
                     Most Popular
                   </div>
                 )}
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform`}>
-                  {service.icon}
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${colorMap[service.icon] || 'from-indigo-500 to-purple-500'} flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform`}>
+                  {iconMap[service.icon] || '⚡'}
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-indigo-400 transition-colors">
                   {service.name}
