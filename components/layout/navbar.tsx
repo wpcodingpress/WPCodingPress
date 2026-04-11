@@ -414,12 +414,23 @@ export function Navbar() {
                     Dashboard
                   </Button>
                 </Link>
-                <Link href="/order">
-                  <Button className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold shadow-md">
-                    Start Project
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
+                {session.user.role === "admin" ? (
+                  <Link href="/admin">
+                    <Button variant="outline" className="border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-400 font-medium">
+                      <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                      </svg>
+                      Admin Panel
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/order">
+                    <Button className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold shadow-md">
+                      Start Project
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                )}
               </>
             ) : (
               <>
@@ -472,9 +483,15 @@ export function Navbar() {
                     <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="outline" className="w-full border-purple-300 text-purple-700 hover:bg-purple-50">Dashboard</Button>
                     </Link>
-                    <Link href="/order" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700">Start Project</Button>
-                    </Link>
+                    {session.user.role === "admin" ? (
+                      <Link href="/admin" onClick={() => setMobileMenuOpen(false)}>
+                        <Button variant="outline" className="w-full border-slate-300 text-slate-700 hover:bg-slate-100">Admin Panel</Button>
+                      </Link>
+                    ) : (
+                      <Link href="/order" onClick={() => setMobileMenuOpen(false)}>
+                        <Button className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700">Start Project</Button>
+                      </Link>
+                    )}
                   </>
                 ) : (
                   <>

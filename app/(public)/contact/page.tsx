@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle2, MessageSquare, Headphones, Zap } from "lucide-react"
+import { Mail, MapPin, Clock, Send, CheckCircle2, MessageSquare, Headphones, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -52,13 +52,6 @@ export default function ContactPage() {
       value: "contact@wpcodingpress.com",
       href: "mailto:contact@wpcodingpress.com",
       color: "from-blue-500 to-cyan-500"
-    },
-    {
-      icon: Phone,
-      title: "Call Us",
-      value: "+880 1943 429727",
-      href: "tel:+8801943429727",
-      color: "from-green-500 to-emerald-500"
     },
     {
       icon: MapPin,

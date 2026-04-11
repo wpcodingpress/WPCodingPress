@@ -1,28 +1,25 @@
 "use client"
 
 import Link from "next/link"
-import { Zap, Mail, Phone, ArrowRight } from "lucide-react"
+import { Zap, Mail, ArrowRight } from "lucide-react"
 
 const footerLinks = {
   services: [
-    { href: "/services/wordpress-to-nextjs", label: "WordPress to Next.js" },
-    { href: "/services/elementor-pro-design", label: "Elementor Pro Design" },
-    { href: "/services/woocommerce-stores", label: "WooCommerce Stores" },
-    { href: "/services/seo-marketing", label: "SEO & Marketing" },
-    { href: "/services/web-applications", label: "Web Applications" },
+    { href: "/services", label: "All Services" },
+    { href: "/order", label: "Start a Project" },
   ],
   products: [
     { href: "/products/plugins", label: "WordPress Plugins" },
+    { href: "/products/themes", label: "WordPress Themes" },
     { href: "/products/templates", label: "Next.js Templates" },
     { href: "/products/mcp-servers", label: "MCP Servers" },
     { href: "/products/ai-agents", label: "AI Agents" },
-    { href: "/products/themes", label: "WordPress Themes" },
   ],
   company: [
+    { href: "/about", label: "About Us" },
     { href: "/portfolio", label: "Portfolio" },
-    { href: "/contact", label: "Contact" },
     { href: "/pricing", label: "Pricing" },
-    { href: "/order", label: "Start Project" },
+    { href: "/contact", label: "Contact" },
   ],
   legal: [
     { href: "/privacy", label: "Privacy Policy" },
@@ -120,12 +117,6 @@ export function Footer() {
                 <Mail className="h-4 w-4 text-purple-600 mt-0.5" />
                 <a href="mailto:contact@wpcodingpress.com" className="text-sm text-slate-600 hover:text-purple-600 transition-colors">
                   contact@wpcodingpress.com
-                </a>
-              </li>
-              <li className="flex items-start gap-3">
-                <Phone className="h-4 w-4 text-purple-600 mt-0.5" />
-                <a href="tel:+8801943429727" className="text-sm text-slate-600 hover:text-purple-600 transition-colors">
-                  +880 1943 429727
                 </a>
               </li>
             </ul>

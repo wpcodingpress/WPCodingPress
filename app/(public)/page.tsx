@@ -494,10 +494,10 @@ export default function HomePage() {
                   Convert Your Site Free
                 </Button>
               </Link>
-              <Link href="/dashboard/sites">
+              <Link href="/order">
                 <Button size="xl" variant="outline" className="w-full sm:w-auto min-w-[220px] border-2 border-violet-300 text-violet-700 hover:bg-violet-50 hover:border-violet-400 px-8 py-4 font-semibold text-base sm:text-lg">
                   <Globe className="mr-2 w-5 h-5" />
-                  View Demo Dashboard
+                  Order Now
                 </Button>
               </Link>
             </div>
