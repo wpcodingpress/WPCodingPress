@@ -87,11 +87,11 @@ export async function POST(request: Request, { params }: Params) {
             <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 18px;">$${order.totalAmount}</td>
           </tr>
           <tr>
-            <td style="padding: 8px 0; color: #059669;">Advance Paid (50%):</td>
+            <td style="padding: 8px 0; color: #059669;">Advance Payment (${Math.round((order.advanceAmount / order.totalAmount) * 100)}%):</td>
             <td style="padding: 8px 0; color: #059669; font-weight: 600;">$${order.advanceAmount} ${order.advancePaid ? '✓' : ''}</td>
           </tr>
           <tr>
-            <td style="padding: 8px 0; color: ${order.remainingPaid ? '#059669' : '#64748b'};">Remaining Payment:</td>
+            <td style="padding: 8px 0; color: ${order.remainingPaid ? '#059669' : '#64748b'};">Remaining Payment (${Math.round((order.remainingAmount / order.totalAmount) * 100)}%):</td>
             <td style="padding: 8px 0; color: ${order.remainingPaid ? '#059669' : '#1e293b'}; font-weight: 600;">$${order.remainingAmount} ${order.remainingPaid ? '✓' : '(Due)'}</td>
           </tr>
         </table>

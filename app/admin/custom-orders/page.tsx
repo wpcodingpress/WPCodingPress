@@ -69,6 +69,7 @@ export default function AdminCustomOrdersPage() {
     projectDescription: "",
     serviceType: "",
     totalAmount: 0,
+    advanceAmount: 0,
     notes: "",
   })
 
@@ -91,8 +92,13 @@ export default function AdminCustomOrdersPage() {
   }
 
   const handleSubmit = async () => {
-    if (!formData.clientName || !formData.clientEmail || !formData.totalAmount) {
-      alert("Please fill in all required fields")
+    if (!formData.clientName || !formData.clientEmail || !formData.totalAmount || !formData.advanceAmount) {
+      alert("Please fill in client name, email, total amount and advance amount")
+      return
+    }
+
+    if (formData.advanceAmount > formData.totalAmount) {
+      alert("Advance amount cannot be greater than total amount")
       return
     }
 
@@ -102,8 +108,7 @@ export default function AdminCustomOrdersPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          advanceAmount: Math.round(formData.totalAmount * 0.5),
-          remainingAmount: Math.round(formData.totalAmount * 0.5),
+          remainingAmount: formData.totalAmount - formData.advanceAmount,
         })
       })
 
@@ -117,6 +122,7 @@ export default function AdminCustomOrdersPage() {
           projectDescription: "",
           serviceType: "",
           totalAmount: 0,
+          advanceAmount: 0,
           notes: "",
         })
         fetchCustomOrders()
@@ -297,7 +303,7 @@ export default function AdminCustomOrdersPage() {
                   <th className="text-left p-4 text-sm font-semibold text-slate-600">Client</th>
                   <th className="text-left p-4 text-sm font-semibold text-slate-600">Project</th>
                   <th className="text-left p-4 text-sm font-semibold text-slate-600">Total</th>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Advance (50%)</th>
+                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Advance</th>
                   <th className="text-left p-4 text-sm font-semibold text-slate-600">Remaining</th>
                   <th className="text-left p-4 text-sm font-semibold text-slate-600">Receipt</th>
                   <th className="text-left p-4 text-sm font-semibold text-slate-600">Status</th>
@@ -419,64 +425,70 @@ export default function AdminCustomOrdersPage() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white">
           <DialogHeader>
-            <DialogTitle className="text-slate-900">Create Custom Order</DialogTitle>
-            <DialogDescription className="text-slate-500">
-              Create a custom project order with 50% advance payment
+            <DialogTitle className="text-slate-900 text-xl font-bold">Create Custom Order</DialogTitle>
+            <DialogDescription className="text-slate-600">
+              Create a custom project order with flexible advance payment
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-4">
+          <div className="space-y-5 mt-4">
+            <div className="bg-violet-50 border border-violet-200 rounded-lg p-3 mb-4">
+              <p className="text-sm text-violet-700 font-medium">
+                <span className="font-bold">Note:</span> Enter the total project cost and the advance amount agreed with the client. Remaining will be calculated automatically.
+              </p>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-slate-700 mb-2 block">Client Name *</label>
+                <label className="text-sm font-bold text-slate-900 mb-2 block">Client Name *</label>
                 <Input 
                   value={formData.clientName}
                   onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
-                  placeholder="John Doe"
-                  className="bg-slate-50 border-slate-200"
+                  placeholder="Enter client name"
+                  className="bg-white border-2 border-slate-300 text-slate-900 font-medium placeholder:text-slate-400 focus:border-violet-500 focus:ring-violet-200"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700 mb-2 block">Client Email *</label>
+                <label className="text-sm font-bold text-slate-900 mb-2 block">Client Email *</label>
                 <Input 
                   type="email"
                   value={formData.clientEmail}
                   onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
-                  placeholder="john@example.com"
-                  className="bg-slate-50 border-slate-200"
+                  placeholder="client@example.com"
+                  className="bg-white border-2 border-slate-300 text-slate-900 font-medium placeholder:text-slate-400 focus:border-violet-500 focus:ring-violet-200"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-2 block">Phone</label>
+              <label className="text-sm font-bold text-slate-900 mb-2 block">Phone Number</label>
               <Input 
                 value={formData.clientPhone}
                 onChange={(e) => setFormData({ ...formData, clientPhone: e.target.value })}
                 placeholder="+1 (555) 123-4567"
-                className="bg-slate-50 border-slate-200"
+                className="bg-white border-2 border-slate-300 text-slate-900 font-medium placeholder:text-slate-400 focus:border-violet-500 focus:ring-violet-200"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-slate-700 mb-2 block">Project Name *</label>
+                <label className="text-sm font-bold text-slate-900 mb-2 block">Project Name *</label>
                 <Input 
                   value={formData.projectName}
                   onChange={(e) => setFormData({ ...formData, projectName: e.target.value })}
                   placeholder="E-commerce Website"
-                  className="bg-slate-50 border-slate-200"
+                  className="bg-white border-2 border-slate-300 text-slate-900 font-medium placeholder:text-slate-400 focus:border-violet-500 focus:ring-violet-200"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700 mb-2 block">Service Type</label>
+                <label className="text-sm font-bold text-slate-900 mb-2 block">Service Type</label>
                 <Select value={formData.serviceType} onValueChange={(v) => setFormData({ ...formData, serviceType: v })}>
-                  <SelectTrigger className="bg-slate-50 border-slate-200">
+                  <SelectTrigger className="bg-white border-2 border-slate-300 text-slate-900 font-medium">
                     <SelectValue placeholder="Select service" />
                   </SelectTrigger>
                   <SelectContent>
                     {serviceTypes.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
+                      <SelectItem key={type.value} value={type.value} className="text-slate-900">
                         {type.label}
                       </SelectItem>
                     ))}
@@ -486,44 +498,72 @@ export default function AdminCustomOrdersPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-2 block">Project Description</label>
+              <label className="text-sm font-bold text-slate-900 mb-2 block">Project Description</label>
               <Textarea 
                 value={formData.projectDescription}
                 onChange={(e) => setFormData({ ...formData, projectDescription: e.target.value })}
-                placeholder="Describe the project requirements..."
-                className="bg-slate-50 border-slate-200 min-h-[100px]"
+                placeholder="Describe the project requirements in detail..."
+                className="bg-white border-2 border-slate-300 text-slate-900 font-medium placeholder:text-slate-400 min-h-[100px] focus:border-violet-500 focus:ring-violet-200"
               />
             </div>
 
-            <div>
-              <label className="text-sm font-medium text-slate-700 mb-2 block">Total Amount ($) *</label>
-              <Input 
-                type="number"
-                value={formData.totalAmount}
-                onChange={(e) => setFormData({ ...formData, totalAmount: parseInt(e.target.value) || 0 })}
-                placeholder="1000"
-                className="bg-slate-50 border-slate-200"
-              />
-              <p className="text-sm text-slate-500 mt-1">
-                Advance (50%): ${Math.round(formData.totalAmount * 0.5)} | Remaining: ${Math.round(formData.totalAmount * 0.5)}
-              </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-bold text-slate-900 mb-2 block">Total Project Cost ($) *</label>
+                <Input 
+                  type="number"
+                  value={formData.totalAmount || ""}
+                  onChange={(e) => setFormData({ ...formData, totalAmount: parseInt(e.target.value) || 0 })}
+                  placeholder="500"
+                  className="bg-white border-2 border-slate-300 text-slate-900 font-bold text-lg placeholder:text-slate-400 focus:border-violet-500 focus:ring-violet-200"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-bold text-green-700 mb-2 block">Advance Amount ($) *</label>
+                <Input 
+                  type="number"
+                  value={formData.advanceAmount || ""}
+                  onChange={(e) => setFormData({ ...formData, advanceAmount: parseInt(e.target.value) || 0 })}
+                  placeholder="200"
+                  className="bg-green-50 border-2 border-green-300 text-green-900 font-bold text-lg placeholder:text-green-400 focus:border-green-500 focus:ring-green-200"
+                />
+              </div>
             </div>
 
+            {formData.totalAmount > 0 && formData.advanceAmount > 0 && (
+              <div className="bg-slate-100 border-2 border-slate-200 rounded-lg p-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm text-slate-600">Remaining Amount</p>
+                    <p className="text-2xl font-bold text-slate-900">
+                      ${formData.totalAmount - formData.advanceAmount}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-slate-500">Advance Paid</p>
+                    <p className="text-lg font-semibold text-green-600">
+                      {Math.round((formData.advanceAmount / formData.totalAmount) * 100)}%
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-2 block">Notes</label>
+              <label className="text-sm font-bold text-slate-900 mb-2 block">Notes</label>
               <Textarea 
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder="Any additional notes..."
-                className="bg-slate-50 border-slate-200"
+                placeholder="Any additional notes for this project..."
+                className="bg-white border-2 border-slate-300 text-slate-900 font-medium placeholder:text-slate-400 focus:border-violet-500 focus:ring-violet-200"
               />
             </div>
 
             <div className="flex justify-end gap-3 pt-4">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-slate-200">
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="border-2 border-slate-300 text-slate-700 font-medium hover:bg-slate-100">
                 Cancel
               </Button>
-              <Button onClick={handleSubmit} className="bg-gradient-to-r from-violet-500 to-purple-500">
+              <Button onClick={handleSubmit} className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 font-semibold px-6">
                 Create Order
               </Button>
             </div>
