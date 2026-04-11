@@ -28,6 +28,7 @@ import {
   Menu,
   Search,
   ArrowRight,
+  FileText,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
@@ -55,6 +56,7 @@ const navItems: NavItem[] = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
   { href: "/admin/custom-orders", icon: DollarSign, label: "Custom Orders" },
+  { href: "/admin/invoices", icon: FileText, label: "Invoices" },
   { href: "/admin/contacts", icon: MessageSquare, label: "Contacts" },
   { href: "/admin/services", icon: Settings, label: "Services" },
   { href: "/admin/products", icon: Image, label: "Products" },
