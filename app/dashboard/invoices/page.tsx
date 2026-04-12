@@ -1,10 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { FileText, Download, Eye, DollarSign, CheckCircle, Clock } from "lucide-react"
+import { FileText, Download, Eye, DollarSign, CheckCircle, Clock, X } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 interface Invoice {
   id: string
@@ -604,6 +605,91 @@ export default function ClientInvoicesPage() {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={!!selectedInvoice} onOpenChange={() => setSelectedInvoice(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-purple-600" />
+              Invoice Details
+            </DialogTitle>
+          </DialogHeader>
+          {selectedInvoice && (
+            <div className="space-y-6 mt-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">Invoice Number</p>
+                  <p className="text-lg font-bold text-gray-900">#{selectedInvoice.id.slice(0, 8).toUpperCase()}</p>
+                </div>
+                <Badge variant={selectedInvoice.advancePaid && selectedInvoice.remainingPaid ? "default" : selectedInvoice.advancePaid ? "secondary" : "destructive"}>
+                  {selectedInvoice.advancePaid && selectedInvoice.remainingPaid ? "PAID" : selectedInvoice.advancePaid ? "PARTIAL" : "UNPAID"}
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Project Name</p>
+                  <p className="font-medium text-gray-900">{selectedInvoice.projectName}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Service Type</p>
+                  <p className="font-medium text-gray-900">{selectedInvoice.serviceType || "Custom Project"}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Invoice Date</p>
+                  <p className="font-medium text-gray-900">{new Date(selectedInvoice.createdAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Status</p>
+                  <p className="font-medium text-gray-900 capitalize">{selectedInvoice.status.replace("_", " ")}</p>
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <p className="text-sm text-gray-500 mb-3">Client Information</p>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="font-medium text-gray-900">{selectedInvoice.clientName}</p>
+                  <p className="text-sm text-gray-500">{selectedInvoice.clientEmail}</p>
+                  {selectedInvoice.clientPhone && <p className="text-sm text-gray-500">{selectedInvoice.clientPhone}</p>}
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <p className="text-sm text-gray-500 mb-3">Payment Details</p>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                    <span className="text-gray-600">Total Amount</span>
+                    <span className="font-bold text-gray-900">${selectedInvoice.totalAmount}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                    <span className="text-gray-600">Advance Paid</span>
+                    <span className={`font-medium ${selectedInvoice.advancePaid ? "text-green-600" : "text-gray-400"}`}>
+                      {selectedInvoice.advancePaid ? `$${selectedInvoice.advanceAmount} ✓` : `$${selectedInvoice.advanceAmount}`}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                    <span className="text-gray-600">Remaining</span>
+                    <span className={`font-medium ${selectedInvoice.remainingPaid ? "text-green-600" : "text-amber-600"}`}>
+                      {selectedInvoice.remainingPaid ? `$${selectedInvoice.remainingAmount} ✓` : `$${selectedInvoice.remainingAmount}`}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button onClick={() => handleDownloadPDF(selectedInvoice)} className="flex-1">
+                  <Download className="h-4 w-4 mr-2" />
+                  Download PDF
+                </Button>
+                <Button variant="outline" onClick={() => setSelectedInvoice(null)}>
+                  <X className="h-4 w-4 mr-2" />
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

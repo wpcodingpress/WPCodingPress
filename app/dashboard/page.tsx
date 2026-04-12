@@ -22,6 +22,8 @@ export default function DashboardOverview() {
   const [notifications, setNotifications] = useState<Array<{id: number, title: string, message: string, time: string, unread: boolean}>>([])
   const [user, setUser] = useState({ name: "User", email: "user@example.com" })
   const [currentPlan, setCurrentPlan] = useState<string | null>(null)
+  const [nextBilling, setNextBilling] = useState<string | null>(null)
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null)
 
   useEffect(() => {
     fetchDashboardData()
@@ -40,6 +42,10 @@ export default function DashboardOverview() {
       const subData = await subRes.json()
       if (subData.subscription?.plan) {
         setCurrentPlan(subData.subscription.plan)
+        setSubscriptionStatus(subData.subscription.status)
+        if (subData.subscription.currentPeriodEnd) {
+          setNextBilling(new Date(subData.subscription.currentPeriodEnd).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }))
+        }
       }
 
       const response = await fetch("/api/orders?userId=" + (sessionData?.user?.id || ""))
@@ -388,18 +394,26 @@ export default function DashboardOverview() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-gray-200">
+        <Card className={`border-gray-200 ${currentPlan && currentPlan !== 'free' ? 'bg-gradient-to-br from-purple-50 to-violet-50' : 'bg-white'}`}>
           <CardContent className="p-6">
             <div className="flex items-center gap-4 mb-4">
-              <div className="p-3 rounded-xl bg-green-100">
-                <Calendar className="w-6 h-6 text-green-600" />
+              <div className={`p-3 rounded-xl ${currentPlan && currentPlan !== 'free' ? 'bg-purple-100' : 'bg-green-100'}`}>
+                <Calendar className={`w-6 h-6 ${currentPlan && currentPlan !== 'free' ? 'text-purple-600' : 'text-green-600'}`} />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Next Billing</p>
-                <p className="text-lg font-bold text-gray-900">-</p>
+                <p className="text-sm text-gray-500">
+                  {currentPlan && currentPlan !== 'free' ? 'Next Billing' : 'Current Plan'}
+                </p>
+                <p className="text-lg font-bold text-gray-900">
+                  {nextBilling || (currentPlan === 'free' || !currentPlan ? 'Free' : '-')}
+                </p>
               </div>
             </div>
-            <p className="text-sm text-gray-500">You're on the Free plan</p>
+            <p className="text-sm text-gray-500">
+              {currentPlan && currentPlan !== 'free' ? (
+                subscriptionStatus === 'active' ? `${currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)} Plan - Active` : `${currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)} Plan`
+              ) : "You're on the Free plan"}
+            </p>
           </CardContent>
         </Card>
       </div>
