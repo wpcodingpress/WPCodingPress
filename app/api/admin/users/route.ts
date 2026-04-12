@@ -4,30 +4,32 @@ import prisma from '@/lib/prisma'
 export async function GET() {
   try {
     const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        company: true,
-        role: true,
-        isActive: true,
-        createdAt: true,
+      include: {
         subscriptions: {
-          select: {
-            id: true,
-            plan: true,
-            status: true,
-            currentPeriodEnd: true
-          },
-          where: { status: 'active' },
-          take: 1
+          where: { status: 'active' }
         }
       },
       orderBy: { createdAt: 'desc' }
     })
 
-    return NextResponse.json(users)
+    const usersData = users.map(user => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      company: user.company,
+      role: user.role,
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+      subscriptions: user.subscriptions.map(sub => ({
+        id: sub.id,
+        plan: sub.plan,
+        status: sub.status,
+        currentPeriodEnd: sub.currentPeriodEnd
+      }))
+    }))
+
+    return NextResponse.json(usersData)
   } catch (error) {
     console.error('Error fetching users:', error)
     return NextResponse.json({ error: 'Failed to fetch users', details: String(error) }, { status: 500 })
