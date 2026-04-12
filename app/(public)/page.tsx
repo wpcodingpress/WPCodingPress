@@ -639,16 +639,6 @@ export default function HomePage() {
                           <span className="block text-xs text-green-600">✓ Installed & Active</span>
                         </div>
                       </div>
-                      <motion.div 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: isConverting ? 1 : 0 }}
-                      className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs mt-2 pt-2 border-t border-slate-200"
-                    >
-                        <div className="flex items-center gap-1 text-green-600"><CheckCircle2 className="w-3 h-3" /> WPGraphQL</div>
-                        <div className="flex items-center gap-1 text-green-600"><CheckCircle2 className="w-3 h-3" /> Next.js 14</div>
-                        <div className="flex items-center gap-1 text-green-600"><CheckCircle2 className="w-3 h-3" /> TypeScript</div>
-                        <div className="flex items-center gap-1 text-green-600"><CheckCircle2 className="w-3 h-3" /> Vercel Deploy</div>
-                      </motion.div>
                     </div>
                   </motion.div>
 
