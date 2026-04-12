@@ -175,9 +175,63 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Compare Plans - Homepage Style */}
+      {/* Pricing Cards */}
+      <section className="py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {subscriptions.map((sub, index) => (
+              <motion.div
+                key={sub.name}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className={`h-full relative bg-gradient-to-br ${sub.color} border-2 ${sub.borderColor} overflow-hidden`}>
+                  {sub.popular && (
+                    <div className="absolute -top-0 left-1/2 -translate-x-1/2">
+                      <span className="px-4 py-1.5 text-xs font-bold rounded-b-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg">
+                        MOST POPULAR
+                      </span>
+                    </div>
+                  )}
+                  <CardHeader className="text-center pb-4 pt-8">
+                    <sub.icon className="h-10 w-10 mx-auto mb-4 text-white" />
+                    <CardTitle className="text-2xl text-white">{sub.name}</CardTitle>
+                    <div className="mt-4">
+                      <span className="text-5xl font-black text-white">{sub.price}</span>
+                      {sub.period && <span className="text-sm text-white/70">{sub.period}</span>}
+                    </div>
+                    <CardDescription className="mt-2 text-white/80">{sub.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <ul className="space-y-3">
+                      {sub.features.map((feature, fIndex) => (
+                        <li key={fIndex} className="flex items-start gap-3">
+                          <Check className="h-5 w-5 text-green-400 mt-0.5 flex-shrink-0" />
+                          <span className="text-sm text-white/90">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                  <CardFooter className="pt-6">
+                    <Link href={sub.planId === 'free' ? '/register' : '/dashboard/subscription'} className="w-full">
+                      <Button className={`w-full ${sub.popular ? 'bg-white text-slate-900 hover:bg-slate-100' : 'bg-white/20 hover:bg-white/30 text-white'}`}>
+                        {sub.cta}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </CardFooter>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* See What's Included - Table */}
       <section className="py-16 bg-gradient-to-br from-slate-50 via-white to-indigo-50">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
               See What's <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">Included</span>
@@ -185,39 +239,51 @@ export default function PricingPage() {
             <p className="text-slate-600">Choose the plan that fits your needs. All plans include free SSL.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {subscriptions.map((sub, index) => (
-              <motion.div
-                key={sub.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className={`relative bg-white rounded-3xl overflow-hidden ${sub.popular ? 'ring-2 ring-indigo-500 shadow-2xl shadow-indigo-200 scale-105 z-10' : 'border border-slate-200 shadow-lg'}`}
-              >
-                {sub.popular && (
-                  <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 py-2 text-center">
-                    <span className="text-white text-xs font-bold uppercase tracking-wider">Most Popular</span>
-                  </div>
-                )}
-                <div className="p-6">
-                  <div className="text-center mb-4">
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">{sub.name}</h3>
-                    <div className="text-3xl font-bold text-slate-900">
-                      {sub.price}<span className="text-sm text-slate-500 font-normal">{sub.period}</span>
-                    </div>
-                  </div>
-                  <ul className="space-y-2 mb-6">
-                    {sub.features.map((feature, j) => (
-                      <li key={j} className="flex items-center gap-2 text-slate-600 text-sm">
-                        <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </motion.div>
-            ))}
+          <div className="bg-white rounded-3xl shadow-2xl shadow-indigo-200 overflow-hidden border border-indigo-100">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+                    <th className="text-left py-5 px-6 text-white font-bold text-lg">Feature</th>
+                    <th className="text-center py-5 px-6 text-white font-bold text-lg bg-white/10">Free</th>
+                    <th className="text-center py-5 px-6 text-white font-bold text-lg bg-white/20">Pro</th>
+                    <th className="text-center py-5 px-6 text-white font-bold text-lg bg-white/10">Enterprise</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { feature: "WordPress Site Conversions", free: "1", pro: "5", enterprise: "Unlimited" },
+                    { feature: "Live Deployment (Vercel)", free: false, pro: true, enterprise: true },
+                    { feature: "Custom Domain", free: false, pro: true, enterprise: true },
+                    { feature: "Analytics Dashboard", free: false, pro: true, enterprise: true },
+                    { feature: "Auto Content Sync", free: false, pro: true, enterprise: true },
+                    { feature: "Priority Support", free: false, pro: true, enterprise: true },
+                    { feature: "24/7 Dedicated Support", free: false, pro: false, enterprise: true },
+                    { feature: "White-label Deployment", free: false, pro: false, enterprise: true },
+                    { feature: "API Access", free: false, pro: false, enterprise: true },
+                  ].map((row, i) => (
+                    <tr key={i} className={`border-b border-indigo-50 ${i % 2 === 0 ? 'bg-slate-50/50' : ''}`}>
+                      <td className="py-4 px-6 text-slate-700 font-medium">{row.feature}</td>
+                      <td className="text-center py-4 px-6">
+                        {typeof row.free === 'boolean' ? (
+                          row.free ? <CheckCircle2 className="w-6 h-6 text-green-500 mx-auto" /> : <X className="w-6 h-6 text-slate-300 mx-auto" />
+                        ) : <span className="text-indigo-600 font-bold">{row.free}</span>}
+                      </td>
+                      <td className="text-center py-4 px-6 bg-indigo-50/30">
+                        {typeof row.pro === 'boolean' ? (
+                          row.pro ? <CheckCircle2 className="w-6 h-6 text-green-500 mx-auto" /> : <X className="w-6 h-6 text-slate-300 mx-auto" />
+                        ) : <span className="text-indigo-600 font-bold">{row.pro}</span>}
+                      </td>
+                      <td className="text-center py-4 px-6">
+                        {typeof row.enterprise === 'boolean' ? (
+                          row.enterprise ? <CheckCircle2 className="w-6 h-6 text-green-500 mx-auto" /> : <X className="w-6 h-6 text-slate-300 mx-auto" />
+                        ) : <span className="text-indigo-600 font-bold">{row.enterprise}</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
