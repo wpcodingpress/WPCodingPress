@@ -7,16 +7,6 @@ interface Params {
   params: Promise<{ id: string }>
 }
 
-async function createNotification(userId: string, type: string, title: string, message: string, link?: string) {
-  try {
-    await prisma.notification.create({
-      data: { userId, type, title, message, link }
-    })
-  } catch (error) {
-    console.error('Error creating notification:', error)
-  }
-}
-
 export async function POST(request: Request, { params }: Params) {
   try {
     const session = await getServerSession(authOptions)
@@ -41,31 +31,11 @@ export async function POST(request: Request, { params }: Params) {
         where: { id },
         data: { advancePaid: true, status: "in_progress" }
       })
-      
-      if (order.userId) {
-        await createNotification(
-          order.userId,
-          "payment",
-          "Advance Payment Received",
-          `Advance payment of $${order.advanceAmount} received for "${order.projectName}". Your project is now in progress.`,
-          "/dashboard/invoices"
-        )
-      }
     } else if (type === "remaining") {
       await prisma.customOrder.update({
         where: { id },
         data: { remainingPaid: true, status: "completed" }
       })
-
-      if (order.userId) {
-        await createNotification(
-          order.userId,
-          "payment",
-          "Final Payment Received",
-          `Remaining payment of $${order.remainingAmount} received for "${order.projectName}". Thank you!`,
-          "/dashboard/invoices"
-        )
-      }
     }
 
     return NextResponse.json({ success: true })
