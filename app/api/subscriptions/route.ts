@@ -63,48 +63,49 @@ export async function POST(request: Request) {
         });
       }
 
-      const newSub = await prisma.subscription.create({
-        data: {
-          userId: user.id,
-          plan: plan,
-          status: 'active',
-          currentPeriodStart: new Date(),
-          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        },
-      }).catch(err => {
-        console.error('Prisma create error:', err);
-        throw err;
-      });
+      const selectedPlan = PLANS[plan as keyof typeof PLANS];
 
-      await createNotification({
+    const newSub = await prisma.subscription.create({
+      data: {
         userId: user.id,
-        type: 'subscription',
-        title: `${selectedPlan.tierName} Plan Activated!`,
-        message: `Your ${selectedPlan.tierName} subscription is now active. Enjoy unlimited conversions!`,
-        link: '/dashboard/subscription',
-        priority: 'high'
-      })
+        plan: plan,
+        status: 'active',
+        currentPeriodStart: new Date(),
+        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      },
+    }).catch(err => {
+      console.error('Prisma create error:', err);
+      throw err;
+    });
 
-      return NextResponse.json({ 
-        message: 'Subscription activated (TESTING_MODE - no payment required)',
-        subscription: newSub 
-      });
-    }
-
-    const selectedPlan = PLANS[plan as keyof typeof PLANS];
-    
-    const successUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription?success=true&plan=${plan}`;
-    const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription?cancelled=true`;
-    
-    const checkoutUrl = `${GUMROAD_PRODUCT_LINK}?wanted_tier=${encodeURIComponent(selectedPlan.tierName)}&success=${encodeURIComponent(successUrl)}&cancel=${encodeURIComponent(cancelUrl)}`;
+    await createNotification({
+      userId: user.id,
+      type: 'subscription',
+      title: `${selectedPlan.tierName} Plan Activated!`,
+      message: `Your ${selectedPlan.tierName} subscription is now active. Enjoy unlimited conversions!`,
+      link: '/dashboard/subscription',
+      priority: 'high'
+    })
 
     return NextResponse.json({ 
-      url: checkoutUrl,
-      plan: selectedPlan,
-      message: 'You will be redirected to Gumroad to complete payment. After payment, enter your Gumroad email to verify and activate your subscription.'
+      message: 'Subscription activated (TESTING_MODE - no payment required)',
+      subscription: newSub 
     });
-  } catch (error: any) {
-    console.error('Subscription error:', error);
+  }
+
+  const selectedPlanSecond = PLANS[plan as keyof typeof PLANS];
+  const successUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription?success=true&plan=${plan}`;
+  const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription?cancelled=true`;
+  
+  const checkoutUrl = `${GUMROAD_PRODUCT_LINK}?wanted_tier=${encodeURIComponent(selectedPlanSecond.tierName)}&success=${encodeURIComponent(successUrl)}&cancel=${encodeURIComponent(cancelUrl)}`;
+
+  return NextResponse.json({ 
+    url: checkoutUrl,
+    plan: selectedPlanSecond,
+    message: 'You will be redirected to Gumroad to complete payment. After payment, enter your Gumroad email to verify and activate your subscription.'
+  });
+} catch (error: any) {
+  console.error('Subscription error:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to create subscription', details: error.stack },
       { status: 500 }
