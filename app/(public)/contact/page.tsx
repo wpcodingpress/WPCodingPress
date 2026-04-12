@@ -261,7 +261,7 @@ export default function ContactPage() {
                               onChange={(e) => setQueryForm({ ...queryForm, message: e.target.value })}
                               placeholder="Tell us about your project or question..."
                               required
-                              className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[150px] focus:border-blue-500 focus:ring-blue-500"
+                              className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 min-h-[150px] focus:border-purple-500 focus:ring-purple-500"
                             />
                           </div>
                           <Button 
@@ -356,11 +356,11 @@ export default function ContactPage() {
                               onChange={(e) => setOrderForm({ ...orderForm, projectDescription: e.target.value })}
                               placeholder="Describe your project requirements in detail..."
                               required
-                              className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[120px] focus:border-blue-500 focus:ring-blue-500"
+                              className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 min-h-[120px] focus:border-purple-500 focus:ring-purple-500"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Estimated Budget</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Estimated Budget</label>
                             <Select value={orderForm.budget} onValueChange={(v) => setOrderForm({ ...orderForm, budget: v })}>
                               <SelectTrigger className="bg-white border-slate-300 text-slate-900">
                                 <SelectValue placeholder="Select budget range" />
