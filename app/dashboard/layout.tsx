@@ -235,7 +235,7 @@ export default function DashboardLayout({
                 </div>
               </div>
               <nav className="p-4 space-y-1">
-                {sidebarLinks.filter(link => !link.allowed || link.allowed.includes(user?.role) || user?.role === 'admin' || user?.role === 'manager' ? link : null).filter(Boolean).map((link) => (
+                {sidebarLinks.filter(link => !link.allowed || (user?.role && link.allowed.includes(user.role))).map((link) => (
                   <Link key={link.href} href={link.href} onClick={() => setSidebarOpen(false)}>
                     <div className={`
                       flex items-center gap-3 px-4 py-3 rounded-xl transition-all
