@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Check, ArrowRight, Zap, Star, Crown, Rocket, CheckCircle2 } from "lucide-react"
+import { Check, ArrowRight, Zap, Star, Crown, Rocket, CheckCircle2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 
