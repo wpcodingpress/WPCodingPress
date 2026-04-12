@@ -4,13 +4,15 @@ import prisma from '@/lib/prisma'
 export async function GET() {
   try {
     const users = await prisma.user.findMany({
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
+      take: 100
     })
 
+    console.log('Users count:', users.length)
     return NextResponse.json(users)
   } catch (error) {
     console.error('Error fetching users:', error)
-    return NextResponse.json({ error: 'Failed to fetch users', details: String(error) }, { status: 500 })
+    return NextResponse.json({ error: String(error) }, { status: 500 })
   }
 }
 
