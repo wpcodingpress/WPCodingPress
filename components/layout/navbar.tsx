@@ -408,12 +408,14 @@ export function Navbar() {
             {session?.user ? (
               <>
                 <NotificationBell />
+                {session.user.role !== "admin" && (
                 <Link href="/dashboard">
                   <Button variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-50 hover:text-purple-800 hover:border-purple-400 font-medium">
                     <User className="mr-2 h-4 w-4" />
                     Dashboard
                   </Button>
                 </Link>
+                )}
                 {session.user.role === "admin" ? (
                   <Link href="/admin">
                     <Button variant="outline" className="border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-400 font-medium">
@@ -480,9 +482,11 @@ export function Navbar() {
               <div className="pt-4 space-y-2 border-t border-slate-200">
                 {session?.user ? (
                   <>
+                    {session.user.role !== "admin" && (
                     <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="outline" className="w-full border-purple-300 text-purple-700 hover:bg-purple-50">Dashboard</Button>
                     </Link>
+                    )}
                     {session.user.role === "admin" ? (
                       <Link href="/admin" onClick={() => setMobileMenuOpen(false)}>
                         <Button variant="outline" className="w-full border-slate-300 text-slate-700 hover:bg-slate-100">Admin Panel</Button>

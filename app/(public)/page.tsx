@@ -111,7 +111,7 @@ export default function HomePage() {
   const [isGameStarted, setIsGameStarted] = useState(false)
   const [gameScore, setGameScore] = useState(0)
   const [clicks, setClicks] = useState(0)
-  const [highestClicks, setHighestClicks] = useState(47)
+  const [highestClicks, setHighestClicks] = useState(0)
   const [isConverting, setIsConverting] = useState(false)
   const [conversionStep, setConversionStep] = useState(0)
   const [userPlan, setUserPlan] = useState<string | null>(null)
@@ -134,6 +134,13 @@ export default function HomePage() {
       setIsLoadingPlan(false)
     }
   }
+
+  useEffect(() => {
+    const savedHighest = localStorage.getItem('highestClicks')
+    if (savedHighest) {
+      setHighestClicks(parseInt(savedHighest, 10))
+    }
+  }, [])
 
   const { scrollY } = useScroll()
   const heroOpacity = useTransform(scrollY, [0, 300], [1, 0])
@@ -206,8 +213,10 @@ export default function HomePage() {
       setGameScore(prev => {
         if (prev >= 100) {
           clearInterval(gameInterval)
-          if (clicks > highestClicks) {
-            setHighestClicks(clicks)
+          const finalClicks = clicks
+          if (finalClicks > highestClicks) {
+            setHighestClicks(finalClicks)
+            localStorage.setItem('highestClicks', finalClicks.toString())
           }
           return 100
         }
@@ -222,6 +231,7 @@ export default function HomePage() {
       setClicks(prev => prev + 1)
       if (clicks + 1 > highestClicks) {
         setHighestClicks(clicks + 1)
+        localStorage.setItem('highestClicks', (clicks + 1).toString())
       }
     }
   }
@@ -229,8 +239,8 @@ export default function HomePage() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.fromTo(".hero-animate",
-        { opacity: 0, y: 60 },
-        { opacity: 1, y: 0, duration: 1, stagger: 0.15, ease: "power3.out", delay: 0.3 }
+        { opacity: 0, y: 40 },
+        { opacity: 1, y: 0, duration: 0.8, stagger: 0.12, ease: "power2.out", delay: 0.1 }
       )
 
       gsap.fromTo(".float-element",
@@ -589,12 +599,16 @@ export default function HomePage() {
                           <span className="block text-xs text-green-600">✓ Installed & Active</span>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs mt-2 pt-2 border-t border-slate-200">
+                      <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: isConverting ? 1 : 0 }}
+                      className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs mt-2 pt-2 border-t border-slate-200"
+                    >
                         <div className="flex items-center gap-1 text-green-600"><CheckCircle2 className="w-3 h-3" /> WPGraphQL</div>
                         <div className="flex items-center gap-1 text-green-600"><CheckCircle2 className="w-3 h-3" /> Next.js 14</div>
                         <div className="flex items-center gap-1 text-green-600"><CheckCircle2 className="w-3 h-3" /> TypeScript</div>
                         <div className="flex items-center gap-1 text-green-600"><CheckCircle2 className="w-3 h-3" /> Vercel Deploy</div>
-                      </div>
+                      </motion.div>
                     </div>
                   </motion.div>
 
@@ -1459,9 +1473,10 @@ export default function HomePage() {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <Link href="/contact">
+            <Link href="/order">
               <Button size="lg" variant="outline" className="border-2 border-white/30 text-white hover:bg-white/10 text-lg px-10 py-6 font-semibold">
-                Contact Sales
+                Order Now
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
           </div>
