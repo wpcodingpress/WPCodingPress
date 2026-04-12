@@ -296,46 +296,53 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Features Comparison Table */}
-      <section className="py-16 bg-white">
-        <div className="max-w-5xl mx-auto">
+      {/* Features Comparison - Card Design */}
+      <section className="py-16 bg-gradient-to-br from-slate-50 via-white to-indigo-50">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
-              Compare <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">Plans</span>
+              Compare <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">Plans</span>
             </h2>
+            <p className="text-slate-600">Choose the plan that fits your needs</p>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="text-left py-4 px-4 font-bold">Feature</th>
-                  <th className="text-center py-4 px-4 bg-purple-50 font-bold">Free</th>
-                  <th className="text-center py-4 px-4 bg-purple-50 font-bold">Pro</th>
-                  <th className="text-center py-4 px-4 bg-amber-50 font-bold">Enterprise</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { f: "WordPress Sites", free: "1", pro: "5", ent: "Unlimited" },
-                  { f: "Live Deployment", free: false, pro: true, ent: true },
-                  { f: "Custom Domain", free: false, pro: true, ent: true },
-                  { f: "Analytics", free: false, pro: true, ent: true },
-                  { f: "Auto Sync", free: false, pro: true, ent: true },
-                  { f: "White-label", free: false, pro: false, ent: true },
-                  { f: "Priority Support", free: false, pro: true, ent: true },
-                  { f: "24/7 Support", free: false, pro: false, ent: true },
-                  { f: "API Access", free: false, pro: true, ent: true },
-                  { f: "Team Collab", free: false, pro: false, ent: true },
-                ].map((r, i) => (
-                  <tr key={i} className="border-b border-slate-100">
-                    <td className="py-3 px-4">{r.f}</td>
-                    <td className="text-center py-3 px-4">{r.free === true ? '✓' : r.free === false ? '—' : r.free}</td>
-                    <td className="text-center py-3 px-4">{r.pro === true ? '✓' : r.pro === false ? '—' : r.pro}</td>
-                    <td className="text-center py-3 px-4">{r.ent === true ? '✓' : r.ent === false ? '—' : r.ent}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { plan: "free", name: "Free", price: "$0", period: "forever", features: ["1 WordPress Site", "Basic Template", "Community Support"] },
+              { plan: "pro", name: "Pro", price: "$19", period: "/month", features: ["5 Sites", "Live Deployment", "Priority Support", "Custom Domain", "Analytics"], popular: true },
+              { plan: "enterprise", name: "Enterprise", price: "$99", period: "/month", features: ["Unlimited Sites", "White-label", "24/7 Support", "API Access", "Team Collab"] },
+            ].map((plan, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className={`relative bg-white rounded-3xl overflow-hidden ${plan.popular ? 'ring-2 ring-indigo-500 shadow-2xl shadow-indigo-200 scale-105 z-10' : 'border border-slate-200 shadow-lg'}`}
+              >
+                {plan.popular && (
+                  <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 py-2 text-center">
+                    <span className="text-white text-xs font-bold uppercase tracking-wider">Most Popular</span>
+                  </div>
+                )}
+                <div className="p-6">
+                  <div className="text-center mb-4">
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">{plan.name}</h3>
+                    <div className="text-3xl font-bold text-slate-900">
+                      {plan.price}<span className="text-sm text-slate-500 font-normal">{plan.period}</span>
+                    </div>
+                  </div>
+                  <ul className="space-y-2 mb-6">
+                    {plan.features.map((feature, j) => (
+                      <li key={j} className="flex items-center gap-2 text-slate-600 text-sm">
+                        <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
