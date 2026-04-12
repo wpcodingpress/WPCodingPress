@@ -16,14 +16,14 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { FloatingButtons } from "@/components/floating-buttons"
+
 
 gsap.registerPlugin(ScrollTrigger)
 
 const plansData = [
-  { name: "Free", planId: "free", price: "$0", period: "forever", description: "Perfect for getting started with WordPress to Next.js conversion", features: ["1 WordPress site conversion", "Basic Next.js template", "Community support", "Basic SEO setup"], href: "/register", popular: false },
-  { name: "Pro", planId: "pro", price: "$19", period: "month", description: "Convert up to 5 WordPress sites to headless Next.js", features: ["5 WordPress to Headless conversions", "Live deployed sites (Vercel/Render)", "Advanced Next.js templates", "Priority email support", "Custom domain support", "Analytics dashboard", "Auto content sync"], href: "/register?plan=pro", popular: true },
-  { name: "Enterprise", planId: "enterprise", price: "$99", period: "month", description: "Unlimited conversions for agencies and businesses", features: ["Unlimited conversions", "White-label deployment", "24/7 Dedicated support", "Custom domain included", "API access", "Advanced analytics", "Team collaboration", "Custom integrations"], href: "/contact", popular: false },
+  { name: "Free", planId: "free", price: "$0", period: "forever", description: "Perfect for getting started with WordPress to Next.js conversion", features: ["1 WordPress site conversion", "Basic Next.js template", "Community support", "No custom domain"], href: "/register", popular: false },
+  { name: "Pro", planId: "pro", price: "$19", period: "month", description: "Convert 1 WordPress site to Next.js", features: ["1 WordPress site conversion", "Live deployment", "Advanced Next.js template", "Priority email support", "Custom domain", "Analytics dashboard", "Auto content sync"], href: "/register?plan=pro", popular: true },
+  { name: "Enterprise", planId: "enterprise", price: "$99", period: "month", description: "Convert 3 WordPress sites to Next.js", features: ["3 WordPress site conversions", "Live deployments", "Advanced Next.js templates", "Priority email support", "Custom domains", "Analytics dashboard", "Auto content sync", "White-label option"], href: "/contact", popular: false },
 ]
 
 const portfolioItems = [
@@ -352,8 +352,6 @@ export default function HomePage() {
 
   return (
     <div ref={containerRef} className="relative min-h-screen bg-white">
-      <FloatingButtons />
-
       {/* SEO Metadata */}
       <Head>
         <title>WPCodingPress | WordPress to Next.js Migration & Web Development Services</title>

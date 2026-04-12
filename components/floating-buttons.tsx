@@ -66,7 +66,7 @@ export function AIChatWidget() {
     {
       id: "1",
       role: "assistant",
-      content: "Hi there! I'm your AI assistant. How can I help you today? Ask me anything about our services, pricing, or how to get started!",
+      content: "Hi! I'm MIKU, your AI assistant at WPCodingPress. How can I help you today? Ask me anything about our services, pricing, or how to get started!",
       timestamp: new Date(),
     },
   ])
@@ -211,7 +211,7 @@ export function AIChatWidget() {
                   <Bot className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-white font-bold text-lg">AI Assistant</h3>
+                  <h3 className="text-white font-bold text-lg">MIKU</h3>
                   <p className="text-white/80 text-sm flex items-center gap-1">
                     <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                     Online now

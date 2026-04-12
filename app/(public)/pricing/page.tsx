@@ -31,11 +31,11 @@ const subscriptions = [
     planId: "pro",
     price: "$19",
     period: "/month",
-    description: "Convert up to 5 WordPress sites to headless Next.js",
-    icon: Star,
-    features: [
-      "5 WordPress to Headless conversions",
-      "Live deployed sites (Vercel/Render)",
+description: "Convert 1 WordPress site to headless Next.js",
+      icon: Star,
+      features: [
+        "1 WordPress to Next.js conversion",
+        "Live deployed site",
       "Advanced Next.js templates",
       "Priority email support",
       "Custom domain support",

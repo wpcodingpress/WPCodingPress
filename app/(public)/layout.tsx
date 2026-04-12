@@ -2,6 +2,7 @@
 
 import { Navbar } from "@/components/layout"
 import { Footer } from "@/components/layout/footer"
+import { FloatingButtons } from "@/components/floating-buttons"
 
 export default function PublicLayout({
   children,
@@ -15,6 +16,7 @@ export default function PublicLayout({
         {children}
       </main>
       <Footer />
+      <FloatingButtons />
     </div>
   )
 }

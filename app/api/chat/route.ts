@@ -32,29 +32,28 @@ Complete setup and ongoing support
 • 1 WordPress site conversion
 • Basic Next.js template
 • Community support
-• 5GB bandwidth
+• No custom domain
 
 💎 **Pro - $19/month**
-• 5 WordPress to Next.js conversions
-• Live deployment (Vercel/Render)
+• 1 WordPress site conversion
+• Live deployment
+• Advanced Next.js template
 • Priority email support
-• Custom domain support
+• Custom domain
 • Analytics dashboard
 • Auto content sync
-• 100GB bandwidth
 
 🚀 **Enterprise - $99/month**
-• Unlimited conversions
-• White-label deployment
-• 24/7 dedicated support
-• Custom domain included
-• API access
-• Advanced analytics
-• Team collaboration
-• Custom integrations
+• 3 WordPress site conversions
+• Live deployments
+• Advanced Next.js templates
+• Priority email support
+• Custom domains
+• Analytics dashboard
+• Auto content sync
+• White-label option
 
 One-time services also available!
-Basic: $100-600 | Standard: $200-900 | Premium: $350-1200
 
 **View pricing:** https://wpcodingpress.onrender.com/pricing`,
 
