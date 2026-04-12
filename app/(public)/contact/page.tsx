@@ -187,12 +187,12 @@ export default function ContactPage() {
                     </div>
                   ) : (
                     <Tabs value={formType} onValueChange={(v) => setFormType(v as "query" | "order")}>
-                      <TabsList className="grid grid-cols-2 bg-slate-800 mb-6">
-                        <TabsTrigger value="query" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white">
+                      <TabsList className="grid grid-cols-2 bg-purple-100 mb-6">
+                        <TabsTrigger value="query" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
                           <MessageSquare className="w-4 h-4 mr-2" />
                           Send Query
                         </TabsTrigger>
-                        <TabsTrigger value="order" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white">
+                        <TabsTrigger value="order" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
                           <FileText className="w-4 h-4 mr-2" />
                           Start Project
                         </TabsTrigger>
@@ -202,18 +202,18 @@ export default function ContactPage() {
                         <form onSubmit={handleQuerySubmit} className="space-y-5">
                           <div className="grid md:grid-cols-2 gap-5">
                             <div>
-                              <label className="block text-sm font-medium text-slate-300 mb-2">Your Name *</label>
+                              <label className="block text-sm font-medium text-slate-700 mb-2">Your Name *</label>
                               <Input
                                 name="name"
                                 value={queryForm.name}
                                 onChange={(e) => setQueryForm({ ...queryForm, name: e.target.value })}
                                 placeholder="John Smith"
                                 required
-                                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
+                                className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:ring-purple-500"
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-slate-300 mb-2">Email Address *</label>
+                              <label className="block text-sm font-medium text-slate-700 mb-2">Email Address *</label>
                               <Input
                                 name="email"
                                 type="email"
@@ -221,26 +221,26 @@ export default function ContactPage() {
                                 onChange={(e) => setQueryForm({ ...queryForm, email: e.target.value })}
                                 placeholder="john@example.com"
                                 required
-                                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
+                                className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:ring-purple-500"
                               />
                             </div>
                           </div>
                           <div className="grid md:grid-cols-2 gap-5">
                             <div>
-                              <label className="block text-sm font-medium text-slate-300 mb-2">Phone</label>
+                              <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
                               <Input
                                 name="phone"
                                 type="tel"
                                 value={queryForm.phone}
                                 onChange={(e) => setQueryForm({ ...queryForm, phone: e.target.value })}
                                 placeholder="+880 1XXX XXXXXX"
-                                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
+                                className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:ring-purple-500"
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-slate-300 mb-2">Subject *</label>
+                              <label className="block text-sm font-medium text-slate-700 mb-2">Subject *</label>
                               <Select value={queryForm.subject} onValueChange={(v) => setQueryForm({ ...queryForm, subject: v })}>
-                                <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                                <SelectTrigger className="bg-white border-slate-300 text-slate-900">
                                   <SelectValue placeholder="Select subject" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -254,7 +254,7 @@ export default function ContactPage() {
                             </div>
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Your Message *</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Your Message *</label>
                             <Textarea
                               name="message"
                               value={queryForm.message}
@@ -285,18 +285,18 @@ export default function ContactPage() {
                         <form onSubmit={handleOrderSubmit} className="space-y-5">
                           <div className="grid md:grid-cols-2 gap-5">
                             <div>
-                              <label className="block text-sm font-medium text-slate-300 mb-2">Your Name *</label>
+                              <label className="block text-sm font-medium text-slate-700 mb-2">Your Name *</label>
                               <Input
                                 name="name"
                                 value={orderForm.name}
                                 onChange={(e) => setOrderForm({ ...orderForm, name: e.target.value })}
                                 placeholder="John Smith"
                                 required
-                                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
+                                className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:ring-purple-500"
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-slate-300 mb-2">Email Address *</label>
+                              <label className="block text-sm font-medium text-slate-700 mb-2">Email Address *</label>
                               <Input
                                 name="email"
                                 type="email"
@@ -304,26 +304,26 @@ export default function ContactPage() {
                                 onChange={(e) => setOrderForm({ ...orderForm, email: e.target.value })}
                                 placeholder="john@example.com"
                                 required
-                                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
+                                className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:ring-purple-500"
                               />
                             </div>
                           </div>
                           <div className="grid md:grid-cols-2 gap-5">
                             <div>
-                              <label className="block text-sm font-medium text-slate-300 mb-2">Phone</label>
+                              <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
                               <Input
                                 name="phone"
                                 type="tel"
                                 value={orderForm.phone}
                                 onChange={(e) => setOrderForm({ ...orderForm, phone: e.target.value })}
                                 placeholder="+880 1XXX XXXXXX"
-                                className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
+                                className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:ring-purple-500"
                               />
                             </div>
                             <div>
-                              <label className="block text-sm font-medium text-slate-300 mb-2">Service Type *</label>
+                              <label className="block text-sm font-medium text-slate-700 mb-2">Service Type *</label>
                               <Select value={orderForm.service} onValueChange={(v) => setOrderForm({ ...orderForm, service: v })}>
-                                <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                                <SelectTrigger className="bg-white border-slate-300 text-slate-900">
                                   <SelectValue placeholder="Select a service" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -338,18 +338,18 @@ export default function ContactPage() {
                             </div>
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Project Name *</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Project Name *</label>
                             <Input
                               name="projectName"
                               value={orderForm.projectName}
                               onChange={(e) => setOrderForm({ ...orderForm, projectName: e.target.value })}
                               placeholder="My Awesome Project"
                               required
-                              className="bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
+                              className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:ring-purple-500"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-2">Project Description *</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Project Description *</label>
                             <Textarea
                               name="projectDescription"
                               value={orderForm.projectDescription}
@@ -362,7 +362,7 @@ export default function ContactPage() {
                           <div>
                             <label className="block text-sm font-medium text-slate-300 mb-2">Estimated Budget</label>
                             <Select value={orderForm.budget} onValueChange={(v) => setOrderForm({ ...orderForm, budget: v })}>
-                              <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                              <SelectTrigger className="bg-white border-slate-300 text-slate-900">
                                 <SelectValue placeholder="Select budget range" />
                               </SelectTrigger>
                               <SelectContent>

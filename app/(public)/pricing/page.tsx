@@ -301,9 +301,9 @@ export default function PricingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">
-              Compare <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">Plans</span>
+              See What's <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">Included</span>
             </h2>
-            <p className="text-slate-600">Choose the plan that fits your needs</p>
+            <p className="text-slate-600">Choose the plan that fits your needs. All plans include free SSL.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
