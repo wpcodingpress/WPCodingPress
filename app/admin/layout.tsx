@@ -112,21 +112,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setSearchQuery(query)
     if (query.length > 1) {
       setShowSearchResults(true)
-      // Search through orders, users, subscribers
       try {
-        const [ordersRes, usersRes] = await Promise.all([
-          fetch(`/api/orders?search=${query}`).catch(() => ({ ok: false })),
-          fetch(`/api/admin/users?search=${query}`).catch(() => ({ ok: false }))
-        ])
         const results: any[] = []
-        if (ordersRes.ok) {
-          const orders = await ordersRes.json()
-          orders.slice(0, 3).forEach((o: any) => results.push({ type: 'order', title: o.clientName, sub: o.status, link: '/admin/orders' }))
-        }
-        if (usersRes.ok) {
-          const users = await usersRes.json()
-          users.slice(0, 3).forEach((u: any) => results.push({ type: 'user', title: u.name, sub: u.email, link: '/admin/users' }))
-        }
+        try {
+          const ordersRes = await fetch(`/api/orders?search=${query}`)
+          if (ordersRes.ok) {
+            const orders = await ordersRes.json()
+            orders.slice(0, 3).forEach((o: any) => results.push({ type: 'order', title: o.clientName, sub: o.status, link: '/admin/orders' }))
+          }
+        } catch { }
+        try {
+          const usersRes = await fetch(`/api/admin/users?search=${query}`)
+          if (usersRes.ok) {
+            const users = await usersRes.json()
+            users.slice(0, 3).forEach((u: any) => results.push({ type: 'user', title: u.name, sub: u.email, link: '/admin/users' }))
+          }
+        } catch { }
         setSearchResults(results)
       } catch { setSearchResults([]) }
     } else {
