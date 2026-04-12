@@ -12,22 +12,33 @@ interface FooterLink {
 export function Footer() {
   const [services, setServices] = useState<FooterLink[]>([])
   const [products, setProducts] = useState<FooterLink[]>([])
+  const [servicesLoading, setServicesLoading] = useState(true)
+  const [productsLoading, setProductsLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [servicesRes, productsRes] = await Promise.all([
-          fetch('/api/public/services'),
-          fetch('/api/products')
-        ])
+        const servicesRes = await fetch('/api/public/services')
         const servicesData = await servicesRes.json()
-        const productsData = await productsRes.json()
-        
         setServices(servicesData.map((s: any) => ({
           href: `/services/${s.slug}`,
           label: s.name
         })))
+        setServicesLoading(false)
+      } catch (e) {
+        console.error('Error fetching services:', e)
+        setServicesLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const productsRes = await fetch('/api/products')
+        const productsData = await productsRes.json()
+        
         const typeMap: Record<string, string> = {
           plugin: 'WordPress Plugins',
           theme: 'WordPress Themes',
@@ -46,11 +57,13 @@ export function Footer() {
           label: typeMap[p.type] || p.name
         }))
         setProducts(uniqueProducts)
+        setProductsLoading(false)
       } catch (e) {
-        console.error('Error fetching footer data:', e)
+        console.error('Error fetching products:', e)
+        setProductsLoading(false)
       }
     }
-    fetchData()
+    fetchProducts()
   }, [])
 
   const company = [
@@ -81,23 +94,51 @@ export function Footer() {
               AI-powered web development agency specializing in WordPress to Next.js migrations. 
               Build lightning-fast, SEO-optimized websites that drive results.
             </p>
-            
           </div>
 
           <div>
             <h3 className="font-semibold text-slate-900 mb-4">Services</h3>
             <ul className="space-y-3">
-              {services.length > 0 ? services.map((link) => (
-<li key={link.href}>
-                  <Link 
-                    href={link.href}
-                    className="text-sm text-slate-600 hover:text-purple-600 transition-colors flex items-center gap-2"
-                  >
-                    <ArrowRight className="h-3 w-3" />
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              {servicesLoading ? (
+                <li className="text-sm text-slate-400">Loading...</li>
+              ) : services.length > 0 ? (
+                services.map((link) => (
+                  <li key={link.href}>
+                    <Link 
+                      href={link.href}
+                      className="text-sm text-slate-600 hover:text-purple-600 transition-colors flex items-center gap-2"
+                    >
+                      <ArrowRight className="h-3 w-3" />
+                      {link.label}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <li className="text-sm text-slate-400">No services</li>
+              )}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-slate-900 mb-4">Products</h3>
+            <ul className="space-y-3">
+              {productsLoading ? (
+                <li className="text-sm text-slate-400">Loading...</li>
+              ) : products.length > 0 ? (
+                products.map((link) => (
+                  <li key={link.href}>
+                    <Link 
+                      href={link.href}
+                      className="text-sm text-slate-600 hover:text-purple-600 transition-colors flex items-center gap-2"
+                    >
+                      <ArrowRight className="h-3 w-3" />
+                      {link.label}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <li className="text-sm text-slate-400">No products</li>
+              )}
             </ul>
           </div>
 
