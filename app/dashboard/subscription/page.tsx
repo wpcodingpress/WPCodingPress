@@ -43,17 +43,17 @@ const plans = [
     name: "Pro",
     price: 19,
     period: "month",
-    description: "Convert up to 5 WordPress sites to headless Next.js",
+    description: "Convert 1 WordPress site to Next.js",
     icon: Crown,
     color: "primary",
     popular: true,
     planId: "pro",
     features: [
-      "5 WordPress to Headless conversions",
-      "Live deployed sites (Vercel/Render)",
-      "Advanced Next.js templates",
+      "1 WordPress site conversion",
+      "Live deployment",
+      "Advanced Next.js template",
       "Priority email support",
-      "Custom domain support",
+      "Custom domain",
       "Analytics dashboard",
       "Auto content sync",
     ]
@@ -62,19 +62,19 @@ const plans = [
     name: "Enterprise",
     price: 99,
     period: "month",
-    description: "Unlimited conversions for agencies and businesses",
+    description: "Convert 3 WordPress sites to Next.js",
     icon: Rocket,
     color: "purple",
     planId: "enterprise",
     features: [
-      "Unlimited conversions",
-      "White-label deployment",
-      "24/7 Dedicated support",
-      "Custom domain included",
-      "API access",
-      "Advanced analytics",
-      "Team collaboration",
-      "Custom integrations",
+      "3 WordPress site conversions",
+      "Live deployments",
+      "Advanced Next.js templates",
+      "Priority email support",
+      "Custom domains",
+      "Analytics dashboard",
+      "Auto content sync",
+      "White-label option",
     ]
   }
 ];
@@ -301,7 +301,7 @@ export default function SubscriptionPage() {
                   Current Plan: {currentPlan === 'enterprise' ? 'Enterprise' : 'Pro'}
                 </p>
                 <p className="text-sm text-slate-500">
-                  {currentPlan === 'enterprise' ? '$99/month - Unlimited conversions' : '$19/month - 5 WordPress sites'}
+                  {currentPlan === 'enterprise' ? '$99/month - 3 sites' : '$19/month - 1 site'}
                 </p>
               </div>
             </div>

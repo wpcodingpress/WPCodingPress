@@ -52,10 +52,10 @@ description: "Convert 1 WordPress site to headless Next.js",
     planId: "enterprise",
     price: "$99",
     period: "/month",
-    description: "Unlimited conversions for agencies and businesses",
-    icon: Crown,
-    features: [
-      "Unlimited conversions",
+description: "Convert 3 WordPress sites to Next.js",
+      icon: Crown,
+      features: [
+        "3 WordPress site conversions",
       "White-label deployment",
       "24/7 Dedicated support",
       "Custom domain included",
@@ -252,15 +252,13 @@ export default function PricingPage() {
                 </thead>
                 <tbody>
                   {[
-                    { feature: "WordPress Site Conversions", free: "1", pro: "5", enterprise: "Unlimited" },
-                    { feature: "Live Deployment (Vercel)", free: false, pro: true, enterprise: true },
+                    { feature: "WordPress Site Conversions", free: "1", pro: "1", enterprise: "3" },
+                    { feature: "Live Deployment", free: false, pro: true, enterprise: true },
                     { feature: "Custom Domain", free: false, pro: true, enterprise: true },
                     { feature: "Analytics Dashboard", free: false, pro: true, enterprise: true },
                     { feature: "Auto Content Sync", free: false, pro: true, enterprise: true },
                     { feature: "Priority Support", free: false, pro: true, enterprise: true },
-                    { feature: "24/7 Dedicated Support", free: false, pro: false, enterprise: true },
-                    { feature: "White-label Deployment", free: false, pro: false, enterprise: true },
-                    { feature: "API Access", free: false, pro: false, enterprise: true },
+                    { feature: "White-label Option", free: false, pro: false, enterprise: true },
                   ].map((row, i) => (
                     <tr key={i} className={`border-b border-indigo-50 ${i % 2 === 0 ? 'bg-slate-50/50' : ''}`}>
                       <td className="py-4 px-6 text-slate-700 font-medium">{row.feature}</td>

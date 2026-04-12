@@ -12,9 +12,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
 const plans = [
-  { name: "Free", planId: "free", price: "Free", period: "forever", features: ["1 WordPress site conversion", "Basic Next.js template", "Community support", "Basic SEO setup"] },
-  { name: "Pro", planId: "pro", price: "$19", period: "/month", features: ["5 WordPress to Headless conversions", "Live deployed sites (Vercel/Render)", "Advanced Next.js templates", "Priority email support", "Custom domain support", "Analytics dashboard", "Auto content sync"] },
-  { name: "Enterprise", planId: "enterprise", price: "$99", period: "/month", features: ["Unlimited conversions", "White-label deployment", "24/7 Dedicated support", "Custom domain included", "API access", "Advanced analytics", "Team collaboration", "Custom integrations"] },
+  { name: "Free", planId: "free", price: "Free", period: "forever", features: ["1 WordPress site conversion", "Basic Next.js template", "Community support", "No custom domain"] },
+  { name: "Pro", planId: "pro", price: "$19", period: "/month", features: ["1 WordPress site conversion", "Live deployment", "Advanced Next.js template", "Priority email support", "Custom domain", "Analytics dashboard", "Auto content sync"] },
+  { name: "Enterprise", planId: "enterprise", price: "$99", period: "/month", features: ["3 WordPress site conversions", "Live deployments", "Advanced Next.js templates", "Priority email support", "Custom domains", "Analytics dashboard", "Auto content sync", "White-label option"] },
 ]
 
 export default function DashboardOverview() {

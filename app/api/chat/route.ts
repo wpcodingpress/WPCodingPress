@@ -53,8 +53,6 @@ Complete setup and ongoing support
 • Auto content sync
 • White-label option
 
-One-time services also available!
-
 **View pricing:** https://wpcodingpress.onrender.com/pricing`,
 
   products: `Our premium products:

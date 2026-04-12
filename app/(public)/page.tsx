@@ -71,8 +71,8 @@ const features = [
 
 const plans = [
   { name: "Free", planId: "free", price: "$0", period: "forever", description: "Perfect for getting started with WordPress to Next.js conversion", features: ["1 WordPress site conversion", "Basic Next.js template", "Community support", "Basic SEO setup"], cta: "Get Started", href: "/register", popular: false },
-  { name: "Pro", planId: "pro", price: "$19", period: "/month", description: "Convert up to 5 WordPress sites to headless Next.js", features: ["5 WordPress to Headless conversions", "Live deployed sites (Vercel/Render)", "Advanced Next.js templates", "Priority email support", "Custom domain support", "Analytics dashboard", "Auto content sync"], cta: "Start Pro", href: "/register?plan=pro", popular: true },
-  { name: "Enterprise", planId: "enterprise", price: "$99", period: "/month", description: "Unlimited conversions for agencies and businesses", features: ["Unlimited conversions", "White-label deployment", "24/7 Dedicated support", "Custom domain included", "API access", "Advanced analytics", "Team collaboration", "Custom integrations"], cta: "Contact Sales", href: "/contact", popularity: false },
+  { name: "Pro", planId: "pro", price: "$19", period: "month", description: "Convert 1 WordPress site to Next.js", features: ["1 WordPress site", "Live deployment", "Advanced Next.js template", "Priority email support", "Custom domain", "Analytics dashboard", "Auto content sync"], cta: "Start Pro", href: "/register?plan=pro", popular: true },
+  { name: "Enterprise", planId: "enterprise", price: "$99", period: "month", description: "Convert 3 WordPress sites to Next.js", features: ["3 WordPress sites", "Live deployments", "Advanced Next.js templates", "Priority email support", "Custom domains", "Analytics dashboard", "Auto content sync", "White-label option"], cta: "Contact Sales", href: "/contact", popularity: false },
 ]
 
 const testimonials = [
@@ -987,15 +987,13 @@ export default function HomePage() {
                 </thead>
                 <tbody>
                   {[
-                    { feature: "WordPress Site Conversions", free: "1", pro: "5", enterprise: "Unlimited" },
-                    { feature: "Live Deployment (Vercel)", free: false, pro: true, enterprise: true },
+                    { feature: "WordPress Site Conversions", free: "1", pro: "1", enterprise: "3" },
+                    { feature: "Live Deployment", free: false, pro: true, enterprise: true },
                     { feature: "Custom Domain", free: false, pro: true, enterprise: true },
                     { feature: "Analytics Dashboard", free: false, pro: true, enterprise: true },
                     { feature: "Auto Content Sync", free: false, pro: true, enterprise: true },
                     { feature: "Priority Support", free: false, pro: true, enterprise: true },
-                    { feature: "24/7 Dedicated Support", free: false, pro: false, enterprise: true },
-                    { feature: "White-label Deployment", free: false, pro: false, enterprise: true },
-                    { feature: "API Access", free: false, pro: false, enterprise: true },
+                    { feature: "White-label Option", free: false, pro: false, enterprise: true },
                   ].map((row, i) => (
                     <tr key={i} className={`border-b border-indigo-50 ${i % 2 === 0 ? 'bg-slate-50/50' : ''}`}>
                       <td className="py-4 px-6 text-slate-700 font-medium">{row.feature}</td>
