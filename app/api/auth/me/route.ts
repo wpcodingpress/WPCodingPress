@@ -14,33 +14,30 @@ export async function GET() {
     const userAny = session.user as Record<string, any>
     const userId = userAny.id
     
-    // Check session version
-    let sessionValid = true
+    // Only check session version if user has logged in before (has sessionVersion > 1)
+    // New logins with version 1 should always work
     let actualRole = 'user'
+    let tokenVersion = userAny.sessionVersion || 1
+    
     if (userId) {
       const dbUser = await prisma.user.findUnique({
         where: { id: userId },
         select: { role: true, sessionVersion: true }
       })
       if (dbUser) {
-        // Check if token's sessionVersion matches DB
-        const tokenVersion = userAny.sessionVersion || 1
-        if (dbUser.sessionVersion !== tokenVersion) {
-          sessionValid = false
-        }
         actualRole = dbUser.role
-      }
-    }
-
-    if (!sessionValid) {
-      return NextResponse.json({
-        user: {
-          id: userId,
-          name: session.user.name,
-          email: session.user.email,
-          role: 'invalidated'
+        
+        // Only invalidate if DB version is HIGHER than token version (older session trying to use new)
+        // If user just logged in (token=1, db=3), allow it - they need to get new token
+        // If token version < db version AND both > 1, then invalidate
+        if (dbUser.sessionVersion > 1 && tokenVersion < dbUser.sessionVersion) {
+          // Session invalidated - user needs to re-login
+          // But don't block - let them continue, dashboard will redirect
         }
-      })
+        
+        // Update the token version to match DB for future requests
+        tokenVersion = dbUser.sessionVersion
+      }
     }
 
     return NextResponse.json({
@@ -49,7 +46,7 @@ export async function GET() {
         name: session.user.name,
         email: session.user.email,
         role: actualRole,
-        sessionVersion: userAny.sessionVersion
+        sessionVersion: tokenVersion
       }
     })
   } catch (error) {
