@@ -37,6 +37,7 @@ model User {
   sites           Site[]
   jobs            Job[]
   notifications  Notification[]
+  customOrders   CustomOrder[]
 }
 
 model Notification {
@@ -171,8 +172,8 @@ model Order {
 
 model CustomOrder {
   id                 String   @id @default(cuid())
-  userId            String
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String?
+  user              User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   clientName       String
   clientEmail      String
   clientPhone     String   @default("")
