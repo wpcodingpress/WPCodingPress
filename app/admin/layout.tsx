@@ -87,7 +87,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (status === "unauthenticated") {
       router.push("/admin/login")
     }
-  }, [status, router])
+    // Allow admin, editor, manager to access admin panel
+    if (session?.user?.role && !['admin', 'editor', 'manager'].includes(session.user.role)) {
+      router.push("/dashboard")
+    }
+  }, [status, router, session])
 
   useEffect(() => {
     const fetchNotifications = async () => {
