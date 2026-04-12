@@ -200,15 +200,32 @@ export async function POST(request: Request) {
     const bcrypt = require('bcryptjs')
     const hashedPassword = await bcrypt.hash(password, 12)
 
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        role: role || 'user',
-        isActive: true,
+    // If role is admin, create in AdminUser table, otherwise in User table
+    let user
+    if (role === 'admin') {
+      const existingAdmin = await prisma.adminUser.findUnique({ where: { email } })
+      if (existingAdmin) {
+        return NextResponse.json({ error: 'Admin user with this email already exists' }, { status: 400 })
       }
-    })
+      user = await prisma.adminUser.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+          role: 'admin',
+        }
+      })
+    } else {
+      user = await prisma.user.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+          role: role || 'user',
+          isActive: true,
+        }
+      })
+    }
 
     return NextResponse.json({ success: true, message: 'User created', user })
   } catch (error) {
