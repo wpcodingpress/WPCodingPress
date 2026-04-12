@@ -137,21 +137,7 @@ export default function ContactPage() {
             fill
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/95 via-purple-950/90 to-slate-950/95" />
-        </div>
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[150px]" />
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div 
-            className="text-center max-w-3xl mx-auto"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-              Get In <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Touch</span>
-            </h1>
-            <p className="text-lg md:text-xl text-slate-300">
+          
               Have a project in mind? We'd love to hear about it. Let's discuss how we can help bring your vision to life.
             </p>
           </motion.div>

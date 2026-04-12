@@ -54,29 +54,17 @@ export default function AboutPage() {
   return (
     <div className="relative">
       {/* Hero */}
-      <section className="relative py-32 overflow-hidden">
-        <div className="absolute inset-0">
-          <Image 
-            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&q=80"
-            alt="Team Working"
-            fill
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-indigo-950/95 via-purple-950/90 to-slate-950/95" />
-        </div>
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[150px]" />
-        
+      <section className="relative py-32 overflow-hidden bg-gradient-to-br from-purple-50 via-white to-violet-50">
         <div className="container mx-auto px-4 relative z-10">
           <motion.div 
             className="text-center max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-              About <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">WPCodingPress</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6">
+              About <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">WPCodingPress</span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-300">
+            <p className="text-lg md:text-xl text-slate-600">
               We're more than a web development agency. We're your partners in digital success, 
               combining technical expertise with creative vision.
             </p>
@@ -85,10 +73,9 @@ export default function AboutPage() {
       </section>
 
       {/* Experience Stats */}
-      <section className="py-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-indigo-950/20 to-slate-950" />
+      <section className="py-16 bg-white">
         
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {experience.map((exp, index) => (
               <motion.div
@@ -97,12 +84,12 @@ export default function AboutPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="text-center p-6 rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50"
+                className="text-center p-6 rounded-2xl bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-100"
               >
-                <div className={`text-4xl md:text-5xl font-black mb-2 bg-gradient-to-r ${exp.color.includes('blue') ? 'from-blue-400 to-cyan-400' : exp.color.includes('purple') ? 'from-purple-400 to-pink-400' : exp.color.includes('green') ? 'from-green-400 to-emerald-400' : 'from-yellow-400 to-amber-400'} bg-clip-text text-transparent`}>
+                <div className={`text-4xl md:text-5xl font-black mb-2 bg-gradient-to-r ${exp.color.includes('blue') ? 'from-blue-600 to-cyan-500' : exp.color.includes('purple') ? 'from-purple-600 to-pink-500' : exp.color.includes('green') ? 'from-green-600 to-emerald-500' : 'from-yellow-500 to-amber-500'} bg-clip-text text-transparent`}>
                   {exp.years}
                 </div>
-                <div className="text-slate-400">{exp.label}</div>
+                <div className="text-slate-600">{exp.label}</div>
               </motion.div>
             ))}
           </div>
@@ -110,8 +97,7 @@ export default function AboutPage() {
       </section>
 
       {/* Story Section */}
-      <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 to-indigo-950/30" />
+      <section className="py-20 bg-gradient-to-br from-purple-50 via-white to-violet-50">
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -120,10 +106,10 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-                Our <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Story</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
+                Our <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Story</span>
               </h2>
-              <div className="space-y-5 text-slate-300">
+              <div className="space-y-5 text-slate-600">
                 <p>
                   Founded with a passion for creating exceptional digital experiences, 
                   WPCodingPress has grown from a solo developer operation into a full-service 
