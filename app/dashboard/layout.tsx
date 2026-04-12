@@ -150,15 +150,23 @@ export default function DashboardLayout({
 
   const checkAuth = async () => {
     try {
-      const response = await fetch("/api/auth/session")
-      const session = await response.json()
+      // Call /api/auth/me which validates session version against DB
+      const response = await fetch("/api/auth/me")
+      const data = await response.json()
       
-      if (!session?.user || session.user.role !== "client") {
+      if (!data.user) {
         router.push("/login")
         return
       }
       
-      setUser(session.user)
+      // If role is invalidated, logout and redirect
+      if (data.user.role === 'invalidated') {
+        await signOut({ redirect: false })
+        router.push("/login?reason=session_expired")
+        return
+      }
+      
+      setUser(data.user)
     } catch (error) {
       router.push("/login")
     } finally {
