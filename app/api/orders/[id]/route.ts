@@ -30,11 +30,22 @@ export async function PATCH(
   try {
     const { id } = await params
     const body = await request.json()
-    const { status } = body
+    const { status, paymentStatus } = body
+
+    const updateData: any = {}
+    if (status) {
+      updateData.status = status
+      if (status === "completed") {
+        updateData.paymentStatus = "paid"
+      }
+    }
+    if (paymentStatus) {
+      updateData.paymentStatus = paymentStatus
+    }
 
     const order = await prisma.order.update({
       where: { id },
-      data: { status }
+      data: updateData
     })
 
     return NextResponse.json(order)
