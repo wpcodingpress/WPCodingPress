@@ -111,7 +111,6 @@ export async function PUT(request: Request) {
       await prisma.user.delete({ where: { id: userId } })
       return NextResponse.json({ success: true, message: 'User deleted' })
     }
-    }
 
     const existingUser = await prisma.user.findUnique({
       where: { id: userId },
