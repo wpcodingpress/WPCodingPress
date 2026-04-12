@@ -81,13 +81,19 @@ export default function ContactPage() {
     setIsSubmitting(true)
     
     try {
-      const response = await fetch("/api/orders", {
+      // Create message combining project details like Send Query does
+      const projectMessage = `Project: ${orderForm.projectName}\nService: ${orderForm.service}\n\n${orderForm.projectDescription}\n\nBudget: ${orderForm.budget}`
+      
+      // Save to contacts table like Send Query does
+      const response = await fetch("/api/contacts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...orderForm,
-          service: orderForm.service,
-          message: `Project: ${orderForm.projectName}\n\n${orderForm.projectDescription}\n\nBudget: ${orderForm.budget}`
+          name: orderForm.name,
+          email: orderForm.email,
+          phone: orderForm.phone,
+          subject: `Start Project: ${orderForm.projectName}`,
+          message: projectMessage
         })
       })
       

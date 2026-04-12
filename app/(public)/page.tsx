@@ -762,7 +762,7 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="max-w-4xl mx-auto"
           >
-            <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-700 overflow-hidden">
+            <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-slate-700 overflow-hidden">
               {/* Game Background */}
               <div className="absolute inset-0 opacity-20">
                 <div className="absolute top-0 left-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 50%)' }} />
@@ -771,85 +771,87 @@ export default function HomePage() {
               
               <div className="relative z-10">
                 {/* Game Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <span className="text-4xl">⚔️</span>
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 md:mb-6">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <span className="text-3xl sm:text-4xl">⚔️</span>
                     <div>
-                      <h3 className="text-white font-bold text-xl">WP vs Next.js Speed Challenge</h3>
-                      <p className="text-slate-400 text-sm">Click the buttons to race the conversion!</p>
+                      <h3 className="text-white font-bold text-base sm:text-xl">WP vs Next.js Speed Challenge</h3>
+                      <p className="text-slate-400 text-xs sm:text-sm">Click the buttons to race!</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="text-right hidden sm:block">
                       <p className="text-xs text-slate-400">🏆 Highest Clicks</p>
                       <p className="text-white font-bold text-lg">{highestClicks}</p>
                     </div>
                     <Button 
                       onClick={startGame}
-                      className="bg-gradient-to-r from-purple-600 to-violet-600 text-white font-bold"
+                      className="bg-gradient-to-r from-purple-600 to-violet-600 text-white font-bold text-xs sm:text-sm px-3 sm:px-4 py-2"
                     >
-                      {isGameStarted ? 'Restart Race' : 'Start Race'}
+                      {isGameStarted ? 'Restart' : 'Start Race'}
                     </Button>
                   </div>
                 </div>
 
                 {/* Game Arena */}
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   {/* WordPress Lane */}
-                  <div className="bg-slate-800/50 rounded-2xl p-4 border border-slate-700">
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="text-3xl">📝</span>
-                      <span className="text-white font-bold">WordPress</span>
+                  <div className="bg-slate-800/50 rounded-xl md:rounded-2xl p-4 border border-slate-700">
+                    <div className="flex items-center gap-2 mb-3 md:mb-4">
+                      <span className="text-2xl md:text-3xl">📝</span>
+                      <span className="text-white font-bold text-sm md:text-base">WordPress</span>
                     </div>
-                    <div className="relative h-32 bg-slate-700 rounded-xl overflow-hidden">
+                    <div className="relative h-24 md:h-32 bg-slate-700 rounded-xl overflow-hidden">
                       <motion.div 
                         className="absolute bottom-0 left-0 h-full bg-gradient-to-r from-yellow-500 to-orange-500"
                         animate={{ width: isGameStarted ? `${gameScore}%` : '20%' }}
                         transition={{ duration: 0.5 }}
                       />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-white font-bold text-2xl">{isGameStarted ? gameScore : 20}%</span>
+                        <span className="text-white font-bold text-xl md:text-2xl">{isGameStarted ? gameScore : 20}%</span>
                       </div>
                     </div>
-                    <p className="text-slate-400 text-xs mt-2">Loading: 3.2s | PageSpeed: 52</p>
+                    <p className="text-slate-400 text-xs mt-2 hidden md:block">Loading: 3.2s | PageSpeed: 52</p>
+                    <p className="text-slate-400 text-xs mt-2 md:hidden">3.2s | 52</p>
                   </div>
 
                   {/* Next.js Lane */}
-                  <div className="bg-slate-800/50 rounded-2xl p-4 border border-slate-700">
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="text-3xl">🚀</span>
-                      <span className="text-white font-bold">Next.js</span>
+                  <div className="bg-slate-800/50 rounded-xl md:rounded-2xl p-4 border border-slate-700">
+                    <div className="flex items-center gap-2 mb-3 md:mb-4">
+                      <span className="text-2xl md:text-3xl">🚀</span>
+                      <span className="text-white font-bold text-sm md:text-base">Next.js</span>
                     </div>
-                    <div className="relative h-32 bg-slate-700 rounded-xl overflow-hidden">
+                    <div className="relative h-24 md:h-32 bg-slate-700 rounded-xl overflow-hidden">
                       <motion.div 
                         className="absolute bottom-0 left-0 h-full bg-gradient-to-r from-green-500 to-emerald-500"
                         animate={{ width: isGameStarted ? `${gameScore + 20}%` : '20%' }}
                         transition={{ duration: 0.3 }}
                       />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-white font-bold text-2xl">{isGameStarted ? Math.min(gameScore + 20, 100) : 20}%</span>
+                        <span className="text-white font-bold text-xl md:text-2xl">{isGameStarted ? Math.min(gameScore + 20, 100) : 20}%</span>
                       </div>
                     </div>
-                    <p className="text-slate-400 text-xs mt-2">Loading: 180ms | PageSpeed: 98</p>
+                    <p className="text-slate-400 text-xs mt-2 hidden md:block">Loading: 180ms | PageSpeed: 98</p>
+                    <p className="text-slate-400 text-xs mt-2 md:hidden">180ms | 98</p>
                   </div>
                 </div>
 
                 {/* Game Controls */}
-                <div className="mt-6">
-                  <p className="text-slate-400 text-sm mb-3 text-center">Click rapidly to power the Next.js conversion!</p>
+                <div className="mt-4 md:mt-6">
+                  <p className="text-slate-400 text-xs sm:text-sm mb-3 text-center">Click rapidly to power the Next.js conversion!</p>
                   <div className="flex justify-center gap-3">
                     {isGameStarted ? (
                       <motion.button
-                        whileTap={{ scale: 0.9 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={playGame}
-                        className="px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-green-500/30 text-lg"
+                        className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-green-500/30 text-base sm:text-lg"
                       >
-                        ⚡ Click to Boost ({clicks} clicks)
+                        ⚡ Click ({clicks})
                       </motion.button>
                     ) : (
-                      <div className="text-center">
-                        <Terminal className="w-10 h-10 text-purple-500 mx-auto mb-2" />
-                        <p className="text-slate-400">Click "Start Race" to begin!</p>
+                      <div className="text-center p-4">
+                        <Terminal className="w-8 h-8 sm:w-10 sm:h-10 text-purple-500 mx-auto mb-2" />
+                        <p className="text-slate-400 text-xs sm:text-sm">Click "Start Race" to begin!</p>
                       </div>
                     )}
                   </div>
