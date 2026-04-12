@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import prisma from '@/lib/prisma'
 
-async function createNotification(userId: string, type: string, title: string, message: string, link?: string) {
+async function createUserNotification(userId: string, type: string, title: string, message: string, link?: string) {
   try {
     await prisma.notification.create({
       data: { userId, type, title, message, link }
@@ -342,6 +342,3 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: 'Failed to update' }, { status: 500 })
   }
 }
-
-export { createNotification }
-export { createNotification as POST }
