@@ -430,13 +430,13 @@ export default function AdminInvoicesPage() {
             <div class="amount-item">
               <span class="amount-item-label">Advance (${advancePercent}%)</span>
               <span class="amount-item-value ${invoice.advancePaid ? 'paid' : 'pending'}">
-                $${invoice.advanceAmount.toLocaleString()} ${invoice.advancePaid ? '✓' : ''}
+                $${(invoice.advanceAmount / 100).toLocaleString()} ${invoice.advancePaid ? '✓' : ''}
               </span>
             </div>
             <div class="amount-item">
               <span class="amount-item-label">Remaining (${remainingPercent}%)</span>
               <span class="amount-item-value ${invoice.remainingPaid ? 'paid' : 'pending'}">
-                $${invoice.remainingAmount.toLocaleString()} ${invoice.remainingPaid ? '✓' : '(Due)'}
+                $${(invoice.remainingAmount / 100).toLocaleString()} ${invoice.remainingPaid ? '✓' : '(Due)'}
               </span>
             </div>
           </div>
@@ -599,7 +599,7 @@ export default function AdminInvoicesPage() {
               <div>
                 <p className="text-sm text-slate-500">Total Revenue</p>
                 <p className="text-2xl font-bold text-slate-900">
-                  ${invoices.reduce((acc, i) => acc + (i.advancePaid ? i.advanceAmount : 0) + (i.remainingPaid ? i.remainingAmount : 0), 0).toLocaleString()}
+                  ${invoices.reduce((acc, i) => acc + (i.advancePaid ? i.advanceAmount : 0) + (i.remainingPaid ? i.remainingAmount : 0), 0).toLocaleString() / 100}
                 </p>
               </div>
             </div>
@@ -670,7 +670,7 @@ export default function AdminInvoicesPage() {
                         <td className="p-4">
                           <div className="flex items-center gap-2">
                             <span className={`text-sm font-medium ${invoice.advancePaid ? "text-green-600" : "text-yellow-600"}`}>
-                              ${invoice.advanceAmount.toLocaleString()}
+                              ${(invoice.advanceAmount / 100).toLocaleString()}
                             </span>
                             {invoice.advancePaid ? (
                               <CheckCircle className="h-4 w-4 text-green-600" />
@@ -684,7 +684,7 @@ export default function AdminInvoicesPage() {
                         <td className="p-4">
                           <div className="flex items-center gap-2">
                             <span className={`text-sm font-medium ${invoice.remainingPaid ? "text-green-600" : "text-slate-500"}`}>
-                              ${invoice.remainingAmount.toLocaleString()}
+                              ${(invoice.remainingAmount / 100).toLocaleString()}
                             </span>
                             {invoice.remainingPaid ? (
                               <CheckCircle className="h-4 w-4 text-green-600" />
@@ -800,7 +800,7 @@ export default function AdminInvoicesPage() {
                     </p>
                     {selectedInvoice.advanceAmount > 0 && (
                       <p className="text-sm text-slate-700 mt-1">
-                        Advance: ${selectedInvoice.advanceAmount.toLocaleString()} | Remaining: ${selectedInvoice.remainingAmount.toLocaleString()}
+                        Advance: ${(selectedInvoice.advanceAmount / 100).toLocaleString()} | Remaining: ${(selectedInvoice.remainingAmount / 100).toLocaleString()}
                       </p>
                     )}
                   </div>
@@ -858,7 +858,7 @@ export default function AdminInvoicesPage() {
                       <span className={`font-bold px-3 py-1 rounded-full text-sm ${
                         selectedInvoice.advancePaid ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
                       }`}>
-                        ${selectedInvoice.advanceAmount.toLocaleString()}
+                        ${(selectedInvoice.advanceAmount / 100).toLocaleString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
@@ -892,7 +892,7 @@ export default function AdminInvoicesPage() {
                       <span className={`font-bold px-3 py-1 rounded-full text-sm ${
                         selectedInvoice.remainingPaid ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"
                       }`}>
-                        ${selectedInvoice.remainingAmount.toLocaleString()}
+                        ${(selectedInvoice.remainingAmount / 100).toLocaleString()}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">

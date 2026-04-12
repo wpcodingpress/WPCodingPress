@@ -901,12 +901,12 @@ export default function AdminCustomOrdersPage() {
                         </div>
                       </td>
                       <td className="p-4 text-slate-900 font-medium">
-                        ${(order.totalAmount / 100).toLocaleString()}
+                        ${order.totalAmount.toLocaleString()}
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
                           <span className={`text-sm font-medium ${order.advancePaid ? "text-green-600" : "text-yellow-600"}`}>
-                            ${order.advanceAmount}
+                            ${(order.advanceAmount / 100).toLocaleString()}
                           </span>
                           {order.advancePaid ? (
                             <CheckCircle className="h-4 w-4 text-green-600" />
@@ -1142,7 +1142,7 @@ export default function AdminCustomOrdersPage() {
                   <div>
                     <p className="text-sm text-slate-600">Remaining Amount</p>
                     <p className="text-2xl font-bold text-slate-900">
-                      ${(formData.totalAmount - (formData.advanceAmount || 0)).toLocaleString()}
+                      ${(formData.totalAmount - (formData.advanceAmount || 0))}
                     </p>
                   </div>
                   {formData.advanceAmount > 0 ? (
@@ -1260,7 +1260,7 @@ export default function AdminCustomOrdersPage() {
                       }
                     </p>
                     <p className="text-base font-semibold text-slate-800 mt-2">
-                      Total Project Cost: <span className="font-bold text-xl">${(selectedOrder.totalAmount / 100).toLocaleString()}</span>
+                      Total Project Cost: <span className="font-bold text-xl">${selectedOrder.totalAmount.toLocaleString()}</span>
                     </p>
                     {selectedOrder.advanceAmount > 0 && (
                       <p className="text-sm text-slate-700 mt-1">

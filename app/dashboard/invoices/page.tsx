@@ -372,13 +372,13 @@ export default function ClientInvoicesPage() {
             <div class="amount-item">
               <span class="amount-item-label">Advance (${advancePercent}%)</span>
               <span class="amount-item-value ${invoice.advancePaid ? 'paid' : 'pending'}">
-                $${invoice.advanceAmount.toLocaleString()} ${invoice.advancePaid ? '✓' : ''}
+                $${(invoice.advanceAmount / 100).toLocaleString()} ${invoice.advancePaid ? '✓' : ''}
               </span>
             </div>
             <div class="amount-item">
               <span class="amount-item-label">Remaining (${remainingPercent}%)</span>
               <span class="amount-item-value ${invoice.remainingPaid ? 'paid' : 'pending'}">
-                $${invoice.remainingAmount.toLocaleString()} ${invoice.remainingPaid ? '✓' : '(Due)'}
+                $${(invoice.remainingAmount / 100).toLocaleString()} ${invoice.remainingPaid ? '✓' : '(Due)'}
               </span>
             </div>
           </div>
@@ -664,13 +664,13 @@ export default function ClientInvoicesPage() {
                   <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
                     <span className="text-gray-600">Advance Paid</span>
                     <span className={`font-medium ${selectedInvoice.advancePaid ? "text-green-600" : "text-gray-400"}`}>
-                      {selectedInvoice.advancePaid ? `$${selectedInvoice.advanceAmount} ✓` : `$${selectedInvoice.advanceAmount}`}
+                      {selectedInvoice.advancePaid ? `$${(selectedInvoice.advanceAmount / 100).toLocaleString()} ✓` : `$${(selectedInvoice.advanceAmount / 100).toLocaleString()}`}
                     </span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                     <span className="text-gray-600">Remaining</span>
                     <span className={`font-medium ${selectedInvoice.remainingPaid ? "text-green-600" : "text-amber-600"}`}>
-                      {selectedInvoice.remainingPaid ? `$${selectedInvoice.remainingAmount} ✓` : `$${selectedInvoice.remainingAmount}`}
+                      {selectedInvoice.remainingPaid ? `$${(selectedInvoice.remainingAmount / 100).toLocaleString()} ✓` : `$${(selectedInvoice.remainingAmount / 100).toLocaleString()}`}
                     </span>
                   </div>
                 </div>
