@@ -91,7 +91,7 @@ export async function PUT(request: Request) {
 
       return NextResponse.json({ 
         success: true, 
-        message: `Subscription ${TESTING_MODE ? '(TESTING_MODE) ' : ''}updated for user` 
+        message: 'Subscription updated for user' 
       })
     }
 
