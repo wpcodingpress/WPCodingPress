@@ -251,3 +251,13 @@ model RoleAuditLog {
   changedBy    String
   changedAt   DateTime @default(now())
 }
+
+model UserSession {
+  id          String   @id @default(cuid())
+  userId      String
+  sessionToken String @unique
+  expiresAt   DateTime
+  ipAddress   String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+}

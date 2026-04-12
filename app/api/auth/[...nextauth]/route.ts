@@ -90,7 +90,20 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user, account }) {
       if (user) {
-        token.role = user.role
+        // Get actual role from database
+        let actualRole = 'user'
+        if (account?.provider === 'admin') {
+          actualRole = 'admin'
+        } else if (user.id) {
+          try {
+            const dbUser = await prisma.user.findUnique({
+              where: { id: user.id },
+              select: { role: true }
+            })
+            if (dbUser) actualRole = dbUser.role
+          } catch (e) { /* ignore */ }
+        }
+        token.role = actualRole
         token.id = user.id
         token.provider = account?.provider || 'credentials'
       }

@@ -46,19 +46,11 @@ export default function LoginPage() {
       const userData = await userRes.json()
       const role = userData?.user?.role || 'user'
 
-      // Route based on role
-      switch (role) {
-        case 'admin':
-          router.push('/admin')
-          break
-        case 'manager':
-          router.push('/dashboard')
-          break
-        case 'editor':
-          router.push('/dashboard')
-          break
-        default:
-          router.push('/dashboard')
+      // Route based on role - admin goes to admin panel
+      if (role === 'admin') {
+        router.push('/admin')
+      } else {
+        router.push('/dashboard')
       }
     } catch (err: any) {
       setError(err.message || "Invalid email or password");

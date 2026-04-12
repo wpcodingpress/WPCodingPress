@@ -74,7 +74,7 @@ export async function PUT(request: Request) {
             changedBy: 'admin'
           }
         })
-        return NextResponse.json({ success: true, message: 'Role updated', user: updatedAdmin })
+        return NextResponse.json({ success: true, message: 'Role updated', user: updatedAdmin, sessionsInvalidated: false })
       }
 
       const updatedUser = await prisma.user.update({
@@ -91,7 +91,9 @@ export async function PUT(request: Request) {
           changedBy: 'admin'
         }
       })
-      return NextResponse.json({ success: true, message: 'Role updated', user: updatedUser })
+      // Invalidate all user sessions (logout from all devices)
+      await prisma.userSession.deleteMany({ where: { userId: userId } })
+      return NextResponse.json({ success: true, message: 'Role updated', user: updatedUser, sessionsInvalidated: true })
     }
 
     if (action === 'update_profile') {

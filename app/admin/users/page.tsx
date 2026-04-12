@@ -120,8 +120,13 @@ export default function AdminUsersPage() {
       })
       const data = await res.json()
       if (res.ok) {
-        setSuccess(`Role changed from ${roleChangeUser.role} to ${newRole}`)
-        setTimeout(() => setSuccess(""), 3000)
+        // Show appropriate success message
+        if (data.sessionsInvalidated) {
+          setSuccess(`Role changed from ${roleChangeUser.role} to ${newRole}. User logged out from all devices.`)
+        } else {
+          setSuccess(`Role changed from ${roleChangeUser.role} to ${newRole}`)
+        }
+        setTimeout(() => setSuccess(""), 5000)
         loadUsers()
       } else {
         setError(data.error || "Failed to update role")
