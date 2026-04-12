@@ -3,14 +3,17 @@ import prisma from '@/lib/prisma'
 
 export async function GET() {
   try {
-    console.log('Fetching users...')
     const users = await prisma.user.findMany({
-      include: {
-        subscriptions: true
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        createdAt: true
       },
       orderBy: { createdAt: 'desc' }
     })
-    console.log('Users found:', users.length)
 
     return NextResponse.json(users)
   } catch (error) {
