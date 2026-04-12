@@ -3,15 +3,28 @@ import prisma from '@/lib/prisma'
 
 export async function GET() {
   try {
-    console.log("API: Starting...")
-    const users = await prisma.user.findMany({
-      where: {},
-      orderBy: { createdAt: 'desc' }
-    })
-    console.log("API: Found", users.length, "users")
-    return NextResponse.json(users)
+    const [users, adminUsers] = await Promise.all([
+      prisma.user.findMany({ orderBy: { createdAt: 'desc' } }),
+      prisma.adminUser.findMany({ orderBy: { createdAt: 'desc' } })
+    ])
+
+    // Convert adminUsers to same format as users
+    const adminAsUsers = adminUsers.map(admin => ({
+      id: admin.id,
+      name: admin.name,
+      email: admin.email,
+      phone: null,
+      company: null,
+      role: admin.role || 'admin',
+      isActive: true,
+      createdAt: admin.createdAt,
+      isAdminUser: true
+    }))
+
+    const allUsers = [...adminAsUsers, ...users]
+    return NextResponse.json(allUsers)
   } catch (err: any) {
-    console.error("API Error:", err.message, err.stack)
+    console.error("API Error:", err.message)
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
