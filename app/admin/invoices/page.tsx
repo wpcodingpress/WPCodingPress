@@ -178,70 +178,63 @@ export default function AdminInvoicesPage() {
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 0; background: #f8fafc; }
     .invoice { max-width: 800px; margin: 0 auto; background: white; }
     .header { 
-      background: linear(135deg, #581c87 0%, #7c3aed 50%, #9333ea 100%); 
-      padding: 40px 50px; 
-      color: white; 
+      background: #ffffff; 
+      padding: 30px 40px; 
+      border-bottom: 4px solid #7c3aed;
       position: relative;
-      overflow: hidden;
     }
-    .header::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -20%;
-      width: 400px;
-      height: 400px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 50%;
+    .header-content { display: flex; justify-content: space-between; align-items: flex-start; }
+    .logo-section { display: flex; align-items: center; gap: 15px; }
+    .logo-icon { 
+      width: 60px; 
+      height: 60px; 
+      background: linear-gradient(135deg, #7c3aed 0%, #581c87 100%); 
+      border-radius: 12px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      font-size: 28px;
+      color: white;
+      font-weight: bold;
     }
-    .header::after {
-      content: '';
-      position: absolute;
-      bottom: -30%;
-      left: -10%;
-      width: 300px;
-      height: 300px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 50%;
-    }
-    .header-content { position: relative; z-index: 1; }
-    .header h1 { 
-      font-size: 32px; 
+    .header-text h1 { 
+      font-size: 26px; 
       font-weight: 800; 
       letter-spacing: -0.5px; 
-      margin-bottom: 8px; 
-      color: #ffffff;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.3);
+      color: #1e293b;
+      margin: 0;
+      line-height: 1.1;
     }
-    .header .subtitle { 
-      font-size: 14px; 
-      opacity: 1; 
+    .header-text .subtitle { 
+      font-size: 13px; 
       font-weight: 500;
-      color: #ffffff;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      color: #64748b;
+      margin-top: 4px;
     }
-    .invoice-info { 
+    .header-right { text-align: right; }
+    .invoice-badge {
+      background: ${isPaid ? '#10b981' : isPartial ? '#f59e0b' : '#ef4444'};
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: white;
+    }
+    .invoice-info-row { 
       display: flex; 
       justify-content: space-between; 
       align-items: flex-start;
-      margin-top: 30px;
-    }
-    .invoice-badge {
-      background: ${isPaid ? '#10b981' : isPartial ? '#f59e0b' : '#ef4444'};
-      padding: 8px 20px;
-      border-radius: 20px;
-      font-weight: 600;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
     }
     .invoice-number {
-      background: rgba(255,255,255,0.2);
-      padding: 10px 20px;
-      border-radius: 8px;
+      text-align: left;
     }
-    .invoice-number span { font-size: 12px; opacity: 0.8; display: block; }
-    .invoice-number strong { font-size: 18px; display: block; margin-top: 2px; }
+    .invoice-number span { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; display: block; }
+    .invoice-number strong { font-size: 18px; color: #1e293b; display: block; margin-top: 2px; font-weight: 700; }
     
     .content { padding: 40px 50px; }
     
@@ -369,17 +362,23 @@ export default function AdminInvoicesPage() {
   <div class="invoice">
     <div class="header">
       <div class="header-content">
-        <h1>⚡ WPCodingPress</h1>
-        <p class="subtitle">Professional Web Development & Digital Solutions</p>
-        
-        <div class="invoice-info">
-          <div class="invoice-number">
-            <span>Invoice Number</span>
-            <strong>#${invoice.id.slice(0, 8).toUpperCase()}</strong>
+        <div class="logo-section">
+          <div class="logo-icon">W</div>
+          <div class="header-text">
+            <h1>WPCodingPress</h1>
+            <p class="subtitle">Professional Web Development & Digital Solutions</p>
           </div>
+        </div>
+        <div class="header-right">
           <div class="invoice-badge">
-            ${isPaid ? '✓ PAID' : isPartial ? '⚠ PARTIAL' : '✕ UNPAID'}
+            ${isPaid ? 'PAID' : isPartial ? 'PARTIAL' : 'UNPAID'}
           </div>
+        </div>
+      </div>
+      <div class="invoice-info-row">
+        <div class="invoice-number">
+          <span>Invoice Number</span>
+          <strong>#${invoice.id.slice(0, 8).toUpperCase()}</strong>
         </div>
       </div>
     </div>
