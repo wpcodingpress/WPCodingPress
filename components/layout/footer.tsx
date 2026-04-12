@@ -88,7 +88,7 @@ export function Footer() {
             <h3 className="font-semibold text-slate-900 mb-4">Services</h3>
             <ul className="space-y-3">
               {services.length > 0 ? services.map((link) => (
-                <li key={link.href}>
+<li key={link.href}>
                   <Link 
                     href={link.href}
                     className="text-sm text-slate-600 hover:text-purple-600 transition-colors flex items-center gap-2"
@@ -97,29 +97,7 @@ export function Footer() {
                     {link.label}
                   </Link>
                 </li>
-              )) : (
-                <li className="text-sm text-slate-400">Loading...</li>
-              )}
               ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-slate-900 mb-4">Products</h3>
-            <ul className="space-y-3">
-              {products.length > 0 ? products.map((link) => (
-                <li key={link.href}>
-                  <Link 
-                    href={link.href}
-                    className="text-sm text-slate-600 hover:text-purple-600 transition-colors flex items-center gap-2"
-                  >
-                    <ArrowRight className="h-3 w-3" />
-                    {link.label}
-                  </Link>
-                </li>
-              )) : (
-                <li className="text-sm text-slate-400">Loading...</li>
-              )}
             </ul>
           </div>
 
