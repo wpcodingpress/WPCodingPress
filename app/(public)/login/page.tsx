@@ -31,27 +31,18 @@ export default function LoginPage() {
       const result = await signIn("client", {
         email,
         password,
-        redirect: false,
+        redirect: true,
+        callbackUrl: '/dashboard'
       });
 
+      // If error before redirect
       if (result?.error) {
         if (result.error === "CredentialsSignin") {
           throw new Error("Invalid email or password");
         }
         throw new Error(result.error);
       }
-
-      // Get user role from API and route accordingly
-      const userRes = await fetch('/api/auth/me')
-      const userData = await userRes.json()
-      const role = userData?.user?.role || 'user'
-
-      // Route based on role - admin goes to admin panel
-      if (role === 'admin') {
-        router.push('/admin')
-      } else {
-        router.push('/dashboard')
-      }
+      // signIn with redirect: true handles the redirect automatically
     } catch (err: any) {
       setError(err.message || "Invalid email or password");
     } finally {
