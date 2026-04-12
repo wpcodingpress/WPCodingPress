@@ -1,5 +1,10 @@
 "use client"
 
+const formatPrice = (cents: number | undefined) => {
+  if (!cents) return "$0"
+  return cents > 10000 ? `$${(cents / 100).toLocaleString()}` : `$${cents}`
+}
+
 import { useEffect, useState, useRef } from "react"
 import { Plus, Eye, Trash2, Send, FileText, DollarSign, CheckCircle, Clock, XCircle, Copy, Mail, Printer, Edit2, Download } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -901,12 +906,12 @@ export default function AdminCustomOrdersPage() {
                         </div>
                       </td>
                       <td className="p-4 text-slate-900 font-medium">
-                        ${order.totalAmount.toLocaleString()}
+                        {formatPrice(order.totalAmount)}
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
                           <span className={`text-sm font-medium ${order.advancePaid ? "text-green-600" : "text-yellow-600"}`}>
-                            ${(order.advanceAmount / 100).toLocaleString()}
+                            {formatPrice(order.advanceAmount)}
                           </span>
                           {order.advancePaid ? (
                             <CheckCircle className="h-4 w-4 text-green-600" />
@@ -1260,7 +1265,7 @@ export default function AdminCustomOrdersPage() {
                       }
                     </p>
                     <p className="text-base font-semibold text-slate-800 mt-2">
-                      Total Project Cost: <span className="font-bold text-xl">${selectedOrder.totalAmount.toLocaleString()}</span>
+                      Total Project Cost: <span className="font-bold text-xl">{formatPrice(selectedOrder.totalAmount)}</span>
                     </p>
                     {selectedOrder.advanceAmount > 0 && (
                       <p className="text-sm text-slate-700 mt-1">
