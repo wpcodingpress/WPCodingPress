@@ -271,8 +271,8 @@ export default function AdminProfilePage() {
                 <p className="text-sm text-slate-500">Get notified when new orders are placed</p>
               </div>
               <button onClick={() => setNotifOrders(!notifOrders)} 
-                className={`w-12 h-6 rounded-full transition-colors relative ${notifOrders ? "bg-violet-600" : "bg-slate-300"}`}>
-                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${notifOrders ? "translate-x-7" : "translate-x-1"}`} />
+                className={"w-12 h-6 rounded-full transition-colors relative " + (notifOrders ? "bg-violet-600" : "bg-slate-300")}>
+                <div className={"absolute top-1 w-4 h-4 bg-white rounded-full transition-transform " + (notifOrders ? "translate-x-7" : "translate-x-1")} />
               </button>
             </label>
             <label className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
@@ -281,8 +281,8 @@ export default function AdminProfilePage() {
                 <p className="text-sm text-slate-500">Get notified when someone subscribes</p>
               </div>
               <button onClick={() => setNotifSubscribers(!notifSubscribers)} 
-                className={`w-12 h-6 rounded-full transition-colors relative ${notifSubscribers ? "bg-violet-600" : "bg-slate-300"}`}>
-                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${notifSubscribers ? "translate-x-7" : "translate-x-1"}} />
+                className={"w-12 h-6 rounded-full transition-colors relative " + (notifSubscribers ? "bg-violet-600" : "bg-slate-300")}>
+                <div className={"absolute top-1 w-4 h-4 bg-white rounded-full transition-transform " + (notifSubscribers ? "translate-x-7" : "translate-x-1")} />
               </button>
             </label>
             <label className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
@@ -291,8 +291,8 @@ export default function AdminProfilePage() {
                 <p className="text-sm text-slate-500">Get notified when someone contacts you</p>
               </div>
               <button onClick={() => setNotifContact(!notifContact)} 
-                className={`w-12 h-6 rounded-full transition-colors relative ${notifContact ? "bg-violet-600" : "bg-slate-300"}`}>
-                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${notifContact ? "translate-x-7" : "translate-x-1"}`} />
+                className={"w-12 h-6 rounded-full transition-colors relative " + (notifContact ? "bg-violet-600" : "bg-slate-300")}>
+                <div className={"absolute top-1 w-4 h-4 bg-white rounded-full transition-transform " + (notifContact ? "translate-x-7" : "translate-x-1")} />
               </button>
             </label>
             <div className="flex justify-end pt-2">
