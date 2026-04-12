@@ -149,7 +149,7 @@ export default function DashboardOverview() {
                   </Button>
                 </Link>
                 <Link href="/order?service=wordpress-development">
-                  <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 font-semibold px-6">
+                  <Button variant="outline" className="border-white bg-white/10 text-white hover:bg-white/20 font-semibold px-6 backdrop-blur-sm">
                     Browse Services
                   </Button>
                 </Link>
