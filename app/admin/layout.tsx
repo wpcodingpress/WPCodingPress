@@ -29,6 +29,12 @@ import {
   Search,
   ArrowRight,
   FileText,
+  Camera,
+  Edit3,
+  Trash2,
+  Play,
+  Pause,
+  MoreVertical
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
@@ -39,7 +45,6 @@ interface NavItem {
   href: string
   icon: React.ElementType
   label: string
-  badge?: number
 }
 
 interface Notification {
@@ -73,8 +78,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname()
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [showSearchResults, setShowSearchResults] = useState(false)
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -101,11 +108,40 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   }, [session])
 
-  const unreadCount = notifications.filter(n => !n.isRead).length
-
-  const markAllRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query)
+    if (query.length > 1) {
+      setShowSearchResults(true)
+      // Search through orders, users, subscribers
+      try {
+        const [ordersRes, usersRes] = await Promise.all([
+          fetch(`/api/orders?search=${query}`).catch(() => ({ ok: false })),
+          fetch(`/api/admin/users?search=${query}`).catch(() => ({ ok: false }))
+        ])
+        const results: any[] = []
+        if (ordersRes.ok) {
+          const orders = await ordersRes.json()
+          orders.slice(0, 3).forEach((o: any) => results.push({ type: 'order', title: o.clientName, sub: o.status, link: '/admin/orders' }))
+        }
+        if (usersRes.ok) {
+          const users = await usersRes.json()
+          users.slice(0, 3).forEach((u: any) => results.push({ type: 'user', title: u.name, sub: u.email, link: '/admin/users' }))
+        }
+        setSearchResults(results)
+      } catch { setSearchResults([]) }
+    } else {
+      setSearchResults([])
+    }
   }
+
+  const markAllRead = async () => {
+    try {
+      await fetch("/api/notifications", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "mark_all_read" }) })
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
+    } catch (e) { console.error(e) }
+  }
+
+  const unreadCount = notifications.filter(n => !n.isRead).length
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -142,9 +178,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   const isNavActive = (href: string) => {
-    if (href === "/admin") {
-      return pathname === "/admin" || pathname === "/admin/dashboard"
-    }
+    if (href === "/admin") return pathname === "/admin" || pathname === "/admin/dashboard"
     return pathname.startsWith(href)
   }
 
@@ -159,148 +193,58 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     )
   }
 
-  if (!session) {
-    return null
-  }
+  if (!session) return null
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50">
-      {/* Sidebar */}
-      <aside 
-        className={cn(
-          "fixed left-0 top-0 bottom-0 z-40 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800 border-r border-slate-700/50 shadow-2xl transition-all duration-300 flex flex-col",
-          sidebarCollapsed ? "w-20" : "w-64"
+      {/* Mobile Overlay */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
         )}
-      >
+      </AnimatePresence>
+
+      {/* Sidebar */}
+      <aside className={cn(
+        "fixed left-0 top-0 bottom-0 z-50 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800 border-r border-slate-700/50 shadow-2xl transition-transform duration-300 flex flex-col",
+        "w-64 lg:translate-x-0",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full lg:relative"
+      )}>
         {/* Logo */}
         <div className="p-4 border-b border-slate-700/50">
           <Link href="/" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/20 flex-shrink-0">
               <Zap className="h-5 w-5 text-white" />
             </div>
-            {!sidebarCollapsed && (
-              <div className="overflow-hidden">
-                <span className="text-lg font-bold text-white">WPCodingPress</span>
-                <p className="text-xs text-slate-400">Admin Panel</p>
-              </div>
-            )}
+            <div className="overflow-hidden">
+              <span className="text-lg font-bold text-white">WPCodingPress</span>
+              <p className="text-xs text-slate-400">Admin Panel</p>
+            </div>
           </Link>
         </div>
 
-        {/* Toggle Sidebar Button */}
-        <button
-          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="absolute -right-3 top-20 w-6 h-6 bg-violet-500 rounded-full flex items-center justify-center text-white shadow-lg hover:bg-violet-600 transition-colors z-50"
-        >
-          <ChevronDown className={cn("w-4 h-4 transition-transform", sidebarCollapsed ? "rotate-180" : "")} />
+        {/* Close Button (Mobile) */}
+        <button onClick={() => setSidebarOpen(false)} className="absolute top-4 right-4 p-1 lg:hidden text-slate-400 hover:text-white">
+          <X className="w-5 h-5" />
         </button>
-
-        {/* Notifications Button */}
-        <div className="p-4 border-b border-slate-700/50">
-          <button
-            onClick={() => setNotificationsOpen(!notificationsOpen)}
-            className={cn(
-              "w-full flex items-center justify-between px-3 py-3 rounded-xl transition-all relative group",
-              "bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50"
-            )}
-          >
-            <div className="flex items-center gap-3">
-              <Bell className="w-5 h-5 text-violet-400 flex-shrink-0" />
-              {!sidebarCollapsed && (
-                <>
-                  <span className="text-slate-200 font-medium">Notifications</span>
-                  {unreadCount > 0 && (
-                    <span className="ml-auto px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded-full">
-                      {unreadCount > 9 ? "9+" : unreadCount}
-                    </span>
-                  )}
-                </>
-              )}
-              {sidebarCollapsed && unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center font-bold">
-                  {unreadCount > 9 ? "9" : unreadCount}
-                </span>
-              )}
-            </div>
-          </button>
-
-          {/* Notifications Dropdown */}
-          <AnimatePresence>
-            {notificationsOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                className="absolute left-4 right-4 mt-2 w-[calc(100%-2rem)] bg-slate-800 border border-slate-700 rounded-xl shadow-2xl max-h-80 overflow-y-auto z-50"
-              >
-                <div className="sticky top-0 bg-slate-800 p-3 border-b border-slate-700 flex items-center justify-between">
-                  <span className="text-slate-200 font-medium text-sm">Recent Activity</span>
-                  {unreadCount > 0 && (
-                    <button onClick={markAllRead} className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1">
-                      <Check className="w-3 h-3" />
-                      Mark all read
-                    </button>
-                  )}
-                </div>
-                {notifications.length === 0 ? (
-                  <div className="p-6 text-center text-slate-500 text-sm">
-                    No new notifications
-                  </div>
-                ) : (
-                  <div className="divide-y divide-slate-700/50">
-                    {notifications.slice(0, 10).map((notif) => (
-                      <div
-                        key={notif.id}
-                        className={`p-3 hover:bg-slate-700/50 transition-colors ${!notif.isRead ? "bg-violet-500/10" : ""}`}
-                      >
-                        <div className="flex gap-3">
-                          <div className={`p-1.5 rounded-lg ${getNotificationColor(notif.type)}`}>
-                            {getNotificationIcon(notif.type)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm text-slate-200 font-medium truncate">{notif.title}</p>
-                            <p className="text-xs text-slate-400 truncate">{notif.message}</p>
-                            <p className="text-xs text-slate-500 mt-1">{formatTime(notif.createdAt)}</p>
-                          </div>
-                          {!notif.isRead && (
-                            <div className="w-2 h-2 rounded-full bg-violet-500 flex-shrink-0 mt-2" />
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = isNavActive(item.href)
             return (
-              <Link
-                key={item.href}
-                href={item.href}
+              <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)}
                 className={cn(
                   "flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all group",
-                  isActive 
-                    ? "bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg shadow-violet-500/20" 
-                    : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                  isActive ? "bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg shadow-violet-500/20" : "text-slate-400 hover:text-white hover:bg-slate-800/50"
                 )}
               >
                 <item.icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-white" : "text-slate-400 group-hover:text-white")} />
-                {!sidebarCollapsed && (
-                  <>
-                    {item.label}
-                    {item.badge && item.badge > 0 && (
-                      <span className="ml-auto px-2 py-0.5 text-xs font-medium bg-white/20 rounded-full">
-                        {item.badge}
-                      </span>
-                    )}
-                  </>
-                )}
+                <span className="truncate">{item.label}</span>
               </Link>
             )
           })}
@@ -308,70 +252,134 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* User Section */}
         <div className="p-4 border-t border-slate-700/50 bg-slate-900/50">
-          <Link href="/" className="flex items-center gap-2 mb-3 text-slate-400 hover:text-violet-400 transition-colors group">
+          <Link href="/admin/profile" className="flex items-center gap-2 mb-3 text-slate-400 hover:text-violet-400 transition-colors group">
             <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
-            {!sidebarCollapsed && <span className="text-sm">Back to Website</span>}
+            <span className="text-sm">Profile Settings</span>
           </Link>
-          <div className={cn("flex items-center gap-3 mb-3", sidebarCollapsed && "justify-center")}>
+          <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center text-white font-medium flex-shrink-0">
               {session.user?.name?.charAt(0) || "A"}
             </div>
-            {!sidebarCollapsed && (
-              <div className="overflow-hidden">
-                <p className="text-sm font-medium text-white truncate">{session.user?.name || "Admin"}</p>
-                <p className="text-xs text-slate-400 truncate">{session.user?.email}</p>
-              </div>
-            )}
+            <div className="overflow-hidden">
+              <p className="text-sm font-medium text-white truncate">{session.user?.name || "Admin"}</p>
+              <p className="text-xs text-slate-400 truncate">{session.user?.email}</p>
+            </div>
           </div>
-          <button
-            onClick={() => signOut({ callbackUrl: "/admin-login" })}
-            className={cn(
-              "flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors",
-              sidebarCollapsed && "justify-center"
-            )}
+          <button onClick={() => signOut({ callbackUrl: "/admin-login" })}
+            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
           >
             <LogOut className="h-4 w-4" />
-            {!sidebarCollapsed && "Sign Out"}
+            <span>Sign Out</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className={cn("min-h-screen transition-all duration-300", sidebarCollapsed ? "ml-20" : "ml-64")}>
+      <main className="min-h-screen lg:ml-0">
         {/* Top Header */}
         <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between px-6 py-4">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                className="p-2 rounded-xl hover:bg-slate-100 transition-colors text-slate-600"
-              >
+          <div className="flex items-center justify-between px-4 py-3">
+            {/* Mobile Menu Button */}
+            <div className="flex items-center gap-3">
+              <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-xl hover:bg-slate-100 transition-colors text-slate-600 lg:hidden">
                 <Menu className="w-5 h-5" />
               </button>
-              <div className="relative hidden md:block">
+              
+              {/* Search */}
+              <div className="relative w-full max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <Input
-                  placeholder="Search anything..."
+                  placeholder="Search orders, users..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-80 pl-10 bg-slate-50 border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-violet-500/20"
+                  onChange={(e) => handleSearch(e.target.value)}
+                  onFocus={() => searchQuery.length > 1 && setShowSearchResults(true)}
+                  onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
+                  className="w-full md:w-64 lg:w-80 pl-10 bg-slate-50 border-slate-200"
                 />
+                {/* Search Results */}
+                <AnimatePresence>
+                  {showSearchResults && searchResults.length > 0 && (
+                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-full mt-1 w-full bg-white rounded-lg shadow-xl border border-slate-200 overflow-hidden z-50">
+                      {searchResults.map((r, i) => (
+                        <Link key={i} href={r.link || '/admin'} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 border-b border-slate-100 last:border-0">
+                          {r.type === 'order' ? <ShoppingBag className="w-4 h-4 text-blue-500" /> : <User className="w-4 h-4 text-green-500" />}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-slate-900 truncate">{r.title}</p>
+                            <p className="text-xs text-slate-500 capitalize">{r.sub}</p>
+                          </div>
+                        </Link>
+                      ))}
+                      <Link href="/admin" className="block px-4 py-2 text-center text-sm text-violet-600 hover:bg-slate-50">
+                        View all results
+                      </Link>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="text-slate-600 hover:text-violet-600 hover:bg-violet-50">
-                <Bell className="w-5 h-5" />
-              </Button>
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center text-white font-medium cursor-pointer">
-                {session.user?.name?.charAt(0) || "A"}
+            {/* Right Side */}
+            <div className="flex items-center gap-2">
+              {/* Notifications */}
+              <div className="relative">
+                <Button variant="ghost" size="icon" onClick={() => setNotificationsOpen(!notificationsOpen)} className="text-slate-600 hover:text-violet-600 hover:bg-violet-50 relative">
+                  <Bell className="w-5 h-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                      {unreadCount > 9 ? "9" : unreadCount}
+                    </span>
+                  )}
+                </Button>
+
+                {/* Notifications Dropdown */}
+                <AnimatePresence>
+                  {notificationsOpen && (
+                    <motion.div initial={{ opacity: 0, y: -10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden z-50">
+                      <div className="sticky top-0 bg-white p-3 border-b border-slate-100 flex items-center justify-between">
+                        <span className="font-semibold text-slate-900">Notifications</span>
+                        {unreadCount > 0 && (
+                          <button onClick={markAllRead} className="text-xs text-violet-600 hover:text-violet-700 font-medium">Mark all read</button>
+                        )}
+                      </div>
+                      <div className="max-h-80 overflow-y-auto">
+                        {notifications.length === 0 ? (
+                          <div className="p-6 text-center text-slate-500 text-sm">No notifications</div>
+                        ) : (
+                          <div className="divide-y divide-slate-100">
+                            {notifications.slice(0, 10).map((notif) => (
+                              <Link key={notif.id} href={notif.link || '#'} onClick={() => setNotificationsOpen(false)}
+                                className={`flex gap-3 p-3 hover:bg-slate-50 ${!notif.isRead ? "bg-violet-50/50" : ""}`}>
+                                <div className={`p-1.5 rounded-lg ${getNotificationColor(notif.type)}`}>
+                                  {getNotificationIcon(notif.type)}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-slate-900 truncate">{notif.title}</p>
+                                  <p className="text-xs text-slate-500 truncate">{notif.message}</p>
+                                  <p className="text-xs text-slate-400 mt-1">{formatTime(notif.createdAt)}</p>
+                                </div>
+                                {!notif.isRead && <div className="w-2 h-2 rounded-full bg-violet-500 flex-shrink-0 mt-2" />}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
+
+              {/* Profile */}
+              <Link href="/admin/profile" className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center text-white font-medium hover:opacity-90 transition-opacity">
+                {session.user?.name?.charAt(0) || "A"}
+              </Link>
             </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <div className="p-6">
+        <div className="p-4 md:p-6">
           {children}
         </div>
       </main>
