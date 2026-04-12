@@ -81,20 +81,20 @@ export default function DashboardOverview() {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 rounded-2xl p-6 text-white cursor-pointer hover:shadow-xl transition-shadow"
+            className="bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white cursor-pointer hover:shadow-xl transition-shadow"
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-white/20">
-                  <Zap className="w-6 h-6" />
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/20 flex-shrink-0">
+                  <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <div>
-                  <p className="font-bold text-lg">Upgrade to Pro - $19/month</p>
-                  <p className="text-white/80 text-sm">Unlock 5 WordPress sites, custom domain, analytics & more</p>
+                <div className="min-w-0">
+                  <p className="font-bold text-sm sm:text-lg">Upgrade to Pro - $19/mo</p>
+                  <p className="text-white/80 text-xs sm:text-sm truncate">Unlock 5 WordPress sites, custom domain & more</p>
                 </div>
               </div>
-              <Button className="bg-white text-pink-600 hover:bg-pink-50 font-semibold">
-                Upgrade Now
+              <Button className="bg-white text-pink-600 hover:bg-pink-50 font-semibold text-xs sm:text-sm py-1.5 sm:py-2.5 px-3 sm:px-6 w-full sm:w-auto flex-shrink-0">
+                Upgrade
               </Button>
             </div>
           </motion.div>
@@ -107,20 +107,20 @@ export default function DashboardOverview() {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 rounded-2xl p-6 text-white cursor-pointer hover:shadow-xl transition-shadow"
+            className="bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white cursor-pointer hover:shadow-xl transition-shadow"
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-white/20">
-                  <Rocket className="w-6 h-6" />
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-white/20 flex-shrink-0">
+                  <Rocket className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <div>
-                  <p className="font-bold text-lg">Upgrade to Enterprise - $99/month</p>
-                  <p className="text-white/80 text-sm">Unlock unlimited conversions, dedicated support, white-label & custom integrations</p>
+                <div className="min-w-0">
+                  <p className="font-bold text-sm sm:text-lg">Upgrade to Enterprise - $99/mo</p>
+                  <p className="text-white/80 text-xs sm:text-sm truncate">Unlimited conversions, dedicated support</p>
                 </div>
               </div>
-              <Button className="bg-white text-purple-600 hover:bg-purple-50 font-semibold">
-                Upgrade Now
+              <Button className="bg-white text-purple-600 hover:bg-purple-50 font-semibold text-xs sm:text-sm py-1.5 sm:py-2.5 px-3 sm:px-6 w-full sm:w-auto flex-shrink-0">
+                Upgrade
               </Button>
             </div>
           </motion.div>

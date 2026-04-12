@@ -14,6 +14,16 @@ interface GumroadWebhookPayload {
   created_at: string;
 }
 
+async function createNotification(userId: string, type: string, title: string, message: string, link?: string) {
+  try {
+    await prisma.notification.create({
+      data: { userId, type, title, message, link }
+    })
+  } catch (error) {
+    console.error('Error creating notification:', error)
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.text();
@@ -36,6 +46,7 @@ export async function POST(request: Request) {
     
     const eventType = payload.product_name?.toLowerCase().includes('enterprise') ? 'enterprise' : 'pro';
     const isSubscription = payload.subscription_id && payload.subscription_unit;
+    const planName = eventType === 'enterprise' ? 'Enterprise' : 'Pro';
 
     let periodEnd = new Date();
     if (isSubscription) {
@@ -52,6 +63,7 @@ export async function POST(request: Request) {
       where: { email: payload.email },
     });
 
+    let isNewUser = false;
     if (!user) {
       user = await prisma.user.create({
         data: {
@@ -60,6 +72,7 @@ export async function POST(request: Request) {
           password: '',
         },
       });
+      isNewUser = true;
     }
 
     const existingSub = await prisma.subscription.findFirst({
@@ -67,16 +80,18 @@ export async function POST(request: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
+    let subscriptionUpdated = false;
     if (existingSub) {
       await prisma.subscription.update({
         where: { id: existingSub.id },
         data: {
-          status: isSubscription ? 'active' : 'active',
+          status: 'active',
           plan: eventType,
           lemonSubscriptionId: payload.subscription_id || payload.id,
           currentPeriodEnd: periodEnd,
         },
       });
+      subscriptionUpdated = true;
     } else {
       await prisma.subscription.create({
         data: {
@@ -89,6 +104,16 @@ export async function POST(request: Request) {
         },
       });
     }
+
+    await createNotification(
+      user.id,
+      'subscription',
+      isNewUser ? `Welcome to ${planName} Plan!` : `${planName} Plan Activated`,
+      isNewUser 
+        ? `Thank you for purchasing the ${planName} plan! Your account is now active.`
+        : `Your ${planName} plan subscription is now active. Your next billing date is ${periodEnd.toLocaleDateString()}.`,
+      '/dashboard/subscription'
+    );
 
     console.log(`Gumroad payment processed for ${payload.email}: ${eventType}`);
 

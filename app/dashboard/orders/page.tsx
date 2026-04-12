@@ -285,77 +285,77 @@ export default function OrdersPage() {
 
       {/* Order Detail Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl p-6 w-full max-w-lg"
+            className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-slate-900">Order Details</h2>
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900">Order Details</h2>
               <button 
                 onClick={() => setSelectedOrder(null)}
-                className="text-slate-400 hover:text-slate-600"
+                className="text-slate-400 hover:text-slate-600 text-xl sm:text-2xl leading-none"
               >
                 ✕
               </button>
             </div>
             
-            <div className="space-y-4">
-              <div className="flex justify-between py-3 border-b border-slate-100">
-                <span className="text-slate-500">Order ID</span>
-                <span className="text-slate-900 font-medium">#{selectedOrder.id.slice(-8).toUpperCase()}</span>
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex justify-between py-2 sm:py-3 border-b border-slate-100">
+                <span className="text-slate-500 text-sm">Order ID</span>
+                <span className="text-slate-900 font-medium text-sm">#{selectedOrder.id.slice(-8).toUpperCase()}</span>
               </div>
-              <div className="flex justify-between py-3 border-b border-slate-100">
-                <span className="text-slate-500">Type</span>
+              <div className="flex justify-between py-2 sm:py-3 border-b border-slate-100">
+                <span className="text-slate-500 text-sm">Type</span>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${selectedOrder.product ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
                   {selectedOrder.product ? 'Product' : 'Service'}
                 </span>
               </div>
-              <div className="flex justify-between py-3 border-b border-slate-100">
-                <span className="text-slate-500">Product/Service</span>
-                <span className="text-slate-900">{selectedOrder.product?.name || selectedOrder.service?.name || '-'}</span>
+              <div className="flex justify-between py-2 sm:py-3 border-b border-slate-100">
+                <span className="text-slate-500 text-sm">Product/Service</span>
+                <span className="text-slate-900 text-sm text-right max-w-[50%] truncate">{selectedOrder.product?.name || selectedOrder.service?.name || '-'}</span>
               </div>
-              <div className="flex justify-between py-3 border-b border-slate-100">
-                <span className="text-slate-500">Package</span>
-                <span className="text-slate-900 capitalize">{selectedOrder.packageType || 'Standard'}</span>
+              <div className="flex justify-between py-2 sm:py-3 border-b border-slate-100">
+                <span className="text-slate-500 text-sm">Package</span>
+                <span className="text-slate-900 capitalize text-sm">{selectedOrder.packageType || 'Standard'}</span>
               </div>
-              <div className="flex justify-between py-3 border-b border-slate-100">
-                <span className="text-slate-500">Amount</span>
+              <div className="flex justify-between py-2 sm:py-3 border-b border-slate-100">
+                <span className="text-slate-500 text-sm">Amount</span>
                 <span className="text-slate-900 font-bold">${selectedOrder.amount || 0}</span>
               </div>
-              <div className="flex justify-between py-3 border-b border-slate-100">
-                <span className="text-slate-500">Status</span>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(selectedOrder.status)}`}>
+              <div className="flex justify-between py-2 sm:py-3 border-b border-slate-100">
+                <span className="text-slate-500 text-sm">Status</span>
+                <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium ${getStatusColor(selectedOrder.status)}`}>
                   {selectedOrder.status}
                 </span>
               </div>
-              <div className="flex justify-between py-3 border-b border-slate-100">
-                <span className="text-slate-500">Payment</span>
-                <span className={`font-medium ${getPaymentColor(selectedOrder.paymentStatus)}`}>
+              <div className="flex justify-between py-2 sm:py-3 border-b border-slate-100">
+                <span className="text-slate-500 text-sm">Payment</span>
+                <span className={`font-medium text-sm ${getPaymentColor(selectedOrder.paymentStatus)}`}>
                   {selectedOrder.paymentStatus}
                 </span>
               </div>
-              <div className="flex justify-between py-3 border-b border-slate-100">
-                <span className="text-slate-500">Date</span>
-                <span className="text-slate-900">{new Date(selectedOrder.createdAt).toLocaleDateString()}</span>
+              <div className="flex justify-between py-2 sm:py-3 border-b border-slate-100">
+                <span className="text-slate-500 text-sm">Date</span>
+                <span className="text-slate-900 text-sm">{new Date(selectedOrder.createdAt).toLocaleDateString()}</span>
               </div>
 
               {/* Bank Transfer Details for Pro Products */}
               {selectedOrder.product && selectedOrder.planType === 'pro' && selectedOrder.status === 'in_progress' && bankDetails && (
-                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Building2 className="h-5 w-5 text-yellow-600" />
-                    <h4 className="font-semibold text-yellow-800">Bank Transfer Details</h4>
+                <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                    <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
+                    <h4 className="font-semibold text-yellow-800 text-sm sm:text-base">Bank Transfer Details</h4>
                   </div>
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
                     <div className="flex justify-between">
                       <span className="text-yellow-700">Bank Name:</span>
-                      <span className="text-yellow-900 font-medium">{bankDetails.bankName}</span>
+                      <span className="text-yellow-900 font-medium truncate max-w-[50%]">{bankDetails.bankName}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-yellow-700">Account Name:</span>
-                      <span className="text-yellow-900 font-medium">{bankDetails.accountName}</span>
+                      <span className="text-yellow-900 font-medium truncate max-w-[50%]">{bankDetails.accountName}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-yellow-700">Account Number:</span>
@@ -370,7 +370,7 @@ export default function OrdersPage() {
                     {bankDetails.iban && (
                       <div className="flex justify-between">
                         <span className="text-yellow-700">IBAN:</span>
-                        <span className="text-yellow-900 font-mono font-medium">{bankDetails.iban}</span>
+                        <span className="text-yellow-900 font-mono font-medium text-xs">{bankDetails.iban}</span>
                       </div>
                     )}
                     {bankDetails.country && (
@@ -380,12 +380,12 @@ export default function OrdersPage() {
                       </div>
                     )}
                     {bankDetails.instructions && (
-                      <div className="mt-3 pt-3 border-t border-yellow-200">
+                      <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-yellow-200">
                         <p className="text-yellow-700 text-xs">{bankDetails.instructions}</p>
                       </div>
                     )}
                   </div>
-                  <div className="mt-3 text-xs text-yellow-600 bg-yellow-100 p-2 rounded">
+                  <div className="mt-2 sm:mt-3 text-xs text-yellow-600 bg-yellow-100 p-2 rounded">
                     Please transfer ${selectedOrder.amount} to the account above. Once confirmed, you'll receive your download.
                   </div>
                 </div>
@@ -393,27 +393,27 @@ export default function OrdersPage() {
 
               {/* Payment Instructions for Pro orders not completed */}
               {selectedOrder.product && selectedOrder.planType === 'pro' && selectedOrder.status !== 'completed' && !bankDetails && (
-                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-yellow-800 text-sm">Please contact support for payment details.</p>
                 </div>
               )}
             </div>
 
-            <div className="mt-6 flex gap-3">
+            <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row gap-2 sm:gap-3">
               {selectedOrder.product && selectedOrder.status === 'completed' && (
                 <a href={selectedOrder.product.downloadUrl || '#'} target="_blank" rel="noopener noreferrer">
-                  <Button className="w-full">
-                    <Download className="mr-2 h-4 w-4" />
+                  <Button className="w-full text-sm sm:text-base py-2">
+                    <Download className="mr-1.5 sm:mr-2 h-4 w-4" />
                     Download
                   </Button>
                 </a>
               )}
               {selectedOrder.product && selectedOrder.planType === 'pro' && selectedOrder.status === 'in_progress' && (
-                <div className="w-full text-center p-3 bg-yellow-50 text-yellow-700 rounded-lg text-sm">
+                <div className="w-full text-center p-2 sm:p-3 bg-yellow-50 text-yellow-700 rounded-lg text-xs sm:text-sm">
                   Waiting for payment confirmation
                 </div>
               )}
-              <Button variant="outline" onClick={() => setSelectedOrder(null)} className="flex-1">
+              <Button variant="outline" onClick={() => setSelectedOrder(null)} className="flex-1 text-sm sm:text-base py-2">
                 Close
               </Button>
             </div>
