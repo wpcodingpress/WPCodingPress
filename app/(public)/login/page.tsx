@@ -42,13 +42,17 @@ export default function LoginPage() {
         throw new Error(result.error);
       }
 
-      // Wait for session to establish
-      await new Promise(resolve => setTimeout(resolve, 500))
-
-      // Get user role and route accordingly
-      const userRes = await fetch('/api/auth/me')
+      // Fetch user role from database directly
+      const userRes = await fetch(`/api/admin/users?email=${encodeURIComponent(email)}`)
       const userData = await userRes.json()
-      const role = userData?.user?.role || 'user'
+      
+      let role = 'user'
+      if (Array.isArray(userData)) {
+        const foundUser = userData.find((u: any) => u.email === email)
+        if (foundUser) {
+          role = foundUser.role || 'user'
+        }
+      }
 
       // Route: editor/manager → admin-login, user/viewer → dashboard
       if (role === 'editor' || role === 'manager') {

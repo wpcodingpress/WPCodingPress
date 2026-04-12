@@ -51,13 +51,18 @@ export default function AdminLoginPage() {
         return
       }
       
-      // Give session time to update
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Fetch user role directly from database
-      const userRes = await fetch('/api/auth/me')
+      // Fetch user role from database directly
+      const userRes = await fetch(`/api/admin/users?email=${encodeURIComponent(formData.email)}`)
       const userData = await userRes.json()
-      const role = userData?.user?.role || 'user'
+      
+      // Find the user and get role
+      let role = 'user'
+      if (Array.isArray(userData)) {
+        const foundUser = userData.find((u: any) => u.email === formData.email)
+        if (foundUser) {
+          role = foundUser.role || 'user'
+        }
+      }
       
       // Route based on role
       if (role === 'admin') {
