@@ -45,43 +45,43 @@ interface NavItem {
   href: string
   icon: React.ElementType
   label: string
-}
-
-interface Notification {
-  id: string
-  type: string
-  title: string
-  message: string
-  isRead: boolean
-  createdAt: string
-  link?: string
+  allowed?: string[]
 }
 
 const navItems: NavItem[] = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/admin/orders", icon: ShoppingCart, label: "Orders" },
-  { href: "/admin/custom-orders", icon: DollarSign, label: "Custom Orders" },
-  { href: "/admin/invoices", icon: FileText, label: "Invoices" },
-  { href: "/admin/contacts", icon: MessageSquare, label: "Contacts" },
-  { href: "/admin/services", icon: Settings, label: "Services" },
-  { href: "/admin/products", icon: Image, label: "Products" },
-  { href: "/admin/users", icon: Users, label: "Users" },
-  { href: "/admin/subscribers", icon: SubscribersIcon, label: "Subscribers" },
-  { href: "/admin/revenue", icon: BarChart3, label: "Revenue" },
-  { href: "/admin/portfolio", icon: BarChart3, label: "Portfolio" },
-  { href: "/admin/bank", icon: Building2, label: "Bank Settings" },
+  { href: "/admin/orders", icon: ShoppingCart, label: "Orders", allowed: ['admin', 'manager'] },
+  { href: "/admin/custom-orders", icon: DollarSign, label: "Custom Orders", allowed: ['admin', 'manager'] },
+  { href: "/admin/invoices", icon: FileText, label: "Invoices", allowed: ['admin', 'manager'] },
+  { href: "/admin/contacts", icon: MessageSquare, label: "Contacts", allowed: ['admin', 'manager'] },
+  { href: "/admin/services", icon: Settings, label: "Services", allowed: ['admin', 'editor', 'manager'] },
+  { href: "/admin/products", icon: Image, label: "Products", allowed: ['admin', 'editor', 'manager'] },
+  { href: "/admin/users", icon: Users, label: "Users", allowed: ['admin'] },
+  { href: "/admin/subscribers", icon: SubscribersIcon, label: "Subscribers", allowed: ['admin'] },
+  { href: "/admin/revenue", icon: BarChart3, label: "Revenue", allowed: ['admin'] },
+  { href: "/admin/portfolio", icon: BarChart3, label: "Portfolio", allowed: ['admin', 'editor', 'manager'] },
+  { href: "/admin/bank", icon: Building2, label: "Bank Settings", allowed: ['admin'] },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const router = useRouter()
   const pathname = usePathname()
+  const [userRole, setUserRole] = useState<string>('admin')
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [showSearchResults, setShowSearchResults] = useState(false)
+
+  // Get user role on mount
+  useEffect(() => {
+    if (session?.user) {
+      const role = (session.user as any).role || 'admin'
+      setUserRole(role)
+    }
+  }, [session])
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -238,7 +238,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Navigation */}
         <nav className="flex-1 p-3 md:p-4 space-y-1 md:space-y-2 overflow-y-auto">
-          {navItems.map((item) => {
+          {navItems.filter(item => !item.allowed || item.allowed.includes(userRole)).map((item) => {
             const isActive = isNavActive(item.href)
             return (
               <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)}

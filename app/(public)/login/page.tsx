@@ -28,21 +28,31 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      // First authenticate
       const result = await signIn("client", {
         email,
         password,
-        redirect: true,
-        callbackUrl: '/dashboard'
+        redirect: false,
       });
 
-      // If error before redirect
       if (result?.error) {
         if (result.error === "CredentialsSignin") {
           throw new Error("Invalid email or password");
         }
         throw new Error(result.error);
       }
-      // signIn with redirect: true handles the redirect automatically
+
+      // Get user role and route accordingly
+      const userRes = await fetch('/api/auth/me')
+      const userData = await userRes.json()
+      const role = userData?.user?.role || 'user'
+
+      // Route: editor/manager → admin-login, user/viewer → dashboard
+      if (role === 'editor' || role === 'manager' || role === 'admin') {
+        router.push('/admin-login')
+      } else {
+        router.push('/dashboard')
+      }
     } catch (err: any) {
       setError(err.message || "Invalid email or password");
     } finally {

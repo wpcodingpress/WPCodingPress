@@ -25,14 +25,40 @@ export default function AdminLoginPage() {
     setError("")
 
     try {
-      const result = await signIn("admin", {
+      // Try admin credentials first
+      let result = await signIn("admin", {
         email: formData.email,
         password: formData.password,
         redirect: false
       })
 
+      // If not admin, try client credentials
       if (result?.error) {
-        setError("Invalid email or password. Please try again.")
+        result = await signIn("client", {
+          email: formData.email,
+          password: formData.password,
+          redirect: false
+        })
+        
+        if (result?.error) {
+          setError("Invalid email or password. Please try again.")
+          setIsLoading(false)
+          return
+        }
+        
+        // Get role for non-admin users
+        const userRes = await fetch('/api/auth/me')
+        const userData = await userRes.json()
+        const role = userData?.user?.role || 'user'
+        
+        // Route based on role
+        if (role === 'editor') {
+          router.push('/admin/services')
+        } else if (role === 'manager') {
+          router.push('/admin/services')
+        } else {
+          router.push('/dashboard')
+        }
       } else {
         router.push("/admin")
       }
