@@ -5,12 +5,12 @@ import { Zap, Mail, ArrowRight } from "lucide-react"
 
 const footerLinks = {
   services: [
-    { href: "/services", label: "All Services" },
-    { href: "/services#custom", label: "Custom Development" },
-    { href: "/services#migration", label: "WP to Next.js" },
-    { href: "/services#mcp", label: "MCP Servers" },
-    { href: "/services#ai", label: "AI Agents" },
-    { href: "/services#plugin", label: "Plugin Development" },
+    { href: "/services/wordpress-to-nextjs", label: "WordPress to Next.js" },
+    { href: "/services/elementor-pro-design", label: "Elementor Pro Design" },
+    { href: "/services/woocommerce-stores", label: "WooCommerce Stores" },
+    { href: "/services/seo-marketing", label: "SEO & Marketing" },
+    { href: "/services/web-applications", label: "Web Applications" },
+    { href: "/services/cloud-devops", label: "Cloud & DevOps" },
   ],
   products: [
     { href: "/products/plugins", label: "WordPress Plugins" },
