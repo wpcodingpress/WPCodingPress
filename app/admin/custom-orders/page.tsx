@@ -925,7 +925,7 @@ export default function AdminCustomOrdersPage() {
                       <td className="p-4">
                         <div className="flex items-center gap-2">
                           <span className={`text-sm font-medium ${order.remainingPaid ? "text-green-600" : "text-slate-500"}`}>
-                            ${order.remainingAmount}
+                            {formatPrice(order.remainingAmount)}
                           </span>
                           {order.remainingPaid ? (
                             <CheckCircle className="h-4 w-4 text-green-600" />
