@@ -132,25 +132,27 @@ export default function DashboardOverview() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <div className="bg-gradient-to-br from-purple-600 via-violet-600 to-indigo-600 rounded-3xl p-8 text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+        <div className="bg-gradient-to-br from-purple-600 via-violet-600 to-indigo-600 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-40 sm:w-64 h-40 sm:h-64 bg-white/10 rounded-full blur-2xl sm:blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-32 sm:w-48 h-32 sm:h-48 bg-white/10 rounded-full blur-xl sm:blur-2xl translate-y-1/2 -translate-x-1/2" />
           <div className="relative z-10">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-              <div>
-                <h2 className="text-3xl font-bold mb-2">Hello, {user.name}! 👋</h2>
-                <p className="text-white/80 text-lg">Ready to build something amazing today?</p>
+            <div className="flex flex-col sm:flex-row sm:items-center md:justify-between gap-4 sm:gap-6">
+              <div className="text-center sm:text-left">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2">Hello, {user.name}! 👋</h2>
+                <p className="text-white/80 text-sm sm:text-lg">Ready to build something amazing today?</p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex flex-row justify-center sm:flex-row gap-2 sm:gap-3">
                 <Link href="/order">
-                  <Button className="bg-white text-purple-600 hover:bg-purple-50 font-semibold px-6">
-                    <Plus className="w-4 h-4 mr-2" />
-                    New Order
+                  <Button className="bg-white text-purple-600 hover:bg-purple-50 font-semibold text-xs sm:text-sm px-3 sm:px-6 py-2 sm:py-2.5 w-full sm:w-auto">
+                    <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">New Order</span>
+                    <span className="sm:hidden">Order</span>
                   </Button>
                 </Link>
-                <Link href="/order?service=wordpress-development">
-                  <Button variant="outline" className="border-white bg-white/10 text-white hover:bg-white/20 font-semibold px-6 backdrop-blur-sm">
-                    Browse Services
+                <Link href="/services">
+                  <Button variant="outline" className="border-white bg-white/10 text-white hover:bg-white/20 font-semibold text-xs sm:text-sm px-3 sm:px-6 py-2 sm:py-2.5 w-full sm:w-auto backdrop-blur-sm">
+                    <span className="hidden sm:inline">Browse Services</span>
+                    <span className="sm:hidden">Services</span>
                   </Button>
                 </Link>
               </div>
@@ -160,7 +162,7 @@ export default function DashboardOverview() {
       </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         {[
           { title: "Total Orders", value: stats.total, icon: ShoppingBag, color: "from-purple-500 to-violet-500" },
           { title: "Completed", value: stats.completed, icon: CheckCircle, color: "from-green-500 to-emerald-500" },
@@ -174,14 +176,14 @@ export default function DashboardOverview() {
             transition={{ delay: index * 0.1 }}
           >
             <Card className="bg-white border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500 font-medium">{stat.title}</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">{stat.value}</p>
+              <CardContent className="p-3 sm:p-4 md:p-6">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs sm:text-sm text-gray-500 font-medium truncate">{stat.title}</p>
+                    <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mt-0.5 sm:mt-1">{stat.value}</p>
                   </div>
-                  <div className={`p-4 rounded-2xl bg-gradient-to-br ${stat.color} shadow-lg`}>
-                    <stat.icon className="w-6 h-6 text-white" />
+                  <div className={`p-2 sm:p-3 md:p-4 rounded-xl sm:rounded-2xl bg-gradient-to-br ${stat.color} shadow-lg`}>
+                    <stat.icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
                   </div>
                 </div>
               </CardContent>
@@ -191,14 +193,14 @@ export default function DashboardOverview() {
       </div>
 
       {/* Quick Actions & Notifications */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Quick Actions */}
         <div className="lg:col-span-1">
           <Card className="bg-white border-gray-200">
-            <CardHeader className="border-b border-gray-100 pb-4">
-              <CardTitle className="text-lg font-semibold text-gray-900">Quick Actions</CardTitle>
+            <CardHeader className="border-b border-gray-100 pb-3 sm:pb-4">
+              <CardTitle className="text-base sm:text-lg font-semibold text-gray-900">Quick Actions</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-2 sm:space-y-3">
               {[
                 { title: "New Order", icon: Plus, href: "/order", color: "from-purple-500 to-violet-500" },
                 { title: "Browse Products", icon: Package, href: "/products", color: "from-violet-500 to-pink-500" },
@@ -207,15 +209,15 @@ export default function DashboardOverview() {
                 <Link key={i} href={action.href}>
                   <motion.div
                     whileHover={{ x: 4 }}
-                    className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-purple-50 transition-colors group"
+                    className="flex items-center gap-2 sm:gap-4 p-3 sm:p-4 rounded-xl bg-gray-50 hover:bg-purple-50 transition-colors group"
                   >
-                    <div className={`p-3 rounded-xl bg-gradient-to-br ${action.color} shadow-lg`}>
-                      <action.icon className="w-5 h-5 text-white" />
+                    <div className={`p-2 sm:p-3 rounded-lg sm:rounded-xl bg-gradient-to-br ${action.color} shadow-lg`}>
+                      <action.icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">{action.title}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900 text-sm sm:text-base group-hover:text-purple-600 transition-colors truncate">{action.title}</p>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" />
+                    <ChevronRight className="w-4 h-4 sm:h-5 sm:w-5 text-gray-400 group-hover:text-purple-600 transition-colors flex-shrink-0" />
                   </motion.div>
                 </Link>
               ))}
@@ -226,35 +228,35 @@ export default function DashboardOverview() {
         {/* Notifications */}
         <div className="lg:col-span-2">
           <Card className="bg-white border-gray-200">
-            <CardHeader className="border-b border-gray-100 pb-4">
+            <CardHeader className="border-b border-gray-100 pb-3 sm:pb-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold text-gray-900">Recent Notifications</CardTitle>
-                <Badge className="bg-purple-100 text-purple-700 border border-purple-200">
+                <CardTitle className="text-base sm:text-lg font-semibold text-gray-900">Recent Notifications</CardTitle>
+                <Badge className="bg-purple-100 text-purple-700 border border-purple-200 text-xs">
                   {notifications.filter(n => n.unread).length} New
                 </Badge>
               </div>
             </CardHeader>
             <CardContent className="p-0">
               {notifications.length === 0 ? (
-                <div className="p-8 text-center text-gray-500">
-                  <Bell className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>No notifications yet</p>
+                <div className="p-4 sm:p-8 text-center text-gray-500">
+                  <Bell className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 mx-auto mb-2 sm:mb-3 opacity-50" />
+                  <p className="text-sm sm:text-base">No notifications yet</p>
                 </div>
               ) : (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-gray-100 max-h-48 sm:max-h-64 overflow-y-auto">
                   {notifications.map((notif) => (
-                    <div key={notif.id} className="p-4 hover:bg-gray-50 transition-colors">
-                      <div className="flex items-start gap-3">
-                        <div className={`p-2 rounded-xl ${notif.unread ? "bg-purple-100 text-purple-600" : "bg-gray-100 text-gray-500"}`}>
-                          <Bell className="w-4 h-4" />
+                    <div key={notif.id} className="p-3 sm:p-4 hover:bg-gray-50 transition-colors">
+                      <div className="flex items-start gap-2 sm:gap-3">
+                        <div className={`p-1.5 sm:p-2 rounded-lg sm:rounded-xl ${notif.unread ? "bg-purple-100 text-purple-600" : "bg-gray-100 text-gray-500"}`}>
+                          <Bell className="w-3 h-3 sm:w-4 sm:h-4" />
                         </div>
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <p className="font-medium text-gray-900 text-sm">{notif.title}</p>
-                            {notif.unread && <div className="w-2 h-2 rounded-full bg-purple-500" />}
+                            <p className="font-medium text-gray-900 text-sm truncate">{notif.title}</p>
+                            {notif.unread && <div className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0" />}
                           </div>
-                          <p className="text-gray-500 text-sm mt-1">{notif.message}</p>
-                          <p className="text-gray-400 text-xs mt-2">{notif.time}</p>
+                          <p className="text-gray-500 text-xs sm:text-sm mt-0.5 line-clamp-2">{notif.message}</p>
+                          <p className="text-gray-400 text-xs mt-1">{notif.time}</p>
                         </div>
                       </div>
                     </div>
@@ -269,26 +271,26 @@ export default function DashboardOverview() {
       {/* Upgrade to Enterprise Card - Show if on Pro */}
       {currentPlan === 'pro' && (
         <Card className="bg-gradient-to-br from-indigo-600 via-purple-600 to-violet-600 border-0">
-          <CardContent className="p-6 text-white">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-xl bg-white/20">
-                <Rocket className="w-6 h-6" />
+          <CardContent className="p-4 sm:p-6 text-white">
+            <div className="flex items-start gap-3 mb-3 sm:mb-4">
+              <div className="p-2 rounded-xl bg-white/20 flex-shrink-0">
+                <Rocket className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <div>
-                <p className="font-bold text-lg">Upgrade to Enterprise</p>
-                <p className="text-white/80 text-sm">Unlock all features</p>
+              <div className="min-w-0">
+                <p className="font-bold text-base sm:text-lg">Upgrade to Enterprise</p>
+                <p className="text-white/80 text-xs sm:text-sm">Unlock all features</p>
               </div>
             </div>
-            <ul className="space-y-2 mb-6">
+            <ul className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-6">
               {["Unlimited Sites", "Priority Support", "Advanced Templates", "White-label deployment", "Custom integrations"].map((feature, i) => (
-                <li key={i} className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4" />
-                  {feature}
+                <li key={i} className="flex items-center gap-2 text-xs sm:text-sm">
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span className="truncate">{feature}</span>
                 </li>
               ))}
             </ul>
             <Link href="/dashboard/subscription">
-              <Button className="w-full bg-white text-purple-600 hover:bg-purple-50 font-semibold">
+              <Button className="w-full bg-white text-purple-600 hover:bg-purple-50 font-semibold text-xs sm:text-sm py-2 sm:py-2.5">
                 Upgrade to Enterprise - $99/mo
               </Button>
             </Link>
@@ -299,26 +301,26 @@ export default function DashboardOverview() {
       {/* Upgrade Card - Show if on Free plan */}
       {currentPlan !== 'pro' && currentPlan !== 'enterprise' && (
         <Card className="bg-gradient-to-br from-purple-600 to-violet-600 border-0">
-          <CardContent className="p-6 text-white">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-xl bg-white/20">
-                <TrendingUp className="w-6 h-6" />
+          <CardContent className="p-4 sm:p-6 text-white">
+            <div className="flex items-start gap-3 mb-3 sm:mb-4">
+              <div className="p-2 rounded-xl bg-white/20 flex-shrink-0">
+                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <div>
-                <p className="font-bold text-lg">Upgrade to Pro</p>
-                <p className="text-white/80 text-sm">Unlock all features</p>
+              <div className="min-w-0">
+                <p className="font-bold text-base sm:text-lg">Upgrade to Pro</p>
+                <p className="text-white/80 text-xs sm:text-sm">Unlock all features</p>
               </div>
             </div>
-            <ul className="space-y-2 mb-6">
+            <ul className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-6">
               {["Unlimited Sites", "Priority Support", "Advanced Templates"].map((feature, i) => (
-                <li key={i} className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4" />
-                  {feature}
+                <li key={i} className="flex items-center gap-2 text-xs sm:text-sm">
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span className="truncate">{feature}</span>
                 </li>
               ))}
             </ul>
             <Link href="/dashboard/subscription">
-              <Button className="w-full bg-white text-purple-600 hover:bg-purple-50 font-semibold">
+              <Button className="w-full bg-white text-purple-600 hover:bg-purple-50 font-semibold text-xs sm:text-sm py-2 sm:py-2.5">
                 Get Started - $19/mo
               </Button>
             </Link>
@@ -328,40 +330,40 @@ export default function DashboardOverview() {
 
       {/* Plans */}
       <Card className="bg-white border-gray-200">
-        <CardHeader className="border-b border-gray-100">
-          <CardTitle className="text-lg font-semibold text-gray-900">Your Current Plan</CardTitle>
+        <CardHeader className="border-b border-gray-100 pb-3 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg font-semibold text-gray-900">Your Current Plan</CardTitle>
         </CardHeader>
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <CardContent className="p-3 sm:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
             {plans.map((plan) => {
               const isCurrent = currentPlan === plan.planId || (!currentPlan && plan.planId === 'free')
               return (
               <div 
                 key={plan.name}
-                className={`p-6 rounded-2xl border-2 ${
+                className={`p-3 sm:p-4 md:p-6 rounded-xl md:rounded-2xl border-2 ${
                   isCurrent 
                     ? 'border-purple-500 bg-purple-50' 
                     : 'border-gray-200 bg-gray-50'
                 }`}
               >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
+                <div className="flex items-center justify-between mb-2 sm:mb-3 md:mb-4">
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-900">{plan.name}</h3>
                   {isCurrent && (
-                    <Badge className="bg-purple-600 text-white">Current</Badge>
+                    <Badge className="bg-purple-600 text-white text-xs">Current</Badge>
                   )}
                 </div>
-                <p className="text-2xl font-bold text-gray-900 mb-1">{plan.price}<span className="text-sm font-normal text-gray-500">{plan.period}</span></p>
-                <ul className="space-y-2 mb-6">
+                <p className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">{plan.price}<span className="text-xs sm:text-sm font-normal text-gray-500">{plan.period}</span></p>
+                <ul className="space-y-1 sm:space-y-2 mb-3 sm:mb-4 md:mb-6">
                   {plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                      {feature}
+                    <li key={i} className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-600">
+                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 flex-shrink-0" />
+                      <span className="truncate">{feature}</span>
                     </li>
                   ))}
                 </ul>
                 {!isCurrent && (
                   <Link href="/dashboard/subscription">
-                    <Button variant="outline" className="w-full border-purple-500 text-purple-600 hover:bg-purple-50">
+                    <Button variant="outline" className="w-full border-purple-500 text-purple-600 hover:bg-purple-50 text-xs sm:text-sm py-1.5 sm:py-2">
                       Upgrade
                     </Button>
                   </Link>
@@ -374,20 +376,20 @@ export default function DashboardOverview() {
       </Card>
 
       {/* Help Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <Card className="bg-white border-gray-200">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="p-3 rounded-xl bg-purple-100">
-                <HelpCircle className="w-6 h-6 text-purple-600" />
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+              <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-purple-100 flex-shrink-0">
+                <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Need Help?</p>
-                <p className="text-lg font-bold text-gray-900">Contact Support</p>
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-gray-500">Need Help?</p>
+                <p className="text-base sm:text-lg font-bold text-gray-900">Contact Support</p>
               </div>
             </div>
             <Link href="/contact">
-              <Button variant="outline" className="w-full border-gray-300 text-gray-600 hover:bg-gray-50">
+              <Button variant="outline" className="w-full border-gray-300 text-gray-600 hover:bg-gray-50 text-xs sm:text-sm py-1.5 sm:py-2">
                 Get Help
               </Button>
             </Link>
@@ -395,21 +397,21 @@ export default function DashboardOverview() {
         </Card>
 
         <Card className={`border-gray-200 ${currentPlan && currentPlan !== 'free' ? 'bg-gradient-to-br from-purple-50 to-violet-50' : 'bg-white'}`}>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4 mb-4">
-              <div className={`p-3 rounded-xl ${currentPlan && currentPlan !== 'free' ? 'bg-purple-100' : 'bg-green-100'}`}>
-                <Calendar className={`w-6 h-6 ${currentPlan && currentPlan !== 'free' ? 'text-purple-600' : 'text-green-600'}`} />
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+              <div className={`p-2 sm:p-3 rounded-lg sm:rounded-xl ${currentPlan && currentPlan !== 'free' ? 'bg-purple-100' : 'bg-green-100'} flex-shrink-0`}>
+                <Calendar className={`w-5 h-5 sm:w-6 sm:h-6 ${currentPlan && currentPlan !== 'free' ? 'text-purple-600' : 'text-green-600'}`} />
               </div>
-              <div>
-                <p className="text-sm text-gray-500">
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-gray-500">
                   {currentPlan && currentPlan !== 'free' ? 'Next Billing' : 'Current Plan'}
                 </p>
-                <p className="text-lg font-bold text-gray-900">
+                <p className="text-base sm:text-lg font-bold text-gray-900">
                   {nextBilling || (currentPlan === 'free' || !currentPlan ? 'Free' : '-')}
                 </p>
               </div>
             </div>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs sm:text-sm text-gray-500">
               {currentPlan && currentPlan !== 'free' ? (
                 subscriptionStatus === 'active' ? `${currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)} Plan - Active` : `${currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)} Plan`
               ) : "You're on the Free plan"}
