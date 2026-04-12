@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Eye, Trash2, CheckCircle2, XCircle, Clock, Hash, CreditCard } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { DollarSign, TrendingUp, Package, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -59,16 +60,25 @@ export default function AdminOrdersPage() {
 
   const updateOrderStatus = async (id: string, status: string) => {
     try {
+      const updateData: any = { status }
+      if (status === "completed") {
+        updateData.paymentStatus = "paid"
+      }
+      
       const res = await fetch(`/api/orders/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status })
+        body: JSON.stringify(updateData)
       })
       
       if (res.ok) {
         fetchOrders()
         if (selectedOrder) {
-          setSelectedOrder({ ...selectedOrder, status })
+          setSelectedOrder({ 
+            ...selectedOrder, 
+            status,
+            paymentStatus: status === "completed" ? "paid" : selectedOrder.paymentStatus
+          })
         }
       }
     } catch (error) {
@@ -115,6 +125,13 @@ export default function AdminOrdersPage() {
     ? orders 
     : orders.filter(o => o.status === filter)
 
+  const stats = {
+    totalRevenue: orders.filter(o => o.paymentStatus === "paid").reduce((sum, o) => sum + (o.amount || 0), 0),
+    pendingPayments: orders.filter(o => o.paymentStatus !== "paid" && o.status !== "rejected").reduce((sum, o) => sum + (o.amount || 0), 0),
+    completedOrders: orders.filter(o => o.status === "completed").length,
+    totalOrders: orders.length
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -143,6 +160,61 @@ export default function AdminOrdersPage() {
             <SelectItem value="rejected">Rejected</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="bg-white border-slate-200">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-green-100">
+                <DollarSign className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">Total Revenue</p>
+                <p className="text-xl font-bold text-slate-900">${stats.totalRevenue}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-white border-slate-200">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-yellow-100">
+                <Clock className="w-5 h-5 text-yellow-600" />
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">Pending Payments</p>
+                <p className="text-xl font-bold text-slate-900">${stats.pendingPayments}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-white border-slate-200">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-purple-100">
+                <TrendingUp className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">Completed</p>
+                <p className="text-xl font-bold text-slate-900">{stats.completedOrders}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-white border-slate-200">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-blue-100">
+                <Package className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">Total Orders</p>
+                <p className="text-xl font-bold text-slate-900">{stats.totalOrders}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Card className="bg-white border-slate-200">
