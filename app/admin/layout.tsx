@@ -78,7 +78,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname()
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [showSearchResults, setShowSearchResults] = useState(false)
@@ -211,9 +211,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed left-0 top-0 bottom-0 z-50 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800 border-r border-slate-700/50 shadow-2xl transition-transform duration-300 flex flex-col",
-        "w-64 lg:translate-x-0",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full lg:relative"
+        "fixed left-0 top-0 bottom-0 z-50 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800 border-r border-slate-700/50 shadow-2xl transition-transform duration-300 flex flex-col w-64",
+        sidebarOpen || "lg:block"
       )}>
         {/* Logo */}
         <div className="p-4 border-b border-slate-700/50">
@@ -276,7 +275,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main Content */}
-      <main className="min-h-screen lg:ml-64">
+      <main className="ml-0 lg:ml-64 min-h-screen">
         {/* Top Header */}
         <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200 shadow-sm">
           <div className="flex items-center justify-between px-4 py-3">
