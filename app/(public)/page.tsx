@@ -592,7 +592,7 @@ export default function HomePage() {
 
                 {/* Terminal Content - Dashboard Flow Animation */}
                 <div className="p-4 sm:p-6">
-                  {/* Step 1: My Sites */}
+                  {/* Step 1: Install Plugin */}
                   <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -601,6 +601,30 @@ export default function HomePage() {
                   >
                     <div className="flex items-center gap-2 mb-3">
                       <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                      <span className="text-sm font-semibold text-slate-700">Install WPCodingPress Plugin</span>
+                    </div>
+                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-violet-500 rounded-lg flex items-center justify-center">
+                          <Zap className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <span className="font-medium text-slate-800">WPCodingPress Plugin</span>
+                          <span className="block text-xs text-green-600">✓ Installed & Active</span>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Step 2: My Sites */}
+                  <motion.div 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 1 }}
+                    className="mb-4"
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
                       <span className="text-sm font-semibold text-slate-700">User Dashboard → My Sites</span>
                     </div>
                     <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center gap-3">
@@ -615,30 +639,6 @@ export default function HomePage() {
                         </div>
                       </div>
                       <Button size="sm" className="bg-green-500 text-white text-xs cursor-default">Connected</Button>
-                    </div>
-                  </motion.div>
-
-                  {/* Step 2: Add Site Details - Install Plugin */}
-                  <motion.div 
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1 }}
-                    className="mb-4"
-                  >
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                      <span className="text-sm font-semibold text-slate-700">Install WPCodingPress Plugin</span>
-                    </div>
-                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-violet-500 rounded-lg flex items-center justify-center">
-                          <Zap className="w-4 h-4 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <span className="font-medium text-slate-800">WPCodingPress Plugin</span>
-                          <span className="block text-xs text-green-600">✓ Installed & Active</span>
-                        </div>
-                      </div>
                     </div>
                   </motion.div>
 

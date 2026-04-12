@@ -44,10 +44,10 @@ const values = [
 ]
 
 const experience = [
-  { years: "8+", label: "Years Experience", color: "text-blue-400" },
-  { years: "150+", label: "Happy Clients", color: "text-purple-400" },
-  { years: "300+", label: "Projects Completed", color: "text-green-400" },
-  { years: "5.0", label: "Average Rating", color: "text-yellow-400" },
+  { years: "8+", label: "Years Experience", color: "from-blue-600 to-cyan-500" },
+  { years: "150+", label: "Happy Clients", color: "from-purple-600 to-pink-500" },
+  { years: "300+", label: "Projects Completed", color: "from-green-600 to-emerald-500" },
+  { years: "5.0", label: "Average Rating", color: "from-yellow-500 to-amber-500" },
 ]
 
 export default function AboutPage() {
@@ -86,10 +86,10 @@ export default function AboutPage() {
                 transition={{ delay: index * 0.1 }}
                 className="text-center p-6 rounded-2xl bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-100"
               >
-                <div className={`text-4xl md:text-5xl font-black mb-2 bg-gradient-to-r ${exp.color.includes('blue') ? 'from-blue-600 to-cyan-500' : exp.color.includes('purple') ? 'from-purple-600 to-pink-500' : exp.color.includes('green') ? 'from-green-600 to-emerald-500' : 'from-yellow-500 to-amber-500'} bg-clip-text text-transparent`}>
+                <div className={`text-4xl md:text-5xl font-black mb-2 bg-gradient-to-r ${exp.color} bg-clip-text text-transparent`}>
                   {exp.years}
                 </div>
-                <div className="text-slate-600">{exp.label}</div>
+                <div className="text-slate-700 font-medium">{exp.label}</div>
               </motion.div>
             ))}
           </div>
@@ -141,15 +141,15 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="relative"
             >
-              <Card className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-blue-500/30 overflow-hidden">
+              <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200 overflow-hidden">
                 <CardContent className="p-8">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shadow-lg">
                       <Code2 className="h-10 w-10 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold text-white">Rahman</h3>
-                      <p className="text-slate-400">Founder & Lead Developer</p>
+                      <h3 className="text-2xl font-bold text-slate-900">Rahman</h3>
+                      <p className="text-slate-600">Founder & Lead Developer</p>
                       <div className="flex gap-1 mt-1">
                         {[...Array(5)].map((_, i) => (
                           <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
@@ -157,7 +157,7 @@ export default function AboutPage() {
                       </div>
                     </div>
                   </div>
-                  <p className="text-slate-300 italic leading-relaxed">
+                  <p className="text-slate-600 italic leading-relaxed">
                     "I believe every business deserves a website that not only looks great 
                     but performs exceptionally. My mission is to make that a reality for 
                     each and every client."
@@ -166,29 +166,26 @@ export default function AboutPage() {
               </Card>
               
               {/* Floating decorative elements */}
-              <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-pink-500/30 to-orange-500/30 rounded-full blur-xl" />
-              <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-gradient-to-br from-blue-500/30 to-cyan-500/30 rounded-full blur-xl" />
+              <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-pink-200 to-orange-200 rounded-full blur-xl" />
+              <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-gradient-to-br from-blue-200 to-cyan-200 rounded-full blur-xl" />
             </motion.div>
           </div>
         </div>
       </section>
 
       {/* Skills Section */}
-      <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/30 via-slate-950 to-slate-950" />
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
-        
-        <div className="container mx-auto px-4 relative z-10">
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
           <motion.div 
             className="text-center mb-12"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Our <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Expertise</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Our <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Expertise</span>
             </h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">
+            <p className="text-slate-600 max-w-2xl mx-auto">
               Years of experience and continuous learning keep us at the cutting edge
             </p>
           </motion.div>
@@ -201,13 +198,13 @@ export default function AboutPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="p-5 rounded-xl bg-slate-800/50 border border-slate-700/50"
+                className="p-5 rounded-xl bg-slate-50 border border-slate-200"
               >
                 <div className="flex justify-between items-center mb-3">
-                  <span className="text-white font-medium">{skill.name}</span>
-                  <span className="text-slate-400 text-sm">{skill.level}%</span>
+                  <span className="text-slate-900 font-medium">{skill.name}</span>
+                  <span className="text-slate-500 text-sm">{skill.level}%</span>
                 </div>
-                <div className="h-3 bg-slate-700/50 rounded-full overflow-hidden">
+                <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
                   <motion.div
                     className="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
                     initial={{ width: 0 }}
@@ -223,26 +220,16 @@ export default function AboutPage() {
       </section>
 
       {/* Values Section */}
-      <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <Image 
-            src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=1920&q=80"
-            alt="Team Meeting"
-            fill
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-indigo-950/95 to-slate-950" />
-        </div>
-        
-        <div className="container mx-auto px-4 relative z-10">
+      <section className="py-20 bg-gradient-to-br from-purple-50 via-white to-violet-50">
+        <div className="container mx-auto px-4">
           <motion.div 
             className="text-center mb-12"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Why Choose <span className="bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">Us</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+              Why Choose <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Us</span>
             </h2>
           </motion.div>
 
@@ -255,13 +242,13 @@ export default function AboutPage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="h-full bg-white/5 backdrop-blur-lg border-white/10 hover:border-blue-500/50 transition-colors">
+                <Card className="h-full bg-white border-slate-200 hover:border-purple-300 transition-colors">
                   <CardContent className="p-6 text-center">
                     <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${value.color} flex items-center justify-center mx-auto mb-4 shadow-lg`}>
                       <value.icon className="h-8 w-8 text-white" />
                     </div>
-                    <h3 className="text-lg font-semibold text-white mb-2">{value.title}</h3>
-                    <p className="text-sm text-slate-400">{value.description}</p>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-2">{value.title}</h3>
+                    <p className="text-sm text-slate-600">{value.description}</p>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -275,17 +262,17 @@ export default function AboutPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <p className="text-slate-400 mb-6">
+            <p className="text-slate-600 mb-6">
               Ready to work with us? Let's create something amazing together.
             </p>
             <div className="flex gap-4 justify-center">
               <Link href="/order">
-                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 shadow-lg shadow-blue-500/25">
+                <Button size="lg" className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500">
                   Start Your Project
                 </Button>
               </Link>
               <Link href="/contact">
-                <Button size="lg" variant="outline" className="bg-white/10 border-white/20 hover:bg-white/20">
+                <Button size="lg" variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-50">
                   Get In Touch
                 </Button>
               </Link>

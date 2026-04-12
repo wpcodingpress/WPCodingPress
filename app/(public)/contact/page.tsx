@@ -410,15 +410,15 @@ export default function ContactPage() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Card className="bg-slate-900/50 border-slate-700/50 hover:border-slate-500 transition-colors">
+                  <Card className="bg-white border-slate-200 hover:border-purple-300 transition-colors">
                     <CardContent className="p-5">
                       <a href={info.href} className="flex items-start gap-4 group">
                         <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${info.color} flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform`}>
                           <info.icon className="h-6 w-6 text-white" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-semibold text-white mb-1 group-hover:text-blue-400 transition-colors">{info.title}</h3>
-                          <p className="text-slate-400 group-hover:text-slate-300 transition-colors">{info.value}</p>
+                          <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-purple-600 transition-colors">{info.title}</h3>
+                          <p className="text-slate-600 group-hover:text-slate-700 transition-colors">{info.value}</p>
                         </div>
                       </a>
                     </CardContent>
