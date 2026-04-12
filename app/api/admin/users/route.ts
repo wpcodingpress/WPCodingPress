@@ -1,57 +1,21 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
-const TESTING_MODE = process.env.TESTING_MODE === 'true'
-
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
-    const search = searchParams.get('search') || ''
-    const plan = searchParams.get('plan') || ''
-
-    const where: any = {}
-
-    if (search) {
-      where.OR = [
-        { email: { contains: search, mode: 'insensitive' } },
-        { name: { contains: search, mode: 'insensitive' } }
-      ]
-    }
-
-    if (plan) {
-      where.subscriptions = {
-        some: {
-          plan: plan
+    const users = await prisma.user.findMany({
+      include: {
+        subscriptions: {
+          where: { status: 'active' }
         }
-      }
-    }
-
-    const [users, total] = await Promise.all([
-      prisma.user.findMany({
-        where,
-        include: {
-          subscriptions: {
-            where: { status: 'active' }
-          }
-        },
-        skip: (page - 1) * limit,
-        take: limit,
-        orderBy: { createdAt: 'desc' }
-      }),
-      prisma.user.count({ where })
-    ])
-
-    return NextResponse.json({
-      users,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit)
+      },
+      orderBy: { createdAt: 'desc' }
     })
+
+    return NextResponse.json(users)
   } catch (error) {
     console.error('Error fetching users:', error)
-    return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch users', details: String(error) }, { status: 500 })
   }
 }
 
@@ -121,16 +85,6 @@ export async function PUT(request: Request) {
           data: {
             plan: plan || activeSub.plan,
             status: status || activeSub.status,
-          },
-        })
-      } else if (plan && plan !== 'free') {
-        await prisma.subscription.create({
-          data: {
-            userId: existingUser.id,
-            plan: plan,
-            status: 'active',
-            currentPeriodStart: new Date(),
-            currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
           },
         })
       }
