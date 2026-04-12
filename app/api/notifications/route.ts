@@ -28,6 +28,11 @@ export async function GET(request: Request) {
       return NextResponse.json([], { status: 200 })
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true }
+    })
+
     let notifications: Array<{
       id: string
       type: string
@@ -188,8 +193,9 @@ export async function GET(request: Request) {
       })
 
       if (user?.email) {
+        const userEmail = user.email
         userCustomOrders
-          .filter(order => order.clientEmail === user.email)
+          .filter((order: any) => order.clientEmail === userEmail)
           .forEach(order => {
             const existing = notifications.find(n => n.type === 'custom_order' && n.message.includes(order.id))
             if (!existing && orderStatusMessages[order.status]) {
