@@ -241,3 +241,13 @@ model SocialLink {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 }
+
+model RoleAuditLog {
+  id          String   @id @default(cuid())
+  userId       String
+  userName     String
+  oldRole      String
+  newRole     String
+  changedBy    String
+  changedAt   DateTime @default(now())
+}

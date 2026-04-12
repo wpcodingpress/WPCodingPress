@@ -1,9 +1,18 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Users, Loader2, Trash2, Eye, EyeOff, UserPlus, X, Search } from "lucide-react"
+import { Users, Loader2, Trash2, Eye, EyeOff, UserPlus, X, Search, Shield, ShieldCheck, ShieldAlert, UserCog, History, CheckCircle, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
 
 interface UserType {
   id: string
@@ -17,14 +26,38 @@ interface UserType {
   isAdminUser?: boolean
 }
 
+interface RoleAuditLog {
+  id: string
+  userId: string
+  userName: string
+  oldRole: string
+  newRole: string
+  changedBy: string
+  changedAt: string
+}
+
+const ROLES = [
+  { value: "viewer", label: "Viewer", description: "View-only access", icon: Eye, color: "bg-slate-100 text-slate-700" },
+  { value: "user", label: "User", description: "Basic dashboard access", icon: UserCog, color: "bg-blue-100 text-blue-700" },
+  { value: "editor", label: "Editor", description: "Can manage content", icon: ShieldAlert, color: "bg-amber-100 text-amber-700" },
+  { value: "manager", label: "Manager", description: "Full content control", icon: Shield, color: "bg-violet-100 text-violet-700" },
+  { value: "admin", label: "Admin", description: "Full system access", icon: ShieldCheck, color: "bg-red-100 text-red-700" },
+]
+
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<UserType[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
   const [search, setSearch] = useState("")
   const [showForm, setShowForm] = useState(false)
+  const [showAuditLog, setShowAuditLog] = useState(false)
+  const [auditLogs, setAuditLogs] = useState<RoleAuditLog[]>([])
   const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "user" })
   const [submitting, setSubmitting] = useState(false)
+  const [roleChangeUser, setRoleChangeUser] = useState<UserType | null>(null)
+  const [newRole, setNewRole] = useState("")
+  const [changingRole, setChangingRole] = useState(false)
 
   useEffect(() => { loadUsers() }, [])
 
@@ -72,13 +105,58 @@ export default function AdminUsersPage() {
     loadUsers()
   }
 
-  const updateRole = async (id: string, role: string) => {
-    await fetch("/api/admin/users", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: id, action: "update_role", role })
-    })
-    loadUsers()
+  const updateRole = async () => {
+    if (!roleChangeUser || !newRole) return
+    if (roleChangeUser.role === newRole) {
+      setRoleChangeUser(null)
+      return
+    }
+    setChangingRole(true)
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: roleChangeUser.id, action: "update_role", role: newRole })
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setSuccess(`Role changed from ${roleChangeUser.role} to ${newRole}`)
+        setTimeout(() => setSuccess(""), 3000)
+        loadUsers()
+      } else {
+        setError(data.error || "Failed to update role")
+      }
+    } catch (e: any) {
+      setError(e.message)
+    } finally {
+      setChangingRole(false)
+      setRoleChangeUser(null)
+    }
+  }
+
+  const getRoleBadge = (role: string) => {
+    const r = ROLES.find(r => r.value === role) || ROLES[0]
+    return (
+      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${r.color}`}>
+        <r.icon className="w-3 h-3" />
+        {r.label}
+      </span>
+    )
+  }
+
+  const loadAuditLog = async () => {
+    try {
+      const res = await fetch("/api/admin/users?audit=true")
+      if (res.ok) {
+        const data = await res.json()
+        setAuditLogs(data.auditLogs || [])
+      }
+    } catch (e) { console.error(e) }
+  }
+
+  const openRoleChange = (user: UserType) => {
+    setRoleChangeUser(user)
+    setNewRole(user.role)
   }
 
   const filtered = users.filter(u => 
@@ -93,20 +171,31 @@ export default function AdminUsersPage() {
   )
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+    <div className="p-3 md:p-4 lg:p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4 mb-4 md:mb-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Users</h1>
-          <p className="text-gray-500 mt-1">{users.length} registered users</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Users & Roles</h1>
+          <p className="text-slate-500 mt-1">{users.length} registered users</p>
         </div>
-        <Button onClick={() => setShowForm(true)} className="bg-violet-600 text-white font-medium">
-          <UserPlus className="w-4 h-4 mr-2" /> Add User
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => { loadAuditLog(); setShowAuditLog(true); }} className="text-xs md:text-sm">
+            <History className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" /> Audit Log
+          </Button>
+          <Button onClick={() => setShowForm(true)} className="bg-violet-600 text-white font-medium text-xs md:text-sm">
+            <UserPlus className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" /> Add User
+          </Button>
+        </div>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-300 text-red-800 p-3 rounded-lg mb-4 text-sm font-medium">
-          {error}
+        <div className="bg-red-50 border border-red-300 text-red-800 p-3 rounded-lg mb-4 text-sm font-medium flex items-center gap-2">
+          <AlertCircle className="w-4 h-4" /> {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="bg-green-50 border border-green-300 text-green-800 p-3 rounded-lg mb-4 text-sm font-medium flex items-center gap-2">
+          <CheckCircle className="w-4 h-4" /> {success}
         </div>
       )}
 
@@ -150,18 +239,14 @@ export default function AdminUsersPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-4 hidden md:table-cell">
-                    <select
-                      value={user.role}
-                      onChange={(e) => updateRole(user.id, e.target.value)}
-                      className="text-sm border border-gray-300 rounded px-2 py-1 bg-white text-gray-700"
-                    >
-                      <option value="user">User</option>
-                      <option value="editor">Editor</option>
-                      <option value="manager">Manager</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                  </td>
+                  <td className="px-3 md:px-4 py-3 md:py-4">
+                      <button
+                        onClick={() => openRoleChange(user)}
+                        className="text-sm border border-slate-300 rounded px-2 py-1 bg-white text-slate-700 hover:border-violet-500 hover:text-violet-600 transition-colors flex items-center gap-1"
+                      >
+                        {getRoleBadge(user.role)}
+                      </button>
+                    </td>
                   <td className="px-4 py-4 hidden lg:table-cell">
                     {user.isActive ? (
                       <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">Active</span>
@@ -228,6 +313,104 @@ export default function AdminUsersPage() {
           </div>
         </div>
       )}
+
+      {/* Role Change Dialog */}
+      <Dialog open={!!roleChangeUser} onOpenChange={() => setRoleChangeUser(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5 text-violet-600" /> Change User Role
+            </DialogTitle>
+            <DialogDescription>
+              Select a new role for this user. Their dashboard access will change accordingly.
+            </DialogDescription>
+          </DialogHeader>
+          {roleChangeUser && (
+            <div className="space-y-3 py-2">
+              <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center text-white font-medium">
+                  {roleChangeUser.name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="font-medium text-slate-900">{roleChangeUser.name}</p>
+                  <p className="text-sm text-slate-500">{roleChangeUser.email}</p>
+                </div>
+              </div>
+              <div className="text-sm text-slate-600">
+                Current role: <span className="font-medium">{getRoleBadge(roleChangeUser.role)}</span>
+              </div>
+              <div className="space-y-2">
+                {ROLES.map((r) => (
+                  <button
+                    key={r.value}
+                    onClick={() => setNewRole(r.value)}
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-all text-left ${
+                      newRole === r.value
+                        ? "border-violet-500 bg-violet-50"
+                        : "border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <r.icon className={`w-5 h-5 ${r.color.replace("bg-", "text-").split(" ")[1]}`} />
+                    <div className="flex-1">
+                      <p className="font-medium text-slate-900">{r.label}</p>
+                      <p className="text-xs text-slate-500">{r.description}</p>
+                    </div>
+                    {newRole === r.value && (
+                      <CheckCircle className="w-5 h-5 text-violet-600" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setRoleChangeUser(null)} className="flex-1">Cancel</Button>
+            <Button onClick={updateRole} disabled={changingRole || newRole === roleChangeUser?.role} className="flex-1">
+              {changingRole && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Audit Log Dialog */}
+      <Dialog open={showAuditLog} onOpenChange={setShowAuditLog}>
+        <DialogContent className="sm:max-w-lg max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="w-5 h-5 text-violet-600" /> Role Change History
+            </DialogTitle>
+            <DialogDescription>
+              Track all role changes made to users.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="overflow-y-auto max-h-96">
+            {auditLogs.length === 0 ? (
+              <div className="text-center py-8 text-slate-500">No role changes recorded yet</div>
+            ) : (
+              <div className="space-y-2">
+                {auditLogs.map((log) => (
+                  <div key={log.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                    <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-600 text-sm font-medium">
+                      {log.userName.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-slate-900 text-sm">{log.userName}</p>
+                      <p className="text-xs text-slate-500">{log.oldRole} → {log.newRole} • by {log.changedBy}</p>
+                    </div>
+                    <div className="text-xs text-slate-400">
+                      {new Date(log.changedAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAuditLog(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

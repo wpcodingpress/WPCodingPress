@@ -1,14 +1,18 @@
 import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
 import prisma from '@/lib/prisma'
+import { authOptions } from '@/lib/auth'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url)
+    const audit = searchParams.get('audit')
+
     const [users, adminUsers] = await Promise.all([
       prisma.user.findMany({ orderBy: { createdAt: 'desc' } }),
       prisma.adminUser.findMany({ orderBy: { createdAt: 'desc' } })
     ])
 
-    // Convert adminUsers to same format as users
     const adminAsUsers = adminUsers.map(admin => ({
       id: admin.id,
       name: admin.name,
@@ -22,6 +26,16 @@ export async function GET() {
     }))
 
     const allUsers = [...adminAsUsers, ...users]
+
+    if (audit === 'true') {
+      // Return audit logs if requested
+      const auditLogs = await prisma.roleAuditLog.findMany({
+        orderBy: { changedAt: 'desc' },
+        take: 50
+      })
+      return NextResponse.json({ auditLogs })
+    }
+
     return NextResponse.json(allUsers)
   } catch (err: any) {
     console.error("API Error:", err.message)
@@ -39,11 +53,47 @@ export async function PUT(request: Request) {
     }
 
     if (action === 'update_role') {
-      const user = await prisma.user.update({
+      // Get current user to log old role
+      const currentUser = await prisma.user.findUnique({ where: { id: userId } })
+      if (!currentUser) {
+        // Check if it's an admin user
+        const adminUser = await prisma.adminUser.findUnique({ where: { id: userId } })
+        if (!adminUser) {
+          return NextResponse.json({ error: 'User not found' }, { status: 404 })
+        }
+        // Update admin user role
+        const updatedAdmin = await prisma.adminUser.update({
+          where: { id: userId },
+          data: { role }
+        })
+        // Log the change
+        await prisma.roleAuditLog.create({
+          data: {
+            userId: userId,
+            userName: adminUser.name,
+            oldRole: adminUser.role,
+            newRole: role,
+            changedBy: 'admin'
+          }
+        })
+        return NextResponse.json({ success: true, message: 'Role updated', user: updatedAdmin })
+      }
+
+      const updatedUser = await prisma.user.update({
         where: { id: userId },
         data: { role: role || 'user' }
       })
-      return NextResponse.json({ success: true, message: 'Role updated', user })
+      // Log the change
+      await prisma.roleAuditLog.create({
+        data: {
+          userId: userId,
+          userName: currentUser.name,
+          oldRole: currentUser.role,
+          newRole: role,
+          changedBy: 'admin'
+        }
+      })
+      return NextResponse.json({ success: true, message: 'Role updated', user: updatedUser })
     }
 
     if (action === 'update_profile') {

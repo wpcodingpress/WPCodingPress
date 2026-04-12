@@ -41,7 +41,25 @@ export default function LoginPage() {
         throw new Error(result.error);
       }
 
-      router.push("/dashboard");
+      // Get user role from API and route accordingly
+      const userRes = await fetch('/api/auth/me')
+      const userData = await userRes.json()
+      const role = userData?.user?.role || 'user'
+
+      // Route based on role
+      switch (role) {
+        case 'admin':
+          router.push('/admin')
+          break
+        case 'manager':
+          router.push('/dashboard')
+          break
+        case 'editor':
+          router.push('/dashboard')
+          break
+        default:
+          router.push('/dashboard')
+      }
     } catch (err: any) {
       setError(err.message || "Invalid email or password");
     } finally {
