@@ -46,12 +46,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+
 
 interface User {
   id: string
@@ -557,40 +552,18 @@ export default function AdminUsersPage() {
                       </td>
                       <td className="px-4 py-4">
                         <div className="flex items-center justify-end gap-1">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="text-slate-500 hover:text-violet-600 hover:bg-violet-50 h-8 w-8">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-48">
-                              <DropdownMenuItem onClick={() => openEditModal(user)}>
-                                <Pencil className="w-4 h-4 mr-2" />
-                                Edit User
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => openSubModal(user)}>
-                                <CreditCard className="w-4 h-4 mr-2" />
-                                Manage Subscription
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleToggleActive(user)}>
-                                {user.isActive ? (
-                                  <>
-                                    <EyeOff className="w-4 h-4 mr-2" />
-                                    Deactivate
-                                  </>
-                                ) : (
-                                  <>
-                                    <Eye className="w-4 h-4 mr-2" />
-                                    Activate
-                                  </>
-                                )}
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleDelete(user.id)} className="text-red-600 focus:text-red-600">
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                Delete User
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <Button variant="ghost" size="icon" onClick={() => openEditModal(user)} className="text-slate-500 hover:text-violet-600 hover:bg-violet-50 h-8 w-8" title="Edit User">
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => openSubModal(user)} className="text-slate-500 hover:text-violet-600 hover:bg-violet-50 h-8 w-8" title="Manage Subscription">
+                            <CreditCard className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => handleToggleActive(user)} className={`text-slate-500 hover:text-violet-600 hover:bg-violet-50 h-8 w-8 ${user.isActive ? '' : 'text-emerald-500'}`} title={user.isActive ? "Deactivate" : "Activate"}>
+                            {user.isActive ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => handleDelete(user.id)} className="text-slate-500 hover:text-red-600 hover:bg-red-50 h-8 w-8" title="Delete User">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </td>
                     </motion.tr>
