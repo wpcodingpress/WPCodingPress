@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Image from "next/image"
 import { motion } from "framer-motion"
 import { Mail, MapPin, Clock, Send, CheckCircle2, MessageSquare, Headphones, Zap, FileText, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -129,15 +128,17 @@ export default function ContactPage() {
 
   return (
     <div className="relative">
-      <section className="relative py-32 overflow-hidden">
-        <div className="absolute inset-0">
-          <Image 
-            src="https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&q=80"
-            alt="Contact Background"
-            fill
-            className="object-cover"
-          />
-          
+      <section className="py-20 bg-gradient-to-br from-purple-50 via-white to-violet-50">
+        <div className="container mx-auto px-4">
+          <motion.div 
+            className="text-center max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6">
+              Get In <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">Touch</span>
+            </h1>
+            <p className="text-lg md:text-xl text-slate-600">
               Have a project in mind? We'd love to hear about it. Let's discuss how we can help bring your vision to life.
             </p>
           </motion.div>
@@ -145,8 +146,7 @@ export default function ContactPage() {
       </section>
 
       <section className="py-20 bg-white">
-        
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
