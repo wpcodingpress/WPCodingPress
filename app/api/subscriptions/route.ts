@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
+import { createNotification, notifyAdmins } from '@/lib/notifications';
 
 const GUMROAD_PRODUCT_LINK = process.env.GUMROAD_PRODUCT_LINK || 'https://rahmanbld.gumroad.com/l/wpcodingpress';
 const TESTING_MODE = process.env.TESTING_MODE === 'true';
@@ -74,6 +75,15 @@ export async function POST(request: Request) {
         console.error('Prisma create error:', err);
         throw err;
       });
+
+      await createNotification({
+        userId: user.id,
+        type: 'subscription',
+        title: `${selectedPlan.tierName} Plan Activated!`,
+        message: `Your ${selectedPlan.tierName} subscription is now active. Enjoy unlimited conversions!`,
+        link: '/dashboard/subscription',
+        priority: 'high'
+      })
 
       return NextResponse.json({ 
         message: 'Subscription activated (TESTING_MODE - no payment required)',

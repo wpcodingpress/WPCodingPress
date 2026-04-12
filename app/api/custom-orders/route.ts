@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import prisma from "@/lib/prisma"
+import { createNotification, notifyAdmins } from "@/lib/notifications"
 
 export async function GET() {
   try {
@@ -58,6 +59,15 @@ export async function POST(request: NextRequest) {
     })
 
     console.log("Custom order created successfully:", order.id)
+
+    await notifyAdmins({
+      type: 'custom_order',
+      title: 'New Custom Order',
+      message: `${clientName} - "${projectName}" - $${totalAmount}`,
+      link: '/admin/custom-orders',
+      priority: 'high'
+    })
+
     return NextResponse.json(order, { status: 201 })
   } catch (error: any) {
     console.error("Error creating custom order:", error.message)

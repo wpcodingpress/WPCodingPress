@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 import { requireActiveSubscription } from '@/lib/subscription';
+import { createNotification } from '@/lib/notifications';
 import crypto from 'crypto';
 
 function generateApiKey(): string {
@@ -80,6 +81,15 @@ export async function POST(request: Request) {
         lastSyncAt: new Date(),
       },
     });
+
+    await createNotification({
+      userId,
+      type: 'site',
+      title: 'Site Connected Successfully!',
+      message: `Your WordPress site at ${domain} has been connected. You can now start converting.`,
+      link: '/dashboard/sites',
+      priority: 'medium'
+    })
 
     return NextResponse.json({
       site: {

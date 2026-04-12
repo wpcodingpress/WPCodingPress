@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma"
 import { sendOrderConfirmation } from "@/lib/email"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { createNotification, notifyAdmins, markAllNotificationsAsRead } from "@/lib/notifications"
 
 export async function GET(request: NextRequest) {
   try {
@@ -194,6 +195,29 @@ export async function POST(request: NextRequest) {
           amount: orderAmount
         }
       )
+    }
+
+    if (order) {
+      const orderStatus = order.status
+      if (userId) {
+        await createNotification({
+          userId,
+          type: 'order',
+          title: orderStatus === 'completed' ? 'Order Completed!' : 'New Order Created',
+          message: orderStatus === 'completed' 
+            ? `Your order for ${productName || serviceName || 'service'} has been completed.`
+            : `Order #${order.id.slice(-8).toUpperCase()} has been created. Status: ${orderStatus}`,
+          link: '/dashboard/orders',
+          priority: orderStatus === 'completed' ? 'high' : 'medium'
+        })
+      }
+      await notifyAdmins({
+        type: 'order',
+        title: 'New Order Received',
+        message: `${clientName} ordered ${productName || serviceName || 'a service'} - $${orderAmount}`,
+        link: '/admin/orders',
+        priority: 'high'
+      })
     }
 
     return NextResponse.json(order, { status: 201 })
