@@ -32,36 +32,40 @@ export default function AdminLoginPage() {
         redirect: false
       })
 
-      // If not admin, try client credentials
-      if (result?.error) {
-        result = await signIn("client", {
-          email: formData.email,
-          password: formData.password,
-          redirect: false
-        })
-        
-        if (result?.error) {
-          setError("Invalid email or password. Please try again.")
-          setIsLoading(false)
-          return
-        }
-        
-        // Wait for session to update
-        await new Promise(resolve => setTimeout(resolve, 500))
-        
-        // Get role for non-admin users - fetch from database directly
-        const userRes = await fetch('/api/auth/me')
-        const userData = await userRes.json()
-        const role = userData?.user?.role || 'user'
-        
-        // Route based on role - manager goes to admin dashboard
-        if (role === 'editor' || role === 'manager') {
-          router.push('/admin/services')
-        } else {
-          router.push('/dashboard')
-        }
-      } else {
+      if (!result?.error) {
+        // Admin login success
         router.push("/admin")
+        return
+      }
+
+      // Try client credentials
+      result = await signIn("client", {
+        email: formData.email,
+        password: formData.password,
+        redirect: false
+      })
+      
+      if (result?.error) {
+        setError("Invalid email or password. Please try again.")
+        setIsLoading(false)
+        return
+      }
+      
+      // Give session time to update
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Fetch user role directly from database
+      const userRes = await fetch('/api/auth/me')
+      const userData = await userRes.json()
+      const role = userData?.user?.role || 'user'
+      
+      // Route based on role
+      if (role === 'admin') {
+        router.push('/admin')
+      } else if (role === 'editor' || role === 'manager') {
+        router.push('/admin/services')
+      } else {
+        router.push('/dashboard')
       }
     } catch {
       setError("An error occurred. Please try again.")
