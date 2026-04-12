@@ -364,7 +364,7 @@ export default function ClientInvoicesPage() {
         <div class="amount-section">
           <div class="amount-main">
             <span class="amount-main-label">Total Project Cost</span>
-            <span class="amount-main-value">$${invoice.totalAmount.toLocaleString()}</span>
+            <span class="amount-main-value">$${(invoice.totalAmount / 100).toLocaleString()}</span>
           </div>
           
           ${invoice.advanceAmount > 0 ? `
@@ -566,7 +566,7 @@ export default function ClientInvoicesPage() {
                           {invoice.projectName}
                         </td>
                         <td className="p-4 text-gray-900 font-bold">
-                          ${invoice.totalAmount.toLocaleString()}
+                          ${(invoice.totalAmount / 100).toLocaleString()}
                         </td>
                         <td className="p-4">
                           <Badge className={`${paymentStatus.color} text-white`}>
@@ -659,7 +659,7 @@ export default function ClientInvoicesPage() {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                     <span className="text-gray-600">Total Amount</span>
-                    <span className="font-bold text-gray-900">${selectedInvoice.totalAmount}</span>
+                    <span className="font-bold text-gray-900">${(selectedInvoice.totalAmount / 100).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
                     <span className="text-gray-600">Advance Paid</span>

@@ -126,8 +126,8 @@ export default function AdminOrdersPage() {
     : orders.filter(o => o.status === filter)
 
   const stats = {
-    totalRevenue: orders.filter(o => o.paymentStatus === "paid").reduce((sum, o) => sum + (o.amount || 0), 0),
-    pendingPayments: orders.filter(o => o.paymentStatus !== "paid" && o.status !== "rejected").reduce((sum, o) => sum + (o.amount || 0), 0),
+    totalRevenue: orders.filter(o => o.paymentStatus === "paid").reduce((sum, o) => sum + (o.amount || 0), 0) / 100,
+    pendingPayments: orders.filter(o => o.paymentStatus !== "paid" && o.status !== "rejected").reduce((sum, o) => sum + (o.amount || 0), 0) / 100,
     completedOrders: orders.filter(o => o.status === "completed").length,
     totalOrders: orders.length
   }
@@ -265,7 +265,7 @@ export default function AdminOrdersPage() {
                         </Badge>
                       </td>
                       <td className="p-4 text-slate-900 font-medium">
-                        ${order.amount || 0}
+                        ${(order.amount || 0) / 100}
                       </td>
                       <td className="p-4">
                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getPaymentColor(order.paymentStatus)}`}>

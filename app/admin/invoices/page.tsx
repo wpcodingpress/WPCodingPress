@@ -422,7 +422,7 @@ export default function AdminInvoicesPage() {
         <div class="amount-section">
           <div class="amount-main">
             <span class="amount-main-label">Total Project Cost</span>
-            <span class="amount-main-value">$${invoice.totalAmount.toLocaleString()}</span>
+            <span class="amount-main-value">$${(invoice.totalAmount / 100).toLocaleString()}</span>
           </div>
           
           ${invoice.advanceAmount > 0 ? `
@@ -665,7 +665,7 @@ export default function AdminInvoicesPage() {
                           {invoice.projectName}
                         </td>
                         <td className="p-4 text-slate-900 font-bold">
-                          ${invoice.totalAmount.toLocaleString()}
+                          ${(invoice.totalAmount / 100).toLocaleString()}
                         </td>
                         <td className="p-4">
                           <div className="flex items-center gap-2">
@@ -796,7 +796,7 @@ export default function AdminInvoicesPage() {
                       }
                     </p>
                     <p className="text-base font-semibold text-slate-800 mt-2">
-                      Total Project Cost: <span className="font-bold text-xl">${selectedInvoice.totalAmount.toLocaleString()}</span>
+                      Total Project Cost: <span className="font-bold text-xl">${(selectedInvoice.totalAmount / 100).toLocaleString()}</span>
                     </p>
                     {selectedInvoice.advanceAmount > 0 && (
                       <p className="text-sm text-slate-700 mt-1">

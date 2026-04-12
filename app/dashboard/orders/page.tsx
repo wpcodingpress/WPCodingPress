@@ -254,7 +254,7 @@ export default function OrdersPage() {
                       </span>
                       <span className="flex items-center gap-1">
                         <CreditCard className="h-3 w-3" />
-                        ${order.amount || 0}
+                        ${(order.amount || 0) / 100}
                       </span>
                     </div>
                   </div>
@@ -322,7 +322,7 @@ export default function OrdersPage() {
               </div>
               <div className="flex justify-between py-2 sm:py-3 border-b border-slate-100">
                 <span className="text-slate-500 text-sm">Amount</span>
-                <span className="text-slate-900 font-bold">${selectedOrder.amount || 0}</span>
+                <span className="text-slate-900 font-bold">${(selectedOrder.amount || 0) / 100}</span>
               </div>
               <div className="flex justify-between py-2 sm:py-3 border-b border-slate-100">
                 <span className="text-slate-500 text-sm">Status</span>
@@ -386,7 +386,7 @@ export default function OrdersPage() {
                     )}
                   </div>
                   <div className="mt-2 sm:mt-3 text-xs text-yellow-600 bg-yellow-100 p-2 rounded">
-                    Please transfer ${selectedOrder.amount} to the account above. Once confirmed, you'll receive your download.
+                    Please transfer ${(selectedOrder.amount || 0) / 100} to the account above. Once confirmed, you'll receive your download.
                   </div>
                 </div>
               )}

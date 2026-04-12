@@ -155,9 +155,9 @@ export default function AdminCustomOrdersPage() {
           projectName: formData.projectName,
           projectDescription: formData.projectDescription,
           serviceType: formData.serviceType,
-          totalAmount: formData.totalAmount,
-          advanceAmount: advanceAmount,
-          remainingAmount: remainingAmount,
+          totalAmount: formData.totalAmount * 100,
+          advanceAmount: advanceAmount * 100,
+          remainingAmount: remainingAmount * 100,
           notes: formData.notes,
           bankAccountId: selectedBankId || null,
         })
@@ -237,9 +237,9 @@ export default function AdminCustomOrdersPage() {
           projectName: formData.projectName,
           projectDescription: formData.projectDescription,
           serviceType: formData.serviceType,
-          totalAmount: formData.totalAmount,
-          advanceAmount: advanceAmount,
-          remainingAmount: remainingAmount,
+          totalAmount: formData.totalAmount * 100,
+          advanceAmount: advanceAmount * 100,
+          remainingAmount: remainingAmount * 100,
           notes: formData.notes,
           bankAccountId: selectedBankId || null,
         })
@@ -549,7 +549,7 @@ export default function AdminCustomOrdersPage() {
         <div class="amount-section">
           <div class="amount-main">
             <span class="amount-main-label">Total Project Cost</span>
-            <span class="amount-main-value">$${invoice.totalAmount.toLocaleString()}</span>
+            <span class="amount-main-value">$${(invoice.totalAmount / 100).toLocaleString()}</span>
           </div>
           
           ${invoice.advanceAmount > 0 ? `
@@ -901,7 +901,7 @@ export default function AdminCustomOrdersPage() {
                         </div>
                       </td>
                       <td className="p-4 text-slate-900 font-medium">
-                        ${order.totalAmount}
+                        ${(order.totalAmount / 100).toLocaleString()}
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
@@ -1142,7 +1142,7 @@ export default function AdminCustomOrdersPage() {
                   <div>
                     <p className="text-sm text-slate-600">Remaining Amount</p>
                     <p className="text-2xl font-bold text-slate-900">
-                      ${formData.totalAmount - (formData.advanceAmount || 0)}
+                      ${(formData.totalAmount - (formData.advanceAmount || 0)) / 100}
                     </p>
                   </div>
                   {formData.advanceAmount > 0 ? (
@@ -1260,7 +1260,7 @@ export default function AdminCustomOrdersPage() {
                       }
                     </p>
                     <p className="text-base font-semibold text-slate-800 mt-2">
-                      Total Project Cost: <span className="font-bold text-xl">${selectedOrder.totalAmount}</span>
+                      Total Project Cost: <span className="font-bold text-xl">${(selectedOrder.totalAmount / 100).toLocaleString()}</span>
                     </p>
                     {selectedOrder.advanceAmount > 0 && (
                       <p className="text-sm text-slate-700 mt-1">
