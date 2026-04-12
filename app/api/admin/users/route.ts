@@ -4,11 +4,6 @@ import prisma from '@/lib/prisma'
 export async function GET() {
   try {
     const users = await prisma.user.findMany({
-      include: {
-        subscriptions: {
-          where: { status: 'active' }
-        }
-      },
       orderBy: { createdAt: 'desc' }
     })
 
