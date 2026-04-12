@@ -21,7 +21,7 @@ export function FloatingButtons() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3">
+    <div className="fixed bottom-8 right-8 z-40 flex flex-col gap-4">
       <AIChatWidget />
       
       <AnimatePresence>
@@ -32,7 +32,7 @@ export function FloatingButtons() {
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             onClick={scrollToTop}
-            className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 to-violet-600 text-white shadow-lg shadow-purple-500/30 flex items-center justify-center cursor-pointer group hover:shadow-xl hover:shadow-purple-500/40 hover:scale-110 transition-all duration-300"
+            className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-violet-600 text-white shadow-lg shadow-purple-500/30 flex items-center justify-center cursor-pointer group hover:shadow-xl hover:shadow-purple-500/40 hover:scale-110 transition-all duration-300"
             aria-label="Back to top"
           >
             <motion.div
@@ -41,7 +41,7 @@ export function FloatingButtons() {
               whileHover={{ scale: 1.5 }}
               transition={{ duration: 0.3 }}
             />
-            <ArrowUp className="w-6 h-6 relative z-10 group-hover:-translate-y-1 transition-transform" />
+            <ArrowUp className="w-5 h-5 relative z-10 group-hover:-translate-y-1 transition-transform" />
             
             <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1 bg-slate-800 text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
               Back to top
@@ -155,7 +155,7 @@ export function AIChatWidget() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.2 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-violet-600 text-white shadow-lg shadow-purple-500/30 flex items-center justify-center cursor-pointer group hover:shadow-xl hover:shadow-purple-500/40 hover:scale-110 transition-all duration-300"
+        className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-violet-600 text-white shadow-lg shadow-purple-500/30 flex items-center justify-center cursor-pointer group hover:shadow-xl hover:shadow-purple-500/40 hover:scale-110 transition-all duration-300"
         aria-label="Open AI Chat"
       >
         <motion.div
@@ -173,7 +173,7 @@ export function AIChatWidget() {
               exit={{ rotate: 90, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <X className="w-7 h-7 relative z-10" />
+              <X className="w-5 h-5 relative z-10" />
             </motion.div>
           ) : (
             <motion.div
@@ -184,9 +184,9 @@ export function AIChatWidget() {
               transition={{ duration: 0.2 }}
               className="relative z-10"
             >
-              <MessageCircle className="w-7 h-7" />
+              <MessageCircle className="w-5 h-5" />
               <motion.span
-                className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full"
+                className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 rounded-full"
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 1, repeat: Infinity }}
               />
