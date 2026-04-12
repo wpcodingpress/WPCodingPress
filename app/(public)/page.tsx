@@ -35,15 +35,23 @@ const portfolioItems = [
   { id: 6, title: "EcomGiantz", category: "E-Commerce", client: "EcomGiantz", liveUrl: "https://ecomgiantz.com", image: "/portfolio/ecomgianrtz.png" },
 ]
 
-const services = [
-  { icon: ArrowRightLeft, title: "WordPress to Next.js", description: "Lightning-fast conversion with auto-sync", color: "from-indigo-500 to-purple-500", href: "/services/wordpress-to-nextjs" },
-  { icon: Palette, title: "Elementor Pro Design", description: "Stunning designs that convert", color: "from-pink-500 to-rose-500", href: "/services/elementor-pro-design" },
-  { icon: ShoppingCart, title: "WooCommerce Stores", description: "Full e-commerce solutions", color: "from-green-500 to-emerald-500", href: "/services/woocommerce-stores" },
-  { icon: Search, title: "SEO & Marketing", description: "Dominate search rankings", color: "from-orange-500 to-amber-500", href: "/services/seo-marketing" },
-  { icon: Code, title: "Web Applications", description: "Custom React/Next.js apps", color: "from-blue-500 to-cyan-500", href: "/services/web-applications" },
-  { icon: Cloud, title: "Cloud & DevOps", description: "Modern infrastructure", color: "from-slate-500 to-gray-500", href: "/services/cloud-devops" },
-  { icon: Globe, title: "Domain & Hosting", description: "Setup & ongoing support", color: "from-violet-500 to-purple-500", href: "/services/domain-hosting" },
-]
+const serviceIcons: Record<string, string> = {
+  code: "⚡", palette: "🎨", "shopping-cart": "🛒", zap: "📈", globe: "🌐", settings: "☁️",
+}
+
+const serviceColors: Record<string, string> = {
+  code: "from-indigo-500 to-purple-500", palette: "from-pink-500 to-rose-500", "shopping-cart": "from-green-500 to-emerald-500",
+  zap: "from-orange-500 to-amber-500", globe: "from-blue-500 to-cyan-500", settings: "from-slate-500 to-gray-500",
+}
+
+const productColors: Record<string, string> = {
+  plugin: "from-blue-500 to-cyan-500", theme: "from-green-500 to-emerald-500", template: "from-violet-500 to-purple-500",
+  mcp_server: "from-pink-500 to-rose-500", ai_agent: "from-orange-500 to-amber-500",
+}
+
+const productIcons: Record<string, string> = {
+  plugin: "🔌", theme: "🎨", template: "⚛️", mcp_server: "🤖", ai_agent: "🧠",
+}
 
 const stats = [
   { value: "700+", label: "Happy Clients", icon: Users },
@@ -121,10 +129,37 @@ export default function HomePage() {
   const [conversionStep, setConversionStep] = useState(0)
   const [userPlan, setUserPlan] = useState<string | null>(null)
   const [isLoadingPlan, setIsLoadingPlan] = useState(true)
+  const [homepageServices, setHomepageServices] = useState<any[]>([])
+  const [homepageProducts, setHomepageProducts] = useState<any[]>([])
 
   useEffect(() => {
     fetchUserPlan()
+    fetchHomepageData()
   }, [])
+
+  const fetchHomepageData = async () => {
+    try {
+      const [servicesRes, productsRes] = await Promise.all([
+        fetch('/api/public/services'),
+        fetch('/api/products')
+      ])
+      const servicesData = await servicesRes.json()
+      const productsData = await productsRes.json()
+      setHomepageServices(servicesData)
+      
+      const typeMap: Record<string, string> = { plugin: 'plugin', theme: 'theme', template: 'template', mcp_server: 'mcp_server', ai_agent: 'ai_agent' }
+      const seen = new Set<string>()
+      const uniqueProducts = productsData.filter((p: any) => {
+        const t = typeMap[p.type] || p.type
+        if (seen.has(t)) return false
+        seen.add(t)
+        return true
+      }).slice(0, 5)
+      setHomepageProducts(uniqueProducts)
+    } catch (e) {
+      console.error('Error fetching homepage data:', e)
+    }
+  }
 
   const fetchUserPlan = async () => {
     try {
@@ -934,60 +969,63 @@ export default function HomePage() {
       </section>
 
       {/* Features Comparison Table */}
-      <section className="py-24 px-6 bg-gradient-to-br from-slate-50 via-white to-purple-50">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-24 px-6 bg-gradient-to-br from-slate-50 via-white to-indigo-50">
+        <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200 px-4 py-1.5 text-sm font-medium mb-6">
               Compare Plans
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-              Choose the <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">Perfect Plan</span>
+              See What's <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 bg-clip-text text-transparent">Included</span>
             </h2>
-            <p className="text-slate-600 max-w-xl mx-auto">Select the plan that fits your needs. All plans include free SSL and CDN.</p>
+            <p className="text-slate-600">Choose the plan that fits your needs. All plans include free SSL.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-            {[
-              { plan: "free", name: "Free", price: "$0", period: "forever", features: ["1 WordPress Site", "Basic Template", "Community Support"] },
-              { plan: "pro", name: "Pro", price: "$19", period: "/month", features: ["5 Sites", "Live Deployment", "Priority Support", "Custom Domain", "Analytics"], popular: true },
-              { plan: "enterprise", name: "Enterprise", price: "$99", period: "/month", features: ["Unlimited Sites", "White-label", "24/7 Support", "API Access", "Team Collab"] },
-            ].map((plan, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className={`relative bg-white rounded-3xl overflow-hidden ${plan.popular ? 'ring-2 ring-indigo-500 shadow-2xl shadow-indigo-200 scale-105 z-10' : 'border border-slate-200 shadow-lg'}`}
-              >
-                {plan.popular && (
-                  <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 py-2 text-center">
-                    <span className="text-white text-xs font-bold uppercase tracking-wider">Most Popular</span>
-                  </div>
-                )}
-                <div className="p-8">
-                  <div className="text-center mb-6">
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">{plan.name}</h3>
-                    <div className="text-4xl font-bold text-slate-900">
-                      {plan.price}<span className="text-lg text-slate-500 font-normal">{plan.period}</span>
-                    </div>
-                  </div>
-                  <ul className="space-y-3 mb-8">
-                    {plan.features.map((feature, j) => (
-                      <li key={j} className="flex items-center gap-3 text-slate-600">
-                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href={plan.plan === "free" ? "/register" : plan.plan === "pro" ? "/register?plan=pro" : "/contact"}>
-                    <Button className={`w-full ${plan.popular ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white' : 'border-2 border-slate-200 text-slate-700 hover:border-indigo-300 hover:bg-indigo-50'}`}>
-                      {plan.plan === "free" ? "Get Started" : plan.plan === "pro" ? "Start Pro" : "Contact Sales"}
-                    </Button>
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
+          <div className="bg-white rounded-3xl shadow-2xl shadow-indigo-200 overflow-hidden border border-indigo-100">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+                    <th className="text-left py-5 px-6 text-white font-bold text-lg">Feature</th>
+                    <th className="text-center py-5 px-6 text-white font-bold text-lg bg-white/10">Free</th>
+                    <th className="text-center py-5 px-6 text-white font-bold text-lg bg-white/20">Pro</th>
+                    <th className="text-center py-5 px-6 text-white font-bold text-lg bg-white/10">Enterprise</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { feature: "WordPress Site Conversions", free: "1", pro: "5", enterprise: "Unlimited" },
+                    { feature: "Live Deployment (Vercel)", free: false, pro: true, enterprise: true },
+                    { feature: "Custom Domain", free: false, pro: true, enterprise: true },
+                    { feature: "Analytics Dashboard", free: false, pro: true, enterprise: true },
+                    { feature: "Auto Content Sync", free: false, pro: true, enterprise: true },
+                    { feature: "Priority Support", free: false, pro: true, enterprise: true },
+                    { feature: "24/7 Dedicated Support", free: false, pro: false, enterprise: true },
+                    { feature: "White-label Deployment", free: false, pro: false, enterprise: true },
+                    { feature: "API Access", free: false, pro: false, enterprise: true },
+                  ].map((row, i) => (
+                    <tr key={i} className={`border-b border-indigo-50 ${i % 2 === 0 ? 'bg-slate-50/50' : ''}`}>
+                      <td className="py-4 px-6 text-slate-700 font-medium">{row.feature}</td>
+                      <td className="text-center py-4 px-6">
+                        {typeof row.free === 'boolean' ? (
+                          row.free ? <CheckCircle2 className="w-6 h-6 text-green-500 mx-auto" /> : <X className="w-6 h-6 text-slate-300 mx-auto" />
+                        ) : <span className="text-indigo-600 font-bold">{row.free}</span>}
+                      </td>
+                      <td className="text-center py-4 px-6 bg-indigo-50/30">
+                        {typeof row.pro === 'boolean' ? (
+                          row.pro ? <CheckCircle2 className="w-6 h-6 text-green-500 mx-auto" /> : <X className="w-6 h-6 text-slate-300 mx-auto" />
+                        ) : <span className="text-indigo-600 font-bold">{row.pro}</span>}
+                      </td>
+                      <td className="text-center py-4 px-6">
+                        {typeof row.enterprise === 'boolean' ? (
+                          row.enterprise ? <CheckCircle2 className="w-6 h-6 text-green-500 mx-auto" /> : <X className="w-6 h-6 text-slate-300 mx-auto" />
+                        ) : <span className="text-indigo-600 font-bold">{row.enterprise}</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
@@ -1041,27 +1079,38 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {services.map((service, i) => (
+            {homepageServices.length > 0 ? homepageServices.map((service, i) => {
+              const colorClass = serviceColors[service.icon] || "from-indigo-500 to-purple-500"
+              const iconEmoji = serviceIcons[service.icon] || "⚡"
+              return (
               <motion.div
                 key={i}
                 className="group p-8 bg-white border border-slate-200 rounded-2xl hover:border-purple-300 hover:shadow-xl hover:shadow-purple-100 transition-all hover:-translate-y-1"
                 whileHover={{ y: -8 }}
               >
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
-                  <service.icon className="w-7 h-7 text-white" />
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${colorClass} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform text-3xl`}>
+                  {iconEmoji}
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-3 group-hover:text-purple-600 transition-colors">
-                  {service.title}
+                  {service.name}
                 </h3>
-                <p className="text-slate-600 mb-6">{service.description}</p>
-                <Link href={service.href}>
+                <p className="text-slate-600 mb-6">{service.description?.substring(0, 60)}</p>
+                <Link href={`/services/${service.slug}`}>
                   <Button variant="ghost" className="p-0 h-auto text-purple-600 hover:text-purple-700 font-medium">
                     Learn More
                     <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
                 </Link>
               </motion.div>
-            ))}
+              )
+            }) : (
+              <motion.div
+                key="loading"
+                className="col-span-full text-center py-12 text-slate-500"
+              >
+                Loading services...
+              </motion.div>
+            )}
           </div>
 
           <div className="text-center mt-12">
@@ -1091,13 +1140,18 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
-            {[
-              { name: "WordPress Plugins", desc: "Extend your site with powerful tools", icon: "🔌", href: "/products/plugins", color: "from-blue-500 to-cyan-500" },
-              { name: "WordPress Themes", desc: "Beautiful, responsive designs", icon: "🎨", href: "/products/themes", color: "from-green-500 to-emerald-500" },
-              { name: "Next.js Templates", desc: "Production-ready code", icon: "⚛️", href: "/products/templates", color: "from-violet-500 to-purple-500" },
-              { name: "MCP Servers", desc: "AI integration Made Easy", icon: "🤖", href: "/products/mcp-servers", color: "from-pink-500 to-rose-500" },
-              { name: "AI Agents", desc: "Smart automation", icon: "🧠", href: "/products/ai-agents", color: "from-orange-500 to-amber-500" },
-            ].map((product, i) => (
+            {homepageProducts.length > 0 ? homepageProducts.map((product: any, i: number) => {
+              const typeMap: Record<string, { name: string, href: string }> = {
+                plugin: { name: "WordPress Plugins", href: "/products/plugins" },
+                theme: { name: "WordPress Themes", href: "/products/themes" },
+                template: { name: "Next.js Templates", href: "/products/templates" },
+                mcp_server: { name: "MCP Servers", href: "/products/mcp-servers" },
+                ai_agent: { name: "AI Agents", href: "/products/ai-agents" },
+              }
+              const productInfo = typeMap[product.type] || { name: product.name || product.type, href: "/products" }
+              const colorClass = productColors[product.type] || "from-indigo-500 to-purple-500"
+              const iconEmoji = productIcons[product.type] || "📦"
+              return (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -1106,21 +1160,26 @@ export default function HomePage() {
                 transition={{ delay: i * 0.1 }}
                 className="group relative bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-2xl p-6 hover:border-cyan-300 hover:shadow-xl transition-all hover:-translate-y-1"
               >
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${product.color} flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform`}>
-                  {product.icon}
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${colorClass} flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform`}>
+                  {iconEmoji}
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-cyan-600 transition-colors">
-                  {product.name}
+                  {productInfo.name}
                 </h3>
-                <p className="text-slate-600 text-sm mb-4">{product.desc}</p>
-                <Link href={product.href}>
+                <p className="text-slate-600 text-sm mb-4">Premium {productInfo.name.toLowerCase()} for your projects</p>
+                <Link href={productInfo.href}>
                   <Button variant="ghost" className="p-0 h-auto text-cyan-600 hover:text-cyan-700 font-medium text-sm">
                     Learn More
                     <ArrowRight className="ml-1 w-4 h-4" />
                   </Button>
                 </Link>
               </motion.div>
-            ))}
+              )
+            }) : (
+              <div className="col-span-full text-center py-12 text-slate-500">
+                Loading products...
+              </div>
+            )}
           </div>
 
           <div className="text-center mt-12">
