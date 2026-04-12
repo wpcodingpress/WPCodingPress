@@ -144,8 +144,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-indigo-950/30 to-slate-950" />
+      <section className="py-20 bg-white">
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12">
@@ -154,8 +153,8 @@ export default function ContactPage() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700/50 overflow-hidden relative">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl" />
+              <Card className="bg-white border-slate-200 overflow-hidden relative">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full blur-3xl" />
                 
                 <CardContent className="p-8 relative z-10">
                   <div className="flex items-center gap-3 mb-6">
@@ -163,8 +162,8 @@ export default function ContactPage() {
                       <MessageSquare className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold text-white">How can we help?</h2>
-                      <p className="text-slate-400 text-sm">Choose an option below</p>
+                      <h2 className="text-2xl font-bold text-slate-900">How can we help?</h2>
+                      <p className="text-slate-500 text-sm">Choose an option below</p>
                     </div>
                   </div>
 
