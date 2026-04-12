@@ -42,7 +42,7 @@ export async function GET(request: Request) {
       const [dbNotifications, recentOrders, recentContacts, recentSubscriptions] = await Promise.all([
         prisma.notification.findMany({
           orderBy: { createdAt: 'desc' },
-          take: 50
+          take: 100
         }),
         prisma.order.findMany({
           where: { createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
@@ -132,7 +132,6 @@ export async function GET(request: Request) {
           include: { service: true }
         }),
         prisma.customOrder.findMany({
-          where: { userId },
           orderBy: { updatedAt: 'desc' },
           take: 10
         }),
@@ -188,35 +187,39 @@ export async function GET(request: Request) {
         }
       })
 
-      userCustomOrders.forEach(order => {
-        const existing = notifications.find(n => n.type === 'custom_order' && n.message.includes(order.id))
-        if (!existing && orderStatusMessages[order.status]) {
-          notifications.push({
-            id: `custom-order-${order.id}`,
-            type: 'custom_order',
-            title: `Custom Order ${order.status.replace(/_/g, ' ')}`,
-            message: `Your custom project "${order.projectName}" ${orderStatusMessages[order.status]}`,
-            isRead: false,
-            createdAt: order.updatedAt.toISOString(),
-            link: '/dashboard/invoices'
-          })
-        }
+      if (user?.email) {
+        userCustomOrders
+          .filter(order => order.clientEmail === user.email)
+          .forEach(order => {
+            const existing = notifications.find(n => n.type === 'custom_order' && n.message.includes(order.id))
+            if (!existing && orderStatusMessages[order.status]) {
+              notifications.push({
+                id: `custom-order-${order.id}`,
+                type: 'custom_order',
+                title: `Custom Order ${order.status.replace(/_/g, ' ')}`,
+                message: `Your custom project "${order.projectName}" ${orderStatusMessages[order.status]}`,
+                isRead: false,
+                createdAt: order.updatedAt.toISOString(),
+                link: '/dashboard/invoices'
+              })
+            }
 
-        if (!existing && order.advancePaid && !order.remainingPaid) {
-          const existingPayment = notifications.find(n => n.type === 'payment' && n.message.includes(order.id))
-          if (!existingPayment) {
-            notifications.push({
-              id: `custom-payment-${order.id}`,
-              type: 'payment',
-              title: 'Payment Received',
-              message: `Advance payment of $${order.advanceAmount} received for "${order.projectName}"`,
-              isRead: false,
-              createdAt: order.updatedAt.toISOString(),
-              link: '/dashboard/invoices'
-            })
-          }
-        }
-      })
+            if (!existing && order.advancePaid && !order.remainingPaid) {
+              const existingPayment = notifications.find(n => n.type === 'payment' && n.message.includes(order.id))
+              if (!existingPayment) {
+                notifications.push({
+                  id: `custom-payment-${order.id}`,
+                  type: 'payment',
+                  title: 'Payment Received',
+                  message: `Advance payment of $${order.advanceAmount} received for "${order.projectName}"`,
+                  isRead: false,
+                  createdAt: order.updatedAt.toISOString(),
+                  link: '/dashboard/invoices'
+                })
+              }
+            }
+          })
+      }
 
       const subStatusMessages: Record<string, string> = {
         active: 'is now active',
