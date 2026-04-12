@@ -1474,7 +1474,7 @@ export default function HomePage() {
               </Button>
             </Link>
             <Link href="/order">
-              <Button size="lg" variant="outline" className="border-2 border-white/30 text-white hover:bg-white/10 text-lg px-10 py-6 font-semibold">
+              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/20 hover:text-purple-600 text-lg px-10 py-6 font-semibold">
                 Order Now
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
