@@ -25,7 +25,6 @@ import {
   ShoppingBag,
   MessageSquare,
   FileText,
-  ExternalLink,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { FloatingButtons } from "@/components/floating-buttons"
@@ -256,11 +255,10 @@ export default function DashboardLayout({
                       <p className="px-4 text-xs font-semibold text-gray-400 uppercase">Admin Area</p>
                     </div>
                     {adminLinks.filter(link => link.allowed.includes('editor')).map((link) => (
-                      <Link key={link.href} href={link.href} target="_blank">
+                      <Link key={link.href} href={link.href}>
                         <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all">
                           <link.icon className="w-5 h-5" />
                           <span className="font-medium flex-1">{link.title}</span>
-                          <ExternalLink className="w-4 h-4 text-gray-400" />
                         </div>
                       </Link>
                     ))}
@@ -272,11 +270,10 @@ export default function DashboardLayout({
                       <p className="px-4 text-xs font-semibold text-gray-400 uppercase">Admin Area</p>
                     </div>
                     {adminLinks.map((link) => (
-                      <Link key={link.href} href={link.href} target="_blank">
+                      <Link key={link.href} href={link.href}>
                         <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all">
                           <link.icon className="w-5 h-5" />
                           <span className="font-medium flex-1">{link.title}</span>
-                          <ExternalLink className="w-4 h-4 text-gray-400" />
                         </div>
                       </Link>
                     ))}
@@ -330,11 +327,10 @@ export default function DashboardLayout({
                 <p className="px-4 text-xs font-semibold text-gray-400 uppercase">Admin Area</p>
               </div>
               {adminLinks.filter(link => link.allowed.includes('editor')).map((link) => (
-                <Link key={link.href} href={link.href} target="_blank">
+                <Link key={link.href} href={link.href}>
                   <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all">
                     <link.icon className="w-5 h-5" />
                     <span className="font-medium flex-1">{link.title}</span>
-                    <ExternalLink className="w-4 h-4 text-gray-400" />
                   </div>
                 </Link>
               ))}
@@ -347,11 +343,10 @@ export default function DashboardLayout({
                 <p className="px-4 text-xs font-semibold text-gray-400 uppercase">Admin Area</p>
               </div>
               {adminLinks.map((link) => (
-                <Link key={link.href} href={link.href} target="_blank">
+                <Link key={link.href} href={link.href}>
                   <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all">
                     <link.icon className="w-5 h-5" />
                     <span className="font-medium flex-1">{link.title}</span>
-                    <ExternalLink className="w-4 h-4 text-gray-400" />
                   </div>
                 </Link>
               ))}
