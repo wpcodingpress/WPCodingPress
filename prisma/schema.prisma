@@ -25,6 +25,7 @@ model User {
   phone           String?
   company        String?
   role            String   @default("user") // user, manager, editor, admin
+  sessionVersion Int      @default(1) // Increment to invalidate all sessions
   isActive        Boolean  @default(true)
   emailVerified   DateTime?
   stripeCustomerId String?

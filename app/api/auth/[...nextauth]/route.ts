@@ -90,27 +90,49 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user, account }) {
       if (user) {
-        // Get actual role from database
+        // Get actual role and sessionVersion from database
         let actualRole = 'user'
+        let sessionVersion = 1
         if (account?.provider === 'admin') {
           actualRole = 'admin'
         } else if (user.id) {
           try {
             const dbUser = await prisma.user.findUnique({
               where: { id: user.id },
-              select: { role: true }
+              select: { role: true, sessionVersion: true }
             })
-            if (dbUser) actualRole = dbUser.role
+            if (dbUser) {
+              actualRole = dbUser.role
+              sessionVersion = dbUser.sessionVersion
+            }
           } catch (e) { /* ignore */ }
         }
         token.role = actualRole
         token.id = user.id
         token.provider = account?.provider || 'credentials'
+        token.sessionVersion = sessionVersion
+      }
+      // Check session version on existing token
+      else if (token.id && token.sessionVersion) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { sessionVersion: true }
+          })
+          if (dbUser && dbUser.sessionVersion !== token.sessionVersion) {
+            // Session version mismatch - token is invalid
+            token.role = 'invalidated'
+          }
+        } catch (e) { /* ignore */ }
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
+        // Check if session was invalidated
+        if (token.role === 'invalidated') {
+          throw new Error('Session invalidated')
+        }
         session.user.role = token.role as string
         session.user.id = token.id as string
       }

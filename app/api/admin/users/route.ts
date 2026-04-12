@@ -91,8 +91,11 @@ export async function PUT(request: Request) {
           changedBy: 'admin'
         }
       })
-      // Invalidate all user sessions (logout from all devices)
-      await prisma.userSession.deleteMany({ where: { userId: userId } })
+      // Increment session version to invalidate all existing JWT tokens
+      await prisma.user.update({
+        where: { id: userId },
+        data: { sessionVersion: { increment: 1 } }
+      })
       return NextResponse.json({ success: true, message: 'Role updated', user: updatedUser, sessionsInvalidated: true })
     }
 
