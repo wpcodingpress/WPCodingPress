@@ -129,7 +129,7 @@ export async function POST(request: Request, { params }: Params) {
       
       <div style="text-align: center; color: #64748b; font-size: 14px; margin-top: 30px;">
         <p>Thank you for choosing WPCodingPress!</p>
-        <p>For any queries, contact: contact@wpcodingpress.com</p>
+        <p>For any queries, contact: support@wpcodingpress.com</p>
       </div>
     </div>
   </body>

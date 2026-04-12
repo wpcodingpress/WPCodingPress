@@ -134,7 +134,7 @@ export function AIChatWidget() {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "I'm having trouble connecting right now. Please try again or contact us directly at contact@wpcodingpress.com",
+        content: "I'm having trouble connecting right now. Please try again or contact us directly at support@wpcodingpress.com",
         timestamp: new Date(),
       }
       setMessages((prev) => [...prev, errorMessage])

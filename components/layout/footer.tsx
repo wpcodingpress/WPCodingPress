@@ -6,7 +6,11 @@ import { Zap, Mail, ArrowRight } from "lucide-react"
 const footerLinks = {
   services: [
     { href: "/services", label: "All Services" },
-    { href: "/order", label: "Start a Project" },
+    { href: "/services#custom", label: "Custom Development" },
+    { href: "/services#migration", label: "WP to Next.js" },
+    { href: "/services#mcp", label: "MCP Servers" },
+    { href: "/services#ai", label: "AI Agents" },
+    { href: "/services#plugin", label: "Plugin Development" },
   ],
   products: [
     { href: "/products/plugins", label: "WordPress Plugins" },
@@ -115,8 +119,8 @@ export function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
                 <Mail className="h-4 w-4 text-purple-600 mt-0.5" />
-                <a href="mailto:contact@wpcodingpress.com" className="text-sm text-slate-600 hover:text-purple-600 transition-colors">
-                  contact@wpcodingpress.com
+                <a href="mailto:support@wpcodingpress.com" className="text-sm text-slate-600 hover:text-purple-600 transition-colors">
+                  support@wpcodingpress.com
                 </a>
               </li>
             </ul>

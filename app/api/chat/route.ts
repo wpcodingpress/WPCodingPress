@@ -9,7 +9,7 @@ const responses: Record<string, string> = {
 
   "get started": `Getting started is easy!\n\n1️⃣ **Sign Up** - Create your free account\n2️⃣ **Choose a Plan** - Start free or upgrade anytime\n3️⃣ **Connect Your Site** - Link your existing website\n4️⃣ **Launch** - Go live in minutes!\n\nReady to begin? Visit our pricing page!`,
 
-  support: `We're here to help!\n\n📧 Email: contact@wpcodingpress.com\n📱 Phone: +880 1943 429727\n💬 Live Chat: Available 24/7\n\nOur typical response time is under 2 hours!`,
+  support: `We're here to help!\n\n📧 Email: support@wpcodingpress.com\n💬 Live Chat: Available 24/7\n\nOur typical response time is under 2 hours!`,
 
   default: `Thanks for reaching out! I'm here to help with:\n\n• Questions about our services\n• Pricing and plans\n• Technical support\n• Getting started guide\n\nWhat would you like to know more about?`,
 }

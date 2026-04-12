@@ -615,7 +615,7 @@ export default function AdminCustomOrdersPage() {
       <div class="footer-title">Thank You for Your Business! 🚀</div>
       <div class="footer-subtitle">We appreciate your trust in WPCodingPress</div>
       <div class="footer-contact">
-        📧 contact@wpcodingpress.com | 🌐 wpcodingpress.com
+        📧 support@wpcodingpress.com | 🌐 wpcodingpress.com
       </div>
     </div>
   </div>

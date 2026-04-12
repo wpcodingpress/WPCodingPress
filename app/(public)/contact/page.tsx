@@ -107,23 +107,23 @@ export default function ContactPage() {
     {
       icon: Mail,
       title: "Email Us",
-      value: "contact@wpcodingpress.com",
-      href: "mailto:contact@wpcodingpress.com",
+      value: "support@wpcodingpress.com",
+      href: "mailto:support@wpcodingpress.com",
       color: "from-blue-500 to-cyan-500"
     },
     {
-      icon: MapPin,
-      title: "Visit Us",
-      value: "78 Naya Paltan, Shanjari Tower, Dhaka",
-      href: "#",
+      icon: Clock,
+      title: "Support Hours",
+      value: "24/7 Available",
+      href: "mailto:support@wpcodingpress.com",
       color: "from-purple-500 to-pink-500"
     },
     {
-      icon: Clock,
-      title: "Working Hours",
-      value: "Mon - Sat: 9AM - 8PM (BST)",
+      icon: Headphones,
+      title: "Priority Support",
+      value: "Instant Response",
       href: "#",
-      color: "from-orange-500 to-amber-500"
+      color: "from-green-500 to-emerald-500"
     }
   ]
 
