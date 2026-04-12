@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Users, CreditCard, Calendar, Search, Download, Mail, Trash2, Edit3, X, Check, AlertCircle, Loader2, Crown, Rocket, Pause, Play } from "lucide-react"
+import { Users, CreditCard, Calendar, Search, Download, Mail, Trash2, Edit3, X, Check, AlertCircle, Loader2, Crown, Rocket, Pause, Play, DollarSign } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -214,7 +214,7 @@ export default function AdminSubscribersPage() {
                 <DollarSign className="h-5 w-5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-emerald-600">${mrr}</p>
+                <p className="text-2xl font-bold text-emerald-600">{"$" + mrr}</p>
                 <p className="text-sm text-slate-500">MRR</p>
               </div>
             </div>
