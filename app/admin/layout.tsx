@@ -276,7 +276,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main Content */}
-      <main className="min-h-screen lg:ml-0">
+      <main className="min-h-screen lg:ml-64">
         {/* Top Header */}
         <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200 shadow-sm">
           <div className="flex items-center justify-between px-4 py-3">
