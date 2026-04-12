@@ -562,13 +562,13 @@ export default function AdminCustomOrdersPage() {
             <div class="amount-item">
               <span class="amount-item-label">Advance (${advancePercent}%)</span>
               <span class="amount-item-value ${invoice.advancePaid ? 'paid' : 'pending'}">
-                $${invoice.advanceAmount.toLocaleString()} ${invoice.advancePaid ? '✓' : ''}
+                ${formatPrice(invoice.advanceAmount)} {invoice.advancePaid ? '✓' : ''}
               </span>
             </div>
             <div class="amount-item">
               <span class="amount-item-label">Remaining (${remainingPercent}%)</span>
               <span class="amount-item-value ${invoice.remainingPaid ? 'paid' : 'pending'}">
-                $${invoice.remainingAmount.toLocaleString()} ${invoice.remainingPaid ? '✓' : '(Due)'}
+                ${formatPrice(invoice.remainingAmount)} {invoice.remainingPaid ? '✓' : '(Due)'}
               </span>
             </div>
           </div>
