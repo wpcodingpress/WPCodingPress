@@ -72,10 +72,45 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json()
-    const { userId, plan, status, action } = body
+    const { userId, plan, status, action, role, name, email, isActive } = body
 
     if (!userId) {
       return NextResponse.json({ error: 'User ID required' }, { status: 400 })
+    }
+
+    if (action === 'update_role') {
+      const user = await prisma.user.update({
+        where: { id: userId },
+        data: { role: role || 'user' }
+      })
+      return NextResponse.json({ success: true, message: 'Role updated', user })
+    }
+
+    if (action === 'update_profile') {
+      const user = await prisma.user.update({
+        where: { id: userId },
+        data: { 
+          name: name,
+          email: email,
+          isActive: isActive !== undefined ? isActive : undefined
+        }
+      })
+      return NextResponse.json({ success: true, message: 'Profile updated', user })
+    }
+
+    if (action === 'toggle_active') {
+      const existingUser = await prisma.user.findUnique({ where: { id: userId } })
+      const user = await prisma.user.update({
+        where: { id: userId },
+        data: { isActive: !existingUser?.isActive }
+      })
+      return NextResponse.json({ success: true, message: 'User status updated', user })
+    }
+
+    if (action === 'delete_user') {
+      await prisma.user.delete({ where: { id: userId } })
+      return NextResponse.json({ success: true, message: 'User deleted' })
+    }
     }
 
     const existingUser = await prisma.user.findUnique({
@@ -143,5 +178,45 @@ export async function PUT(request: Request) {
   } catch (error) {
     console.error('Error updating user subscription:', error)
     return NextResponse.json({ error: 'Failed to update subscription' }, { status: 500 })
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const session = await getServerSession(authOptions)
+    
+    if (!session || session.user.role !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const body = await request.json()
+    const { name, email, password, role } = body
+
+    if (!name || !email || !password) {
+      return NextResponse.json({ error: 'Name, email and password required' }, { status: 400 })
+    }
+
+    const existingUser = await prisma.user.findUnique({ where: { email } })
+    if (existingUser) {
+      return NextResponse.json({ error: 'User with this email already exists' }, { status: 400 })
+    }
+
+    const bcrypt = require('bcryptjs')
+    const hashedPassword = await bcrypt.hash(password, 12)
+
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role: role || 'user',
+        isActive: true,
+      }
+    })
+
+    return NextResponse.json({ success: true, message: 'User created', user })
+  } catch (error) {
+    console.error('Error creating user:', error)
+    return NextResponse.json({ error: 'Failed to create user' }, { status: 500 })
   }
 }

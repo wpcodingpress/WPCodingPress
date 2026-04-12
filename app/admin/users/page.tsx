@@ -41,9 +41,11 @@ export default function AdminUsersPage() {
   const [error, setError] = useState("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showSubModal, setShowSubModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [subPlan, setSubPlan] = useState("pro");
   const [subStatus, setSubStatus] = useState("active");
   const [isUpdatingSub, setIsUpdatingSub] = useState(false);
+  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "user" });
 
   useEffect(() => {
     fetchUsers();
@@ -88,10 +90,51 @@ export default function AdminUsersPage() {
     if (!confirm("Are you sure you want to delete this user?")) return;
 
     try {
-      await fetch(`/api/admin/users/${id}`, { method: "DELETE" });
+      await fetch("/api/admin/users", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: id, action: "delete_user" })
+      });
       fetchUsers();
     } catch (error) {
       console.error("Error deleting user:", error);
+    }
+  };
+
+  const updateUserRole = async (userId: string, role: string) => {
+    try {
+      await fetch("/api/admin/users", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, action: "update_role", role })
+      });
+      fetchUsers();
+    } catch (error) {
+      console.error("Error updating role:", error);
+    }
+  };
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUser)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Failed to create user");
+      } else {
+        setShowCreateModal(false);
+        setNewUser({ name: "", email: "", password: "", role: "user" });
+        fetchUsers();
+      }
+    } catch (error) {
+      console.error("Error creating user:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -177,7 +220,64 @@ export default function AdminUsersPage() {
           <h1 className="text-3xl font-bold text-slate-900">Users</h1>
           <p className="text-slate-500 mt-1">Manage registered users</p>
         </div>
+        <Button onClick={() => setShowCreateModal(true)} className="bg-violet-600 hover:bg-violet-700">
+          <UserPlus className="w-4 h-4 mr-2" />
+          Add User
+        </Button>
       </div>
+
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Create New User</h2>
+            <form onSubmit={handleCreateUser} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
+                <Input
+                  value={newUser.name}
+                  onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                <Input
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                <Input
+                  type="password"
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
+                <select
+                  value={newUser.role}
+                  onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                  className="w-full border rounded-lg p-2"
+                >
+                  <option value="user">User</option>
+                  <option value="editor">Editor</option>
+                  <option value="manager">Manager</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              <div className="flex gap-3">
+                <Button type="submit" className="flex-1">Create User</Button>
+                <Button type="button" variant="outline" onClick={() => setShowCreateModal(false)}>Cancel</Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600">
@@ -204,6 +304,7 @@ export default function AdminUsersPage() {
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
                     <th className="text-left p-4 text-sm font-semibold text-slate-600">User</th>
+                    <th className="text-left p-4 text-sm font-semibold text-slate-600">Role</th>
                     <th className="text-left p-4 text-sm font-semibold text-slate-600">Company</th>
                     <th className="text-left p-4 text-sm font-semibold text-slate-600">Phone</th>
                     <th className="text-left p-4 text-sm font-semibold text-slate-600">Subscription</th>
@@ -226,6 +327,23 @@ export default function AdminUsersPage() {
                           <p className="font-medium text-slate-900">{user.name}</p>
                           <p className="text-sm text-slate-500">{user.email}</p>
                         </div>
+                      </td>
+                      <td className="p-4">
+                        <select
+                          value={user.role || 'user'}
+                          onChange={(e) => updateUserRole(user.id, e.target.value)}
+                          className={`text-xs font-medium px-2 py-1 rounded-full border ${
+                            user.role === 'admin' ? 'bg-red-100 text-red-700 border-red-200' :
+                            user.role === 'manager' ? 'bg-orange-100 text-orange-700 border-orange-200' :
+                            user.role === 'editor' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                            'bg-slate-100 text-slate-700 border-slate-200'
+                          }`}
+                        >
+                          <option value="user">User</option>
+                          <option value="editor">Editor</option>
+                          <option value="manager">Manager</option>
+                          <option value="admin">Admin</option>
+                        </select>
                       </td>
                       <td className="p-4 text-slate-600">
                         {user.company || "-"}
