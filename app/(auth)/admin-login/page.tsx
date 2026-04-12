@@ -46,15 +46,16 @@ export default function AdminLoginPage() {
           return
         }
         
-        // Get role for non-admin users
+        // Wait for session to update
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        // Get role for non-admin users - fetch from database directly
         const userRes = await fetch('/api/auth/me')
         const userData = await userRes.json()
         const role = userData?.user?.role || 'user'
         
-        // Route based on role
-        if (role === 'editor') {
-          router.push('/admin/services')
-        } else if (role === 'manager') {
+        // Route based on role - manager goes to admin dashboard
+        if (role === 'editor' || role === 'manager') {
           router.push('/admin/services')
         } else {
           router.push('/dashboard')
