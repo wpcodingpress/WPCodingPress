@@ -100,15 +100,15 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
-          <p className="text-slate-500 mt-1">Welcome back! Here's an overview of your business.</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Dashboard</h1>
+          <p className="text-sm md:text-base text-slate-500 mt-0.5 md:mt-1">Welcome back! Here's an overview of your business.</p>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         {statCards.map((stat, index) => (
           <motion.div
             key={stat.title}
@@ -118,14 +118,14 @@ export default function AdminDashboardPage() {
           >
             <Link href={stat.href}>
               <Card className="bg-white border-slate-200 hover:shadow-lg hover:shadow-violet-500/10 transition-all cursor-pointer group">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-slate-500 mb-1">{stat.title}</p>
-                      <p className="text-3xl font-bold text-slate-900">{stat.value}</p>
+                <CardContent className="p-3 md:p-6">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] md:text-sm text-slate-500 mb-0.5 md:mb-1 truncate">{stat.title}</p>
+                      <p className="text-xl md:text-3xl font-bold text-slate-900">{stat.value}</p>
                     </div>
-                    <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} shadow-lg group-hover:scale-110 transition-transform`}>
-                      <stat.icon className="h-6 w-6 text-white" />
+                    <div className={`p-2 md:p-3 rounded-xl bg-gradient-to-br ${stat.color} shadow-lg group-hover:scale-110 transition-transform flex-shrink-0`}>
+                      <stat.icon className="h-4 w-4 md:h-6 md:w-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -142,8 +142,8 @@ export default function AdminDashboardPage() {
         transition={{ delay: 0.4 }}
       >
         <Card className="bg-white border-slate-200">
-          <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 pb-4">
-            <CardTitle className="text-xl font-semibold text-slate-900">Recent Orders</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 pb-3 md:pb-4 gap-2">
+            <CardTitle className="text-lg md:text-xl font-semibold text-slate-900">Recent Orders</CardTitle>
             <Link href="/admin/orders" className="text-sm text-violet-600 hover:text-violet-700 flex items-center gap-1">
               View All <ArrowRight className="h-4 w-4" />
             </Link>
@@ -154,31 +154,31 @@ export default function AdminDashboardPage() {
                 No orders yet
               </div>
             ) : (
-              <div className="space-y-4">
-                {recentOrders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
-                    <div>
-                      <p className="font-medium text-slate-900">{order.clientName}</p>
-                      <p className="text-sm text-slate-500">{order.service?.name} - {order.packageType}</p>
+<div className="space-y-2 md:space-y-4">
+                  {recentOrders.map((order) => (
+                    <div key={order.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 md:p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-slate-900 truncate">{order.clientName}</p>
+                        <p className="text-xs md:text-sm text-slate-500 truncate">{order.service?.name} - {order.packageType}</p>
+                      </div>
+                      <div className="text-left sm:text-right flex items-center justify-between sm:block">
+                        <Badge className={getStatusColor(order.status)}>
+                          {order.status.replace("_", " ")}
+                        </Badge>
+                        <p className="text-xs text-slate-400 mt-0.5 md:mt-1">
+                          {new Date(order.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <Badge className={getStatusColor(order.status)}>
-                        {order.status.replace("_", " ")}
-                      </Badge>
-                      <p className="text-xs text-slate-400 mt-1">
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
             )}
           </CardContent>
         </Card>
       </motion.div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         {[
           { title: "Manage Orders", description: "View and update order status", icon: ShoppingCart, href: "/admin/orders", color: "from-violet-500 to-purple-500" },
           { title: "Contact Messages", description: `${stats.unreadContacts} unread messages`, icon: MessageSquare, href: "/admin/contacts", color: "from-blue-400 to-cyan-500" },
@@ -193,17 +193,17 @@ export default function AdminDashboardPage() {
           >
             <Link href={item.href}>
               <Card className="bg-white border-slate-200 hover:shadow-lg hover:shadow-violet-500/10 transition-all cursor-pointer group h-full">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className={`p-3 rounded-xl bg-gradient-to-br ${item.color} shadow-lg group-hover:scale-110 transition-transform`}>
-                      <item.icon className="h-6 w-6 text-white" />
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex items-center gap-3 md:gap-4 mb-2 md:mb-4">
+                    <div className={`p-2 md:p-3 rounded-xl bg-gradient-to-br ${item.color} shadow-lg group-hover:scale-110 transition-transform flex-shrink-0`}>
+                      <item.icon className="h-4 w-4 md:h-6 md:w-6 text-white" />
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-slate-900">{item.title}</h3>
-                      <p className="text-sm text-slate-500">{item.description}</p>
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-slate-900 text-sm md:text-base truncate">{item.title}</h3>
+                      <p className="text-xs md:text-sm text-slate-500 truncate">{item.description}</p>
                     </div>
                   </div>
-                  <span className="text-sm text-violet-600 hover:text-violet-700 flex items-center gap-1">
+                  <span className="text-xs md:text-sm text-violet-600 hover:text-violet-700 flex items-center gap-1">
                     Go to {item.title} →
                   </span>
                 </CardContent>

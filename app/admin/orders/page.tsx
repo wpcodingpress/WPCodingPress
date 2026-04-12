@@ -141,15 +141,15 @@ export default function AdminOrdersPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Orders</h1>
-          <p className="text-slate-500">Manage and track all your orders</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1 md:mb-2">Orders</h1>
+          <p className="text-sm text-slate-500">Manage and track all your orders</p>
         </div>
         <Select value={filter} onValueChange={setFilter}>
-          <SelectTrigger className="w-[180px] bg-white border-slate-200">
-            <SelectValue placeholder="Filter by status" />
+          <SelectTrigger className="w-full sm:w-[180px] bg-white border-slate-200">
+            <SelectValue placeholder="Filter" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Orders</SelectItem>
@@ -162,7 +162,7 @@ export default function AdminOrdersPage() {
         </Select>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <Card className="bg-white border-slate-200">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
@@ -220,19 +220,19 @@ export default function AdminOrdersPage() {
       <Card className="bg-white border-slate-200">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[800px]">
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Client</th>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Type</th>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Product/Service</th>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Package</th>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Amount</th>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Payment</th>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Downloads</th>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Status</th>
-                  <th className="text-left p-4 text-sm font-semibold text-slate-600">Date</th>
-                  <th className="text-right p-4 text-sm font-semibold text-slate-600">Actions</th>
+                  <th className="text-left p-3 md:p-4 text-xs md:text-sm font-semibold text-slate-600">Client</th>
+                  <th className="text-left p-3 md:p-4 text-xs md:text-sm font-semibold text-slate-600">Type</th>
+                  <th className="text-left p-3 md:p-4 text-xs md:text-sm font-semibold text-slate-600">Product/Service</th>
+                  <th className="text-left p-3 md:p-4 text-xs md:text-sm font-semibold text-slate-600">Package</th>
+                  <th className="text-left p-3 md:p-4 text-xs md:text-sm font-semibold text-slate-600">Amount</th>
+                  <th className="text-left p-3 md:p-4 text-xs md:text-sm font-semibold text-slate-600 hidden lg:table-cell">Payment</th>
+                  <th className="text-left p-3 md:p-4 text-xs md:text-sm font-semibold text-slate-600 hidden md:table-cell">Downloads</th>
+                  <th className="text-left p-3 md:p-4 text-xs md:text-sm font-semibold text-slate-600">Status</th>
+                  <th className="text-left p-3 md:p-4 text-xs md:text-sm font-semibold text-slate-600 hidden sm:table-cell">Date</th>
+                  <th className="text-right p-3 md:p-4 text-xs md:text-sm font-semibold text-slate-600">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">

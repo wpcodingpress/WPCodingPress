@@ -203,7 +203,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {sidebarOpen && (
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 z-40 lg:hidden"
+            className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
           />
         )}
@@ -211,8 +211,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed left-0 top-0 bottom-0 z-50 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800 border-r border-slate-700/50 shadow-2xl transition-transform duration-300 flex flex-col w-64",
-        sidebarOpen || "lg:block"
+        "fixed left-0 top-0 bottom-0 z-50 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800 border-r border-slate-700/50 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col w-64",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         {/* Logo */}
         <div className="p-4 border-b border-slate-700/50">
@@ -233,18 +233,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </button>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        <nav className="flex-1 p-3 md:p-4 space-y-1 md:space-y-2 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = isNavActive(item.href)
             return (
               <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all group",
+                  "flex items-center gap-3 px-3 py-2.5 md:py-3 rounded-xl text-sm font-medium transition-all group",
                   isActive ? "bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg shadow-violet-500/20" : "text-slate-400 hover:text-white hover:bg-slate-800/50"
                 )}
               >
-                <item.icon className={cn("h-5 w-5 flex-shrink-0", isActive ? "text-white" : "text-slate-400 group-hover:text-white")} />
-                <span className="truncate">{item.label}</span>
+                <item.icon className={cn("h-4 w-4 md:h-5 md:w-5 flex-shrink-0", isActive ? "text-white" : "text-slate-400 group-hover:text-white")} />
+                <span className="truncate hidden sm:block">{item.label}</span>
+                <span className="truncate sm:hidden text-xs">{item.label}</span>
               </Link>
             )
           })}
@@ -275,34 +276,34 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main Content */}
-      <main className="ml-0 lg:ml-64 min-h-screen">
+      <main className="lg:ml-64 min-h-screen">
         {/* Top Header */}
         <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center justify-between px-3 md:px-4 py-2 md:py-3 gap-2 md:gap-0">
             {/* Mobile Menu Button */}
-            <div className="flex items-center gap-3">
-              <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-xl hover:bg-slate-100 transition-colors text-slate-600 lg:hidden">
+            <div className="flex items-center gap-2 md:gap-3 flex-1">
+              <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-xl hover:bg-slate-100 transition-colors text-slate-600 lg:hidden flex-shrink-0">
                 <Menu className="w-5 h-5" />
               </button>
               
-              {/* Search */}
-              <div className="relative w-full max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              {/* Search - Full width on mobile */}
+              <div className="relative flex-1 max-w-md min-w-0">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-slate-400" />
                 <Input
-                  placeholder="Search orders, users..."
+                  placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
                   onFocus={() => searchQuery.length > 1 && setShowSearchResults(true)}
                   onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
-                  className="w-full md:w-64 lg:w-80 pl-10 bg-slate-50 border-slate-200"
+                  className="w-full pl-10 bg-slate-50 border-slate-200 h-9 md:h-10 text-sm"
                 />
                 {/* Search Results */}
                 <AnimatePresence>
                   {showSearchResults && searchResults.length > 0 && (
                     <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                      className="absolute top-full mt-1 w-full bg-white rounded-lg shadow-xl border border-slate-200 overflow-hidden z-50">
+                      className="absolute top-full mt-1 w-[calc(100vw-2rem)] sm:w-full max-w-md bg-white rounded-lg shadow-xl border border-slate-200 overflow-hidden z-50 left-2 sm:left-0 right-2 sm:right-auto">
                       {searchResults.map((r, i) => (
-                        <Link key={i} href={r.link || '/admin'} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 border-b border-slate-100 last:border-0">
+                        <Link key={i} href={r.link || '/admin'} className="flex items-center gap-3 px-3 md:px-4 py-2 md:py-3 hover:bg-slate-50 border-b border-slate-100 last:border-0">
                           {r.type === 'order' ? <ShoppingBag className="w-4 h-4 text-blue-500" /> : <User className="w-4 h-4 text-green-500" />}
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-slate-900 truncate">{r.title}</p>
@@ -310,7 +311,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                           </div>
                         </Link>
                       ))}
-                      <Link href="/admin" className="block px-4 py-2 text-center text-sm text-violet-600 hover:bg-slate-50">
+                      <Link href="/admin" className="block px-3 md:px-4 py-2 text-center text-sm text-violet-600 hover:bg-slate-50">
                         View all results
                       </Link>
                     </motion.div>
@@ -336,7 +337,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <AnimatePresence>
                   {notificationsOpen && (
                     <motion.div initial={{ opacity: 0, y: -10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden z-50">
+                      className="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-80 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden z-50">
                       <div className="sticky top-0 bg-white p-3 border-b border-slate-100 flex items-center justify-between">
                         <span className="font-semibold text-slate-900">Notifications</span>
                         {unreadCount > 0 && (
@@ -379,7 +380,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
 
         {/* Page Content */}
-        <div className="p-4 md:p-6">
+        <div className="p-3 md:p-4 lg:p-6">
           {children}
         </div>
       </main>
