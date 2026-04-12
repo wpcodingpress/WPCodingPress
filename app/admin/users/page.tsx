@@ -25,6 +25,7 @@ interface User {
   email: string;
   phone: string | null;
   company: string | null;
+  role: string;
   isActive: boolean;
   createdAt: string;
   subscriptions?: Array<{
