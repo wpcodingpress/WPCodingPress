@@ -2,37 +2,67 @@
 
 import Link from "next/link"
 import { Zap, Mail, ArrowRight } from "lucide-react"
+import { useEffect, useState } from "react"
 
-const footerLinks = {
-  services: [
-    { href: "/services/wordpress-to-nextjs", label: "WordPress to Next.js" },
-    { href: "/services/elementor-pro-design", label: "Elementor Pro Design" },
-    { href: "/services/woocommerce-stores", label: "WooCommerce Stores" },
-    { href: "/services/seo-marketing", label: "SEO & Marketing" },
-    { href: "/services/web-applications", label: "Web Applications" },
-    { href: "/services/cloud-devops", label: "Cloud & DevOps" },
-    { href: "/services/domain-hosting", label: "Domain & Hosting" },
-  ],
-  products: [
-    { href: "/products/plugins", label: "WordPress Plugins" },
-    { href: "/products/themes", label: "WordPress Themes" },
-    { href: "/products/templates", label: "Next.js Templates" },
-    { href: "/products/mcp-servers", label: "MCP Servers" },
-    { href: "/products/ai-agents", label: "AI Agents" },
-  ],
-  company: [
+interface FooterLink {
+  href: string
+  label: string
+}
+
+export function Footer() {
+  const [services, setServices] = useState<FooterLink[]>([])
+  const [products, setProducts] = useState<FooterLink[]>([])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [servicesRes, productsRes] = await Promise.all([
+          fetch('/api/public/services'),
+          fetch('/api/products')
+        ])
+        const servicesData = await servicesRes.json()
+        const productsData = await productsRes.json()
+        
+        setServices(servicesData.map((s: any) => ({
+          href: `/services/${s.slug}`,
+          label: s.name
+        })))
+
+        const typeMap: Record<string, string> = {
+          plugin: 'WordPress Plugins',
+          theme: 'WordPress Themes',
+          template: 'Next.js Templates',
+          mcp_server: 'MCP Servers',
+          ai_agent: 'AI Agents'
+        }
+        const seen = new Set<string>()
+        const uniqueProducts = productsData.filter((p: any) => {
+          const t = p.type
+          if (seen.has(t)) return false
+          seen.add(t)
+          return true
+        }).map((p: any) => ({
+          href: `/products/${typeMap[p.type]?.toLowerCase().replace(' ', '-') || p.type}`,
+          label: typeMap[p.type] || p.name
+        }))
+        setProducts(uniqueProducts)
+      } catch (e) {
+        console.error('Error fetching footer data:', e)
+      }
+    }
+    fetchData()
+  }, [])
+
+  const company = [
     { href: "/about", label: "About Us" },
     { href: "/portfolio", label: "Portfolio" },
     { href: "/pricing", label: "Pricing" },
     { href: "/contact", label: "Contact" },
-  ],
-  legal: [
+  ]
+  const legal = [
     { href: "/privacy", label: "Privacy Policy" },
     { href: "/terms", label: "Terms of Service" },
-  ],
-}
-
-export function Footer() {
+  ]
   return (
     <footer className="bg-slate-50 text-slate-900 border-t border-slate-200">
       <div className="container mx-auto px-4 py-16">
@@ -57,7 +87,7 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-slate-900 mb-4">Services</h3>
             <ul className="space-y-3">
-              {footerLinks.services.map((link) => (
+              {services.length > 0 ? services.map((link) => (
                 <li key={link.href}>
                   <Link 
                     href={link.href}
@@ -67,6 +97,9 @@ export function Footer() {
                     {link.label}
                   </Link>
                 </li>
+              )) : (
+                <li className="text-sm text-slate-400">Loading...</li>
+              )}
               ))}
             </ul>
           </div>
@@ -74,7 +107,7 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-slate-900 mb-4">Products</h3>
             <ul className="space-y-3">
-              {footerLinks.products.map((link) => (
+              {products.length > 0 ? products.map((link) => (
                 <li key={link.href}>
                   <Link 
                     href={link.href}
@@ -84,14 +117,16 @@ export function Footer() {
                     {link.label}
                   </Link>
                 </li>
-              ))}
+              )) : (
+                <li className="text-sm text-slate-400">Loading...</li>
+              )}
             </ul>
           </div>
 
           <div>
             <h3 className="font-semibold text-slate-900 mb-4">Company</h3>
             <ul className="space-y-3">
-              {footerLinks.company.map((link) => (
+              {company.map((link) => (
                 <li key={link.href}>
                   <Link 
                     href={link.href}
@@ -123,7 +158,7 @@ export function Footer() {
             © {new Date().getFullYear()} WPCodingPress. All rights reserved.
           </p>
           <div className="flex gap-6">
-            {footerLinks.legal.map((link) => (
+            {legal.map((link) => (
               <Link 
                 key={link.href}
                 href={link.href}

@@ -555,15 +555,15 @@ export default function HomePage() {
             <div className="hero-animate flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-sm text-slate-500 mb-16">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-green-500" />
-                <span>700+ Sites Migrated</span>
+                <span>100+ Sites Migrated</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-green-500" />
-                <span>3-Minute Average</span>
+                <span>1-Minute Average</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-green-500" />
-                <span>98 SEO Score</span>
+                <span>99 SEO Score</span>
               </div>
             </div>
           </div>
@@ -677,48 +677,53 @@ export default function HomePage() {
                     </div>
                   </motion.div>
 
-                  {/* Step 4: Progress Animation */}
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: isConverting ? 1 : 0 }}
-                    className="mb-4"
-                  >
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
-                      <span className="text-sm font-semibold text-slate-700">Converting...</span>
-                    </div>
-                    <div className="bg-slate-900 rounded-xl p-4 font-mono text-xs space-y-1">
-                      {conversionSteps.map((step, index) => (
-                        <motion.div 
-                          key={index}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: conversionStep >= index ? 1 : 0.3 }}
-                          transition={{ delay: step.delay }}
-                          className={conversionStep > index ? "text-green-400" : conversionStep === index ? "text-purple-400 animate-pulse" : "text-slate-500"}
-                        >
-                          {step.text}
-                        </motion.div>
-                      ))}
-                    </div>
-                  </motion.div>
+                  {/* Step 4: Progress Animation - only show during conversion */}
+                  {isConverting && (
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="mb-4"
+                    >
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
+                        <span className="text-sm font-semibold text-slate-700">Converting...</span>
+                      </div>
+                      <div className="bg-slate-900 rounded-xl p-4 font-mono text-xs space-y-1">
+                        {conversionSteps.map((step, index) => (
+                          <motion.div 
+                            key={index}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: conversionStep >= index ? 1 : 0.3 }}
+                            transition={{ delay: step.delay }}
+                            className={conversionStep > index ? "text-green-400" : conversionStep === index ? "text-purple-400 animate-pulse" : "text-slate-500"}
+                          >
+                            {step.text}
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
 
-                  {/* Step 5: Success */}
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 3.8 }}
-                    className="mt-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-                        <CheckCircle2 className="w-6 h-6 text-white" />
+                  {/* Step 5: Success - only show during conversion */}
+                  {isConverting && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="mt-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                          <CheckCircle2 className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <div className="font-bold text-green-600">🎉 Site Converted Successfully!</div>
+                          <div className="text-xs text-green-500">Live at: mywordpress-next.vercel.app • 180ms • 99 SEO</div>
+                        </div>
                       </div>
-                      <div>
-                        <div className="font-bold text-green-600">🎉 Site Converted Successfully!</div>
-                        <div className="text-xs text-green-500">Live at: mywordpress-next.vercel.app • 180ms • 98 SEO</div>
-                      </div>
-                    </div>
-                  </motion.div>
+                    </motion.div>
+                  )}
                 </div>
               </div>
             </div>
