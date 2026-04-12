@@ -14,6 +14,7 @@ interface UserType {
   role: string
   isActive: boolean
   createdAt: string
+  isAdminUser?: boolean
 }
 
 export default function AdminUsersPage() {

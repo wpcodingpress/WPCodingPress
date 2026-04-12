@@ -165,7 +165,7 @@ export default function AdminSubscribersPage() {
               <select
                 value={planFilter}
                 onChange={(e) => setPlanFilter(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-900"
+                className="px-4 py-2.5 rounded-lg border border-slate-300 bg-white text-slate-900 font-medium text-sm min-w-[140px]"
               >
                 <option value="all">All Plans</option>
                 <option value="free">Free</option>
