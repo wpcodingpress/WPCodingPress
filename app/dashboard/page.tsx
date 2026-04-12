@@ -56,7 +56,7 @@ export default function DashboardOverview() {
           total: orders.length,
           completed: orders.filter((o: any) => o.status === "completed").length,
           inProgress: orders.filter((o: any) => o.status === "in_progress").length,
-          totalSpent: orders.reduce((sum: number, o: any) => sum + (o.amount || 0), 0)
+          totalSpent: orders.reduce((sum: number, o: any) => sum + (o.amount || 0), 0) / 100
         })
         
         const recentNotifications = orders.slice(0, 3).map((order: any, i: number) => ({
@@ -167,7 +167,7 @@ export default function DashboardOverview() {
           { title: "Total Orders", value: stats.total, icon: ShoppingBag, color: "from-purple-500 to-violet-500" },
           { title: "Completed", value: stats.completed, icon: CheckCircle, color: "from-green-500 to-emerald-500" },
           { title: "In Progress", value: stats.inProgress, icon: Clock, color: "from-blue-500 to-cyan-500" },
-          { title: "Total Spent", value: `$${stats.totalSpent}`, icon: DollarSign, color: "from-orange-500 to-pink-500" },
+          { title: "Total Spent", value: `$${stats.totalSpent.toLocaleString()}`, icon: DollarSign, color: "from-orange-500 to-pink-500" },
         ].map((stat, index) => (
           <motion.div
             key={stat.title}

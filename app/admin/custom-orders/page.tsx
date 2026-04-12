@@ -1142,7 +1142,7 @@ export default function AdminCustomOrdersPage() {
                   <div>
                     <p className="text-sm text-slate-600">Remaining Amount</p>
                     <p className="text-2xl font-bold text-slate-900">
-                      ${(formData.totalAmount - (formData.advanceAmount || 0)) / 100}
+                      ${(formData.totalAmount - (formData.advanceAmount || 0)).toLocaleString()}
                     </p>
                   </div>
                   {formData.advanceAmount > 0 ? (
