@@ -8,9 +8,21 @@ export async function GET() {
         id: true,
         name: true,
         email: true,
+        phone: true,
+        company: true,
         role: true,
         isActive: true,
-        createdAt: true
+        createdAt: true,
+        subscriptions: {
+          select: {
+            id: true,
+            plan: true,
+            status: true,
+            currentPeriodEnd: true
+          },
+          where: { status: 'active' },
+          take: 1
+        }
       },
       orderBy: { createdAt: 'desc' }
     })
