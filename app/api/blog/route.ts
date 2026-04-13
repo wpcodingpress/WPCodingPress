@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     const search = searchParams.get('search')
     const force = searchParams.get('force')
     const updateImage = searchParams.get('updateImage')
+    const seed = searchParams.get('seed')
 
     const where: any = { isPublished: true }
     

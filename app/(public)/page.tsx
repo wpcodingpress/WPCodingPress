@@ -515,6 +515,66 @@ export default function HomePage() {
         <motion.div className="absolute top-60 left-1/2 w-7 h-7 bg-emerald-400/40 rounded-full" animate={{ y: [-14, 14] }} transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }} />
         <motion.div className="absolute bottom-1/4 right-1/2 w-9 h-9 bg-sky-400/40 rounded-xl" animate={{ y: [-16, 16], rotate: [0, -6] }} transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} />
 
+        {/* Wall Clock - Top Left of Hero */}
+        <div className="absolute top-32 left-8 lg:left-16 z-20">
+          <div className="relative w-24 h-24 lg:w-28 lg:h-28">
+            {/* Clock Face */}
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 rounded-full border-4 border-purple-500/50 shadow-2xl shadow-purple-500/20">
+              {/* Hour markers */}
+              {[...Array(12)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute w-1 h-2 bg-purple-400/70"
+                  style={{
+                    top: '8px',
+                    left: '50%',
+                    transform: `translateX(-50%) rotate(${i * 30}deg) translateY(38px)`,
+                  }}
+                />
+              ))}
+              {/* Center dot */}
+              <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-purple-500 rounded-full -translate-x-1/2 -translate-y-1/2" />
+              {/* Hour hand */}
+              <div
+                className="absolute top-1/2 left-1/2 w-1.5 h-8 bg-gradient-to-b from-purple-400 to-purple-600 rounded-full origin-bottom"
+                style={{
+                  transformOrigin: 'bottom center',
+                  transform: `translateX(-50%) rotate(${(new Date().getHours() % 12) * 30 + new Date().getMinutes() / 2}deg)`,
+                  bottom: '50%',
+                  left: 'calc(50% - 3px)',
+                }}
+              />
+              {/* Minute hand */}
+              <div
+                className="absolute top-1/2 left-1/2 w-1 h-10 bg-gradient-to-b from-cyan-400 to-cyan-500 rounded-full origin-bottom"
+                style={{
+                  transformOrigin: 'bottom center',
+                  transform: `translateX(-50%) rotate(${new Date().getMinutes() * 6}deg)`,
+                  bottom: '50%',
+                  left: 'calc(50% - 2px)',
+                }}
+              />
+              {/* Second hand */}
+              <div
+                className="absolute top-1/2 left-1/2 w-0.5 h-11 bg-red-500 rounded-full origin-bottom"
+                style={{
+                  transformOrigin: 'bottom center',
+                  transform: `translateX(-50%) rotate(${new Date().getSeconds() * 6}deg)`,
+                  bottom: '50%',
+                  left: 'calc(50% - 1px)',
+                }}
+              />
+            </div>
+            {/* Clock ticks animation */}
+            <motion.div
+              className="absolute inset-0 rounded-full border-2 border-purple-500/30"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+            />
+          </div>
+          <p className="text-xs text-slate-500 mt-2 text-center font-medium">WPCodingPress</p>
+        </div>
+
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           {/* Hero Content - Centered */}
           <div className="max-w-4xl mx-auto text-center">
