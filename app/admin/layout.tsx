@@ -61,6 +61,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/admin/notifications", icon: Bell, label: "Notifications", allowed: ['admin'] },
+  { href: "/admin/blog", icon: LayoutDashboard, label: "Blog", allowed: ['admin'] },
   { href: "/admin/orders", icon: ShoppingCart, label: "Orders", allowed: ['admin', 'manager'] },
   { href: "/admin/custom-orders", icon: DollarSign, label: "Custom Orders", allowed: ['admin'] },
   { href: "/admin/invoices", icon: FileText, label: "Invoices", allowed: ['admin'] },

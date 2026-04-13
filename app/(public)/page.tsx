@@ -951,7 +951,7 @@ export default function HomePage() {
                     </Button>
                   ) : (
                     <Link href={plan.href} className="block">
-                      <Button className={`w-full ${plan.popular ? 'bg-purple-600 hover:bg-purple-700' : 'border-2 border-slate-200 hover:border-slate-300 text-slate-700 hover:bg-slate-50'}`}>
+                      <Button className={`w-full ${plan.popular ? 'bg-purple-600 hover:bg-purple-700' : plan.price === '$99' ? 'bg-slate-900 hover:bg-slate-800 text-white' : 'bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 hover:bg-slate-50'}`}>
                         {plan.price === '$0' ? 'Get Started' : 'Subscribe Now'}
                       </Button>
                     </Link>

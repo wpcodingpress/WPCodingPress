@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { ArrowRight, Calendar, User, Clock, Search, Tag } from "lucide-react"
+import { ArrowRight, Calendar, Clock, Search, Tag, Plus, Edit, Trash2 } from "lucide-react"
 
 interface BlogPost {
   id: string
@@ -20,7 +20,7 @@ interface BlogPost {
   readingTime: number
 }
 
-const blogPosts: BlogPost[] = [
+const defaultPosts: BlogPost[] = [
   {
     id: "1",
     slug: "wordpress-to-nextjs-migration-guide",
@@ -103,11 +103,18 @@ const blogPosts: BlogPost[] = [
 
 const categories = ["All", "Development", "Business", "Technology"]
 
+const plans = [
+  { name: "Free", price: "$0", period: "forever", features: ["1 WordPress site conversion", "Basic Next.js template", "Community support", "No custom domain"], buttonText: "Get Started", href: "/register" },
+  { name: "Pro", price: "$19", period: "/month", features: ["1 WordPress site conversion", "Live deployment", "Advanced Next.js template", "Priority email support", "Custom domain", "Analytics dashboard", "Auto content sync"], popular: true, buttonText: "Subscribe Now", href: "/dashboard/subscription?plan=pro" },
+  { name: "Enterprise", price: "$99", period: "/month", features: ["3 WordPress site conversions", "Live deployments", "Advanced Next.js templates", "Priority email support", "Custom domains", "Analytics dashboard", "Auto content sync", "White-label option"], buttonText: "Subscribe Now", href: "/dashboard/subscription?plan=enterprise" },
+]
+
 export default function BlogPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("All")
+  const [posts, setPosts] = useState<BlogPost[]>(defaultPosts)
 
-  const filteredPosts = blogPosts.filter(post => {
+  const filteredPosts = posts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCategory = selectedCategory === "All" || post.category === selectedCategory
@@ -245,25 +252,72 @@ export default function BlogPage() {
         </div>
       </section>
 
-      {/* Newsletter Section */}
-      <section className="py-16 bg-gradient-to-r from-violet-600/20 to-purple-600/20 border-t border-white/10">
+      {/* Pricing Section */}
+      <section className="py-16 md:py-24 bg-gradient-to-b from-slate-900 to-slate-950">
         <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">Stay Updated</h2>
-            <p className="text-slate-300 mb-6">Subscribe to our newsletter for the latest articles and updates.</p>
-            <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
-              />
-              <button
-                type="submit"
-                className="px-6 py-3 rounded-lg bg-violet-600 text-white font-medium hover:bg-violet-700 transition-colors"
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+          >
+            <Badge className="bg-violet-100 text-violet-700 border-violet-200 px-4 py-1.5 text-sm font-medium mb-6">
+              Pricing Plans
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Choose Your <span className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">Plan</span>
+            </h2>
+            <p className="text-slate-400 max-w-2xl mx-auto">
+              Start free and scale as you grow. No hidden fees.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {plans.map((plan, index) => (
+              <motion.div
+                key={plan.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className={`relative bg-slate-800/50 rounded-2xl border ${plan.popular ? 'border-violet-500' : 'border-white/10'} p-8 hover:border-violet-500/50 transition-all`}
               >
-                Subscribe
-              </button>
-            </form>
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className="bg-violet-600 text-white text-xs font-medium px-3 py-1 rounded-full">
+                      Most Popular
+                    </span>
+                  </div>
+                )}
+
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-bold text-white mb-2">{plan.name}</h3>
+                  <div className="flex items-baseline justify-center gap-1">
+                    <span className="text-4xl font-bold text-white">{plan.price}</span>
+                    <span className="text-slate-400">{plan.period}</span>
+                  </div>
+                </div>
+
+                <ul className="space-y-3 mb-8">
+                  {plan.features.map((feature, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm text-slate-300">
+                      <ArrowRight className="w-4 h-4 text-violet-400 flex-shrink-0 mt-0.5" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+
+                <Link href={plan.href} className="block">
+                  <button className={`w-full py-3 rounded-lg font-medium transition-all ${
+                    plan.popular 
+                      ? 'bg-violet-600 hover:bg-violet-700 text-white' 
+                      : plan.name === 'Enterprise'
+                        ? 'bg-white text-slate-900 hover:bg-slate-100'
+                        : 'border-2 border-white/20 text-white hover:bg-white/10'
+                  }`}>
+                    {plan.buttonText}
+                  </button>
+                </Link>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
