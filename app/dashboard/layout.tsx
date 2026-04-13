@@ -54,7 +54,6 @@ const adminLinks = [
   { title: "Products", href: "/admin/products", icon: Package, allowed: ['editor', 'manager'] },
   { title: "Portfolio", href: "/admin/portfolio", icon: LayoutDashboard, allowed: ['editor', 'manager'] },
   { title: "Orders", href: "/admin/orders", icon: ShoppingCart, allowed: ['manager'] },
-  { title: "Invoices", href: "/admin/invoices", icon: FileText, allowed: ['manager'] },
   { title: "Contacts", href: "/admin/contacts", icon: MessageSquare, allowed: ['manager'] },
 ]
 

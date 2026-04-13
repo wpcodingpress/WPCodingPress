@@ -20,7 +20,7 @@ const plans = [
 export default function DashboardOverview() {
   const [stats, setStats] = useState({ total: 0, completed: 0, inProgress: 0, totalSpent: 0 })
   const [notifications, setNotifications] = useState<Array<{id: number, title: string, message: string, time: string, unread: boolean}>>([])
-  const [user, setUser] = useState({ name: "User", email: "user@example.com" })
+  const [user, setUser] = useState({ name: "User", email: "user@example.com", role: "user" })
   const [currentPlan, setCurrentPlan] = useState<string | null>(null)
   const [nextBilling, setNextBilling] = useState<string | null>(null)
   const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null)
@@ -34,7 +34,7 @@ export default function DashboardOverview() {
       const sessionRes = await fetch("/api/auth/session")
       const sessionData = await sessionRes.json()
       if (sessionData?.user) {
-        setUser({ name: sessionData.user.name || "User", email: sessionData.user.email || "" })
+        setUser({ name: sessionData.user.name || "User", email: sessionData.user.email || "", role: sessionData.user.role || "user" })
       }
 
       // Fetch subscription
@@ -142,19 +142,31 @@ export default function DashboardOverview() {
                 <p className="text-white/80 text-sm sm:text-lg">Ready to build something amazing today?</p>
               </div>
               <div className="flex flex-row justify-center sm:flex-row gap-2 sm:gap-3">
-                <Link href="/order">
-                  <Button className="bg-white text-purple-600 hover:bg-purple-50 font-semibold text-xs sm:text-sm px-3 sm:px-6 py-2 sm:py-2.5 w-full sm:w-auto">
-                    <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                    <span className="hidden sm:inline">New Order</span>
-                    <span className="sm:hidden">Order</span>
-                  </Button>
-                </Link>
-                <Link href="/services">
-                  <Button variant="outline" className="border-white bg-white/10 text-white hover:bg-white/20 font-semibold text-xs sm:text-sm px-3 sm:px-6 py-2 sm:py-2.5 w-full sm:w-auto backdrop-blur-sm">
-                    <span className="hidden sm:inline">Browse Services</span>
-                    <span className="sm:hidden">Services</span>
-                  </Button>
-                </Link>
+                {user.role === 'editor' || user.role === 'manager' ? (
+                  <Link href="/admin">
+                    <Button className="bg-white text-purple-600 hover:bg-purple-50 font-semibold text-xs sm:text-sm px-3 sm:px-6 py-2 sm:py-2.5 w-full sm:w-auto">
+                      <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                      <span className="hidden sm:inline">Admin Panel</span>
+                      <span className="sm:hidden">Admin</span>
+                    </Button>
+                  </Link>
+                ) : (
+                  <>
+                    <Link href="/order">
+                      <Button className="bg-white text-purple-600 hover:bg-purple-50 font-semibold text-xs sm:text-sm px-3 sm:px-6 py-2 sm:py-2.5 w-full sm:w-auto">
+                        <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                        <span className="hidden sm:inline">New Order</span>
+                        <span className="sm:hidden">Order</span>
+                      </Button>
+                    </Link>
+                    <Link href="/services">
+                      <Button variant="outline" className="border-white bg-white/10 text-white hover:bg-white/20 font-semibold text-xs sm:text-sm px-3 sm:px-6 py-2 sm:py-2.5 w-full sm:w-auto backdrop-blur-sm">
+                        <span className="hidden sm:inline">Browse Services</span>
+                        <span className="sm:hidden">Services</span>
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
