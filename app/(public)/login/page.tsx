@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn, signOut } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -35,29 +35,10 @@ export default function LoginPage() {
         throw new Error("Invalid email or password");
       }
 
-      const userRes = await fetch(`/api/admin/users?email=${encodeURIComponent(email)}`)
-      const userData = await userRes.json()
-      
-      let role = 'user'
-      if (Array.isArray(userData)) {
-        const foundUser = userData.find((u: any) => u.email === email)
-        if (foundUser) {
-          role = foundUser.role || 'user'
-        }
-      }
-
-      if (role === 'admin' || role === 'editor' || role === 'manager') {
-        setError(`This account requires admin access. Please use the admin login page.`)
-        await signOut({ redirect: false })
-        setIsLoading(false)
-        return
-      }
-
-      // Success - redirect to dashboard
-      router.push('/dashboard')
+      // Success - directly redirect to dashboard
+      window.location.href = '/dashboard'
     } catch (err: any) {
       setError(err.message || "Invalid email or password");
-    } finally {
       setIsLoading(false);
     }
   };
