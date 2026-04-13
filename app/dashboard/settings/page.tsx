@@ -183,6 +183,7 @@ export default function SettingsPage() {
   const tabs = [
     { id: "profile", label: "Profile", icon: User },
     { id: "security", label: "Security", icon: Shield },
+    { id: "billing", label: "Billing", icon: CreditCard },
     { id: "notifications", label: "Notifications", icon: Bell },
   ];
 
@@ -384,6 +385,94 @@ export default function SettingsPage() {
                   <Button variant="outline" size="sm" disabled>
                     Coming Soon
                   </Button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === "billing" && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-xl border border-slate-200 p-6"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-purple-100">
+                  <CreditCard className="h-5 w-5 text-purple-600" />
+                </div>
+                <h2 className="text-lg font-semibold text-slate-900">Billing & Payment</h2>
+              </div>
+
+              <div className="space-y-6">
+                <div className="p-4 bg-slate-50 rounded-lg">
+                  <h3 className="font-medium text-slate-900 mb-4">Saved Payment Methods</h3>
+                  <div className="text-center py-8 text-slate-500">
+                    <CreditCard className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+                    <p>No payment methods saved yet</p>
+                    <p className="text-sm text-slate-400 mt-1">Add a payment method to speed up checkout</p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-slate-50 rounded-lg">
+                  <h3 className="font-medium text-slate-900 mb-4">Billing Address</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                      <Input placeholder="John Doe" className="bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Company Name</label>
+                      <Input placeholder="Acme Inc." className="bg-white" />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Street Address</label>
+                      <Input placeholder="123 Main St, Apt 4" className="bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">City</label>
+                      <Input placeholder="New York" className="bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">State/Province</label>
+                      <Input placeholder="NY" className="bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Postal Code</label>
+                      <Input placeholder="10001" className="bg-white" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Country</label>
+                      <Input placeholder="United States" className="bg-white" />
+                    </div>
+                  </div>
+                  <Button className="mt-4 bg-primary hover:bg-primary/90">
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Billing Details
+                  </Button>
+                </div>
+
+                <div className="p-4 bg-slate-50 rounded-lg">
+                  <h3 className="font-medium text-slate-900 mb-4">Invoice Preferences</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-white rounded-lg">
+                      <div>
+                        <p className="font-medium text-slate-900">Email Invoices</p>
+                        <p className="text-sm text-slate-500">Receive invoices via email</p>
+                      </div>
+                      <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-primary transition-colors">
+                        <span className="inline-block h-4 w-4 transform rounded-full bg-white translate-x-6 transition-transform" />
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-white rounded-lg">
+                      <div>
+                        <p className="font-medium text-slate-900">Auto-download PDFs</p>
+                        <p className="text-sm text-slate-500">Automatically save invoice PDFs</p>
+                      </div>
+                      <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-300 transition-colors">
+                        <span className="inline-block h-4 w-4 transform rounded-full bg-white translate-x-1 transition-transform" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>

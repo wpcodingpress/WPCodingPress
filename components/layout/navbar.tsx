@@ -148,7 +148,7 @@ function NotificationBell() {
           )}
           <div className="p-3 border-t border-gray-100 bg-gray-50">
             <Link 
-              href="/dashboard" 
+              href={['admin', 'editor', 'manager'].includes(session?.user?.role as string) ? '/admin/notifications' : '/dashboard'} 
               onClick={() => setNotificationsOpen(false)}
               className="block text-center text-sm text-purple-600 font-medium hover:text-purple-700"
             >

@@ -42,6 +42,7 @@ interface Notification {
 const sidebarLinks = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard, allowed: ['user', 'viewer'] },
   { title: "My Orders", href: "/dashboard/orders", icon: ShoppingCart, allowed: ['user'] },
+  { title: "Invoices", href: "/dashboard/invoices", icon: FileText, allowed: ['user'] },
   { title: "Downloads", href: "/dashboard/downloads", icon: DownloadCloud, allowed: ['user'] },
   { title: "Subscription", href: "/dashboard/subscription", icon: CreditCard, allowed: ['user'] },
   { title: "My Sites", href: "/dashboard/sites", icon: Globe, allowed: ['user'] },
