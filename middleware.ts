@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
   // Check if accessing dashboard routes  
   const isDashboardRoute = dashboardRoutes.some(route => pathname.startsWith(route))
 
-  // Skip if on login pages
+  // Skip auth check for login pages and API routes - allow through
   if (pathname === '/login' || pathname === '/admin-login' || pathname.startsWith('/api/auth')) {
     return NextResponse.next()
   }
@@ -22,8 +22,8 @@ export async function middleware(request: NextRequest) {
   try {
     const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
 
+    // Not logged in - redirect to appropriate login
     if (!token) {
-      // Not logged in - redirect based on route
       if (isDashboardRoute) {
         return NextResponse.redirect(new URL('/login', request.url))
       }
@@ -33,30 +33,27 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next()
     }
 
-    // Check if session was invalidated
+    // Session invalidated
     if (token.role === 'invalidated') {
-      // Clear the cookie and redirect to login
       const response = NextResponse.redirect(new URL('/login', request.url))
       response.cookies.set('next-auth.token', '', { expires: new Date(0) })
       response.cookies.set('next-auth.session-token', '', { expires: new Date(0) })
       return response
     }
 
-    // Role-based access control
-    // Editor/Manager/Admin can access admin routes
+    // Role-based access
     const userRole = (token.role as string) || 'user'
+    
+    // Non-admin/editor/manager trying to access admin routes
     if (isAdminRoute && !['admin', 'editor', 'manager'].includes(userRole)) {
-      // Non-admin/editor/manager trying to access admin - redirect to dashboard
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
-    // If user tries to access login page but is already logged in with proper role, redirect to appropriate page
+    // Already logged in user trying to access login page - redirect based on role
     if (pathname === '/login') {
       if (['admin', 'editor', 'manager'].includes(userRole)) {
-        // Admins going to /login should go to admin-login
         return NextResponse.redirect(new URL('/admin-login', request.url))
       } else {
-        // Regular users already logged in going to /login should go to dashboard
         return NextResponse.redirect(new URL('/dashboard', request.url))
       }
     }
@@ -67,7 +64,7 @@ export async function middleware(request: NextRequest) {
 
     return NextResponse.next()
   } catch (error) {
-    // Error checking token - allow request
+    // Error - allow request
     return NextResponse.next()
   }
 }
@@ -79,5 +76,6 @@ export const config = {
     '/admin',
     '/admin/:path*',
     '/admin-login',
+    '/login',
   ],
 }
