@@ -75,6 +75,8 @@ export function Footer() {
   const legal = [
     { href: "/privacy", label: "Privacy Policy" },
     { href: "/terms", label: "Terms of Service" },
+    { href: "/cookie-policy", label: "Cookie Policy" },
+    { href: "/refund", label: "Refund Policy" },
   ]
   return (
     <footer className="bg-slate-50 text-slate-900 border-t border-slate-200">
