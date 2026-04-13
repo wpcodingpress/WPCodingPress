@@ -83,7 +83,7 @@ Google's Core Web Vitals are now ranking factors:
 SEO is not a one-time task but an ongoing process. By implementing these WordPress SEO strategies, you'll be well on your way to ranking higher on Google in 2024 and beyond.
 
 Remember: Quality content that provides value to users is the foundation of successful SEO. All technical optimizations should support your content strategy, not replace it.`,
-        coverImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80',
+        coverImage: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&q=80',
         author: 'WPCodingPress Team',
         category: 'Development',
         tags: 'wordpress,seo,google,ranking,optimization',
