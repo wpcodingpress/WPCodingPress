@@ -164,7 +164,7 @@ export default function AdminCustomOrdersPage() {
           advanceAmount: advanceAmount * 100,
           remainingAmount: remainingAmount * 100,
           notes: formData.notes,
-          bankAccountId: selectedBankId || null,
+          bankAccountId: selectedBankId === "none" ? null : (selectedBankId || null),
         })
       })
 
@@ -246,7 +246,7 @@ export default function AdminCustomOrdersPage() {
           advanceAmount: advanceAmount * 100,
           remainingAmount: remainingAmount * 100,
           notes: formData.notes,
-          bankAccountId: selectedBankId || null,
+          bankAccountId: selectedBankId === "none" ? null : (selectedBankId || null),
         })
       })
 
@@ -281,16 +281,15 @@ export default function AdminCustomOrdersPage() {
   const downloadPDF = async (invoice: CustomOrder) => {
     try {
       let bankSettings = null
+      
+      // Only fetch bank details if the order has a bankAccountId
       if (invoice.bankAccountId) {
         const bankRes = await fetch(`/api/bank-settings/${invoice.bankAccountId}`)
         if (bankRes.ok) {
           bankSettings = await bankRes.json()
         }
       }
-      if (!bankSettings) {
-        const bankRes = await fetch("/api/public/bank-settings")
-        bankSettings = await bankRes.json()
-      }
+      // If no bankAccountId on the order, bankSettings stays null - no bank details in invoice
 
       const advancePercent = invoice.advanceAmount > 0 ? Math.round((invoice.advanceAmount / invoice.totalAmount) * 100) : 0
       const remainingPercent = invoice.remainingAmount > 0 ? Math.round((invoice.remainingAmount / invoice.totalAmount) * 100) : 0
@@ -1177,14 +1176,16 @@ export default function AdminCustomOrdersPage() {
               />
             </div>
 
-            {bankAccounts.length > 0 && (
-              <div>
+            <div>
                 <label className="text-sm font-bold text-slate-900 mb-2 block">Bank Account for Invoice</label>
                 <Select value={selectedBankId} onValueChange={setSelectedBankId}>
                   <SelectTrigger className="bg-white border-2 border-slate-300 text-slate-900 font-medium">
-                    <SelectValue placeholder="Select bank account" />
+                    <SelectValue placeholder="Select bank account (optional)" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="none" className="text-slate-600">
+                      None - Don't show bank details in invoice
+                    </SelectItem>
                     {bankAccounts.map((bank) => (
                       <SelectItem key={bank.id} value={bank.id} className="text-slate-900">
                         {bank.bankName} - {bank.accountName}
@@ -1192,9 +1193,8 @@ export default function AdminCustomOrdersPage() {
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-slate-500 mt-1">This bank account will be shown in the invoice sent to client</p>
+                <p className="text-xs text-slate-500 mt-1">Leave empty or select "None" to exclude bank details from invoice</p>
               </div>
-            )}
 
             <div className="flex justify-end gap-3 pt-4">
               <Button 
