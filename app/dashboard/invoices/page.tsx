@@ -183,13 +183,11 @@ export default function ClientInvoicesPage() {
     .section { margin-bottom: 30px; }
     .section-title {
       color: #7c3aed;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
       margin-bottom: 15px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #ede9fe;
     }
     
     .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
@@ -204,8 +202,8 @@ export default function ClientInvoicesPage() {
       padding: 20px;
     }
     .client-name { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
-    .client-details { color: #64748b; font-size: 13px; }
-    .client-details div { margin-bottom: 4px; }
+    .client-details { color: #64748b; font-size: 14px; }
+    .client-details div { margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
     
     .amount-section { 
       background: ${isPaid ? 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)' : isPartial ? 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)' : 'linear-gradient(135deg, #fef2f2 0%, #fecaca 100%)'};
@@ -218,21 +216,34 @@ export default function ClientInvoicesPage() {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 20px;
+      padding-bottom: 15px;
       border-bottom: 1px dashed ${isPaid ? '#6ee7b7' : isPartial ? '#fcd34d' : '#fca5a5'};
     }
-    .amount-main-label { font-size: 16px; font-weight: 600; color: #1e293b; }
-    .amount-main-value { font-size: 36px; font-weight: 800; color: #1e293b; }
+    .amount-main-label { font-size: 18px; font-weight: 600; color: #1e293b; }
+    .amount-main-value { font-size: 32px; font-weight: 800; color: #1e293b; }
     
-    .amount-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.amount-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
     .amount-item {
-      background: rgba(255,255,255,0.7);
-      border-radius: 10px;
-      padding: 15px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 15px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 10px;
+    }
+    .amount-item-label { color: #64748b; font-size: 14px; font-weight: 500; }
+    .amount-item-value { font-size: 18px; font-weight: 700; }
+    .amount-item-value.paid { color: #10b981; }
+    .amount-item-value.pending { color: #ef4444; }
+    
+    .payment-terms {
+      background: #fff;
+      border: 1px dashed #e2e8f0;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      color: #64748b;
+      font-size: 14px;
     }
     .amount-item-label { font-size: 13px; color: #64748b; }
     .amount-item-value { 
@@ -353,8 +364,8 @@ export default function ClientInvoicesPage() {
         <div class="client-box">
           <div class="client-name">${invoice.clientName}</div>
           <div class="client-details">
-            <div>📧 ${invoice.clientEmail}</div>
-            ${invoice.clientPhone ? `<div>📞 ${invoice.clientPhone}</div>` : ''}
+            <div>${invoice.clientEmail}</div>
+            ${invoice.clientPhone ? `<div>${invoice.clientPhone}</div>` : ''}
           </div>
         </div>
       </div>
