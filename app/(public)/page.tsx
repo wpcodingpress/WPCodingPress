@@ -131,6 +131,16 @@ export default function HomePage() {
   const [isLoadingPlan, setIsLoadingPlan] = useState(true)
   const [homepageServices, setHomepageServices] = useState<any[]>([])
   const [homepageProducts, setHomepageProducts] = useState<any[]>([])
+  const [currentTime, setCurrentTime] = useState(new Date())
+  
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [])
+  
+  const hourRotation = ((currentTime.getHours() % 12) + currentTime.getMinutes() / 60) * 30
+  const minuteRotation = (currentTime.getMinutes() + currentTime.getSeconds() / 60) * 6
+  const secondRotation = currentTime.getSeconds() * 6
 
   useEffect(() => {
     fetchUserPlan()
@@ -517,62 +527,97 @@ export default function HomePage() {
 
         {/* Wall Clock - Top Left of Hero */}
         <div className="absolute top-32 left-8 lg:left-16 z-20">
-          <div className="relative w-24 h-24 lg:w-28 lg:h-28">
-            {/* Clock Face */}
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 rounded-full border-4 border-purple-500/50 shadow-2xl shadow-purple-500/20">
-              {/* Hour markers */}
-              {[...Array(12)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute w-1 h-2 bg-purple-400/70"
-                  style={{
-                    top: '8px',
-                    left: '50%',
-                    transform: `translateX(-50%) rotate(${i * 30}deg) translateY(38px)`,
-                  }}
-                />
-              ))}
-              {/* Center dot */}
-              <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-purple-500 rounded-full -translate-x-1/2 -translate-y-1/2" />
-              {/* Hour hand */}
-              <div
-                className="absolute top-1/2 left-1/2 w-1.5 h-8 bg-gradient-to-b from-purple-400 to-purple-600 rounded-full origin-bottom"
-                style={{
-                  transformOrigin: 'bottom center',
-                  transform: `translateX(-50%) rotate(${(new Date().getHours() % 12) * 30 + new Date().getMinutes() / 2}deg)`,
-                  bottom: '50%',
-                  left: 'calc(50% - 3px)',
-                }}
-              />
-              {/* Minute hand */}
-              <div
-                className="absolute top-1/2 left-1/2 w-1 h-10 bg-gradient-to-b from-cyan-400 to-cyan-500 rounded-full origin-bottom"
-                style={{
-                  transformOrigin: 'bottom center',
-                  transform: `translateX(-50%) rotate(${new Date().getMinutes() * 6}deg)`,
-                  bottom: '50%',
-                  left: 'calc(50% - 2px)',
-                }}
-              />
-              {/* Second hand */}
-              <div
-                className="absolute top-1/2 left-1/2 w-0.5 h-11 bg-red-500 rounded-full origin-bottom"
-                style={{
-                  transformOrigin: 'bottom center',
-                  transform: `translateX(-50%) rotate(${new Date().getSeconds() * 6}deg)`,
-                  bottom: '50%',
-                  left: 'calc(50% - 1px)',
-                }}
-              />
+          <div className="relative w-32 h-32 lg:w-40 lg:h-40">
+            {/* Wooden Frame Outer Ring */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-amber-700 via-amber-600 to-amber-800 shadow-2xl shadow-amber-900/30 border-4 border-amber-800">
+              {/* Wood grain effect */}
+              <div className="absolute inset-1 rounded-full bg-gradient-to-br from-amber-600 to-amber-700 overflow-hidden">
+                <div className="absolute inset-0 opacity-20" style={{
+                  backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(101, 67, 33, 0.3) 8px, rgba(101, 67, 33, 0.3) 10px)`,
+                }} />
+              </div>
+              
+              {/* Inner Bevel */}
+              <div className="absolute inset-2 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 border-2 border-amber-400/50">
+                {/* Clock Face */}
+                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-amber-50 to-amber-100">
+                  {/* Clock Numbers - Beautiful Roman Style */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    {[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((num, i) => {
+                      const angle = (i - 3) * 30 * (Math.PI / 180)
+                      const radius = 52
+                      const x = Math.cos(angle) * radius
+                      const y = Math.sin(angle) * radius
+                      return (
+                        <span
+                          key={num}
+                          className="absolute text-amber-900 font-bold italic"
+                          style={{
+                            transform: `translate(${x}px, ${y}px)`,
+                            fontSize: num === 12 || num === 6 ? '1rem' : '0.75rem',
+                            fontFamily: 'Georgia, serif',
+                          }}
+                        >
+                          {num}
+                        </span>
+                      )
+                    })}
+                  </div>
+                  
+                  {/* Center Cap */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-gradient-to-br from-amber-700 to-amber-900 border-2 border-amber-600 shadow-md" />
+                </div>
+              </div>
             </div>
-            {/* Clock ticks animation */}
-            <motion.div
-              className="absolute inset-0 rounded-full border-2 border-purple-500/30"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+            
+            {/* Hour Hand - Dark Wood */}
+            <div
+              className="absolute top-1/2 left-1/2 w-1.5 h-9 bg-gradient-to-b from-amber-900 to-amber-800 rounded-full origin-bottom shadow-md"
+              style={{
+                transformOrigin: 'bottom center',
+                transform: `translateX(-50%) rotate(${hourRotation}deg)`,
+                bottom: '50%',
+                left: 'calc(50% - 3px)',
+                height: '36px',
+              }}
+            />
+            
+            {/* Minute Hand - Dark Wood */}
+            <div
+              className="absolute top-1/2 left-1/2 w-1 h-11 bg-gradient-to-b from-amber-800 to-amber-700 rounded-full origin-bottom shadow-md"
+              style={{
+                transformOrigin: 'bottom center',
+                transform: `translateX(-50%) rotate(${minuteRotation}deg)`,
+                bottom: '50%',
+                left: 'calc(50% - 2px)',
+                height: '44px',
+              }}
+            />
+            
+            {/* Second Hand - Red Tip */}
+            <div
+              className="absolute top-1/2 left-1/2 w-0.5 h-12 bg-gradient-to-b from-red-600 to-red-500 rounded-full origin-bottom shadow-sm"
+              style={{
+                transformOrigin: 'bottom center',
+                transform: `translateX(-50%) rotate(${secondRotation}deg)`,
+                bottom: '50%',
+                left: 'calc(50% - 1px)',
+                height: '48px',
+              }}
+            />
+            
+            {/* Second Hand Counterweight */}
+            <div
+              className="absolute top-1/2 left-1/2 w-1 h-4 bg-red-500 rounded-full"
+              style={{
+                transformOrigin: 'bottom center',
+                transform: `translateX(-50%) rotate(${secondRotation}deg)`,
+                top: '50%',
+                left: 'calc(50% - 2px)',
+              }}
             />
           </div>
-          <p className="text-xs text-slate-500 mt-2 text-center font-medium">WPCodingPress</p>
+          <p className="text-xs text-amber-700 mt-2 text-center font-medium" style={{ fontFamily: 'Georgia, serif' }}>WPCodingPress</p>
         </div>
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
