@@ -91,16 +91,15 @@ export default function ClientInvoicesPage() {
   const downloadPDF = async (invoice: Invoice) => {
     try {
       let bankSettings = null
+      
+      // Only fetch bank details if the invoice has a bankAccountId - same as admin behavior
       if (invoice.bankAccountId) {
         const bankRes = await fetch(`/api/bank-settings/${invoice.bankAccountId}`)
         if (bankRes.ok) {
           bankSettings = await bankRes.json()
         }
       }
-      if (!bankSettings) {
-        const bankRes = await fetch("/api/public/bank-settings")
-        bankSettings = await bankRes.json()
-      }
+      // If no bankAccountId on the order, bankSettings stays null - no bank details in invoice
 
       const advancePercent = invoice.advanceAmount > 0 ? Math.round((invoice.advanceAmount / invoice.totalAmount) * 100) : 0
       const remainingPercent = invoice.remainingAmount > 0 ? Math.round((invoice.remainingAmount / invoice.totalAmount) * 100) : 0
