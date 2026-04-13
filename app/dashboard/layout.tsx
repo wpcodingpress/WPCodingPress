@@ -40,21 +40,12 @@ interface Notification {
 }
 
 const sidebarLinks = [
-  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard, allowed: ['user', 'editor', 'manager', 'viewer'] },
-  { title: "My Orders", href: "/dashboard/orders", icon: ShoppingCart, allowed: ['user', 'editor', 'manager'] },
-  { title: "Invoices", href: "/dashboard/invoices", icon: FileText, allowed: ['manager'] },
-  { title: "Downloads", href: "/dashboard/downloads", icon: DownloadCloud, allowed: ['user', 'editor', 'manager'] },
-  { title: "Subscription", href: "/dashboard/subscription", icon: CreditCard, allowed: ['user', 'editor', 'manager'] },
-  { title: "My Sites", href: "/dashboard/sites", icon: Globe, allowed: ['user', 'editor', 'manager'] },
-  { title: "Settings", href: "/dashboard/settings", icon: Settings, allowed: ['user', 'editor', 'manager'] },
-]
-
-const adminLinks = [
-  { title: "Services", href: "/admin/services", icon: Settings, allowed: ['editor', 'manager'] },
-  { title: "Products", href: "/admin/products", icon: Package, allowed: ['editor', 'manager'] },
-  { title: "Portfolio", href: "/admin/portfolio", icon: LayoutDashboard, allowed: ['editor', 'manager'] },
-  { title: "Orders", href: "/admin/orders", icon: ShoppingCart, allowed: ['manager'] },
-  { title: "Contacts", href: "/admin/contacts", icon: MessageSquare, allowed: ['manager'] },
+  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard, allowed: ['user', 'viewer'] },
+  { title: "My Orders", href: "/dashboard/orders", icon: ShoppingCart, allowed: ['user'] },
+  { title: "Downloads", href: "/dashboard/downloads", icon: DownloadCloud, allowed: ['user'] },
+  { title: "Subscription", href: "/dashboard/subscription", icon: CreditCard, allowed: ['user'] },
+  { title: "My Sites", href: "/dashboard/sites", icon: Globe, allowed: ['user'] },
+  { title: "Settings", href: "/dashboard/settings", icon: Settings, allowed: ['user'] },
 ]
 
 interface UserType {
@@ -176,6 +167,11 @@ export default function DashboardLayout({
       }
       
       setUser(data.user)
+      
+      // Redirect editor/manager to admin panel
+      if (data.user.role === 'editor' || data.user.role === 'manager') {
+        router.push("/admin")
+      }
     } catch (error) {
       router.push("/login")
     } finally {
@@ -247,37 +243,6 @@ export default function DashboardLayout({
                     </div>
                   </Link>
                 ))}
-                {/* Admin Links - for editor and manager */}
-                {user?.role === 'editor' && (
-                  <>
-                    <div className="pt-4 pb-2">
-                      <p className="px-4 text-xs font-semibold text-gray-400 uppercase">Admin Area</p>
-                    </div>
-                    {adminLinks.filter(link => link.allowed.includes('editor')).map((link) => (
-                      <Link key={link.href} href={link.href}>
-                        <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all">
-                          <link.icon className="w-5 h-5" />
-                          <span className="font-medium flex-1">{link.title}</span>
-                        </div>
-                      </Link>
-                    ))}
-                  </>
-                )}
-                {user?.role === 'manager' && (
-                  <>
-                    <div className="pt-4 pb-2">
-                      <p className="px-4 text-xs font-semibold text-gray-400 uppercase">Admin Area</p>
-                    </div>
-                    {adminLinks.map((link) => (
-                      <Link key={link.href} href={link.href}>
-                        <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all">
-                          <link.icon className="w-5 h-5" />
-                          <span className="font-medium flex-1">{link.title}</span>
-                        </div>
-                      </Link>
-                    ))}
-                  </>
-                )}
               </nav>
               <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100">
                 <button 
@@ -319,38 +284,6 @@ export default function DashboardLayout({
               </div>
             </Link>
           ))}
-          {/* Admin Links - for editor */}
-          {user?.role === 'editor' && (
-            <>
-              <div className="pt-4 pb-2">
-                <p className="px-4 text-xs font-semibold text-gray-400 uppercase">Admin Area</p>
-              </div>
-              {adminLinks.filter(link => link.allowed.includes('editor')).map((link) => (
-                <Link key={link.href} href={link.href}>
-                  <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all">
-                    <link.icon className="w-5 h-5" />
-                    <span className="font-medium flex-1">{link.title}</span>
-                  </div>
-                </Link>
-              ))}
-            </>
-          )}
-          {/* Admin Links - for manager */}
-          {user?.role === 'manager' && (
-            <>
-              <div className="pt-4 pb-2">
-                <p className="px-4 text-xs font-semibold text-gray-400 uppercase">Admin Area</p>
-              </div>
-              {adminLinks.map((link) => (
-                <Link key={link.href} href={link.href}>
-                  <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all">
-                    <link.icon className="w-5 h-5" />
-                    <span className="font-medium flex-1">{link.title}</span>
-                  </div>
-                </Link>
-              ))}
-            </>
-          )}
           {/* No admin links for viewer */}
           {user?.role === 'viewer' && (
             <div className="p-4 text-sm text-gray-500">
