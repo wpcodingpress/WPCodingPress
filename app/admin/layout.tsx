@@ -61,14 +61,14 @@ interface NavItem {
 const navItems: NavItem[] = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/admin/orders", icon: ShoppingCart, label: "Orders", allowed: ['admin', 'manager'] },
-  { href: "/admin/custom-orders", icon: DollarSign, label: "Custom Orders", allowed: ['admin', 'manager'] },
-  { href: "/admin/invoices", icon: FileText, label: "Invoices", allowed: ['admin', 'manager'] },
+  { href: "/admin/custom-orders", icon: DollarSign, label: "Custom Orders", allowed: ['admin'] },
+  { href: "/admin/invoices", icon: FileText, label: "Invoices", allowed: ['admin'] },
   { href: "/admin/contacts", icon: MessageSquare, label: "Contacts", allowed: ['admin', 'manager'] },
   { href: "/admin/services", icon: Settings, label: "Services", allowed: ['admin', 'editor', 'manager'] },
   { href: "/admin/products", icon: Image, label: "Products", allowed: ['admin', 'editor', 'manager'] },
   { href: "/admin/users", icon: Users, label: "Users", allowed: ['admin'] },
-  { href: "/admin/subscribers", icon: SubscribersIcon, label: "Subscribers", allowed: ['admin'] },
-  { href: "/admin/revenue", icon: BarChart3, label: "Revenue", allowed: ['admin'] },
+  { href: "/admin/subscribers", icon: SubscribersIcon, label: "Subscribers", allowed: ['admin', 'manager'] },
+  { href: "/admin/revenue", icon: BarChart3, label: "Revenue", allowed: ['admin', 'manager'] },
   { href: "/admin/portfolio", icon: BarChart3, label: "Portfolio", allowed: ['admin', 'editor', 'manager'] },
   { href: "/admin/bank", icon: Building2, label: "Bank Settings", allowed: ['admin'] },
 ]
