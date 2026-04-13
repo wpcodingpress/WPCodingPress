@@ -439,15 +439,6 @@ export function Navbar() {
                 )}
               </>
             ) : (
-                  <Link href="/order">
-                    <Button className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold shadow-md">
-                      Start Project
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                )}
-              </>
-            ) : (
               <>
                 <Link href="/login">
                   <Button variant="ghost" className="text-slate-700 hover:text-purple-600 hover:bg-purple-50 font-medium">
