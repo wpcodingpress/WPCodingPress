@@ -290,9 +290,9 @@ export async function GET(request: Request) {
         }
       })
 
-      const totalRevenue = [...recentOrders, ...recentCustomOrders].reduce((sum, order) => {
+      const totalRevenue = [...recentOrders, ...recentCustomOrders].reduce((sum, order: any) => {
         const amount = order.amount || order.totalAmount || 0
-        const paid = 'remainingPaid' in order ? (order as any).remainingPaid : true
+        const paid = 'remainingPaid' in order ? order.remainingPaid : true
         return sum + (paid ? amount : 0)
       }, 0)
       
