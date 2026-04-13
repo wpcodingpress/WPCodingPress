@@ -282,10 +282,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <p className="text-xs text-slate-400 truncate">{session.user?.email}</p>
             </div>
           </div>
-          <button onClick={() => {
+          <button onClick={async () => {
             const role = (session.user as any)?.role
-            const redirectUrl = ['admin', 'editor', 'manager'].includes(role) ? "/admin-login" : "/login"
-            signOut({ callbackUrl: redirectUrl })
+            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://wpcodingpress.com'
+            const redirectUrl = ['admin', 'editor', 'manager'].includes(role) ? `${baseUrl}/admin-login` : `${baseUrl}/login`
+            await signOut({ callbackUrl: redirectUrl })
           }}
             className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
           >

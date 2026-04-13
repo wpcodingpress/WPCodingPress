@@ -44,21 +44,21 @@ export async function middleware(request: NextRequest) {
     // Role-based access
     const userRole = (token.role as string) || 'user'
     
-    // Non-admin/editor/manager trying to access admin routes
-    if (isAdminRoute && !['admin', 'editor', 'manager'].includes(userRole)) {
+    // Non-admin/editor/manager/viewer trying to access admin routes
+    if (isAdminRoute && !['admin', 'editor', 'manager', 'viewer'].includes(userRole)) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
     // Already logged in user trying to access login page - redirect based on role
     if (pathname === '/login') {
-      if (['admin', 'editor', 'manager'].includes(userRole)) {
+      if (['admin', 'editor', 'manager', 'viewer'].includes(userRole)) {
         return NextResponse.redirect(new URL('/admin-login', request.url))
       } else {
         return NextResponse.redirect(new URL('/dashboard', request.url))
       }
     }
 
-    if (pathname === '/admin-login' && userRole === 'admin') {
+    if (pathname === '/admin-login' && ['admin', 'editor', 'manager', 'viewer'].includes(userRole)) {
       return NextResponse.redirect(new URL('/admin', request.url))
     }
 

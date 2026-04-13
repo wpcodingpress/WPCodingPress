@@ -65,7 +65,7 @@ export default function AdminLoginPage() {
       }
       
       // Only allow admin/editor/manager from admin-login
-      if (!['admin', 'editor', 'manager'].includes(role)) {
+      if (!['admin', 'editor', 'manager', 'viewer'].includes(role)) {
         setError("This page is for admin accounts only. Please use the regular login.")
         await signOut({ redirect: false })
         setIsLoading(false)
@@ -73,7 +73,7 @@ export default function AdminLoginPage() {
       }
       
       // Route based on role
-      if (role === 'admin') {
+      if (role === 'admin' || role === 'viewer') {
         router.push('/admin')
       } else if (role === 'editor' || role === 'manager') {
         router.push('/admin/services')
