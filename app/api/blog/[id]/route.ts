@@ -33,12 +33,12 @@ export async function PUT(request: Request) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized - please log in' }, { status: 401 })
     }
 
     const userRole = (session.user as any)?.role
     if (userRole !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden - admin access required' }, { status: 403 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -48,7 +48,13 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Post ID required' }, { status: 400 })
     }
 
-    const body = await request.json()
+    let body
+    try {
+      body = await request.json()
+    } catch (e) {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+    }
+
     const { title, excerpt, content, coverImage, author, category, tags } = body
 
     const readingTime = Math.max(5, Math.ceil((content || '').split(' ').length / 200))
