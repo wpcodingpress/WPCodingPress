@@ -8,6 +8,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search')
     const force = searchParams.get('force')
+    const updateImage = searchParams.get('updateImage')
 
     const where: any = { isPublished: true }
     
@@ -19,6 +20,14 @@ export async function GET(request: Request) {
         { category: { contains: search, mode: 'insensitive' } },
         { tags: { contains: search, mode: 'insensitive' } },
       ]
+    }
+
+    // Update specific post cover image if requested
+    if (updateImage === 'true') {
+      await prisma.blogPost.update({
+        where: { slug: 'wordpress-seo-guide-2024' },
+        data: { coverImage: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80' }
+      })
     }
 
     let posts = await prisma.blogPost.findMany({
