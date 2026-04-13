@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
+import { signIn, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Zap, Loader2, Mail, Lock, Eye, EyeOff, Shield } from "lucide-react"
@@ -62,6 +62,14 @@ export default function AdminLoginPage() {
         if (foundUser) {
           role = foundUser.role || 'user'
         }
+      }
+      
+      // Only allow admin/editor/manager from admin-login
+      if (!['admin', 'editor', 'manager'].includes(role)) {
+        setError("This page is for admin accounts only. Please use the regular login.")
+        await signOut({ redirect: false })
+        setIsLoading(false)
+        return
       }
       
       // Route based on role

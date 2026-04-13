@@ -54,12 +54,16 @@ export default function LoginPage() {
         }
       }
 
-      // Route: editor/manager → admin-login, user/viewer → dashboard
-      if (role === 'editor' || role === 'manager') {
-        router.push('/admin-login')
-      } else {
-        router.push('/dashboard')
+      // Admin/Editor/Manager must use /admin-login, not /login
+      if (role === 'admin' || role === 'editor' || role === 'manager') {
+        setError(`This account requires admin access. Please use the admin login page.`)
+        await signOut({ redirect: false })
+        setIsLoading(false)
+        return
       }
+
+      // Viewer/User go to dashboard
+      router.push('/dashboard')
     } catch (err: any) {
       setError(err.message || "Invalid email or password");
     } finally {
