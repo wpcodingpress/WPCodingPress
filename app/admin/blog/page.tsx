@@ -116,7 +116,7 @@ export default function AdminBlogPage() {
 
     try {
       if (editingPost) {
-        const res = await fetch(`/api/blog?id=${editingPost.id}`, {
+        const res = await fetch(`/api/blog/${editingPost.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData)
@@ -130,7 +130,7 @@ export default function AdminBlogPage() {
         const updated = await res.json()
         setPosts(posts.map(p => p.id === editingPost.id ? updated : p))
       } else {
-        const res = await fetch("/api/blog", {
+        const res = await fetch("/api/blog/create", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData)
@@ -156,7 +156,7 @@ export default function AdminBlogPage() {
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this post?")) {
       try {
-        const res = await fetch(`/api/blog?id=${id}`, { method: "DELETE" })
+        const res = await fetch(`/api/blog/${id}`, { method: "DELETE" })
         if (res.ok) {
           setPosts(posts.filter(p => p.id !== id))
         }
