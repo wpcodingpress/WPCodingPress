@@ -253,6 +253,23 @@ model RoleAuditLog {
   changedAt   DateTime @default(now())
 }
 
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String   @db.Text
+  content     String   @db.LongText
+  coverImage  String
+  author      String
+  category    String
+  tags        String   // Comma-separated tags
+  publishedAt DateTime @default(now())
+  readingTime Int      @default(5)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model UserSession {
   id          String   @id @default(cuid())
   userId      String

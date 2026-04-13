@@ -4,7 +4,8 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { ArrowRight, Calendar, Clock, Search, Tag, Plus, Edit, Trash2 } from "lucide-react"
+import { ArrowRight, Calendar, Clock, Search } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 
 interface BlogPost {
   id: string
@@ -15,90 +16,15 @@ interface BlogPost {
   coverImage: string
   author: string
   category: string
-  tags: string[]
+  tags: string
   publishedAt: string
   readingTime: number
 }
 
 const defaultPosts: BlogPost[] = [
-  {
-    id: "1",
-    slug: "wordpress-to-nextjs-migration-guide",
-    title: "Complete Guide to Migrating from WordPress to Next.js in 2026",
-    excerpt: "Learn the step-by-step process of migrating your WordPress website to Next.js for better performance, SEO, and developer experience.",
-    content: "",
-    coverImage: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
-    author: "WPCodingPress Team",
-    category: "Development",
-    tags: ["WordPress", "Next.js", "Migration", "SEO"],
-    publishedAt: "April 10, 2026",
-    readingTime: 15,
-  },
-  {
-    id: "2",
-    slug: "saas-business-growth-strategies",
-    title: "10 Proven Strategies to Grow Your SaaS Business in 2026",
-    excerpt: "Discover the most effective tactics for scaling your SaaS startup from early stages to a profitable business.",
-    content: "",
-    coverImage: "https://images.unsplash.com/photo-1553484771-371a605b060b?w=800&q=80",
-    author: "WPCodingPress Team",
-    category: "Business",
-    tags: ["SaaS", "Growth", "Business", "Marketing"],
-    publishedAt: "April 5, 2026",
-    readingTime: 12,
-  },
-  {
-    id: "3",
-    slug: "ai-web-development-future",
-    title: "How AI is Revolutionizing Web Development in 2026",
-    excerpt: "Explore how artificial intelligence and machine learning are transforming the way we build and maintain websites.",
-    content: "",
-    coverImage: "https://images.unsplash.com/photo-1677442136019-21780ecad9be?w=800&q=80",
-    author: "WPCodingPress Team",
-    category: "Technology",
-    tags: ["AI", "Web Development", "Future", "Automation"],
-    publishedAt: "March 28, 2026",
-    readingTime: 10,
-  },
-  {
-    id: "4",
-    slug: "nextjs-performance-optimization",
-    title: "Next.js Performance Optimization: The Ultimate Checklist",
-    excerpt: "A comprehensive checklist to ensure your Next.js application loads fast and provides the best user experience.",
-    content: "",
-    coverImage: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
-    author: "WPCodingPress Team",
-    category: "Development",
-    tags: ["Next.js", "Performance", "Optimization", "Speed"],
-    publishedAt: "March 20, 2026",
-    readingTime: 8,
-  },
-  {
-    id: "5",
-    slug: "custom-wordpress-solutions",
-    title: "When to Choose Custom WordPress Development Over Themes",
-    excerpt: "Learn when custom WordPress development makes more sense than using pre-built themes for your project.",
-    content: "",
-    coverImage: "https://images.unsplash.com/photo-1522542550221-31fd8575f5a5?w=800&q=80",
-    author: "WPCodingPress Team",
-    category: "Development",
-    tags: ["WordPress", "Custom Development", "Themes"],
-    publishedAt: "March 15, 2026",
-    readingTime: 7,
-  },
-  {
-    id: "6",
-    slug: "web-development-cost-guide",
-    title: "Understanding Web Development Costs: A Complete Guide for 2026",
-    excerpt: "Everything you need to know about budgeting for your next web development project, from small sites to enterprise solutions.",
-    content: "",
-    coverImage: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80",
-    author: "WPCodingPress Team",
-    category: "Business",
-    tags: ["Cost", "Budget", "Planning", "Guide"],
-    publishedAt: "March 8, 2026",
-    readingTime: 11,
-  },
+  { id: "1", slug: "wordpress-to-nextjs-migration-guide", title: "Complete Guide to Migrating from WordPress to Next.js in 2026", excerpt: "Learn the step-by-step process of migrating your WordPress website to Next.js.", content: "", coverImage: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80", author: "WPCodingPress Team", category: "Development", tags: "WordPress,Next.js,Migration", publishedAt: "2026-04-10", readingTime: 15 },
+  { id: "2", slug: "saas-business-growth-strategies", title: "10 Proven Strategies to Grow Your SaaS Business in 2026", excerpt: "Discover the most effective tactics for scaling your SaaS startup.", content: "", coverImage: "https://images.unsplash.com/photo-1553484771-371a605b060b?w=800&q=80", author: "WPCodingPress Team", category: "Business", tags: "SaaS,Growth", publishedAt: "2026-04-05", readingTime: 12 },
+  { id: "3", slug: "ai-web-development-future", title: "How AI is Revolutionizing Web Development in 2026", excerpt: "Explore how AI and ML are transforming the way we build websites.", content: "", coverImage: "https://images.unsplash.com/photo-1677442136019-21780ecad9be?w=800&q=80", author: "WPCodingPress Team", category: "Technology", tags: "AI,Web Development", publishedAt: "2026-03-28", readingTime: 10 },
 ]
 
 const categories = ["All", "Development", "Business", "Technology"]
@@ -112,7 +38,32 @@ const plans = [
 export default function BlogPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("All")
-  const [posts, setPosts] = useState<BlogPost[]>(defaultPosts)
+  const [posts, setPosts] = useState<BlogPost[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await fetch("/api/blog")
+        if (res.ok) {
+          const data = await res.json()
+          if (data.length > 0) {
+            setPosts(data)
+          } else {
+            setPosts(defaultPosts)
+          }
+        } else {
+          setPosts(defaultPosts)
+        }
+      } catch (error) {
+        console.error("Error fetching posts:", error)
+        setPosts(defaultPosts)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchPosts()
+  }, [])
 
   const filteredPosts = posts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -120,6 +71,14 @@ export default function BlogPage() {
     const matchesCategory = selectedCategory === "All" || post.category === selectedCategory
     return matchesSearch && matchesCategory
   })
+
+  const formatDate = (dateStr: string) => {
+    try {
+      return new Date(dateStr).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+    } catch {
+      return dateStr
+    }
+  }
 
   return (
     <div className="min-h-screen bg-slate-900">
@@ -189,64 +148,66 @@ export default function BlogPage() {
       {/* Blog Posts Grid */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredPosts.map((post, index) => (
-              <motion.article
-                key={post.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="group"
-              >
-                <Link href={`/blog/${post.slug}`}>
-                  <div className="bg-slate-800/50 rounded-2xl overflow-hidden border border-white/10 hover:border-violet-500/50 transition-all hover:shadow-2xl hover:shadow-violet-500/10">
-                    <div className="relative h-48 overflow-hidden">
-                      <Image
-                        src={post.coverImage}
-                        alt={post.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute top-4 left-4">
-                        <span className="px-3 py-1 rounded-full bg-violet-600/90 text-white text-xs font-medium">
-                          {post.category}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="p-6">
-                      <div className="flex items-center gap-4 text-sm text-slate-400 mb-3">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          {post.publishedAt}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-4 h-4" />
-                          {post.readingTime} min read
-                        </span>
-                      </div>
-                      <h2 className="text-xl font-bold text-white mb-3 group-hover:text-violet-400 transition-colors line-clamp-2">
-                        {post.title}
-                      </h2>
-                      <p className="text-slate-400 text-sm mb-4 line-clamp-2">
-                        {post.excerpt}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-slate-500">{post.author}</span>
-                        <span className="flex items-center gap-1 text-violet-400 text-sm font-medium group-hover:gap-2 transition-all">
-                          Read more <ArrowRight className="w-4 h-4" />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </motion.article>
-            ))}
-          </div>
-
-          {filteredPosts.length === 0 && (
+          {isLoading ? (
+            <div className="text-center py-16 text-slate-400">Loading...</div>
+          ) : filteredPosts.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-slate-400 text-lg">No articles found matching your search.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredPosts.map((post, index) => (
+                <motion.article
+                  key={post.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="group"
+                >
+                  <Link href={`/blog/${post.slug}`}>
+                    <div className="bg-slate-800/50 rounded-2xl overflow-hidden border border-white/10 hover:border-violet-500/50 transition-all hover:shadow-2xl hover:shadow-violet-500/10">
+                      <div className="relative h-48 overflow-hidden">
+                        <Image
+                          src={post.coverImage}
+                          alt={post.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute top-4 left-4">
+                          <span className="px-3 py-1 rounded-full bg-violet-600/90 text-white text-xs font-medium">
+                            {post.category}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="p-6">
+                        <div className="flex items-center gap-4 text-sm text-slate-400 mb-3">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-4 h-4" />
+                            {formatDate(post.publishedAt)}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-4 h-4" />
+                            {post.readingTime} min read
+                          </span>
+                        </div>
+                        <h2 className="text-xl font-bold text-white mb-3 group-hover:text-violet-400 transition-colors line-clamp-2">
+                          {post.title}
+                        </h2>
+                        <p className="text-slate-400 text-sm mb-4 line-clamp-2">
+                          {post.excerpt}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-slate-500">{post.author}</span>
+                          <span className="flex items-center gap-1 text-violet-400 text-sm font-medium group-hover:gap-2 transition-all">
+                            Read more <ArrowRight className="w-4 h-4" />
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.article>
+              ))}
             </div>
           )}
         </div>
