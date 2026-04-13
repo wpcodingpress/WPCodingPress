@@ -44,17 +44,18 @@ export async function middleware(request: NextRequest) {
 
     // Role-based access control
     // Editor/Manager/Admin can access admin routes
-    if (isAdminRoute && !['admin', 'editor', 'manager'].includes(token.role)) {
+    const userRole = (token.role as string) || 'user'
+    if (isAdminRoute && !['admin', 'editor', 'manager'].includes(userRole)) {
       // Non-admin/editor/manager trying to access admin - redirect to dashboard
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
     // If user tries to access login page but is already logged in with proper role, redirect to appropriate page
-    if (pathname === '/login' && ['admin', 'editor', 'manager'].includes(token.role)) {
+    if (pathname === '/login' && ['admin', 'editor', 'manager'].includes(userRole)) {
       return NextResponse.redirect(new URL('/admin-login', request.url))
     }
 
-    if (pathname === '/admin-login' && token.role === 'admin') {
+    if (pathname === '/admin-login' && userRole === 'admin') {
       return NextResponse.redirect(new URL('/admin', request.url))
     }
 
