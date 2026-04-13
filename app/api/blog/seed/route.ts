@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import prisma from '@/lib/prisma'
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
     // Skip auth for development - always allow seeding
     // const session = await getServerSession(authOptions)
