@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     if (updateImage === 'true') {
       try {
         const updated = await prisma.blogPost.update({
-          where: { slug: 'wordpress-seo-guide-2024' },
+          where: { slug: 'wordpress-seo-guide-2026' },
           data: { coverImage: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80' }
         })
         return NextResponse.json({ message: 'Image updated', coverImage: updated.coverImage })
@@ -49,10 +49,10 @@ export async function GET(request: Request) {
       
       const samplePosts = [
         {
-          slug: 'wordpress-seo-guide-2024',
-          title: 'Complete WordPress SEO Guide: Rank #1 on Google in 2024',
-          excerpt: 'Learn the proven WordPress SEO strategies that will help your website rank higher on Google. This comprehensive guide covers everything from technical SEO to content optimization.',
-          content: `Search engine optimization (SEO) is crucial for any WordPress website looking to attract organic traffic. In this comprehensive guide, we'll explore the most effective strategies to help your WordPress site rank higher on Google in 2024.
+slug: 'wordpress-seo-guide-2026',
+          title: 'Complete WordPress SEO Guide: Rank #1 on Google in 2026',
+          excerpt: 'Learn the proven WordPress SEO strategies that will help your website rank higher on Google in 2026. This comprehensive guide covers everything from technical SEO to content optimization.',
+          content: `Search engine optimization (SEO) is crucial for any WordPress website looking to attract organic traffic. In this comprehensive guide, we'll explore the most effective strategies to help your WordPress site rank higher on Google in 2026.
 
 ## Why WordPress SEO Matters
 
@@ -111,7 +111,7 @@ Google's Core Web Vitals are now ranking factors:
 
 ## Conclusion
 
-SEO is not a one-time task but an ongoing process. By implementing these WordPress SEO strategies, you'll be well on your way to ranking higher on Google in 2024 and beyond.
+SEO is not a one-time task but an ongoing process. By implementing these WordPress SEO strategies, you'll be well on your way to ranking higher on Google in 2026 and beyond.
 
 Remember: Quality content that provides value to users is the foundation of successful SEO. All technical optimizations should support your content strategy, not replace it.`,
           coverImage: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80',
@@ -122,12 +122,12 @@ Remember: Quality content that provides value to users is the foundation of succ
           isPublished: true,
         },
         {
-          slug: 'grow-business-online-2024',
-          title: 'How to Grow Your Business Online: Complete Digital Strategy',
-          excerpt: 'Discover the proven digital strategies that successful businesses use to grow their online presence. From website optimization to social media marketing, learn it all here.',
-          content: `In today's digital age, establishing and growing your business online is no longer optional—it's essential for survival. This comprehensive guide will walk you through the proven strategies to expand your digital footprint and attract more customers.
+          slug: 'grow-business-online-2026',
+          title: 'How to Grow Your Business Online: Complete Digital Strategy for 2026',
+          excerpt: 'Discover the proven digital strategies that successful businesses use to grow their online presence in 2026. From website optimization to social media marketing, learn it all here.',
+          content: `In today's digital age, establishing and growing your business online is no longer optional—it's essential for survival. This comprehensive guide will walk you through the proven strategies to expand your digital footprint and attract more customers in 2026.
 
-## The Digital Landscape in 2024
+## The Digital Landscape in 2026
 
 The way consumers discover and engage with businesses has dramatically changed. Today, 87% of customers begin their search for products and services online. Your digital presence is often the first— and sometimes only—impression potential customers will have of your business.
 
@@ -350,9 +350,9 @@ Test one change at a time, measure results, and iterate. What works for one stor
           isPublished: true,
         },
         {
-          slug: 'why-nextjs-future-web-development-2024',
-          title: 'Why Next.js is the Future of Web Development in 2024',
-          excerpt: 'Discover why leading businesses are migrating from WordPress to Next.js. Learn about the performance, security, and SEO benefits that make Next.js the top choice for modern websites.',
+slug: 'why-nextjs-future-web-development-2024',
+          title: 'Why Next.js is the Future of Web Development in 2026',
+          excerpt: 'Discover why leading businesses are migrating from WordPress to Next.js in 2026. Learn about the performance, security, and SEO benefits that make Next.js the top choice for modern websites.',
           content: `The web development landscape has shifted dramatically in recent years, and Next.js has emerged as the clear leader for building high-performance, secure, and SEO-friendly websites. If you're still relying on WordPress, you might be holding your business back.
 
 ## Why Next.js is Winning the Web Development Race
@@ -432,10 +432,10 @@ Next.js developers use:
 
 ## Conclusion
 
-The migration from WordPress to Next.js isn't just a technical decision—it's a business decision. The performance improvements alone can increase conversions, while the security benefits reduce risk and maintenance costs. At WPCodingPress, we specialize in helping businesses make this transition smoothly, preserving all their content while unlocking the full potential of modern web development.
+The migration from WordPress to Next.js isn't just a technical decision—it's a business decision in 2026. The performance improvements alone can increase conversions, while the security benefits reduce risk and maintenance costs. At WPCodingPress, we specialize in helping businesses make this transition smoothly, preserving all their content while unlocking the full potential of modern web development.
 
 Ready to modernize your website? Let's talk about how Next.js can transform your online presence.`,
-          coverImage: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80',
+        coverImage: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80',
           author: 'WPCodingPress Team',
           category: 'Technology',
           tags: 'nextjs,web development,modernization,react,javascript',
@@ -591,10 +591,10 @@ Need help with your migration? WPCodingPress specializes in seamless WordPress t
           isPublished: true,
         },
         {
-          slug: 'nextjs-vs-wordpress-comparison-2024',
-          title: 'Next.js vs WordPress: Which is Better for Your Business in 2024?',
-          excerpt: 'An honest comparison of Next.js and WordPress for business websites. Discover the pros, cons, and real-world performance differences to make the best decision for your company.',
-          content: `Choosing between Next.js and WordPress is one of the most important technical decisions you'll make for your business. Let's break down everything objectively so you can make the right choice.
+slug: 'nextjs-vs-wordpress-comparison-2024',
+          title: 'Next.js vs WordPress: Which is Better for Your Business in 2026?',
+          excerpt: 'An honest comparison of Next.js and WordPress for business websites in 2026. Discover the pros, cons, and real-world performance differences to make the best decision for your company.',
+          content: `Choosing between Next.js and WordPress is one of the most important technical decisions you'll make for your business in 2026. Let's break down everything objectively so you can make the right choice.
 
 ## Performance Comparison
 
@@ -723,12 +723,12 @@ This approach gives you:
 
 ## Conclusion
 
-For most businesses in 2024, Next.js is the better choice. The performance, security, and SEO advantages are significant, and the total cost of ownership is often lower. However, the right choice depends on your specific situation, budget, and technical capabilities.
+For most businesses in 2026, Next.js is the better choice. The performance, security, and SEO advantages are significant, and the total cost of ownership is often lower. However, the right choice depends on your specific situation, budget, and technical capabilities.
 
 If you're serious about your online presence—whether for lead generation, e-commerce, or brand building—investing in Next.js will pay dividends in performance, security, and growth potential.
 
 Ready to explore your options? Let's discuss which approach works best for your business.`,
-          coverImage: 'https://images.unsplash.com/photo-1522542550221-31fd8575e74b?w=800&q=80',
+        coverImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
           author: 'WPCodingPress Team',
           category: 'Technology',
           tags: 'nextjs,wordpress,comparison,web development,business',
