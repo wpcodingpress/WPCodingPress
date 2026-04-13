@@ -48,12 +48,13 @@ export default function LoginPage() {
 
       if (role === 'admin' || role === 'editor' || role === 'manager') {
         setError(`This account requires admin access. Please use the admin login page.`)
-        await signOut({ redirect: false })
-        setIsLoading(false)
+        await signOut({ redirect: true, callbackUrl: "/login" })
         return
       }
 
+      // Success - redirect to dashboard
       router.push('/dashboard')
+      return
     } catch (err: any) {
       setError(err.message || "Invalid email or password");
     } finally {

@@ -51,8 +51,15 @@ export async function middleware(request: NextRequest) {
     }
 
     // If user tries to access login page but is already logged in with proper role, redirect to appropriate page
-    if (pathname === '/login' && ['admin', 'editor', 'manager'].includes(userRole)) {
-      return NextResponse.redirect(new URL('/admin-login', request.url))
+    if (pathname === '/login') {
+      if (['admin', 'editor', 'manager'].includes(userRole)) {
+        // Admins going to /login should be allowed - let them through to login page
+        // They will be handled by the login page logic
+        return NextResponse.next()
+      } else {
+        // Regular users already logged in going to /login should go to dashboard
+        return NextResponse.redirect(new URL('/dashboard', request.url))
+      }
     }
 
     if (pathname === '/admin-login' && userRole === 'admin') {
