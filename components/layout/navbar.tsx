@@ -35,6 +35,7 @@ interface ProductItem {
 }
 
 function NotificationBell() {
+  const { data: session } = useSession()
   const [hasNotifications, setHasNotifications] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [notifications, setNotifications] = useState<any[]>([])
@@ -43,7 +44,8 @@ function NotificationBell() {
   useEffect(() => {
     const checkNotifications = async () => {
       try {
-        const res = await fetch("/api/notifications?type=user")
+        const notifType = ['admin', 'editor', 'manager'].includes(session?.user?.role as string) ? 'admin' : 'user'
+        const res = await fetch(`/api/notifications?type=${notifType}`)
         const data = await res.json()
         setNotifications(data)
         setHasNotifications(data.filter((n: any) => !n.isRead).length > 0)
@@ -51,10 +53,12 @@ function NotificationBell() {
         setHasNotifications(false)
       }
     }
-    checkNotifications()
-    const interval = setInterval(checkNotifications, 30000)
-    return () => clearInterval(interval)
-  }, [])
+    if (session?.user) {
+      checkNotifications()
+      const interval = setInterval(checkNotifications, 30000)
+      return () => clearInterval(interval)
+    }
+  }, [session])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -408,7 +412,7 @@ export function Navbar() {
             {session?.user ? (
               <>
                 <NotificationBell />
-                {session.user.role !== "admin" && (
+                {!['admin', 'editor', 'manager'].includes(session.user.role as string) && (
                 <Link href="/dashboard">
                   <Button variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-50 hover:text-purple-800 hover:border-purple-400 font-medium">
                     <User className="mr-2 h-4 w-4" />
@@ -416,7 +420,7 @@ export function Navbar() {
                   </Button>
                 </Link>
                 )}
-                {session.user.role === "admin" ? (
+                {['admin', 'editor', 'manager'].includes(session.user.role as string) ? (
                   <Link href="/admin">
                     <Button variant="outline" className="border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-400 font-medium">
                       <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -426,6 +430,15 @@ export function Navbar() {
                     </Button>
                   </Link>
                 ) : (
+                  <Link href="/order">
+                    <Button className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-600 text-white font-semibold shadow-md">
+                      Start Project
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                )}
+              </>
+            ) : (
                   <Link href="/order">
                     <Button className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold shadow-md">
                       Start Project
@@ -482,12 +495,12 @@ export function Navbar() {
               <div className="pt-4 space-y-2 border-t border-slate-200">
                 {session?.user ? (
                   <>
-                    {session.user.role !== "admin" && (
+                    {!['admin', 'editor', 'manager'].includes(session.user.role as string) && (
                     <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="outline" className="w-full border-purple-300 text-purple-700 hover:bg-purple-50">Dashboard</Button>
                     </Link>
                     )}
-                    {session.user.role === "admin" ? (
+                    {['admin', 'editor', 'manager'].includes(session.user.role as string) ? (
                       <Link href="/admin" onClick={() => setMobileMenuOpen(false)}>
                         <Button variant="outline" className="w-full border-slate-300 text-slate-700 hover:bg-slate-100">Admin Panel</Button>
                       </Link>
