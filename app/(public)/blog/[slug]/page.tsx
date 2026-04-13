@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useParams } from "next/navigation"
 import { motion } from "framer-motion"
-import { ArrowLeft, Calendar, Clock, Share2, Link as LinkIcon, Mail, Facebook, Twitter, Linkedin, WhatsApp } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, Share2, Link as LinkIcon, Mail, Facebook, Twitter, Linkedin, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface BlogPost {
@@ -274,7 +274,7 @@ export default function BlogPostPage() {
                     className="p-2 rounded-lg bg-white/10 text-slate-300 hover:text-white hover:bg-white/20 transition-colors"
                     title="Share on WhatsApp"
                   >
-                    <WhatsApp className="w-5 h-5" />
+                    <MessageCircle className="w-5 h-5" />
                   </a>
                   <a 
                     href={`mailto:?subject=${encodeURIComponent(post?.title || '')}&body=${encodeURIComponent('Check out this article: ' + (typeof window !== 'undefined' ? window.location.href : ''))}`}
