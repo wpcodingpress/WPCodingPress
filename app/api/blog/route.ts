@@ -26,8 +26,8 @@ export async function GET(request: Request) {
       orderBy: { publishedAt: 'desc' }
     })
 
-    // Auto-seed sample posts if none exist and seed param is provided
-    if (posts.length === 0 && seed === 'true') {
+    // Auto-seed sample posts if none exist
+    if (posts.length === 0) {
       const samplePosts = [
         {
           slug: 'wordpress-seo-guide-2024',

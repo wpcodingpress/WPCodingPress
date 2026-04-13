@@ -32,6 +32,7 @@ export default function BlogPostPage() {
   useEffect(() => {
     const fetchPost = async () => {
       try {
+        // First try to get all posts and find by slug
         const res = await fetch(`/api/blog`)
         if (res.ok) {
           const posts = await res.json()
@@ -42,6 +43,22 @@ export default function BlogPostPage() {
               .filter((p: BlogPost) => p.category === found.category && p.id !== found.id)
               .slice(0, 3)
             setRelatedPosts(related)
+          } else {
+            // Try fetching by ID directly if slug doesn't work
+            const singleRes = await fetch(`/api/blog/${params.slug}`)
+            if (singleRes.ok) {
+              const data = await singleRes.json()
+              setPost(data)
+              // Fetch related from all posts
+              const allRes = await fetch("/api/blog")
+              if (allRes.ok) {
+                const allPosts = await allRes.json()
+                const related = allPosts
+                  .filter((p: BlogPost) => p.category === data.category && p.id !== data.id)
+                  .slice(0, 3)
+                setRelatedPosts(related)
+              }
+            }
           }
         }
       } catch (error) {

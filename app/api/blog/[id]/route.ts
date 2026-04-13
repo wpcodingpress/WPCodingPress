@@ -3,6 +3,32 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import prisma from '@/lib/prisma'
 
+export async function GET(request: Request, { params }: { params: { id: string } }) {
+  try {
+    const { id } = params
+    
+    // Try to find by slug first, then by id
+    let post = await prisma.blogPost.findUnique({
+      where: { slug: id }
+    })
+    
+    if (!post) {
+      post = await prisma.blogPost.findUnique({
+        where: { id }
+      })
+    }
+    
+    if (!post) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+    }
+    
+    return NextResponse.json(post)
+  } catch (error) {
+    console.error('Error fetching blog post:', error)
+    return NextResponse.json({ error: 'Failed to fetch post' }, { status: 500 })
+  }
+}
+
 export async function PUT(request: Request) {
   try {
     const session = await getServerSession(authOptions)
