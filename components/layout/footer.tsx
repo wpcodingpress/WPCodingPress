@@ -70,6 +70,7 @@ export function Footer() {
     { href: "/about", label: "About Us" },
     { href: "/portfolio", label: "Portfolio" },
     { href: "/pricing", label: "Pricing" },
+    { href: "/blog", label: "Blog" },
     { href: "/contact", label: "Contact" },
   ]
   const legal = [

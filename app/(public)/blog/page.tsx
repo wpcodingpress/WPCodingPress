@@ -1,0 +1,272 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import Link from "next/link"
+import Image from "next/image"
+import { motion } from "framer-motion"
+import { ArrowRight, Calendar, User, Clock, Search, Tag } from "lucide-react"
+
+interface BlogPost {
+  id: string
+  slug: string
+  title: string
+  excerpt: string
+  content: string
+  coverImage: string
+  author: string
+  category: string
+  tags: string[]
+  publishedAt: string
+  readingTime: number
+}
+
+const blogPosts: BlogPost[] = [
+  {
+    id: "1",
+    slug: "wordpress-to-nextjs-migration-guide",
+    title: "Complete Guide to Migrating from WordPress to Next.js in 2026",
+    excerpt: "Learn the step-by-step process of migrating your WordPress website to Next.js for better performance, SEO, and developer experience.",
+    content: "",
+    coverImage: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+    author: "WPCodingPress Team",
+    category: "Development",
+    tags: ["WordPress", "Next.js", "Migration", "SEO"],
+    publishedAt: "April 10, 2026",
+    readingTime: 15,
+  },
+  {
+    id: "2",
+    slug: "saas-business-growth-strategies",
+    title: "10 Proven Strategies to Grow Your SaaS Business in 2026",
+    excerpt: "Discover the most effective tactics for scaling your SaaS startup from early stages to a profitable business.",
+    content: "",
+    coverImage: "https://images.unsplash.com/photo-1553484771-371a605b060b?w=800&q=80",
+    author: "WPCodingPress Team",
+    category: "Business",
+    tags: ["SaaS", "Growth", "Business", "Marketing"],
+    publishedAt: "April 5, 2026",
+    readingTime: 12,
+  },
+  {
+    id: "3",
+    slug: "ai-web-development-future",
+    title: "How AI is Revolutionizing Web Development in 2026",
+    excerpt: "Explore how artificial intelligence and machine learning are transforming the way we build and maintain websites.",
+    content: "",
+    coverImage: "https://images.unsplash.com/photo-1677442136019-21780ecad9be?w=800&q=80",
+    author: "WPCodingPress Team",
+    category: "Technology",
+    tags: ["AI", "Web Development", "Future", "Automation"],
+    publishedAt: "March 28, 2026",
+    readingTime: 10,
+  },
+  {
+    id: "4",
+    slug: "nextjs-performance-optimization",
+    title: "Next.js Performance Optimization: The Ultimate Checklist",
+    excerpt: "A comprehensive checklist to ensure your Next.js application loads fast and provides the best user experience.",
+    content: "",
+    coverImage: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+    author: "WPCodingPress Team",
+    category: "Development",
+    tags: ["Next.js", "Performance", "Optimization", "Speed"],
+    publishedAt: "March 20, 2026",
+    readingTime: 8,
+  },
+  {
+    id: "5",
+    slug: "custom-wordpress-solutions",
+    title: "When to Choose Custom WordPress Development Over Themes",
+    excerpt: "Learn when custom WordPress development makes more sense than using pre-built themes for your project.",
+    content: "",
+    coverImage: "https://images.unsplash.com/photo-1522542550221-31fd8575f5a5?w=800&q=80",
+    author: "WPCodingPress Team",
+    category: "Development",
+    tags: ["WordPress", "Custom Development", "Themes"],
+    publishedAt: "March 15, 2026",
+    readingTime: 7,
+  },
+  {
+    id: "6",
+    slug: "web-development-cost-guide",
+    title: "Understanding Web Development Costs: A Complete Guide for 2026",
+    excerpt: "Everything you need to know about budgeting for your next web development project, from small sites to enterprise solutions.",
+    content: "",
+    coverImage: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80",
+    author: "WPCodingPress Team",
+    category: "Business",
+    tags: ["Cost", "Budget", "Planning", "Guide"],
+    publishedAt: "March 8, 2026",
+    readingTime: 11,
+  },
+]
+
+const categories = ["All", "Development", "Business", "Technology"]
+
+export default function BlogPage() {
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState("All")
+
+  const filteredPosts = blogPosts.filter(post => {
+    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCategory = selectedCategory === "All" || post.category === selectedCategory
+    return matchesSearch && matchesCategory
+  })
+
+  return (
+    <div className="min-h-screen bg-slate-900">
+      {/* Hero Section */}
+      <section className="relative py-20 md:py-28 overflow-hidden">
+        <div className="absolute inset-0">
+          <Image 
+            src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1920&q=80"
+            alt="Blog Background"
+            fill
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/95 via-slate-900/90 to-slate-950/95" />
+        </div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-500/20 rounded-full blur-[150px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[150px]" />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div 
+            className="max-w-3xl mx-auto text-center"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+              Our <span className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">Blog</span>
+            </h1>
+            <p className="text-xl text-slate-300 mb-8">
+              Insights, tutorials, and updates from the WPCodingPress team
+            </p>
+            
+            {/* Search Bar */}
+            <div className="relative max-w-xl mx-auto">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search articles..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent backdrop-blur-sm"
+              />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Category Filter */}
+      <section className="py-8 border-b border-white/10">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-wrap justify-center gap-3">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+                  selectedCategory === category
+                    ? "bg-violet-600 text-white"
+                    : "bg-white/10 text-slate-300 hover:bg-white/20"
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Blog Posts Grid */}
+      <section className="py-16 md:py-24">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredPosts.map((post, index) => (
+              <motion.article
+                key={post.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="group"
+              >
+                <Link href={`/blog/${post.slug}`}>
+                  <div className="bg-slate-800/50 rounded-2xl overflow-hidden border border-white/10 hover:border-violet-500/50 transition-all hover:shadow-2xl hover:shadow-violet-500/10">
+                    <div className="relative h-48 overflow-hidden">
+                      <Image
+                        src={post.coverImage}
+                        alt={post.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute top-4 left-4">
+                        <span className="px-3 py-1 rounded-full bg-violet-600/90 text-white text-xs font-medium">
+                          {post.category}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="p-6">
+                      <div className="flex items-center gap-4 text-sm text-slate-400 mb-3">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4" />
+                          {post.publishedAt}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          {post.readingTime} min read
+                        </span>
+                      </div>
+                      <h2 className="text-xl font-bold text-white mb-3 group-hover:text-violet-400 transition-colors line-clamp-2">
+                        {post.title}
+                      </h2>
+                      <p className="text-slate-400 text-sm mb-4 line-clamp-2">
+                        {post.excerpt}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-slate-500">{post.author}</span>
+                        <span className="flex items-center gap-1 text-violet-400 text-sm font-medium group-hover:gap-2 transition-all">
+                          Read more <ArrowRight className="w-4 h-4" />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </motion.article>
+            ))}
+          </div>
+
+          {filteredPosts.length === 0 && (
+            <div className="text-center py-16">
+              <p className="text-slate-400 text-lg">No articles found matching your search.</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Newsletter Section */}
+      <section className="py-16 bg-gradient-to-r from-violet-600/20 to-purple-600/20 border-t border-white/10">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="text-3xl font-bold text-white mb-4">Stay Updated</h2>
+            <p className="text-slate-300 mb-6">Subscribe to our newsletter for the latest articles and updates.</p>
+            <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="flex-1 px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500"
+              />
+              <button
+                type="submit"
+                className="px-6 py-3 rounded-lg bg-violet-600 text-white font-medium hover:bg-violet-700 transition-colors"
+              >
+                Subscribe
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
