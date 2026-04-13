@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Check, ArrowRight, Zap, Star, Crown, Rocket, CheckCircle2, X } from "lucide-react"
+import { Check, ArrowRight, Zap, Star, Crown, Rocket, CheckCircle2, X, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 
@@ -372,20 +372,26 @@ export default function PricingPage() {
           </motion.div>
 
           <div className="max-w-3xl mx-auto space-y-4">
-            {faqs.map((faq, index) => (
+            {faqs.map((faq, i) => (
               <motion.div
-                key={index}
+                key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-purple-200 transition-colors"
               >
-                <Card>
-                  <CardContent className="p-6">
-                    <h3 className="text-lg font-semibold text-foreground mb-2">{faq.q}</h3>
-                    <p className="text-muted-foreground">{faq.a}</p>
-                  </CardContent>
-                </Card>
+                <details className="group">
+                  <summary className="flex items-center justify-between p-6 cursor-pointer list-none">
+                    <h3 className="font-semibold text-slate-900 pr-4">{faq.q}</h3>
+                    <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 group-open:bg-purple-600 group-open:rotate-180 transition-all">
+                      <ChevronDown className="w-4 h-4 text-purple-600 group-open:text-white" />
+                    </div>
+                  </summary>
+                  <div className="px-6 pb-6 pt-0">
+                    <p className="text-slate-600">{faq.a}</p>
+                  </div>
+                </details>
               </motion.div>
             ))}
           </div>
