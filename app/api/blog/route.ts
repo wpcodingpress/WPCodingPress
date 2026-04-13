@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search')
-    const seed = searchParams.get('seed')
+    const force = searchParams.get('force')
 
     const where: any = { isPublished: true }
     
@@ -27,7 +27,12 @@ export async function GET(request: Request) {
     })
 
     // Auto-seed sample posts if none exist
-    if (posts.length === 0) {
+    if (posts.length === 0 || force === 'true') {
+      // Delete existing posts if force is true
+      if (force === 'true') {
+        await prisma.blogPost.deleteMany({})
+      }
+      
       const samplePosts = [
         {
           slug: 'wordpress-seo-guide-2024',
