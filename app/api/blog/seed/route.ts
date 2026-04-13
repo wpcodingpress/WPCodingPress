@@ -1,14 +1,8 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
-export async function POST() {
+export async function GET() {
   try {
-    // Skip auth for development - always allow seeding
-    // const session = await getServerSession(authOptions)
-    // if (!session?.user) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    // }
-
     const blogPosts = [
       {
         slug: 'wordpress-seo-guide-2024',
