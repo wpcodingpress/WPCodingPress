@@ -38,6 +38,8 @@ export default function AdminBlogPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState("")
   const [formData, setFormData] = useState({
     title: "",
     excerpt: "",
@@ -76,6 +78,7 @@ export default function AdminBlogPage() {
   }
 
   const handleOpenDialog = (post?: BlogPost) => {
+    setError("")
     if (post) {
       setEditingPost(post)
       setFormData({
@@ -103,6 +106,14 @@ export default function AdminBlogPage() {
   }
 
   const handleSave = async () => {
+    if (!formData.title || !formData.excerpt || !formData.coverImage) {
+      setError("Please fill in all required fields")
+      return
+    }
+
+    setIsSaving(true)
+    setError("")
+
     try {
       if (editingPost) {
         const res = await fetch(`/api/blog?id=${editingPost.id}`, {
@@ -110,24 +121,35 @@ export default function AdminBlogPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData)
         })
-        if (res.ok) {
-          const updated = await res.json()
-          setPosts(posts.map(p => p.id === editingPost.id ? updated : p))
+        
+        if (!res.ok) {
+          const err = await res.json()
+          throw new Error(err.error || "Failed to update post")
         }
+        
+        const updated = await res.json()
+        setPosts(posts.map(p => p.id === editingPost.id ? updated : p))
       } else {
         const res = await fetch("/api/blog", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData)
         })
-        if (res.ok) {
-          const newPost = await res.json()
-          setPosts([newPost, ...posts])
+        
+        if (!res.ok) {
+          const err = await res.json()
+          throw new Error(err.error || "Failed to create post")
         }
+        
+        const newPost = await res.json()
+        setPosts([newPost, ...posts])
       }
       setIsDialogOpen(false)
-    } catch (error) {
-      console.error("Error saving post:", error)
+    } catch (err: any) {
+      console.error("Error saving post:", err)
+      setError(err.message || "Failed to save post")
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -218,17 +240,23 @@ export default function AdminBlogPage() {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white text-slate-900 border-slate-200">
           <DialogHeader>
-            <DialogTitle>{editingPost ? "Edit Post" : "Create New Post"}</DialogTitle>
+            <DialogTitle className="text-slate-900">{editingPost ? "Edit Post" : "Create New Post"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-4">
+            {error && (
+              <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
             <div>
               <label className="text-sm font-medium text-slate-700 mb-1 block">Title *</label>
               <Input
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="Enter post title"
+                className="bg-white border-slate-200 text-slate-900"
               />
             </div>
             <div>
@@ -238,6 +266,7 @@ export default function AdminBlogPage() {
                 onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
                 placeholder="Enter short description"
                 rows={3}
+                className="bg-white border-slate-200 text-slate-900"
               />
             </div>
             <div>
@@ -247,6 +276,7 @@ export default function AdminBlogPage() {
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 placeholder="Write your blog post content here..."
                 rows={10}
+                className="bg-white border-slate-200 text-slate-900"
               />
             </div>
             <div>
@@ -255,6 +285,7 @@ export default function AdminBlogPage() {
                 value={formData.coverImage}
                 onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
                 placeholder="https://example.com/image.jpg"
+                className="bg-white border-slate-200 text-slate-900"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -264,6 +295,7 @@ export default function AdminBlogPage() {
                   value={formData.author}
                   onChange={(e) => setFormData({ ...formData, author: e.target.value })}
                   placeholder="Author name"
+                  className="bg-white border-slate-200 text-slate-900"
                 />
               </div>
               <div>
@@ -271,7 +303,7 @@ export default function AdminBlogPage() {
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-900"
                 >
                   {categories.map((cat) => (
                     <option key={cat} value={cat}>{cat}</option>
@@ -279,8 +311,17 @@ export default function AdminBlogPage() {
                 </select>
               </div>
             </div>
-            <Button onClick={handleSave} className="w-full bg-violet-600 hover:bg-violet-700" disabled={!formData.title || !formData.excerpt || !formData.coverImage}>
-              {editingPost ? "Update Post" : "Publish Post"}
+            <Button 
+              onClick={handleSave} 
+              className="w-full bg-violet-600 hover:bg-violet-700" 
+              disabled={isSaving || !formData.title || !formData.excerpt || !formData.coverImage}
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : editingPost ? "Update Post" : "Publish Post"}
             </Button>
           </div>
         </DialogContent>
