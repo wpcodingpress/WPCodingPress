@@ -226,10 +226,13 @@ export default function BlogPostPage() {
               
               <div className="flex items-center justify-between border-t border-white/10 pt-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center text-white font-medium">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-violet-600 to-cyan-600 flex items-center justify-center text-white font-bold text-lg">
                     {post.author.charAt(0)}
                   </div>
-                  <span className="text-white font-medium">{post.author}</span>
+                  <div>
+                    <span className="text-white font-medium block">{post.author}</span>
+                    <span className="text-slate-400 text-sm">Author</span>
+                  </div>
                 </div>
                 
                 <div className="flex items-center gap-2">
