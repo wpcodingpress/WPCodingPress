@@ -103,30 +103,12 @@ const servicePricing = [
 ]
 
 const faqs = [
-  {
-    q: "What's included in the Free plan?",
-    a: "The Free plan includes 1 WordPress site conversion with basic Next.js template, community support, and 5GB bandwidth. Perfect for testing our platform."
-  },
-  {
-    q: "Can I cancel my subscription anytime?",
-    a: "Yes! You can cancel your subscription at any time. No questions asked. Your access continues until the end of your billing period."
-  },
-  {
-    q: "Do you offer refunds?",
-    a: "We offer a 7-day money-back guarantee for all paid plans. If you're not satisfied, contact us for a full refund."
-  },
-  {
-    q: "What payment methods do you accept?",
-    a: "We accept all major credit cards, PayPal, and bank transfers for Enterprise plans."
-  },
-  {
-    q: "Can I upgrade or downgrade my plan?",
-    a: "Absolutely! You can change your plan at any time. We'll prorate the difference based on your new plan."
-  },
-  {
-    q: "Is there a setup fee?",
-    a: "No setup fees for any plan. You can start using our platform immediately after signing up."
-  }
+  { q: "How long does WordPress to Next.js migration take?", a: "Most conversions are completed within 24-72 hours depending on the size and complexity of your WordPress site." },
+  { q: "Will my SEO rankings be preserved after migration?", a: "Absolutely! We preserve all URLs, meta tags, sitemaps, and SEO structure during migration to ensure your rankings remain intact." },
+  { q: "Can I still manage my content in WordPress?", a: "Yes! We connect your WordPress admin to Next.js using WPGraphQL, allowing you to manage content while enjoying Next.js performance." },
+  { q: "What happens to my WordPress plugins?", a: "We migrate plugin functionality to modern, faster Next.js alternatives. You get better performance without plugin vulnerabilities." },
+  { q: "Do you offer ongoing support?", a: "Yes! We provide 24/7 support, regular maintenance, and security updates for all converted websites." },
+  { q: "Which platforms do you deploy to?", a: "We deploy to Vercel, Netlify, or any hosting platform of your choice with free SSL and CDN." },
 ]
 
 export default function PricingPage() {
