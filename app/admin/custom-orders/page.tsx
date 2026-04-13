@@ -843,7 +843,7 @@ export default function AdminCustomOrdersPage() {
                   ${orders.reduce((acc, o) => {
                     const advancePaid = o.advancePaid === true
                     const remainingPaid = o.remainingPaid === true
-                    return acc + (advancePaid ? Number(o.advanceAmount) : 0) + (remainingPaid ? Number(o.remainingAmount) : 0)
+                    return acc + (advancePaid ? Number(o.advanceAmount) / 100 : 0) + (remainingPaid ? Number(o.remainingAmount) / 100 : 0)
                   }, 0).toLocaleString()}
                 </p>
               </div>
