@@ -3,37 +3,24 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import prisma from '@/lib/prisma'
 
-export async function GET(request: Request) {
+export async function POST(request: Request) {
   try {
-    const { searchParams } = new URL(request.url)
-    const search = searchParams.get('search')
-    const seed = searchParams.get('seed')
-
-    const where: any = { isPublished: true }
-    
-    if (search) {
-      where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { excerpt: { contains: search, mode: 'insensitive' } },
-        { content: { contains: search, mode: 'insensitive' } },
-        { category: { contains: search, mode: 'insensitive' } },
-        { tags: { contains: search, mode: 'insensitive' } },
-      ]
+    const session = await getServerSession(authOptions)
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    let posts = await prisma.blogPost.findMany({
-      where,
-      orderBy: { publishedAt: 'desc' }
-    })
+    const userRole = (session.user as any)?.role
+    if (userRole !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
 
-    // Auto-seed sample posts if none exist and seed param is provided
-    if (posts.length === 0 && seed === 'true') {
-      const samplePosts = [
-        {
-          slug: 'wordpress-seo-guide-2024',
-          title: 'Complete WordPress SEO Guide: Rank #1 on Google in 2024',
-          excerpt: 'Learn the proven WordPress SEO strategies that will help your website rank higher on Google. This comprehensive guide covers everything from technical SEO to content optimization.',
-          content: `Search engine optimization (SEO) is crucial for any WordPress website looking to attract organic traffic. In this comprehensive guide, we'll explore the most effective strategies to help your WordPress site rank higher on Google in 2024.
+    const blogPosts = [
+      {
+        slug: 'wordpress-seo-guide-2024',
+        title: 'Complete WordPress SEO Guide: Rank #1 on Google in 2024',
+        excerpt: 'Learn the proven WordPress SEO strategies that will help your website rank higher on Google. This comprehensive guide covers everything from technical SEO to content optimization.',
+        content: `Search engine optimization (SEO) is crucial for any WordPress website looking to attract organic traffic. In this comprehensive guide, we'll explore the most effective strategies to help your WordPress site rank higher on Google in 2024.
 
 ## Why WordPress SEO Matters
 
@@ -63,6 +50,7 @@ Use clean, descriptive URLs that include your target keyword:
 
 ### Content Optimization
 Every piece of content should be optimized for your target keyword. Here's how:
+
 1. **Place keyword in title**: Include your main keyword within the first 60 characters
 2. **Use keyword in URL**: Keep URLs short and descriptive
 3. **Add meta description**: Write compelling summaries under 160 characters
@@ -95,18 +83,17 @@ Google's Core Web Vitals are now ranking factors:
 SEO is not a one-time task but an ongoing process. By implementing these WordPress SEO strategies, you'll be well on your way to ranking higher on Google in 2024 and beyond.
 
 Remember: Quality content that provides value to users is the foundation of successful SEO. All technical optimizations should support your content strategy, not replace it.`,
-          coverImage: 'https://images.unsplash.com/photo-1432888622747-4eb9a8efeb01?w=800&q=80',
-          author: 'WPCodingPress Team',
-          category: 'Development',
-          tags: 'wordpress,seo,google,ranking,optimization',
-          readingTime: 8,
-          isPublished: true,
-        },
-        {
-          slug: 'grow-business-online-2024',
-          title: 'How to Grow Your Business Online: Complete Digital Strategy',
-          excerpt: 'Discover the proven digital strategies that successful businesses use to grow their online presence. From website optimization to social media marketing, learn it all here.',
-          content: `In today's digital age, establishing and growing your business online is no longer optional—it's essential for survival. This comprehensive guide will walk you through the proven strategies to expand your digital footprint and attract more customers.
+        coverImage: 'https://images.unsplash.com/photo-1432888622747-4eb9a8efeb01?w=800&q=80',
+        author: 'WPCodingPress Team',
+        category: 'Development',
+        tags: 'wordpress,seo,google,ranking,optimization',
+        readingTime: 8
+      },
+      {
+        slug: 'grow-business-online-2024',
+        title: 'How to Grow Your Business Online: Complete Digital Strategy',
+        excerpt: 'Discover the proven digital strategies that successful businesses use to grow their online presence. From website optimization to social media marketing, learn it all here.',
+        content: `In today's digital age, establishing and growing your business online is no longer optional—it's essential for survival. This comprehensive guide will walk you through the proven strategies to expand your digital footprint and attract more customers.
 
 ## The Digital Landscape in 2024
 
@@ -191,18 +178,17 @@ Track these key metrics:
 Growing your business online requires a strategic, patient approach. Focus on providing value, building relationships, and consistently refining your strategy based on data. The businesses that succeed are those that adapt to changing customer needs while maintaining authenticity.
 
 Start with one channel, master it, then expand. Quality always trumps quantity in digital marketing.`,
-          coverImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
-          author: 'WPCodingPress Team',
-          category: 'Business',
-          tags: 'business,digital marketing,growth,online strategy',
-          readingTime: 6,
-          isPublished: true,
-        },
-        {
-          slug: 'woocommerce-conversion-optimization',
-          title: 'WooCommerce Conversion Optimization: Turn Visitors into Buyers',
-          excerpt: 'Master the art of WooCommerce conversion optimization. Learn how to optimize your online store to increase sales and revenue with proven strategies.',
-          content: `Running a WooCommerce store is only half the battle—converting visitors into paying customers is where the real challenge lies. In this guide, we'll explore proven strategies to optimize your WooCommerce store for maximum conversions.
+        coverImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
+        author: 'WPCodingPress Team',
+        category: 'Business',
+        tags: 'business,digital marketing,growth,online strategy',
+        readingTime: 6
+      },
+      {
+        slug: 'woocommerce-conversion-optimization',
+        title: 'WooCommerce Conversion Optimization: Turn Visitors into Buyers',
+        excerpt: 'Master the art of WooCommerce conversion optimization. Learn how to optimize your online store to increase sales and revenue with proven strategies.',
+        content: `Running a WooCommerce store is only half the battle—converting visitors into paying customers is where the real challenge lies. In this guide, we'll explore proven strategies to optimize your WooCommerce store for maximum conversions.
 
 ## Understanding Conversion Rates
 
@@ -323,84 +309,35 @@ Show relevant products based on:
 Converting visitors into buyers requires continuous testing and optimization. Start with the biggest friction points in your store and work systematically through each improvement. Remember: small improvements compound into significant revenue growth.
 
 Test one change at a time, measure results, and iterate. What works for one store may not work for another—your customers are unique, and your optimization strategy should be too.`,
-          coverImage: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80',
-          author: 'WPCodingPress Team',
-          category: 'Development',
-          tags: 'woocommerce,ecommerce,conversion,sales,optimization',
-          readingTime: 7,
-          isPublished: true,
-        },
-      ]
-
-      for (const post of samplePosts) {
-        try {
-          await prisma.blogPost.create({
-            data: {
-              ...post,
-              publishedAt: new Date(),
-            }
-          })
-        } catch (e) {
-          // Post might already exist
-        }
+        coverImage: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80',
+        author: 'WPCodingPress Team',
+        category: 'Development',
+        tags: 'woocommerce,ecommerce,conversion,sales,optimization',
+        readingTime: 7
       }
+    ]
 
-      posts = await prisma.blogPost.findMany({
-        where,
-        orderBy: { publishedAt: 'desc' }
-      })
-    }
-
-    return NextResponse.json(posts)
-  } catch (error) {
-    console.error('Error fetching blog posts:', error)
-    return NextResponse.json({ error: 'Failed to fetch posts' }, { status: 500 })
-  }
-}
-
-export async function POST(request: Request) {
-  try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const userRole = (session.user as any)?.role
-    if (userRole !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
-    const body = await request.json()
-    const { title, excerpt, content, coverImage, author, category, tags } = body
-
-    const slug = title
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '')
-
-    const readingTime = Math.max(5, Math.ceil((content || '').split(' ').length / 200))
-
-    const post = await prisma.blogPost.create({
-      data: {
-        slug,
-        title,
-        excerpt,
-        content,
-        coverImage,
-        author,
-        category,
-        tags: tags || '',
-        readingTime,
-        isPublished: true,
-        publishedAt: new Date()
+    const createdPosts = []
+    for (const post of blogPosts) {
+      try {
+        const created = await prisma.blogPost.upsert({
+          where: { slug: post.slug },
+          update: post,
+          create: post
+        })
+        createdPosts.push(created)
+      } catch (error) {
+        console.error('Error creating post:', post.slug, error)
       }
+    }
+
+    return NextResponse.json({ 
+      message: 'Blog posts seeded successfully', 
+      count: createdPosts.length,
+      posts: createdPosts 
     })
-
-    return NextResponse.json(post)
   } catch (error) {
-    console.error('Error creating blog post:', error)
-    return NextResponse.json({ error: 'Failed to create post' }, { status: 500 })
+    console.error('Error seeding blog posts:', error)
+    return NextResponse.json({ error: 'Failed to seed posts' }, { status: 500 })
   }
 }

@@ -158,3 +158,34 @@ INSERT INTO `portfolio` (`title`, `category`, `image_url`, `description`, `techn
 ('Law Firm Portal', 'Professional Services', 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80', 'Corporate website with case management', '["WordPress","Custom Theme","CRM Integration"]', 3),
 ('Restaurant Booking App', 'Food & Beverage', 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80', 'Online ordering and reservation system', '["WordPress","WooCommerce","Custom Plugin"]', 4),
 ('Real Estate Platform', 'Real Estate', 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80', 'Property listings with virtual tours', '["WordPress","IDX","VR Integration"]', 5);
+
+-- ================================================
+-- BLOG POSTS TABLE
+-- ================================================
+CREATE TABLE IF NOT EXISTS `blog_posts` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `slug` VARCHAR(200) NOT NULL UNIQUE,
+    `title` VARCHAR(255) NOT NULL,
+    `excerpt` TEXT,
+    `content` LONGTEXT,
+    `cover_image` VARCHAR(500),
+    `author` VARCHAR(100),
+    `category` VARCHAR(100),
+    `tags` VARCHAR(255),
+    `reading_time` INT DEFAULT 5,
+    `is_published` TINYINT(1) DEFAULT 1,
+    `published_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX `idx_slug` (`slug`),
+    INDEX `idx_category` (`category`),
+    INDEX `idx_published` (`is_published`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ================================================
+-- INSERT SAMPLE BLOG POSTS (SEO Optimized)
+-- ================================================
+INSERT INTO `blog_posts` (`slug`, `title`, `excerpt`, `content`, `cover_image`, `author`, `category`, `tags`, `reading_time`) VALUES
+('wordpress-seo-guide-2024', 'Complete WordPress SEO Guide: Rank #1 on Google in 2024', 'Learn the proven WordPress SEO strategies that will help your website rank higher on Google. This comprehensive guide covers everything from technical SEO to content optimization.', 'https://images.unsplash.com/photo-1432888622747-4eb9a8efeb01?w=800&q=80', 'WPCodingPress Team', 'Development', 'wordpress,seo,google,ranking,optimization', 8),
+('grow-business-online-2024', 'How to Grow Your Business Online: Complete Digital Strategy', 'Discover the proven digital strategies that successful businesses use to grow their online presence. From website optimization to social media marketing, learn it all here.', 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80', 'WPCodingPress Team', 'Business', 'business,digital marketing,growth,online strategy', 6),
+('woocommerce-conversion-optimization', 'WooCommerce Conversion Optimization: Turn Visitors into Buyers', 'Master the art of WooCommerce conversion optimization. Learn how to optimize your online store to increase sales and revenue with proven strategies.', 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80', 'WPCodingPress Team', 'Development', 'woocommerce,ecommerce,conversion,sales,optimization', 7);

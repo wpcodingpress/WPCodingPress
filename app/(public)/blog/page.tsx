@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { ArrowRight, Calendar, Clock, Search } from "lucide-react"
+import { ArrowRight, Calendar, Clock, Search, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 interface BlogPost {
@@ -29,7 +30,14 @@ const defaultPosts: BlogPost[] = [
 
 const categories = ["All", "Development", "Business", "Technology"]
 
-const plans = [
+function BlogContent() {
+  const searchParams = useSearchParams()
+  const initialSearch = searchParams.get('search') || ''
+  
+  const [searchQuery, setSearchQuery] = useState(initialSearch)
+  const [selectedCategory, setSelectedCategory] = useState("All")
+  const [posts, setPosts] = useState<BlogPost[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   { name: "Free", price: "$0", period: "forever", features: ["1 WordPress site conversion", "Basic Next.js template", "Community support", "No custom domain"], buttonText: "Get Started", href: "/register" },
   { name: "Pro", price: "$19", period: "/month", features: ["1 WordPress site conversion", "Live deployment", "Advanced Next.js template", "Priority email support", "Custom domain", "Analytics dashboard", "Auto content sync"], popular: true, buttonText: "Subscribe Now", href: "/dashboard/subscription?plan=pro" },
   { name: "Enterprise", price: "$99", period: "/month", features: ["3 WordPress site conversions", "Live deployments", "Advanced Next.js templates", "Priority email support", "Custom domains", "Analytics dashboard", "Auto content sync", "White-label option"], buttonText: "Subscribe Now", href: "/dashboard/subscription?plan=enterprise" },
@@ -44,7 +52,8 @@ export default function BlogPage() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch("/api/blog")
+        const searchParam = initialSearch ? `?search=${encodeURIComponent(initialSearch)}` : ''
+        const res = await fetch(`/api/blog${searchParam}`)
         if (res.ok) {
           const data = await res.json()
           if (data.length > 0) {
@@ -63,11 +72,20 @@ export default function BlogPage() {
       }
     }
     fetchPosts()
-  }, [])
+  }, [initialSearch])
+
+  // Clear search handler
+  const clearSearch = () => {
+    setSearchQuery('')
+    window.history.replaceState({}, '', '/blog')
+  }
 
   const filteredPosts = posts.filter(post => {
-    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesSearch = 
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.tags.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.category.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCategory = selectedCategory === "All" || post.category === selectedCategory
     return matchesSearch && matchesCategory
   })
@@ -110,16 +128,38 @@ export default function BlogPage() {
             </p>
             
             {/* Search Bar */}
-            <div className="relative max-w-xl mx-auto">
+            <form 
+              action="/blog" 
+              method="GET"
+              className="relative max-w-xl mx-auto"
+            >
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input
                 type="text"
+                name="search"
                 placeholder="Search articles..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent backdrop-blur-sm"
+                className="w-full pl-12 pr-24 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent backdrop-blur-sm"
               />
-            </div>
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={clearSearch}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/20 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 text-white font-medium transition-colors"
+                >
+                  Search
+                </button>
+              </div>
+            </form>
           </motion.div>
         </div>
       </section>
@@ -283,5 +323,19 @@ export default function BlogPage() {
         </div>
       </section>
     </div>
+  )
+}
+
+// Main page export with Suspense
+export default function BlogPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="animate-pulse text-violet-400">Loading...</div>
+      </div>
+    }>
+    >
+      <BlogContent />
+    </Suspense>
   )
 }
