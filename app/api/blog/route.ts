@@ -40,10 +40,14 @@ export async function GET(request: Request) {
       orderBy: { publishedAt: 'desc' }
     })
 
-    // Auto-seed sample posts if none exist
-    if (posts.length === 0 || force === 'true' || seed === 'refresh') {
-      // Delete existing posts
+    // Always delete and recreate when seed=refresh
+    if (seed === 'refresh') {
       await prisma.blogPost.deleteMany({})
+    } else if (posts.length === 0 || force === 'true') {
+      // Only delete if no posts exist
+      if (force === 'true') {
+        await prisma.blogPost.deleteMany({})
+      }
       
       const samplePosts = [
         {
