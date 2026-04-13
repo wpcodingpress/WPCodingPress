@@ -60,6 +60,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
+  { href: "/admin/notifications", icon: Bell, label: "Notifications", allowed: ['admin'] },
   { href: "/admin/orders", icon: ShoppingCart, label: "Orders", allowed: ['admin', 'manager'] },
   { href: "/admin/custom-orders", icon: DollarSign, label: "Custom Orders", allowed: ['admin'] },
   { href: "/admin/invoices", icon: FileText, label: "Invoices", allowed: ['admin'] },
@@ -341,8 +342,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {/* Right Side */}
             <div className="flex items-center gap-2">
               {/* Notifications */}
-              <div className="relative">
-                <Button variant="ghost" size="icon" onClick={() => setNotificationsOpen(!notificationsOpen)} className="text-slate-600 hover:text-violet-600 hover:bg-violet-50 relative">
+              <Link href="/admin/notifications" className="relative">
+                <Button variant="ghost" size="icon" className="text-slate-600 hover:text-violet-600 hover:bg-violet-50 relative">
                   <Bell className="w-5 h-5" />
                   {unreadCount > 0 && (
                     <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
@@ -350,44 +351,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </span>
                   )}
                 </Button>
-
-                {/* Notifications Dropdown */}
-                <AnimatePresence>
-                  {notificationsOpen && (
-                    <motion.div initial={{ opacity: 0, y: -10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      className="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-80 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden z-50">
-                      <div className="sticky top-0 bg-white p-3 border-b border-slate-100 flex items-center justify-between">
-                        <span className="font-semibold text-slate-900">Notifications</span>
-                        {unreadCount > 0 && (
-                          <button onClick={markAllRead} className="text-xs text-violet-600 hover:text-violet-700 font-medium">Mark all read</button>
-                        )}
-                      </div>
-                      <div className="max-h-80 overflow-y-auto">
-                        {notifications.length === 0 ? (
-                          <div className="p-6 text-center text-slate-500 text-sm">No notifications</div>
-                        ) : (
-                          <div className="divide-y divide-slate-100">
-                            {notifications.slice(0, 10).map((notif) => (
-                              <Link key={notif.id} href={notif.link || '#'} onClick={() => setNotificationsOpen(false)}
-                                className={`flex gap-3 p-3 hover:bg-slate-50 ${!notif.isRead ? "bg-violet-50/50" : ""}`}>
-                                <div className={`p-1.5 rounded-lg ${getNotificationColor(notif.type)}`}>
-                                  {getNotificationIcon(notif.type)}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-slate-900 truncate">{notif.title}</p>
-                                  <p className="text-xs text-slate-500 truncate">{notif.message}</p>
-                                  <p className="text-xs text-slate-400 mt-1">{formatTime(notif.createdAt)}</p>
-                                </div>
-                                {!notif.isRead && <div className="w-2 h-2 rounded-full bg-violet-500 flex-shrink-0 mt-2" />}
-                              </Link>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              </Link>
 
               {/* Profile */}
               <Link href="/admin/profile" className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center text-white font-medium hover:opacity-90 transition-opacity">

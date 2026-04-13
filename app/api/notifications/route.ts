@@ -3,16 +3,6 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import prisma from '@/lib/prisma'
 
-async function createUserNotification(userId: string, type: string, title: string, message: string, link?: string) {
-  try {
-    await prisma.notification.create({
-      data: { userId, type, title, message, link }
-    })
-  } catch (error) {
-    console.error('Error creating notification:', error)
-  }
-}
-
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions)
@@ -30,7 +20,7 @@ export async function GET(request: Request) {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { email: true }
+      select: { email: true, role: true }
     })
 
     let notifications: Array<{
@@ -44,30 +34,67 @@ export async function GET(request: Request) {
     }> = []
 
     if (type === 'admin') {
-      const [dbNotifications, recentOrders, recentContacts, recentSubscriptions] = await Promise.all([
-        prisma.notification.findMany({
-          orderBy: { createdAt: 'desc' },
-          take: 100
-        }),
+      const [
+        recentOrders,
+        recentCustomOrders,
+        recentContacts,
+        recentSubscriptions,
+        recentUsers,
+        recentSites,
+        recentJobs,
+        recentProducts,
+        dbNotifications
+      ] = await Promise.all([
         prisma.order.findMany({
-          where: { createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
+          where: { createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
           orderBy: { createdAt: 'desc' },
-          take: 10,
-          include: { service: true }
+          take: 20,
+          include: { service: true, user: { select: { name: true, email: true } } }
+        }),
+        prisma.customOrder.findMany({
+          where: { createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
+          orderBy: { createdAt: 'desc' },
+          take: 20
         }),
         prisma.contact.findMany({
-          where: { createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
+          where: { createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
           orderBy: { createdAt: 'desc' },
-          take: 10
+          take: 20
         }),
         prisma.subscription.findMany({
-          where: { 
-            createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-            status: 'active'
-          },
+          where: { createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
           orderBy: { createdAt: 'desc' },
-          take: 10,
+          take: 30,
           include: { user: { select: { name: true, email: true } } }
+        }),
+        prisma.user.findMany({
+          where: { createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
+          orderBy: { createdAt: 'desc' },
+          take: 20
+        }),
+        prisma.site.findMany({
+          where: { createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
+          orderBy: { createdAt: 'desc' },
+          take: 20
+        }),
+        prisma.job.findMany({
+          where: { createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } },
+          orderBy: { createdAt: 'desc' },
+          take: 20,
+          include: { site: { select: { domain: true } }, user: { select: { name: true, email: true } } }
+        }),
+        prisma.order.findMany({
+          where: { 
+            createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+            downloadCount: { gt: 0 }
+          },
+          orderBy: { updatedAt: 'desc' },
+          take: 20,
+          include: { user: { select: { name: true, email: true } }, product: true }
+        }),
+        prisma.notification.findMany({
+          orderBy: { createdAt: 'desc' },
+          take: 50
         })
       ])
 
@@ -83,14 +110,30 @@ export async function GET(request: Request) {
         })
       })
 
+      recentUsers.forEach(u => {
+        const existing = notifications.find(n => n.type === 'user_registration' && n.message.includes(u.email))
+        if (!existing) {
+          notifications.push({
+            id: `user-${u.id}`,
+            type: 'user_registration',
+            title: 'New User Registration',
+            message: `${u.name || 'New user'} (${u.email}) registered as ${u.role}`,
+            isRead: false,
+            createdAt: u.createdAt.toISOString(),
+            link: '/admin/users'
+          })
+        }
+      })
+
       recentOrders.forEach(order => {
         const existing = notifications.find(n => n.type === 'order' && n.message.includes(order.id))
         if (!existing) {
+          const statusEmoji = order.status === 'completed' ? '✅' : order.status === 'cancelled' ? '❌' : order.status === 'in_progress' ? '🔄' : '⏳'
           notifications.push({
             id: `order-${order.id}`,
             type: 'order',
-            title: 'New Order Received',
-            message: `${order.clientName} ordered ${order.service?.name || 'a service'} - $${order.amount}`,
+            title: `${statusEmoji} New Order Received`,
+            message: `${order.clientName || order.user?.name || 'Customer'} ordered ${order.service?.name || 'a service'} - $${(order.amount / 100).toFixed(2)}`,
             isRead: false,
             createdAt: order.createdAt.toISOString(),
             link: '/admin/orders'
@@ -98,31 +141,172 @@ export async function GET(request: Request) {
         }
       })
 
+      recentCustomOrders.forEach(order => {
+        const existing = notifications.find(n => n.type === 'custom_order' && n.message.includes(order.id))
+        if (!existing) {
+          const paymentStatus = order.advancePaid && order.remainingPaid ? '💰 Fully Paid' : order.advancePaid ? '💵 Partial' : '📝 Unpaid'
+          notifications.push({
+            id: `custom-order-${order.id}`,
+            type: 'custom_order',
+            title: `📋 New Custom Order`,
+            message: `${order.clientName} - ${order.projectName} (${(order.totalAmount / 100).toFixed(2)}) - ${paymentStatus}`,
+            isRead: false,
+            createdAt: order.createdAt.toISOString(),
+            link: '/admin/custom-orders'
+          })
+
+          if (order.advancePaid && !order.remainingPaid) {
+            notifications.push({
+              id: `custom-payment-${order.id}-advance`,
+              type: 'payment',
+              title: '💵 Advance Payment Received',
+              message: `${order.clientName} paid advance $${(order.advanceAmount / 100).toFixed(2)} for "${order.projectName}"`,
+              isRead: false,
+              createdAt: order.updatedAt.toISOString(),
+              link: '/admin/custom-orders'
+            })
+          }
+
+          if (order.remainingPaid && order.remainingAmount > 0) {
+            notifications.push({
+              id: `custom-payment-${order.id}-remaining`,
+              type: 'payment',
+              title: '💰 Full Payment Received',
+              message: `${order.clientName} completed payment for "${order.projectName}"`,
+              isRead: false,
+              createdAt: order.updatedAt.toISOString(),
+              link: '/admin/custom-orders'
+            })
+          }
+        }
+      })
+
       recentContacts.forEach(contact => {
-        notifications.push({
-          id: `contact-${contact.id}`,
-          type: 'contact',
-          title: 'New Contact Message',
-          message: `${contact.name}: ${contact.message.substring(0, 50)}...`,
-          isRead: contact.isRead,
-          createdAt: contact.createdAt.toISOString(),
-          link: '/admin/contacts'
-        })
+        const existing = notifications.find(n => n.type === 'contact' && n.message.includes(contact.id))
+        if (!existing) {
+          notifications.push({
+            id: `contact-${contact.id}`,
+            type: 'contact',
+            title: '📩 New Contact Message',
+            message: `${contact.name} (${contact.email}): ${contact.subject || 'No subject'}`,
+            isRead: contact.isRead,
+            createdAt: contact.createdAt.toISOString(),
+            link: '/admin/contacts'
+          })
+        }
       })
 
       recentSubscriptions.forEach(sub => {
-        if (sub.plan !== 'free') {
+        const existing = notifications.find(n => n.type === 'subscription' && n.message.includes(sub.id))
+        if (!existing) {
+          if (sub.status === 'active' && sub.plan !== 'free') {
+            notifications.push({
+              id: `sub-${sub.id}`,
+              type: 'subscription',
+              title: '🎉 New Subscription',
+              message: `${sub.user.name} (${sub.user.email}) subscribed to ${sub.plan.toUpperCase()} plan`,
+              isRead: false,
+              createdAt: sub.createdAt.toISOString(),
+              link: '/admin/subscribers'
+            })
+          } else if (sub.status === 'cancelled') {
+            notifications.push({
+              id: `sub-cancelled-${sub.id}`,
+              type: 'subscription_cancelled',
+              title: '⚠️ Subscription Cancelled',
+              message: `${sub.user.name} (${sub.user.email}) cancelled their ${sub.plan} subscription`,
+              isRead: false,
+              createdAt: sub.updatedAt.toISOString(),
+              link: '/admin/subscribers'
+            })
+          }
+        }
+      })
+
+      const expiringSubscriptions = recentSubscriptions.filter(sub => 
+        sub.status === 'active' && 
+        sub.currentPeriodEnd && 
+        new Date(sub.currentPeriodEnd) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      )
+      expiringSubscriptions.forEach(sub => {
+        const existing = notifications.find(n => n.type === 'subscription_expiring' && n.message.includes(sub.user.email))
+        if (!existing) {
           notifications.push({
-            id: `sub-${sub.id}`,
-            type: 'subscriber',
-            title: `New ${sub.plan.charAt(0).toUpperCase() + sub.plan.slice(1)} Subscriber`,
-            message: `${sub.user.name} (${sub.user.email}) subscribed to ${sub.plan} plan`,
+            id: `sub-expiring-${sub.id}`,
+            type: 'subscription_expiring',
+            title: '⏰ Subscription Expiring Soon',
+            message: `${sub.user.name}'s ${sub.plan} subscription expires on ${new Date(sub.currentPeriodEnd).toLocaleDateString()}`,
             isRead: false,
-            createdAt: sub.createdAt.toISOString(),
+            createdAt: new Date().toISOString(),
             link: '/admin/subscribers'
           })
         }
       })
+
+      recentSites.forEach(site => {
+        const existing = notifications.find(n => n.type === 'site' && n.message.includes(site.id))
+        if (!existing) {
+          const statusIcon = site.status === 'connected' ? '🔗' : site.status === 'error' ? '❌' : '🔌'
+          notifications.push({
+            id: `site-${site.id}`,
+            type: 'site',
+            title: `${statusIcon} New Site Connection`,
+            message: `Site ${site.domain} - ${site.status}`,
+            isRead: false,
+            createdAt: site.createdAt.toISOString(),
+            link: '/admin/users'
+          })
+        }
+      })
+
+      recentJobs.forEach(job => {
+        const existing = notifications.find(n => n.type === 'job' && n.message.includes(job.id))
+        if (!existing) {
+          const statusIcon = job.status === 'completed' ? '✅' : job.status === 'failed' ? '❌' : job.status === 'processing' ? '🔄' : '⏳'
+          notifications.push({
+            id: `job-${job.id}`,
+            type: 'job',
+            title: `${statusIcon} Conversion Job ${job.status === 'completed' ? 'Complete' : 'Update'}`,
+            message: `${job.user?.name || 'User'}'s site "${job.site?.domain}" - ${job.status}`,
+            isRead: false,
+            createdAt: job.createdAt.toISOString(),
+            link: '/admin/users'
+          })
+        }
+      })
+
+      recentProducts.forEach(order => {
+        const existing = notifications.find(n => n.type === 'product_download' && n.message.includes(order.id))
+        if (!existing && order.downloadCount > 0) {
+          notifications.push({
+            id: `download-${order.id}`,
+            type: 'product_download',
+            title: '📦 Product Downloaded',
+            message: `${order.user?.name || order.clientName} downloaded ${order.product?.name || 'a product'}`,
+            isRead: false,
+            createdAt: order.updatedAt.toISOString(),
+            link: '/admin/orders'
+          })
+        }
+      })
+
+      const totalRevenue = [...recentOrders, ...recentCustomOrders].reduce((sum, order) => {
+        const amount = order.amount || order.totalAmount || 0
+        const paid = 'remainingPaid' in order ? (order as any).remainingPaid : true
+        return sum + (paid ? amount : 0)
+      }, 0)
+      
+      if (totalRevenue > 0) {
+        notifications.push({
+          id: `revenue-${Date.now()}`,
+          type: 'revenue',
+          title: '💰 Revenue Update',
+          message: `Total revenue in last 30 days: $${(totalRevenue / 100).toLocaleString()}`,
+          isRead: false,
+          createdAt: new Date().toISOString(),
+          link: '/admin/revenue'
+        })
+      }
     } else {
       const [dbNotifications, userOrders, userCustomOrders, userSubscriptions, userSites, userJobs] = await Promise.all([
         prisma.notification.findMany({
