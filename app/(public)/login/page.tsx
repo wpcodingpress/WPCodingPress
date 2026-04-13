@@ -35,10 +35,29 @@ export default function LoginPage() {
         throw new Error("Invalid email or password");
       }
 
-      // Login successful - redirect to dashboard
+      const userRes = await fetch(`/api/admin/users?email=${encodeURIComponent(email)}`)
+      const userData = await userRes.json()
+      
+      let role = 'user'
+      if (Array.isArray(userData)) {
+        const foundUser = userData.find((u: any) => u.email === email)
+        if (foundUser) {
+          role = foundUser.role || 'user'
+        }
+      }
+
+      if (role === 'admin' || role === 'editor' || role === 'manager') {
+        setError(`This account requires admin access. Please use the admin login page.`)
+        await signOut({ redirect: false })
+        setIsLoading(false)
+        return
+      }
+
+      // Success - redirect to dashboard
       router.push('/dashboard')
     } catch (err: any) {
       setError(err.message || "Invalid email or password");
+    } finally {
       setIsLoading(false);
     }
   };
