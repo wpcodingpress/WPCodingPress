@@ -182,8 +182,7 @@ export default function DashboardLayout({
 
   const handleLogout = async () => {
     await signOut({ redirect: false })
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://wpcodingpress.com'
-    window.location.href = baseUrl
+    window.location.href = 'https://wpcodingpress.com/'
   }
 
   const getPageTitle = () => {
