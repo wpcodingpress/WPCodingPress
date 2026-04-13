@@ -24,10 +24,15 @@ export async function GET(request: Request) {
 
     // Update specific post cover image if requested
     if (updateImage === 'true') {
-      await prisma.blogPost.update({
-        where: { slug: 'wordpress-seo-guide-2024' },
-        data: { coverImage: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80' }
-      })
+      try {
+        const updated = await prisma.blogPost.update({
+          where: { slug: 'wordpress-seo-guide-2024' },
+          data: { coverImage: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80' }
+        })
+        return NextResponse.json({ message: 'Image updated', coverImage: updated.coverImage })
+      } catch (e) {
+        return NextResponse.json({ error: 'Failed to update' }, { status: 500 })
+      }
     }
 
     let posts = await prisma.blogPost.findMany({
