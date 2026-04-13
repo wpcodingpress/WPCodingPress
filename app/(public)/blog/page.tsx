@@ -2,7 +2,6 @@
 
 import { useEffect, useState, Suspense } from "react"
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { ArrowRight, Calendar, Clock, Search, X } from "lucide-react"
@@ -30,20 +29,13 @@ const defaultPosts: BlogPost[] = [
 
 const categories = ["All", "Development", "Business", "Technology"]
 
-function BlogContent() {
-  const searchParams = useSearchParams()
-  const initialSearch = searchParams.get('search') || ''
-  
-  const [searchQuery, setSearchQuery] = useState(initialSearch)
-  const [selectedCategory, setSelectedCategory] = useState("All")
-  const [posts, setPosts] = useState<BlogPost[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+const plans = [
   { name: "Free", price: "$0", period: "forever", features: ["1 WordPress site conversion", "Basic Next.js template", "Community support", "No custom domain"], buttonText: "Get Started", href: "/register" },
   { name: "Pro", price: "$19", period: "/month", features: ["1 WordPress site conversion", "Live deployment", "Advanced Next.js template", "Priority email support", "Custom domain", "Analytics dashboard", "Auto content sync"], popular: true, buttonText: "Subscribe Now", href: "/dashboard/subscription?plan=pro" },
   { name: "Enterprise", price: "$99", period: "/month", features: ["3 WordPress site conversions", "Live deployments", "Advanced Next.js templates", "Priority email support", "Custom domains", "Analytics dashboard", "Auto content sync", "White-label option"], buttonText: "Subscribe Now", href: "/dashboard/subscription?plan=enterprise" },
 ]
 
-export default function BlogPage() {
+function BlogContent() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("All")
   const [posts, setPosts] = useState<BlogPost[]>([])
@@ -52,7 +44,7 @@ export default function BlogPage() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const searchParam = initialSearch ? `?search=${encodeURIComponent(initialSearch)}` : ''
+        const searchParam = searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : ''
         const res = await fetch(`/api/blog${searchParam}`)
         if (res.ok) {
           const data = await res.json()
@@ -72,13 +64,7 @@ export default function BlogPage() {
       }
     }
     fetchPosts()
-  }, [initialSearch])
-
-  // Clear search handler
-  const clearSearch = () => {
-    setSearchQuery('')
-    window.history.replaceState({}, '', '/blog')
-  }
+  }, [searchQuery])
 
   const filteredPosts = posts.filter(post => {
     const matchesSearch = 
@@ -96,6 +82,14 @@ export default function BlogPage() {
     } catch {
       return dateStr
     }
+  }
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+  }
+
+  const clearSearch = () => {
+    setSearchQuery("")
   }
 
   return (
@@ -128,15 +122,10 @@ export default function BlogPage() {
             </p>
             
             {/* Search Bar */}
-            <form 
-              action="/blog" 
-              method="GET"
-              className="relative max-w-xl mx-auto"
-            >
+            <form onSubmit={handleSearch} className="relative max-w-xl mx-auto">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input
                 type="text"
-                name="search"
                 placeholder="Search articles..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -326,7 +315,6 @@ export default function BlogPage() {
   )
 }
 
-// Main page export with Suspense
 export default function BlogPage() {
   return (
     <Suspense fallback={
@@ -334,7 +322,6 @@ export default function BlogPage() {
         <div className="animate-pulse text-violet-400">Loading...</div>
       </div>
     }>
-    >
       <BlogContent />
     </Suspense>
   )
