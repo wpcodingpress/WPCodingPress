@@ -546,83 +546,94 @@ export default function HomePage() {
 
         {/* Futuristic Digital Clock - Top Left of Hero */}
         <div className="absolute top-28 left-16 lg:left-24 z-20">
-          <div className="relative w-44 h-28 lg:w-56 lg:h-36 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl border-2 border-cyan-500/50 shadow-2xl shadow-cyan-500/20 overflow-hidden">
-            {/* Holographic Glow Effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-purple-500/10" />
+          <div className="relative w-48 h-32 lg:w-60 lg:h-40 rounded-3xl overflow-hidden shadow-2xl">
+            {/* Glossy Glass Effect - Multiple Layers */}
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl" />
             
-            {/* Scan Lines Effect */}
-            <div className="absolute inset-0 opacity-20" style={{
-              backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(6, 182, 212, 0.3) 2px, rgba(6, 182, 212, 0.3) 4px)',
-            }} />
+            {/* Glossy Top Highlight */}
+            <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/20 to-transparent rounded-t-3xl" />
             
-            {/* Digital Display Background */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                {/* Main Time Display */}
-                <div className="font-mono text-4xl lg:text-5xl font-bold tracking-wider">
-                  <span className="text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]">{hours}</span>
-                  <span className="text-slate-600 mx-1">:</span>
-                  <span className="text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]">{minutes}</span>
-                  <span className="text-slate-600 mx-1">:</span>
-                  <span className="text-red-400 drop-shadow-[0_0_10px_rgba(248,113,113,0.8)]">{seconds}</span>
+            {/* Reflection Effect */}
+            <div className="absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-cyan-400/10 to-transparent" />
+            
+            {/* Screen Bezel */}
+            <div className="absolute inset-2 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700">
+              {/* Inner Glow */}
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-purple-500/5" />
+              
+              {/* Scan Lines */}
+              <div className="absolute inset-0 opacity-10" style={{
+                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(34, 211, 238, 0.2) 1px, rgba(34, 211, 238, 0.2) 2px)',
+              }} />
+              
+              {/* Digital Display */}
+              <div className="absolute inset-0 flex items-center justify-center p-4">
+                <div className="text-center w-full">
+                  {/* Main Time Display - High Contrast */}
+                  <div className="font-mono text-5xl lg:text-6xl font-bold tracking-[0.15em]">
+                    <span className="text-white drop-shadow-[0_0_15px_rgba(34,211,238,1)]">{hours}</span>
+                    <span className="text-cyan-300 mx-2 animate-pulse">:</span>
+                    <span className="text-white drop-shadow-[0_0_15px_rgba(34,211,238,1)]">{minutes}</span>
+                    <span className="text-cyan-300 mx-2 animate-pulse">:</span>
+                    <span className="text-red-400 drop-shadow-[0_0_15px_rgba(248,113,113,1)]">{seconds}</span>
+                  </div>
+                  
+                  {/* Date Display */}
+                  <div className="mt-3 font-mono text-sm lg:text-base text-cyan-400 tracking-[0.3em] uppercase">
+                    {currentTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                  </div>
+                  
+                  {/* Glowing Divider */}
+                  <div className="mt-3 h-0.5 w-32 mx-auto bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_rgba(34,211,238,0.8)]" />
+                  
+                  {/* Brand Text */}
+                  <div className="mt-2 font-mono text-[10px] text-slate-500 tracking-[0.4em]">WPCODINGPRESS</div>
                 </div>
-                
-                {/* Date Display */}
-                <div className="mt-2 font-mono text-xs lg:text-sm text-cyan-500/70 tracking-widest">
-                  {currentTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase()}
-                </div>
-                
-                {/* Glowing Line */}
-                <div className="mt-2 h-0.5 w-24 mx-auto bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_10px_cyan]" />
               </div>
             </div>
             
-            {/* Corner Accents */}
-            <div className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 border-cyan-400" />
-            <div className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 border-cyan-400" />
-            <div className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 border-cyan-400" />
-            <div className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 border-cyan-400" />
-          </div>
-          
-          {/* Digital Label */}
-          <div className="mt-3 text-center">
-            <p className="text-xs text-cyan-600 font-semibold tracking-wider" style={{ fontFamily: 'monospace' }}>WPCODINGPRESS</p>
+            {/* Corner LED Indicators */}
+            <div className="absolute top-3 left-3 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,1)] animate-pulse" />
+            <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-green-400 shadow-[0_0_10px_rgba(74,222,128,1)]" />
+            <div className="absolute bottom-3 left-3 w-2 h-2 rounded-full bg-red-400 shadow-[0_0_10px_rgba(248,113,113,1)] animate-pulse" />
+            <div className="absolute bottom-3 right-3 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,1)]" />
           </div>
         </div>
 
-        {/* Binary Code Matrix Background - 45 Degree Angle flowing right to bottom-left */}
+        {/* Binary Code Matrix Background - Visible sliding from right to bottom-left */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">
-          <div className="absolute inset-0">
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(90deg, transparent 0%, transparent 70%, rgba(6, 182, 212, 0.03) 100%)',
+            }}
+          />
+          <div className="absolute inset-0 overflow-hidden">
             <div 
-              className="absolute inset-0 opacity-[0.04] font-mono text-[10px] leading-relaxed whitespace-nowrap text-cyan-500"
+              className="absolute inset-0 font-mono text-xs leading-6 whitespace-nowrap"
               style={{
-                background: `repeating-linear-gradient(
-                  90deg,
-                  transparent 0px,
-                  transparent 8px,
-                  rgba(6, 182, 212, 0.5) 8px,
-                  rgba(6, 182, 212, 0.5) 9px
-                )`,
-                transform: 'skewX(-30deg) translateX(-30%)',
-                height: '300%',
-                top: '-100%',
+                transform: 'skewX(-25deg) translateX(-20%)',
+                width: '150%',
+                left: '-20%',
               }}
             >
-              {Array(40).fill(0).map((_, row) => (
+              {Array(25).fill(0).map((_, row) => (
                 <div 
                   key={row} 
                   className="flex"
                   style={{
-                    animation: `binaryScroll ${8 + row * 0.5}s linear infinite`,
-                    opacity: 0.6,
+                    animation: `binaryScroll ${6 + row * 0.3}s linear infinite`,
+                    marginTop: row * 2,
                   }}
                 >
-                  {Array(200).fill(0).map((_, i) => (
+                  {Array(120).fill(0).map((_, i) => (
                     <span 
                       key={i} 
                       style={{ 
-                        color: i % 8 === 0 ? '#22d3ee' : 'rgba(6, 182, 212, 0.4)',
-                        textShadow: i % 8 === 0 ? '0 0 5px rgba(34, 211, 238, 0.5)' : 'none',
+                        color: i % 10 === 0 ? '#22d3ee' : 'rgba(34, 211, 238, 0.5)',
+                        textShadow: i % 10 === 0 ? '0 0 8px rgba(34, 211, 238, 1)' : 'none',
+                        fontSize: i % 10 === 0 ? '14px' : '12px',
+                        fontWeight: i % 10 === 0 ? 'bold' : 'normal',
                       }}
                     >
                       {Math.random() > 0.5 ? '1' : '0'}
