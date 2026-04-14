@@ -525,104 +525,123 @@ export default function HomePage() {
         <motion.div className="absolute top-60 left-1/2 w-7 h-7 bg-emerald-400/40 rounded-full" animate={{ y: [-14, 14] }} transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }} />
         <motion.div className="absolute bottom-1/4 right-1/2 w-9 h-9 bg-sky-400/40 rounded-xl" animate={{ y: [-16, 16], rotate: [0, -6] }} transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} />
 
-        {/* Wall Clock - Top Left of Hero */}
-        <div className="absolute top-32 left-16 lg:left-24 z-20">
-          <div className="relative w-32 h-32 lg:w-40 lg:h-40">
-            {/* Wooden Frame Outer Ring */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-violet-800 via-violet-700 to-violet-900 shadow-2xl shadow-violet-900/40 border-4 border-violet-600">
-              {/* Wood grain effect */}
-              <div className="absolute inset-1 rounded-full bg-gradient-to-br from-violet-700 to-violet-800 overflow-hidden">
-                <div className="absolute inset-0 opacity-30" style={{
-                  backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(139, 92, 246, 0.4) 8px, rgba(139, 92, 246, 0.4) 10px)`,
+        {/* Beautiful Wall Clock - Top Left of Hero */}
+        <div className="absolute top-28 left-16 lg:left-24 z-20">
+          <div className="relative w-40 h-40 lg:w-48 lg:h-48">
+            {/* Outer Decorative Ring with Glowing Effect */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-amber-700 via-amber-600 to-amber-800 shadow-2xl shadow-amber-900/50 border-4 border-amber-600">
+              {/* Gold Accent Ring */}
+              <div className="absolute inset-1 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 border-2 border-amber-400/60" />
+              
+              {/* Wood Texture Effect */}
+              <div className="absolute inset-2 rounded-full bg-gradient-to-br from-amber-800 via-amber-700 to-amber-900 overflow-hidden">
+                <div className="absolute inset-0 opacity-20" style={{
+                  backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent 6px, rgba(245, 158, 11, 0.3) 6px, rgba(245, 158, 11, 0.3) 8px)`,
                 }} />
               </div>
               
-              {/* Inner Bevel */}
-              <div className="absolute inset-2 rounded-full bg-gradient-to-br from-violet-100 to-violet-200 border-2 border-violet-400/50">
-                {/* Clock Face */}
-                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-white to-violet-50">
-                  {/* Clock Numbers - Beautiful Style */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    {[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((num) => {
-                      const positions: Record<number, {x: string, y: string}> = {
-                        12: { x: '50%', y: '12%' },
-                        1: { x: '78%', y: '22%' },
-                        2: { x: '92%', y: '42%' },
-                        3: { x: '88%', y: '72%' },
-                        4: { x: '72%', y: '92%' },
-                        5: { x: '50%', y: '98%' },
-                        6: { x: '28%', y: '92%' },
-                        7: { x: '8%', y: '72%' },
-                        8: { x: '8%', y: '42%' },
-                        9: { x: '22%', y: '22%' },
-                        10: { x: '42%', y: '10%' },
-                        11: { x: '62%', y: '5%' },
-                      }
-                      const pos = positions[num]
+              {/* Inner Beautiful Bevel */}
+              <div className="absolute inset-3 rounded-full bg-gradient-to-br from-amber-50 to-amber-100 border-2 border-amber-300/50">
+                {/* Clock Face - Elegant Off White */}
+                <div className="absolute inset-1 rounded-full bg-gradient-to-br from-white to-amber-50 shadow-inner">
+                  {/* Hour Markers - Beautiful Dots */}
+                  <div className="absolute inset-0">
+                    {[...Array(12)].map((_, i) => {
+                      const angle = i * 30
+                      const rad = (angle - 90) * (Math.PI / 180)
+                      const isMainHour = i % 3 === 0
                       return (
-                        <span
-                          key={num}
-                          className="absolute text-violet-900 font-bold"
+                        <div
+                          key={i}
+                          className="absolute w-1 bg-gradient-to-b from-slate-800 to-slate-700 rounded-full"
                           style={{
-                            left: pos.x,
-                            top: pos.y,
-                            transform: 'translate(-50%, -50%)',
-                            fontSize: num === 12 || num === 6 || num === 9 ? '0.85rem' : '0.7rem',
-                            fontFamily: 'Georgia, serif',
+                            left: '50%',
+                            top: '50%',
+                            width: isMainHour ? '3px' : '2px',
+                            height: isMainHour ? '10px' : '6px',
+                            transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-38px)`,
                           }}
-                        >
-                          {num}
-                        </span>
+                        />
                       )
                     })}
                   </div>
                   
-                  {/* Center Cap */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-gradient-to-br from-violet-700 to-violet-900 border border-violet-500 shadow-md z-20" />
+                  {/* Minute Markers */}
+                  <div className="absolute inset-0">
+                    {[...Array(60)].map((_, i) => {
+                      if (i % 5 === 0) return null
+                      const angle = i * 6
+                      return (
+                        <div
+                          key={`min-${i}`}
+                          className="absolute w-0.5 h-1.5 bg-slate-400 rounded-full"
+                          style={{
+                            left: '50%',
+                            top: '50%',
+                            transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-38px)`,
+                          }}
+                        />
+                      )
+                    })}
+                  </div>
+                  
+                  {/* Center Decorative Ring */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 border border-amber-300/30" />
+                  
+                  {/* Center Cap - Elegant Gold */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-gradient-to-br from-amber-600 via-amber-500 to-amber-700 border-2 border-amber-400 shadow-lg z-30" />
                 </div>
               </div>
             </div>
             
-            {/* Clock Hands Container - Properly Centered */}
+            {/* Clock Hands - Perfectly Centered & Functional */}
             <div className="absolute inset-0 flex items-center justify-center">
-              {/* Hour Hand */}
+              {/* Hour Hand - Bold & Elegant */}
               <div
-                className="absolute w-1.5 h-8 bg-gradient-to-b from-violet-900 to-violet-800 rounded-full origin-center shadow-md z-10"
+                className="absolute w-1.5 lg:w-2 h-10 lg:h-12 bg-gradient-to-b from-slate-800 to-slate-900 rounded-lg origin-center shadow-lg z-20"
                 style={{
                   transform: `rotate(${hourRotation}deg)`,
-                  top: 'calc(50% - 32px)',
+                  top: '50%',
+                  marginTop: '-48px',
                 }}
               />
               
-              {/* Minute Hand */}
+              {/* Minute Hand - Sleek & Long */}
               <div
-                className="absolute w-1 h-10 bg-gradient-to-b from-violet-800 to-violet-700 rounded-full origin-center shadow-md z-10"
+                className="absolute w-1 h-14 lg:h-16 bg-gradient-to-b from-slate-700 to-slate-800 rounded-lg origin-center shadow-md z-20"
                 style={{
                   transform: `rotate(${minuteRotation}deg)`,
-                  top: 'calc(50% - 40px)',
+                  top: '50%',
+                  marginTop: '-60px',
                 }}
               />
               
-              {/* Second Hand */}
+              {/* Second Hand - Red & Dynamic */}
               <div
-                className="absolute w-0.5 h-11 bg-gradient-to-b from-red-500 to-red-600 rounded-full origin-center shadow-sm z-10"
+                className="absolute w-0.5 h-16 lg:h-18 bg-gradient-to-b from-red-500 to-red-600 rounded-full origin-center shadow-sm z-25"
                 style={{
                   transform: `rotate(${secondRotation}deg)`,
-                  top: 'calc(50% - 44px)',
+                  top: '50%',
+                  marginTop: '-64px',
                 }}
               />
               
-              {/* Second Hand Counterweight */}
+              {/* Second Hand Tail - Counterweight */}
               <div
-                className="absolute w-0.5 h-3 bg-red-400 rounded-full origin-center z-10"
+                className="absolute w-0.5 h-4 bg-red-400 rounded-full origin-center z-25"
                 style={{
                   transform: `rotate(${secondRotation}deg)`,
-                  top: 'calc(50% + 4px)',
+                  top: '50%',
+                  marginTop: '8px',
                 }}
               />
             </div>
           </div>
-          <p className="text-xs text-violet-700 mt-2 text-center font-medium" style={{ fontFamily: 'Georgia, serif' }}>WPCodingPress</p>
+          
+          {/* Elegant Clock Label */}
+          <div className="mt-3 text-center">
+            <p className="text-xs text-amber-700 font-semibold tracking-wider" style={{ fontFamily: 'Georgia, serif' }}>WPCodingPress</p>
+          </div>
         </div>
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
