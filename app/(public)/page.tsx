@@ -396,7 +396,7 @@ export default function HomePage() {
 
         {/* Minimal Floating Elements - Hidden on very small screens */}
         <div className="hidden xs:block absolute top-32 right-8 sm:right-12 w-12 sm:w-16 h-12 sm:h-16 bg-purple-300/30 rounded-2xl animate-bounce" style={{ animationDuration: '4s' }} />
-        <div className="hidden sm:block absolute top-1/2 left-8 w-10 h-10 bg-violet-300/30 rounded-xl animate-bounce" style={{ animationDuration: '4.5s', delay: '0.3s' }} />
+        <div className="hidden sm:block absolute top-1/2 left-8 w-10 h-10 bg-violet-300/30 rounded-xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '0.3s' }} />
         
         {/* Grid Pattern */}
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #8b5cf6 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
