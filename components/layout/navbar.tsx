@@ -173,6 +173,7 @@ export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [expandedMobileSubmenu, setExpandedMobileSubmenu] = useState<string | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const { data: session } = useSession()
   const pathname = usePathname()
@@ -474,54 +475,115 @@ export function Navbar() {
 
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-white border-t border-slate-200"
-          >
-            <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-4 space-y-2 max-h-[80vh] overflow-y-auto">
-              {mainNavLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block py-3 px-4 text-base sm:text-base text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg font-medium"
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <div className="pt-4 sm:pt-4 space-y-2 border-t border-slate-200">
-                {session?.user ? (
-                  <>
-                    {!['admin', 'editor', 'manager'].includes(session.user.role as string) && (
-                    <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full text-base sm:text-base border-purple-300 text-purple-700 hover:bg-purple-50">Dashboard</Button>
-                    </Link>
-                    )}
-                    {['admin', 'editor', 'manager'].includes(session.user.role as string) ? (
-                      <Link href="/admin" onClick={() => setMobileMenuOpen(false)}>
-                        <Button variant="outline" className="w-full text-base sm:text-base border-slate-300 text-slate-700 hover:bg-slate-100">Admin Panel</Button>
-                      </Link>
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm lg:hidden z-[59]"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, x: "-100%" }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: "-100%" }}
+              transition={{ type: "tween", duration: 0.3 }}
+              className="fixed top-[64px] left-0 right-0 bg-white border-t border-slate-200 shadow-2xl lg:hidden z-[70] max-h-[calc(100vh-64px)] overflow-y-auto"
+            >
+              <div className="container mx-auto px-3 py-4 space-y-2">
+                {mainNavLinks.map((link) => (
+                  <div key={link.href}>
+                    {(link.label === "Services" || link.label === "Products") ? (
+                      <div>
+                        <button
+                          onClick={() => setExpandedMobileSubmenu(link.label === "Services" ? "services" : "products")}
+                          className="flex items-center justify-between w-full py-3 px-4 text-base text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg font-medium"
+                        >
+                          <span>{link.label}</span>
+                          <ChevronDown className={`w-5 h-5 transition-transform ${expandedMobileSubmenu === (link.label === "Services" ? "services" : "products") ? "rotate-180" : ""}`} />
+                        </button>
+                        {expandedMobileSubmenu === "services" && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="pl-4 space-y-1"
+                          >
+                            {services.map((service) => (
+                              <Link
+                                key={service.href}
+                                href={service.href}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="block py-2 px-4 text-sm text-slate-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg"
+                              >
+                                {service.title}
+                              </Link>
+                            ))}
+                          </motion.div>
+                        )}
+                        {expandedMobileSubmenu === "products" && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="pl-4 space-y-1"
+                          >
+                            {products.map((product) => (
+                              <Link
+                                key={product.href}
+                                href={product.href}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="block py-2 px-4 text-sm text-slate-600 hover:text-violet-600 hover:bg-violet-50 rounded-lg"
+                              >
+                                {product.title}
+                              </Link>
+                            ))}
+                          </motion.div>
+                        )}
+                      </div>
                     ) : (
-                      <Link href="/order" onClick={() => setMobileMenuOpen(false)}>
-                        <Button className="w-full text-base sm:text-base bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700">Start Project</Button>
+                      <Link
+                        href={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block py-3 px-4 text-base text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg font-medium"
+                      >
+                        {link.label}
                       </Link>
                     )}
-                  </>
-                ) : (
-                  <>
-                    <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full text-base sm:text-base border-purple-300 text-purple-700 hover:bg-purple-50">Login</Button>
-                    </Link>
-                    <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full text-base sm:text-base bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700">Get Started</Button>
-                    </Link>
-                  </>
-                )}
+                  </div>
+                ))}
+                <div className="pt-4 space-y-2 border-t border-slate-200">
+                  {session?.user ? (
+                    <>
+                      {!['admin', 'editor', 'manager'].includes(session.user.role as string) && (
+                      <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                        <Button variant="outline" className="w-full text-base border-purple-300 text-purple-700 hover:bg-purple-50">Dashboard</Button>
+                      </Link>
+                      )}
+                      {['admin', 'editor', 'manager'].includes(session.user.role as string) ? (
+                        <Link href="/admin" onClick={() => setMobileMenuOpen(false)}>
+                          <Button variant="outline" className="w-full text-base border-slate-300 text-slate-700 hover:bg-slate-100">Admin Panel</Button>
+                        </Link>
+                      ) : (
+                        <Link href="/order" onClick={() => setMobileMenuOpen(false)}>
+                          <Button className="w-full text-base bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700">Start Project</Button>
+                        </Link>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                        <Button variant="outline" className="w-full text-base border-purple-300 text-purple-700 hover:bg-purple-50">Login</Button>
+                      </Link>
+                      <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                        <Button className="w-full text-base bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700">Get Started</Button>
+                      </Link>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </nav>

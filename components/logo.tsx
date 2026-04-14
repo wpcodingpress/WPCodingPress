@@ -20,7 +20,7 @@ export function AnimatedLogo({ className = "", size = "md", showText = true }: L
   const s = sizes[size]
   
   return (
-    <Link href="/" className={`flex items-center gap-3 group ${className}`}>
+    <Link href="https://wpcodingpress.com" className={`flex items-center gap-3 group ${className}`}>
       <motion.div
         className={`${s.padding} rounded-xl bg-gradient-to-br from-purple-600 via-violet-600 to-purple-700 flex items-center justify-center shadow-lg shadow-purple-500/25 relative overflow-hidden`}
         whileHover={{ scale: 1.05 }}
