@@ -457,11 +457,11 @@ export function Navbar() {
           </div>
 
           <button
-            className="lg:hidden p-2 sm:p-2.5 text-slate-700 hover:bg-slate-100 rounded-lg"
+            className="lg:hidden p-2.5 sm:p-2.5 text-slate-700 hover:bg-slate-100 rounded-lg touch-manipulation"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X className="h-5 w-5 sm:h-6 sm:w-6" /> : <Menu className="h-5 w-5 sm:h-6 sm:w-6" />}
+            {mobileMenuOpen ? <X className="h-6 w-6 sm:h-6 sm:w-6" /> : <Menu className="h-6 w-6 sm:h-6 sm:w-6" />}
           </button>
         </div>
       </div>
@@ -474,42 +474,42 @@ export function Navbar() {
             exit={{ opacity: 0, height: 0 }}
             className="lg:hidden bg-white border-t border-slate-200"
           >
-            <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 space-y-1 max-h-[80vh] overflow-y-auto">
+            <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-4 space-y-2 max-h-[80vh] overflow-y-auto">
               {mainNavLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block py-2.5 sm:py-3 px-3 sm:px-4 text-sm sm:text-base text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg font-medium"
+                  className="block py-3 px-4 text-base sm:text-base text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg font-medium"
                 >
                   {link.label}
                 </Link>
               ))}
-              <div className="pt-3 sm:pt-4 space-y-2 border-t border-slate-200">
+              <div className="pt-4 sm:pt-4 space-y-2 border-t border-slate-200">
                 {session?.user ? (
                   <>
                     {!['admin', 'editor', 'manager'].includes(session.user.role as string) && (
                     <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full text-sm sm:text-base border-purple-300 text-purple-700 hover:bg-purple-50">Dashboard</Button>
+                      <Button variant="outline" className="w-full text-base sm:text-base border-purple-300 text-purple-700 hover:bg-purple-50">Dashboard</Button>
                     </Link>
                     )}
                     {['admin', 'editor', 'manager'].includes(session.user.role as string) ? (
                       <Link href="/admin" onClick={() => setMobileMenuOpen(false)}>
-                        <Button variant="outline" className="w-full text-sm sm:text-base border-slate-300 text-slate-700 hover:bg-slate-100">Admin Panel</Button>
+                        <Button variant="outline" className="w-full text-base sm:text-base border-slate-300 text-slate-700 hover:bg-slate-100">Admin Panel</Button>
                       </Link>
                     ) : (
                       <Link href="/order" onClick={() => setMobileMenuOpen(false)}>
-                        <Button className="w-full text-sm sm:text-base bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700">Start Project</Button>
+                        <Button className="w-full text-base sm:text-base bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700">Start Project</Button>
                       </Link>
                     )}
                   </>
                 ) : (
                   <>
                     <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full text-sm sm:text-base border-purple-300 text-purple-700 hover:bg-purple-50">Login</Button>
+                      <Button variant="outline" className="w-full text-base sm:text-base border-purple-300 text-purple-700 hover:bg-purple-50">Login</Button>
                     </Link>
                     <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full text-sm sm:text-base bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700">Get Started</Button>
+                      <Button className="w-full text-base sm:text-base bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700">Get Started</Button>
                     </Link>
                   </>
                 )}
