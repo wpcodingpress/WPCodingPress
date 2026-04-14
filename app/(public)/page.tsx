@@ -386,7 +386,7 @@ export default function HomePage() {
       {/* Hero Section - Light Purple Gradient with Centered Text */}
       <section 
         ref={heroRef} 
-        className="relative min-h-screen flex items-center pt-24 sm:pt-26 lg:pt-28 pb-10 sm:pb-14 overflow-hidden bg-gradient-to-br from-purple-50 via-white to-violet-50"
+        className="relative min-h-screen flex items-center pt-20 sm:pt-24 lg:pt-28 pb-8 sm:pb-12 overflow-hidden bg-gradient-to-br from-purple-50 via-white to-violet-50"
       >
         {/* Optimized Animated Background */}
         <div className="absolute inset-0 overflow-hidden">
