@@ -114,36 +114,36 @@ function BlogContent() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white mb-4 sm:mb-6">
               Our <span className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">Blog</span>
             </h1>
-            <p className="text-xl text-slate-300 mb-8">
+            <p className="text-base sm:text-xl text-slate-300 mb-6 sm:mb-8">
               Insights, tutorials, and updates from the WPCodingPress team
             </p>
             
             {/* Search Bar */}
-            <form onSubmit={handleSearch} className="relative max-w-xl mx-auto">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <form onSubmit={handleSearch} className="relative max-w-xl mx-auto px-2 sm:px-0">
+              <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search articles..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-24 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent backdrop-blur-sm"
+                className="w-full pl-10 sm:pl-12 pr-20 sm:pr-24 py-3 sm:py-4 rounded-lg sm:rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent backdrop-blur-sm text-sm sm:text-base"
               />
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+              <div className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5 sm:gap-2">
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={clearSearch}
                     className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/20 transition-colors"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3 h-4 sm:w-4" />
                   </button>
                 )}
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 text-white font-medium transition-colors"
+                  className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-violet-600 hover:bg-violet-700 text-white font-medium transition-colors text-xs sm:text-sm"
                 >
                   Search
                 </button>

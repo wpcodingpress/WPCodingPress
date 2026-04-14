@@ -555,45 +555,45 @@ export default function HomePage() {
             initial={{ opacity: 0, scale: 0.95, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.6 }}
-            className="relative max-w-4xl mx-auto mb-12 sm:mb-16 px-2 sm:px-0"
+            className="relative max-w-4xl mx-auto mb-10 sm:mb-16 px-2 sm:px-0"
           >
             {/* Terminal Window */}
             <div className="relative">
-              <div className="absolute -inset-3 bg-gradient-to-r from-purple-200 via-violet-200 to-purple-200 rounded-2xl blur-xl opacity-50" />
-              <div className="relative bg-white border-2 border-purple-200 rounded-2xl shadow-2xl overflow-hidden">
+              <div className="absolute -inset-2 sm:-inset-3 bg-gradient-to-r from-purple-200 via-violet-200 to-purple-200 rounded-xl sm:rounded-2xl blur-lg sm:blur-xl opacity-50" />
+              <div className="relative bg-white border-2 border-purple-200 rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl overflow-hidden">
                 {/* Terminal Header */}
-                <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-violet-600">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-white/80" />
-                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-white/80" />
-                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-white/80" />
+                <div className="flex items-center justify-between px-2 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-violet-600">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <div className="w-2 sm:w-3 h-2 sm:h-3 rounded-full bg-white/80" />
+                    <div className="w-2 sm:w-3 h-2 sm:h-3 rounded-full bg-white/80" />
+                    <div className="w-2 sm:w-3 h-2 sm:h-3 rounded-full bg-white/80" />
                   </div>
-                  <span className="text-white text-xs sm:text-sm font-medium hidden xs:block">WPCodingPress Dashboard - Add & Convert Site</span>
-                  <span className="text-white text-xs font-medium xs:hidden">Dashboard</span>
-                  <div className="w-12 sm:w-20" />
+                  <span className="text-white text-[10px] sm:text-xs md:text-sm font-medium hidden xs:block">WPCodingPress Dashboard</span>
+                  <span className="text-white text-[10px] sm:text-xs font-medium xs:hidden">Dashboard</span>
+                  <div className="w-8 sm:w-20" />
                 </div>
 
                 {/* Terminal Content - Dashboard Flow Animation */}
-                <div className="p-4 sm:p-6">
+                <div className="p-3 sm:p-6">
                   {/* Step 1: Install Plugin */}
                   <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="mb-4"
+                    className="mb-3 sm:mb-4"
                   >
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                      <span className="text-sm font-semibold text-slate-700">Install WPCodingPress Plugin</span>
+                    <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                      <span className="w-5 h-5 sm:w-6 sm:h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold">1</span>
+                      <span className="text-xs sm:text-sm font-semibold text-slate-700">Install WPCodingPress Plugin</span>
                     </div>
-                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-violet-500 rounded-lg flex items-center justify-center">
-                          <Zap className="w-4 h-4 text-white" />
+                    <div className="bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl p-2 sm:p-3">
+                      <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-purple-500 to-violet-500 rounded flex items-center justify-center">
+                          <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                         </div>
                         <div className="flex-1">
-                          <span className="font-medium text-slate-800">WPCodingPress Plugin</span>
-                          <span className="block text-xs text-green-600">✓ Installed & Active</span>
+                          <span className="font-medium text-xs sm:text-sm text-slate-800">WPCodingPress Plugin</span>
+                          <span className="block text-[10px] sm:text-xs text-green-600">✓ Installed & Active</span>
                         </div>
                       </div>
                     </div>
@@ -604,24 +604,24 @@ export default function HomePage() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 1 }}
-                    className="mb-4"
+                    className="mb-3 sm:mb-4"
                   >
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                      <span className="text-sm font-semibold text-slate-700">User Dashboard → My Sites</span>
+                    <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                      <span className="w-5 h-5 sm:w-6 sm:h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold">2</span>
+                      <span className="text-xs sm:text-sm font-semibold text-slate-700">User Dashboard → My Sites</span>
                     </div>
-                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center gap-3">
-                      <Globe className="w-8 h-8 text-violet-500" />
-                      <div className="flex-1">
+                    <div className="bg-slate-50 border border-slate-200 rounded-lg sm:rounded-xl p-2 sm:p-3 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+                      <Globe className="w-6 h-6 sm:w-8 sm:h-8 text-violet-500 flex-shrink-0" />
+                      <div className="flex-1 w-full">
                         <div className="flex items-center justify-between">
-                          <span className="font-medium text-slate-800">mywordpress.com</span>
-                          <span className="text-xs text-slate-500">WordPress</span>
+                          <span className="font-medium text-xs sm:text-sm text-slate-800">mywordpress.com</span>
+                          <span className="text-[10px] sm:text-xs text-slate-500">WordPress</span>
                         </div>
-                        <div className="w-full bg-slate-200 rounded-full h-2 mt-2">
-                          <div className="bg-green-500 h-2 rounded-full w-[100%]" />
+                        <div className="w-full bg-slate-200 rounded-full h-1.5 sm:h-2 mt-1 sm:mt-2">
+                          <div className="bg-green-500 h-1.5 sm:h-2 rounded-full w-[100%]" />
                         </div>
                       </div>
-                      <Button size="sm" className="bg-green-500 text-white text-xs cursor-default">Connected</Button>
+                      <Button size="sm" className="bg-green-500 text-white text-[10px] sm:text-xs px-2 sm:px-3 py-1 cursor-default whitespace-nowrap">Connected</Button>
                     </div>
                   </motion.div>
 
@@ -630,11 +630,11 @@ export default function HomePage() {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 1.5 }}
-                    className="mb-4"
+                    className="mb-3 sm:mb-4"
                   >
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                      <span className="text-sm font-semibold text-slate-700">Click Convert</span>
+                    <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                      <span className="w-5 h-5 sm:w-6 sm:h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold">3</span>
+                      <span className="text-xs sm:text-sm font-semibold text-slate-700">Click Convert</span>
                     </div>
                     <div className="flex justify-center">
                       <motion.button
@@ -642,9 +642,9 @@ export default function HomePage() {
                         whileTap={!isConverting ? { scale: 0.95 } : {}}
                         onClick={startConversion}
                         disabled={isConverting}
-                        className={`bg-gradient-to-r from-purple-600 to-violet-600 text-white font-bold px-8 py-3 rounded-xl shadow-lg shadow-purple-500/30 flex items-center gap-2 ${isConverting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`bg-gradient-to-r from-purple-600 to-violet-600 text-white font-bold px-4 sm:px-8 py-2 sm:py-3 rounded-lg sm:rounded-xl shadow-lg shadow-purple-500/30 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm ${isConverting ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
-                        <Zap className="w-5 h-5" />
+                        <Zap className="w-3 h-3 sm:w-5 sm:h-5" />
                         {isConverting ? 'CONVERTING...' : 'CONVERT TO NEXT.JS'}
                       </motion.button>
                     </div>
@@ -656,13 +656,13 @@ export default function HomePage() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="mb-4"
+                      className="mb-3 sm:mb-4"
                     >
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xs font-bold">4</span>
-                        <span className="text-sm font-semibold text-slate-700">Converting...</span>
+                      <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                        <span className="w-5 h-5 sm:w-6 sm:h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold">4</span>
+                        <span className="text-xs sm:text-sm font-semibold text-slate-700">Converting...</span>
                       </div>
-                      <div className="bg-slate-900 rounded-xl p-4 font-mono text-xs space-y-1">
+                      <div className="bg-slate-900 rounded-lg sm:rounded-xl p-2 sm:p-4 font-mono text-[10px] sm:text-xs space-y-1">
                         {conversionSteps.map((step, index) => (
                           <motion.div 
                             key={index}
@@ -684,15 +684,15 @@ export default function HomePage() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
-                      className="mt-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl"
+                      className="mt-3 sm:mt-4 p-3 sm:p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg sm:rounded-xl"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-                          <CheckCircle2 className="w-6 h-6 text-white" />
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-8 h-8 sm:w-12 sm:h-12 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                          <CheckCircle2 className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                         </div>
                         <div>
-                          <div className="font-bold text-green-600">🎉 Site Converted Successfully!</div>
-                          <div className="text-xs text-green-500">Live at: mywordpress-next.vercel.app • 180ms • 99 SEO</div>
+                          <div className="font-bold text-green-600 text-xs sm:text-base">🎉 Site Converted Successfully!</div>
+                          <div className="text-[10px] sm:text-xs text-green-500">Live at: mywordpress-next.vercel.app • 180ms • 99 SEO</div>
                         </div>
                       </div>
                     </motion.div>
@@ -1447,11 +1447,11 @@ export default function HomePage() {
       {/* Testimonials Section */}
       <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-white">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
-            <Badge className="bg-amber-100 text-amber-700 border-amber-200 px-4 py-1.5 text-sm font-medium mb-6">
+          <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+            <Badge className="bg-amber-100 text-amber-700 border-amber-200 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
               Testimonials
             </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900">
               What Our <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">Clients Say</span>
             </h2>
           </div>
@@ -1462,27 +1462,27 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-100 rounded-3xl p-10 text-center"
+              className="bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-100 rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 text-center"
             >
-              <div className="flex justify-center gap-1 mb-6">
+              <div className="flex justify-center gap-1 mb-4 sm:mb-6">
                 {[...Array(5)].map((_, i) => (
-                  <StarIcon key={i} className="w-6 h-6 fill-amber-400 text-amber-400" />
+                  <StarIcon key={i} className="w-4 h-4 sm:w-6 sm:h-6 fill-amber-400 text-amber-400" />
                 ))}
               </div>
-              <p className="text-2xl text-slate-800 italic mb-8">"{testimonials[currentTestimonial].content}"</p>
-              <div className="border-t border-purple-100 pt-6">
-                <div className="font-bold text-slate-900 text-lg">{testimonials[currentTestimonial].name}</div>
-                <div className="text-slate-600">{testimonials[currentTestimonial].role}</div>
+              <p className="text-base sm:text-xl lg:text-2xl text-slate-800 italic mb-4 sm:mb-8">"{testimonials[currentTestimonial].content}"</p>
+              <div className="border-t border-purple-100 pt-4 sm:pt-6">
+                <div className="font-bold text-slate-900 text-sm sm:text-lg">{testimonials[currentTestimonial].name}</div>
+                <div className="text-slate-600 text-xs sm:text-base">{testimonials[currentTestimonial].role}</div>
               </div>
             </motion.div>
           </AnimatePresence>
 
-          <div className="flex justify-center gap-2 mt-8">
+          <div className="flex justify-center gap-2 mt-6 sm:mt-8">
             {testimonials.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentTestimonial(i)}
-                className={`w-3 h-3 rounded-full transition-all ${i === currentTestimonial ? "bg-purple-600 w-8" : "bg-slate-300 hover:bg-slate-400"}`}
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all ${i === currentTestimonial ? "bg-purple-600 w-6 sm:w-8" : "bg-slate-300 hover:bg-slate-400"}`}
               />
             ))}
           </div>

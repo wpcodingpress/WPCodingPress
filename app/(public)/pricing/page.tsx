@@ -139,17 +139,17 @@ export default function PricingPage() {
       <div className="fixed top-1/4 right-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[150px] opacity-20 pointer-events-none" />
       
       {/* Hero */}
-      <section className="relative py-24">
+      <section className="relative py-16 sm:py-20 lg:py-24">
         <div className="container mx-auto px-4">
           <motion.div 
             className="text-center max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4 sm:mb-6">
               Simple, <span className="gradient-text">Transparent</span> Pricing
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base sm:text-lg text-muted-foreground">
               Choose the perfect plan for your needs. Start free and scale as you grow. 
               No hidden fees, no surprises.
             </p>
@@ -158,9 +158,9 @@ export default function PricingPage() {
       </section>
 
       {/* Pricing Cards */}
-      <section className="py-12">
+      <section className="py-8 sm:py-12">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
             {subscriptions.map((sub, index) => (
               <motion.div
                 key={sub.name}

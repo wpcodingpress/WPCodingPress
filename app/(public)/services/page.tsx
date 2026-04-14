@@ -44,19 +44,19 @@ export default async function ServicesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Hero */}
-      <section className="relative py-32 px-6 overflow-hidden">
+      <section className="relative py-20 sm:py-24 lg:py-32 px-4 sm:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-500/20 via-purple-500/10 to-transparent" />
         <div className="max-w-6xl mx-auto text-center relative z-10">
-          <span className="inline-block px-4 py-2 bg-indigo-500/20 border border-indigo-500/30 rounded-full text-indigo-300 text-sm font-medium mb-6">
+          <span className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 bg-indigo-500/20 border border-indigo-500/30 rounded-full text-indigo-300 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
             Our Services
           </span>
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6">
             Expert Web
             <span className="block bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
               Development
             </span>
           </h1>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto">
+          <p className="text-base sm:text-xl text-slate-300 max-w-2xl sm:max-w-3xl mx-auto">
             From WordPress migrations to custom web applications, we deliver 
             high-performance solutions that drive results.
           </p>
@@ -64,27 +64,27 @@ export default async function ServicesPage() {
       </section>
 
       {/* Services Grid */}
-      <section className="py-24 px-6">
+      <section className="py-12 sm:py-20 lg:py-24 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {services.map((service, index) => (
               <Link
                 key={service.id}
                 href={`/services/${service.slug}`}
-                className="group relative bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8 hover:border-indigo-500/50 transition-all hover:-translate-y-1"
+                className="group relative bg-slate-800/50 border border-slate-700/50 rounded-xl sm:rounded-2xl p-5 sm:p-8 hover:border-indigo-500/50 transition-all hover:-translate-y-1"
               >
                 {index === 0 && (
-                  <div className="absolute -top-3 -right-3 px-3 py-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full text-white text-xs font-semibold">
+                  <div className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 px-2 sm:px-3 py-0.5 sm:py-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full text-white text-[10px] sm:text-xs font-semibold">
                     Most Popular
                   </div>
                 )}
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${colorMap[service.icon] || 'from-indigo-500 to-purple-500'} flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform`}>
+                <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${colorMap[service.icon] || 'from-indigo-500 to-purple-500'} flex items-center justify-center text-2xl sm:text-3xl mb-4 sm:mb-6 group-hover:scale-110 transition-transform`}>
                   {iconMap[service.icon] || '⚡'}
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-indigo-400 transition-colors">
+                <h3 className="text-lg sm:text-2xl font-bold text-white mb-2 sm:mb-3 group-hover:text-indigo-400 transition-colors">
                   {service.name}
                 </h3>
-                <p className="text-slate-400 mb-4">
+                <p className="text-slate-400 text-sm sm:text-base mb-3 sm:mb-4">
                   {service.description}
                 </p>
                 <div className="flex items-center gap-2 text-indigo-400 group-hover:gap-4 transition-all">
