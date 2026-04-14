@@ -421,7 +421,7 @@ export default function HomePage() {
         <motion.div className="absolute bottom-1/4 right-1/2 w-9 h-9 bg-sky-400/40 rounded-xl" animate={{ y: [-16, 16], rotate: [0, -6] }} transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} />
 
         {/* Transparent Analog Wall Clock - Top Left of Hero */}
-        <div className="absolute top-20 left-6 sm:top-24 sm:left-12 lg:top-28 lg:left-16 z-20">
+        <div className="absolute top-36 left-1/2 -translate-x-1/2 sm:top-24 sm:left-12 md:top-28 md:left-16 lg:top-28 lg:left-16 z-20">
           <div className="relative w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32">
             {/* Transparent Clock Face with Glass Effect & Purple tint */}
             <div className="absolute inset-0 rounded-full bg-purple-50/30 backdrop-blur-sm border border-purple-200/40 shadow-lg" />
