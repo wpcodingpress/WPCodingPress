@@ -386,39 +386,20 @@ export default function HomePage() {
       {/* Hero Section - Light Purple Gradient with Centered Text */}
       <section 
         ref={heroRef} 
-        className="relative min-h-screen flex items-center pt-20 sm:pt-22 lg:pt-24 pb-12 sm:pb-16 overflow-hidden bg-gradient-to-br from-purple-50 via-white to-violet-50"
+        className="relative min-h-screen flex items-center pt-24 sm:pt-26 lg:pt-28 pb-10 sm:pb-14 overflow-hidden bg-gradient-to-br from-purple-50 via-white to-violet-50"
       >
-        {/* Simplified Animated Background - Performance Optimized */}
+        {/* Optimized Animated Background */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-[400px] sm:w-[600px] h-[400px] sm:h-[600px] bg-gradient-to-r from-purple-400/30 to-violet-400/30 rounded-full blur-[80px] sm:blur-[120px] animate-pulse" style={{ animationDuration: '4s' }} />
-          <div className="absolute bottom-1/4 right-1/4 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-gradient-to-r from-indigo-400/25 to-purple-400/25 rounded-full blur-[60px] sm:blur-[100px] animate-pulse" style={{ animationDuration: '5s', animationDelay: '0.5s' }} />
+          <div className="absolute top-1/4 left-1/4 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-gradient-to-r from-purple-400/20 to-violet-400/20 rounded-full blur-[60px] sm:blur-[100px] animate-pulse" style={{ animationDuration: '4s' }} />
+          <div className="absolute bottom-1/4 right-1/4 w-[250px] sm:w-[400px] h-[250px] sm:h-[400px] bg-gradient-to-r from-indigo-400/20 to-purple-400/20 rounded-full blur-[50px] sm:blur-[80px] animate-pulse" style={{ animationDuration: '5s', animationDelay: '0.5s' }} />
         </div>
 
-        {/* Minimal Floating Elements - CSS Only */}
-        <div className="absolute top-32 right-10 w-16 sm:w-20 h-16 sm:h-20 bg-purple-300/40 rounded-2xl sm:rounded-3xl animate-bounce" style={{ animationDuration: '4s' }} />
-        <div className="absolute top-48 left-16 sm:left-20 w-12 sm:w-16 h-12 sm:h-16 bg-violet-300/40 rounded-xl sm:rounded-2xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '0.3s' }} />
-        <div className="hidden sm:block absolute bottom-40 right-1/4 w-12 h-12 bg-pink-300/40 rounded-full animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.6s' }} />
+        {/* Minimal Floating Elements - Hidden on very small screens */}
+        <div className="hidden xs:block absolute top-32 right-8 sm:right-12 w-12 sm:w-16 h-12 sm:h-16 bg-purple-300/30 rounded-2xl animate-bounce" style={{ animationDuration: '4s' }} />
+        <div className="hidden sm:block absolute top-1/2 left-8 w-10 h-10 bg-violet-300/30 rounded-xl animate-bounce" style={{ animationDuration: '4.5s', delay: '0.3s' }} />
         
-        {/* Animated Grid Pattern */}
-        <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle, #8b5cf6 1.5px, transparent 1.5px)', backgroundSize: '30px 30px' }} />
-        
-        {/* Blur Circles */}
-        <div className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-purple-300/40 rounded-full blur-[100px]" />
-        <div className="absolute bottom-20 left-1/4 w-[500px] h-[500px] bg-violet-300/40 rounded-full blur-[120px]" />
-        <div className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-purple-400/30 rounded-full blur-[80px]" />
-        <div className="absolute bottom-20 left-1/4 w-[500px] h-[500px] bg-violet-400/30 rounded-full blur-[100px]" />
-        <div className="absolute top-1/2 left-10 w-[200px] h-[200px] bg-indigo-400/25 rounded-full blur-[60px]" />
-        <div className="absolute bottom-1/3 right-10 w-[250px] h-[250px] bg-pink-400/25 rounded-full blur-[70px]" />
-
-        {/* Additional Floating Elements */}
-        <motion.div className="absolute top-40 right-1/3 w-12 h-12 bg-blue-400/40 rounded-2xl" animate={{ y: [-15, 15], rotate: [0, 10] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} />
-        <motion.div className="absolute top-1/3 right-20 w-8 h-8 bg-amber-400/40 rounded-full" animate={{ y: [-20, 20], x: [0, 10] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.2 }} />
-        <motion.div className="absolute bottom-1/2 left-20 w-10 h-10 bg-cyan-400/40 rounded-xl" animate={{ y: [-18, 18], rotate: [0, -8] }} transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }} />
-        <motion.div className="absolute top-2/3 left-1/4 w-14 h-14 bg-orange-400/30 rounded-lg" animate={{ y: [-22, 22], x: [0, -12] }} transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 0.6 }} />
-        <motion.div className="absolute bottom-20 right-1/3 w-6 h-6 bg-teal-400/40 rounded-full" animate={{ y: [-12, 12], x: [0, 8] }} transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", delay: 0.8 }} />
-        <motion.div className="absolute top-1/4 left-1/3 w-16 h-16 bg-rose-400/30 rounded-2xl" animate={{ y: [-25, 25], rotate: [0, 12] }} transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1 }} />
-        <motion.div className="absolute top-60 left-1/2 w-7 h-7 bg-emerald-400/40 rounded-full" animate={{ y: [-14, 14] }} transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }} />
-        <motion.div className="absolute bottom-1/4 right-1/2 w-9 h-9 bg-sky-400/40 rounded-xl" animate={{ y: [-16, 16], rotate: [0, -6] }} transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} />
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #8b5cf6 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
 
         {/* Transparent Analog Wall Clock - Positioned above badge on mobile, inner on larger screens */}
         <div className="absolute top-28 left-1/2 -translate-x-1/2 sm:top-24 sm:left-20 md:top-28 md:left-24 lg:top-32 lg:left-28 xl:top-32 xl:left-32 z-20">
@@ -520,20 +501,20 @@ export default function HomePage() {
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           {/* Hero Content - Centered */}
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="hero-animate inline-flex items-center gap-2 px-5 py-2.5 bg-purple-100 border border-purple-200 rounded-full text-purple-700 text-sm font-semibold mb-6 sm:mb-8 shadow-sm">
-              <Sparkles className="w-4 h-4" />
+          <div className="max-w-4xl mx-auto text-center px-2 sm:px-4">
+            <div className="hero-animate inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-purple-100 border border-purple-200 rounded-full text-purple-700 text-xs sm:text-sm font-semibold mb-4 sm:mb-6 shadow-sm">
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
               AI-Powered Web Development Agency
             </div>
 
-            <h1 className="hero-animate text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-slate-900 mb-4 sm:mb-6 leading-tight">
+            <h1 className="hero-animate text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl font-bold text-slate-900 mb-3 sm:mb-4 lg:mb-6 leading-tight">
               Transform Your
               <span className="block bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 bg-clip-text text-transparent">
                 WordPress to Next.js
               </span>
             </h1>
 
-            <p className="hero-animate text-base sm:text-lg md:text-xl text-slate-600 mb-8 sm:mb-10 max-w-xl sm:max-w-2xl mx-auto leading-relaxed">
+            <p className="hero-animate text-sm sm:text-base md:text-lg lg:text-xl text-slate-600 mb-6 sm:mb-8 lg:mb-10 max-w-lg sm:max-w-xl md:max-w-2xl mx-auto leading-relaxed">
               Lightning-fast, SEO-optimized websites that load in milliseconds. 
               Convert automatically with our AI-powered platform.
             </p>
@@ -581,14 +562,15 @@ export default function HomePage() {
               <div className="absolute -inset-3 bg-gradient-to-r from-purple-200 via-violet-200 to-purple-200 rounded-2xl blur-xl opacity-50" />
               <div className="relative bg-white border-2 border-purple-200 rounded-2xl shadow-2xl overflow-hidden">
                 {/* Terminal Header */}
-                <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-purple-600 to-violet-600">
+                <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-purple-600 to-violet-600">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-white/80" />
-                    <div className="w-3 h-3 rounded-full bg-white/80" />
-                    <div className="w-3 h-3 rounded-full bg-white/80" />
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-white/80" />
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-white/80" />
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-white/80" />
                   </div>
-                  <span className="text-white text-sm font-medium">WPCodingPress Dashboard - Add & Convert Site</span>
-                  <div className="w-20" />
+                  <span className="text-white text-xs sm:text-sm font-medium hidden xs:block">WPCodingPress Dashboard - Add & Convert Site</span>
+                  <span className="text-white text-xs font-medium xs:hidden">Dashboard</span>
+                  <div className="w-12 sm:w-20" />
                 </div>
 
                 {/* Terminal Content - Dashboard Flow Animation */}
@@ -721,20 +703,20 @@ export default function HomePage() {
           </motion.div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-12 sm:mt-16 max-w-4xl mx-auto px-2 sm:px-0">
             {stats.map((stat, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 + i * 0.1 }}
-                className="text-center p-6 bg-white border border-purple-100 rounded-2xl shadow-sm hover:shadow-lg hover:border-purple-200 transition-all"
+                className="text-center p-3 sm:p-6 bg-white border border-purple-100 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-md hover:border-purple-200 transition-all"
               >
-                <stat.icon className="w-8 h-8 mx-auto mb-3 text-purple-600" />
-                <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent mb-1">
+                <stat.icon className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 sm:mb-3 text-purple-600" />
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent mb-1">
                   {stat.value}
                 </div>
-                <div className="text-slate-600 font-medium text-sm">{stat.label}</div>
+                <div className="text-slate-600 font-medium text-xs sm:text-sm">{stat.label}</div>
               </motion.div>
             ))}
           </div>
@@ -742,17 +724,17 @@ export default function HomePage() {
       </section>
 
       {/* Interactive Demo Section - Business Focused */}
-      <section className="py-24 px-6 bg-gradient-to-br from-purple-50 via-white to-violet-50">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-gradient-to-br from-purple-50 via-white to-violet-50">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <Badge className="bg-purple-100 text-purple-700 border-purple-200 px-4 py-1.5 text-sm font-medium mb-6">
-              <Sparkles className="w-4 h-4 mr-2" />
+          <div className="text-center mb-8 sm:mb-12">
+            <Badge className="bg-purple-100 text-purple-700 border-purple-200 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               See It In Action
             </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-3 sm:mb-4">
               Watch Your WordPress Transform to <span className="bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">Next.js</span>
             </h2>
-            <p className="text-slate-600 max-w-2xl mx-auto mb-8">
+            <p className="text-slate-600 max-w-xl sm:max-w-2xl mx-auto mb-6 sm:mb-8 text-sm sm:text-base">
               Our AI-powered converter automatically migrates your entire WordPress site including posts, pages, 
               WooCommerce products, and media to a blazing-fast Next.js application.
             </p>
@@ -878,7 +860,7 @@ export default function HomePage() {
       </section>
 
       {/* Pricing Section - Below Game */}
-      <section className="py-24 px-6 bg-gradient-to-br from-purple-50 via-white to-violet-50">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-gradient-to-br from-purple-50 via-white to-violet-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <Badge className="bg-purple-100 text-purple-700 border-purple-200 px-4 py-1.5 text-sm font-medium mb-6">
@@ -967,7 +949,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Comparison Table */}
-      <section className="py-24 px-6 bg-gradient-to-br from-slate-50 via-white to-indigo-50">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-gradient-to-br from-slate-50 via-white to-indigo-50">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200 px-4 py-1.5 text-sm font-medium mb-6">
@@ -1027,7 +1009,7 @@ export default function HomePage() {
       </section>
 
       {/* Process Section */}
-      <section className="py-24 px-6 bg-gradient-to-b from-white to-purple-50">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-gradient-to-b from-white to-purple-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <Badge className="bg-purple-100 text-purple-700 border-purple-200 px-4 py-1.5 text-sm font-medium mb-6">
@@ -1060,7 +1042,7 @@ export default function HomePage() {
       </section>
 
       {/* Services Section */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <Badge className="bg-violet-100 text-violet-700 border-violet-200 px-4 py-1.5 text-sm font-medium mb-6">
@@ -1121,7 +1103,7 @@ export default function HomePage() {
       </section>
 
       {/* Products Section */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <Badge className="bg-cyan-100 text-cyan-700 border-cyan-200 px-4 py-1.5 text-sm font-medium mb-6">
@@ -1190,7 +1172,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 px-6 bg-gradient-to-br from-purple-50 via-white to-violet-50">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-gradient-to-br from-purple-50 via-white to-violet-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <Badge className="bg-purple-100 text-purple-700 border-purple-200 px-4 py-1.5 text-sm font-medium mb-6">
@@ -1223,7 +1205,7 @@ export default function HomePage() {
       </section>
 
       {/* Portfolio Section */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
             <div>
@@ -1315,7 +1297,7 @@ export default function HomePage() {
       </AnimatePresence>
 
       {/* Tech Stack Section */}
-      <section className="py-24 px-6 bg-gradient-to-br from-purple-50 via-white to-violet-50">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-gradient-to-br from-purple-50 via-white to-violet-50">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -1381,7 +1363,7 @@ export default function HomePage() {
       </section>
 
       {/* Performance Comparison */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <Badge className="bg-green-100 text-green-700 border-green-200 px-4 py-1.5 text-sm font-medium mb-6">
@@ -1463,7 +1445,7 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <Badge className="bg-amber-100 text-amber-700 border-amber-200 px-4 py-1.5 text-sm font-medium mb-6">
@@ -1508,7 +1490,7 @@ export default function HomePage() {
       </section>
 
       {/* Integrations Section */}
-      <section className="py-24 px-6 bg-gradient-to-br from-purple-50 via-white to-violet-50">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-gradient-to-br from-purple-50 via-white to-violet-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <Badge className="bg-amber-100 text-amber-700 border-amber-200 px-4 py-1.5 text-sm font-medium mb-6">
@@ -1539,7 +1521,7 @@ export default function HomePage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <Badge className="bg-blue-100 text-blue-700 border-blue-200 px-4 py-1.5 text-sm font-medium mb-6">
@@ -1578,7 +1560,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6 bg-gradient-to-br from-purple-600 via-violet-600 to-purple-700">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 bg-gradient-to-br from-purple-600 via-violet-600 to-purple-700">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Ready to <span className="bg-gradient-to-r from-amber-300 to-pink-300 bg-clip-text text-transparent">Transform</span> Your Website?
