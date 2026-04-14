@@ -3,6 +3,7 @@
 import Link from "next/link"
 import Head from "next/head"
 import { useEffect, useRef, useState } from "react"
+import { useSession } from "next-auth/react"
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
@@ -118,6 +119,7 @@ const processSteps = [
 export default function HomePage() {
   const containerRef = useRef<HTMLDivElement>(null)
   const heroRef = useRef<HTMLDivElement>(null)
+  const { data: session, status } = useSession()
   const [selectedPortfolio, setSelectedPortfolio] = useState<typeof portfolioItems[0] | null>(null)
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
   const [isDemoStarted, setIsDemoStarted] = useState(false)
@@ -520,18 +522,37 @@ export default function HomePage() {
             </p>
 
             <div className="hero-animate flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 px-4">
-              <Link href="/register">
-                <Button size="xl" className="w-full sm:w-auto min-w-[220px] bg-gradient-to-r from-purple-600 via-violet-600 to-purple-600 hover:from-purple-700 hover:via-violet-700 hover:to-purple-700 text-white font-bold px-8 py-4 shadow-xl shadow-purple-500/30 text-base sm:text-lg">
-                  <Zap className="mr-2 w-5 h-5" />
-                  Convert Your Site Free
-                </Button>
-              </Link>
-              <Link href="/order">
-                <Button size="xl" variant="outline" className="w-full sm:w-auto min-w-[220px] border-2 border-violet-300 text-violet-700 hover:bg-violet-50 hover:border-violet-400 px-8 py-4 font-semibold text-base sm:text-lg">
-                  <Globe className="mr-2 w-5 h-5" />
-                  Order Now
-                </Button>
-              </Link>
+              {session ? (
+                <>
+                  <Link href="/dashboard">
+                    <Button size="xl" className="w-full sm:w-auto min-w-[220px] bg-gradient-to-r from-purple-600 via-violet-600 to-purple-600 hover:from-purple-700 hover:via-violet-700 hover:to-purple-700 text-white font-bold px-8 py-4 shadow-xl shadow-purple-500/30 text-base sm:text-lg">
+                      <Zap className="mr-2 w-5 h-5" />
+                      Go to Dashboard
+                    </Button>
+                  </Link>
+                  <Link href="/order">
+                    <Button size="xl" variant="outline" className="w-full sm:w-auto min-w-[220px] border-2 border-violet-300 text-violet-700 hover:bg-violet-50 hover:border-violet-400 px-8 py-4 font-semibold text-base sm:text-lg">
+                      <Globe className="mr-2 w-5 h-5" />
+                      Order Now
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/register">
+                    <Button size="xl" className="w-full sm:w-auto min-w-[220px] bg-gradient-to-r from-purple-600 via-violet-600 to-purple-600 hover:from-purple-700 hover:via-violet-700 hover:to-purple-700 text-white font-bold px-8 py-4 shadow-xl shadow-purple-500/30 text-base sm:text-lg">
+                      <Zap className="mr-2 w-5 h-5" />
+                      Convert Your Site Free
+                    </Button>
+                  </Link>
+                  <Link href="/login">
+                    <Button size="xl" variant="outline" className="w-full sm:w-auto min-w-[220px] border-2 border-violet-300 text-violet-700 hover:bg-violet-50 hover:border-violet-400 px-8 py-4 font-semibold text-base sm:text-lg">
+                      <Globe className="mr-2 w-5 h-5" />
+                      Order Now
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
 
             <div className="hero-animate flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-sm text-slate-500 mb-16">
@@ -929,15 +950,41 @@ export default function HomePage() {
                 </ul>
                 {(() => {
                   const isCurrentPlan = userPlan === plan.planId || (!userPlan && plan.planId === 'free')
-                  return isCurrentPlan ? (
-                    <Button className={`w-full ${plan.popular ? 'bg-purple-600 cursor-default' : 'border-2 border-slate-200 text-slate-700'}`} disabled>
-                      <CheckCircle2 className="mr-2 h-4 w-4" />
-                      Current Plan
-                    </Button>
-                  ) : (
-                    <Link href={plan.href} className="block">
+                  if (isCurrentPlan) {
+                    return (
+                      <Button className={`w-full ${plan.popular ? 'bg-purple-600 cursor-default' : 'border-2 border-slate-200 text-slate-700'}`} disabled>
+                        <CheckCircle2 className="mr-2 h-4 w-4" />
+                        Current Plan
+                      </Button>
+                    )
+                  }
+                  
+                  const getButtonLink = () => {
+                    if (!session) {
+                      if (plan.planId === 'free') return '/register'
+                      if (plan.planId === 'enterprise') return '/contact'
+                      return '/register?plan=pro'
+                    }
+                    if (plan.planId === 'free') return '/dashboard'
+                    if (plan.planId === 'enterprise') return '/contact'
+                    return '/dashboard/subscription'
+                  }
+                  
+                  const getButtonText = () => {
+                    if (!session) {
+                      if (plan.planId === 'free') return 'Get Started'
+                      if (plan.planId === 'enterprise') return 'Contact Sales'
+                      return 'Subscribe Now'
+                    }
+                    if (plan.planId === 'free') return 'Go to Dashboard'
+                    if (plan.planId === 'enterprise') return 'Contact Sales'
+                    return 'Subscribe Now'
+                  }
+                  
+                  return (
+                    <Link href={getButtonLink()} className="block">
                       <Button className={`w-full ${plan.popular ? 'bg-purple-600 hover:bg-purple-700' : plan.price === '$99' ? 'bg-slate-900 hover:bg-slate-800 text-white' : 'bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 hover:bg-slate-50'}`}>
-                        {plan.price === '$0' ? 'Get Started' : 'Subscribe Now'}
+                        {getButtonText()}
                       </Button>
                     </Link>
                   )
