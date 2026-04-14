@@ -480,7 +480,8 @@ export function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm lg:hidden z-[59]"
+              className="fixed bg-slate-900/50 backdrop-blur-md lg:hidden z-[59]"
+              style={{ top: '64px', left: 0, right: 0, bottom: 0 }}
               onClick={() => setMobileMenuOpen(false)}
             />
             <motion.div
@@ -490,35 +491,38 @@ export function Navbar() {
               transition={{ type: "tween", duration: 0.3 }}
               className="fixed top-[64px] left-0 right-0 bg-white border-t border-slate-200 shadow-2xl lg:hidden z-[70] max-h-[calc(100vh-64px)] overflow-y-auto"
             >
-              <div className="container mx-auto px-3 py-4 space-y-2">
+              <div className="container mx-auto px-3 py-4 space-y-1">
                 {mainNavLinks.map((link) => (
                   <div key={link.href}>
                     {(link.label === "Services" || link.label === "Products") ? (
                       <div>
                         <button
-                          onClick={() => setExpandedMobileSubmenu(link.label === "Services" ? "services" : "products")}
+                          onClick={() => setExpandedMobileSubmenu(expandedMobileSubmenu === (link.label === "Services" ? "services" : "products") ? null : (link.label === "Services" ? "services" : "products"))}
                           className="flex items-center justify-between w-full py-3 px-4 text-base text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg font-medium"
                         >
                           <span>{link.label}</span>
-                          <ChevronDown className={`w-5 h-5 transition-transform ${expandedMobileSubmenu === (link.label === "Services" ? "services" : "products") ? "rotate-180" : ""}`} />
+                          <ChevronDown className={`w-5 h-5 transition-transform duration-200 ${expandedMobileSubmenu === (link.label === "Services" ? "services" : "products") ? "rotate-180" : ""}`} />
                         </button>
                         {expandedMobileSubmenu === "services" && (
                           <motion.div
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            className="pl-4 space-y-1"
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden"
                           >
-                            {services.map((service) => (
-                              <Link
-                                key={service.href}
-                                href={service.href}
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="block py-2 px-4 text-sm text-slate-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg"
-                              >
-                                {service.title}
-                              </Link>
-                            ))}
+                            <div className="pl-4 pb-2 space-y-1">
+                              {services.map((service) => (
+                                <Link
+                                  key={service.href}
+                                  href={service.href}
+                                  onClick={() => { setMobileMenuOpen(false); setExpandedMobileSubmenu(null); }}
+                                  className="block py-2 px-4 text-sm text-slate-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg"
+                                >
+                                  {service.title}
+                                </Link>
+                              ))}
+                            </div>
                           </motion.div>
                         )}
                         {expandedMobileSubmenu === "products" && (
@@ -526,18 +530,21 @@ export function Navbar() {
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            className="pl-4 space-y-1"
-                          >
-                            {products.map((product) => (
-                              <Link
-                                key={product.href}
-                                href={product.href}
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="block py-2 px-4 text-sm text-slate-600 hover:text-violet-600 hover:bg-violet-50 rounded-lg"
-                              >
-                                {product.title}
-                              </Link>
-                            ))}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden"
+>
+                            <div className="pl-4 pb-2 space-y-1">
+                              {products.map((product) => (
+                                <Link
+                                  key={product.href}
+                                  href={product.href}
+                                  onClick={() => { setMobileMenuOpen(false); setExpandedMobileSubmenu(null); }}
+                                  className="block py-2 px-4 text-sm text-slate-600 hover:text-violet-600 hover:bg-violet-50 rounded-lg"
+                                >
+                                  {product.title}
+                                </Link>
+                              ))}
+                            </div>
                           </motion.div>
                         )}
                       </div>
