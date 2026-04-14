@@ -480,78 +480,111 @@ export function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-slate-900/30 backdrop-blur-lg lg:hidden z-[59]"
+              className="fixed inset-0 bg-slate-900/60 backdrop-blur-xl lg:hidden z-[59]"
               onClick={() => setMobileMenuOpen(false)}
             />
             <motion.div
               initial={{ opacity: 0, x: "-100%" }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: "-100%" }}
-              transition={{ type: "tween", duration: 0.3 }}
-              className="fixed top-[64px] left-0 right-0 bg-white border-t border-slate-200 shadow-2xl lg:hidden z-[70] max-h-[calc(100vh-64px)] overflow-y-auto"
+              transition={{ type: "tween", duration: 0.25 }}
+              className="fixed top-0 left-0 right-0 bg-white lg:hidden z-[70] shadow-2xl"
+              style={{ paddingTop: '64px', maxHeight: '100vh', overflowY: 'auto' }}
             >
-              <div className="container mx-auto px-3 py-4 space-y-1">
+              <div className="container mx-auto px-3 py-4">
                 {mainNavLinks.map((link) => {
-                    const isServices = link.label === "Services"
-                    const isProducts = link.label === "Products"
-                    const submenuKey = isServices ? "services" : "products"
-                    
-                    return (
-                      <div key={link.href}>
-                        {(isServices || isProducts) ? (
-                          <div>
-                            <button
-                              onClick={() => setExpandedMobileSubmenu(expandedMobileSubmenu === submenuKey ? null : submenuKey)}
-                              className="flex items-center justify-between w-full py-3 px-4 text-base text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg font-medium"
-                            >
-                              <span>{link.label}</span>
-                              <ChevronDown className={`w-5 h-5 transition-transform duration-200 ${expandedMobileSubmenu === submenuKey ? "rotate-180" : ""}`} />
-                            </button>
-                            {isServices && expandedMobileSubmenu === "services" && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.2 }}
-                                className="overflow-hidden"
-                              >
-                                <div className="pl-4 pb-2 space-y-1">
-                                  {services.map((service) => (
-                                    <Link
-                                      key={service.href}
-                                      href={service.href}
-                                      onClick={() => { setMobileMenuOpen(false); setExpandedMobileSubmenu(null); }}
-                                      className="block py-2 px-4 text-sm text-slate-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg"
-                                    >
-                                      {service.title}
-                                    </Link>
-                                  ))}
-                                </div>
-                              </motion.div>
-                            )}
-                            {isProducts && expandedMobileSubmenu === "products" && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="overflow-hidden"
->
-                            <div className="pl-4 pb-2 space-y-1">
+                  const isServices = link.label === "Services"
+                  const isProducts = link.label === "Products"
+                  
+                  return (
+                    <div key={link.href} className="border-b border-slate-100 last:border-b-0">
+                      {(isServices || isProducts) ? (
+                        <>
+                          <button
+                            onClick={() => setExpandedMobileSubmenu(expandedMobileSubmenu === (isServices ? "services" : "products") ? null : (isServices ? "services" : "products"))}
+                            className="flex items-center justify-between w-full py-4 px-2 text-base text-slate-800 hover:bg-purple-50 font-semibold"
+                          >
+                            <span>{link.label}</span>
+                            <ChevronDown className={`w-5 h-5 transition-transform duration-200 text-slate-500 ${expandedMobileSubmenu === (isServices ? "services" : "products") ? "rotate-180" : ""}`} />
+                          </button>
+                          
+                          {isServices && expandedMobileSubmenu === "services" && (
+                            <div className="pb-3 bg-purple-50/50">
+                              {services.map((service) => (
+                                <Link
+                                  key={service.href}
+                                  href={service.href}
+                                  onClick={() => { setMobileMenuOpen(false); setExpandedMobileSubmenu(null); }}
+                                  className="block py-2.5 px-6 text-sm text-slate-600 hover:text-purple-600 hover:bg-purple-50 border-l-2 border-transparent hover:border-purple-500"
+                                >
+                                  {service.title}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {isProducts && expandedMobileSubmenu === "products" && (
+                            <div className="pb-3 bg-violet-50/50">
                               {products.map((product) => (
                                 <Link
                                   key={product.href}
                                   href={product.href}
                                   onClick={() => { setMobileMenuOpen(false); setExpandedMobileSubmenu(null); }}
-                                  className="block py-2 px-4 text-sm text-slate-600 hover:text-violet-600 hover:bg-violet-50 rounded-lg"
+                                  className="block py-2.5 px-6 text-sm text-slate-600 hover:text-violet-600 hover:bg-violet-50 border-l-2 border-transparent hover:border-violet-500"
                                 >
                                   {product.title}
                                 </Link>
                               ))}
                             </div>
-                          </motion.div>
-                        )}
-                      </div>
+                          )}
+                        </>
+                      ) : (
+                        <Link
+                          href={link.href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="block py-4 px-2 text-base text-slate-800 hover:bg-purple-50 font-semibold"
+                        >
+                          {link.label}
+                        </Link>
+                      )}
+                    </div>
+                  )
+                })}
+                
+                <div className="pt-4 pb-8 space-y-3">
+                  {session?.user ? (
+                    <>
+                      {!['admin', 'editor', 'manager'].includes(session.user.role as string) && (
+                      <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                        <Button variant="outline" className="w-full text-base border-purple-300 text-purple-700 hover:bg-purple-50">Dashboard</Button>
+                      </Link>
+                      )}
+                      {['admin', 'editor', 'manager'].includes(session.user.role as string) ? (
+                        <Link href="/admin" onClick={() => setMobileMenuOpen(false)}>
+                          <Button variant="outline" className="w-full text-base border-slate-300 text-slate-700 hover:bg-slate-100">Admin Panel</Button>
+                        </Link>
+                      ) : (
+                        <Link href="/order" onClick={() => setMobileMenuOpen(false)}>
+                          <Button className="w-full text-base bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700">Start Project</Button>
+                        </Link>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                        <Button variant="outline" className="w-full text-base border-purple-300 text-purple-700 hover:bg-purple-50">Login</Button>
+                      </Link>
+                      <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                        <Button className="w-full text-base bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700">Get Started</Button>
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
                     ) : (
                       <Link
                         href={link.href}
