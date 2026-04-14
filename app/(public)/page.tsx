@@ -420,9 +420,9 @@ export default function HomePage() {
         <motion.div className="absolute top-60 left-1/2 w-7 h-7 bg-emerald-400/40 rounded-full" animate={{ y: [-14, 14] }} transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }} />
         <motion.div className="absolute bottom-1/4 right-1/2 w-9 h-9 bg-sky-400/40 rounded-xl" animate={{ y: [-16, 16], rotate: [0, -6] }} transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} />
 
-        {/* Transparent Analog Wall Clock - Top Left of Hero */}
-        <div className="absolute top-36 left-1/2 -translate-x-1/2 sm:top-24 sm:left-12 md:top-28 md:left-16 lg:top-28 lg:left-16 z-20">
-          <div className="relative w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32">
+        {/* Transparent Analog Wall Clock - Positioned above badge on mobile, inner on larger screens */}
+        <div className="absolute top-28 left-1/2 -translate-x-1/2 sm:top-24 sm:left-20 md:top-28 md:left-24 lg:top-32 lg:left-28 xl:top-32 xl:left-32 z-20">
+          <div className="relative w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 opacity-60 sm:opacity-80 md:opacity-100">
             {/* Transparent Clock Face with Glass Effect & Purple tint */}
             <div className="absolute inset-0 rounded-full bg-purple-50/30 backdrop-blur-sm border border-purple-200/40 shadow-lg" />
             
@@ -440,9 +440,9 @@ export default function HomePage() {
                     style={{
                       left: '50%',
                       top: '50%',
-                      height: i % 3 === 0 ? '10px' : '6px',
-                      width: i % 3 === 0 ? '2px' : '1px',
-                      transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-42px)`,
+                      height: i % 3 === 0 ? '6px' : '4px',
+                      width: i % 3 === 0 ? '1.5px' : '0.5px',
+                      transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-22px)`,
                     }}
                   />
                 )
@@ -461,8 +461,8 @@ export default function HomePage() {
                     style={{
                       left: '50%',
                       top: '50%',
-                      height: '3px',
-                      transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-42px)`,
+                      height: '2px',
+                      transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-22px)`,
                     }}
                   />
                 )
@@ -470,11 +470,11 @@ export default function HomePage() {
             </div>
             
             {/* Center Dot - Purple */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-gradient-to-br from-purple-600 to-violet-600 z-10 shadow-sm" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 sm:w-2 md:w-2.5 h-1.5 sm:h-2 md:h-2.5 rounded-full bg-gradient-to-br from-purple-600 to-violet-600 z-10 shadow-sm" />
             
             {/* Hour Hand - Purple gradient */}
             <div
-              className="absolute w-1.5 h-6 sm:h-7 lg:h-8 bg-gradient-to-b from-purple-700 to-purple-800 rounded-full origin-bottom shadow-sm"
+              className="absolute w-1 h-3 sm:w-1.5 sm:h-5 md:h-6 lg:h-7 bg-gradient-to-b from-purple-700 to-purple-800 rounded-full origin-bottom shadow-sm"
               style={{
                 left: '50%',
                 top: '50%',
@@ -485,7 +485,7 @@ export default function HomePage() {
             
             {/* Minute Hand - Violet gradient */}
             <div
-              className="absolute w-1 h-8 sm:h-9 lg:h-10 bg-gradient-to-b from-violet-600 to-violet-700 rounded-full origin-bottom shadow-sm"
+              className="absolute w-0.5 h-4 sm:h-6 md:h-7 lg:h-8 bg-gradient-to-b from-violet-600 to-violet-700 rounded-full origin-bottom shadow-sm"
               style={{
                 left: '50%',
                 top: '50%',
@@ -496,7 +496,7 @@ export default function HomePage() {
             
             {/* Second Hand - Red with Purple accent */}
             <div
-              className="absolute w-0.5 h-9 sm:h-10 lg:h-11 bg-gradient-to-b from-red-500 to-red-600 rounded-full origin-bottom z-10 shadow-sm"
+              className="absolute w-0.5 h-5 sm:h-7 md:h-8 lg:h-9 bg-gradient-to-b from-red-500 to-red-600 rounded-full origin-bottom z-10 shadow-sm"
               style={{
                 left: '50%',
                 top: '50%',
