@@ -480,8 +480,7 @@ export function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed bg-slate-900/50 backdrop-blur-md lg:hidden z-[59]"
-              style={{ top: '64px', left: 0, right: 0, bottom: 0 }}
+              className="fixed inset-0 bg-slate-900/30 backdrop-blur-lg lg:hidden z-[59]"
               onClick={() => setMobileMenuOpen(false)}
             />
             <motion.div
@@ -492,40 +491,45 @@ export function Navbar() {
               className="fixed top-[64px] left-0 right-0 bg-white border-t border-slate-200 shadow-2xl lg:hidden z-[70] max-h-[calc(100vh-64px)] overflow-y-auto"
             >
               <div className="container mx-auto px-3 py-4 space-y-1">
-                {mainNavLinks.map((link) => (
-                  <div key={link.href}>
-                    {(link.label === "Services" || link.label === "Products") ? (
-                      <div>
-                        <button
-                          onClick={() => setExpandedMobileSubmenu(expandedMobileSubmenu === (link.label === "Services" ? "services" : "products") ? null : (link.label === "Services" ? "services" : "products"))}
-                          className="flex items-center justify-between w-full py-3 px-4 text-base text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg font-medium"
-                        >
-                          <span>{link.label}</span>
-                          <ChevronDown className={`w-5 h-5 transition-transform duration-200 ${expandedMobileSubmenu === (link.label === "Services" ? "services" : "products") ? "rotate-180" : ""}`} />
-                        </button>
-                        {expandedMobileSubmenu === "services" && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="overflow-hidden"
-                          >
-                            <div className="pl-4 pb-2 space-y-1">
-                              {services.map((service) => (
-                                <Link
-                                  key={service.href}
-                                  href={service.href}
-                                  onClick={() => { setMobileMenuOpen(false); setExpandedMobileSubmenu(null); }}
-                                  className="block py-2 px-4 text-sm text-slate-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg"
-                                >
-                                  {service.title}
-                                </Link>
-                              ))}
-                            </div>
-                          </motion.div>
-                        )}
-                        {expandedMobileSubmenu === "products" && (
+                {mainNavLinks.map((link) => {
+                    const isServices = link.label === "Services"
+                    const isProducts = link.label === "Products"
+                    const submenuKey = isServices ? "services" : "products"
+                    
+                    return (
+                      <div key={link.href}>
+                        {(isServices || isProducts) ? (
+                          <div>
+                            <button
+                              onClick={() => setExpandedMobileSubmenu(expandedMobileSubmenu === submenuKey ? null : submenuKey)}
+                              className="flex items-center justify-between w-full py-3 px-4 text-base text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg font-medium"
+                            >
+                              <span>{link.label}</span>
+                              <ChevronDown className={`w-5 h-5 transition-transform duration-200 ${expandedMobileSubmenu === submenuKey ? "rotate-180" : ""}`} />
+                            </button>
+                            {isServices && expandedMobileSubmenu === "services" && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="overflow-hidden"
+                              >
+                                <div className="pl-4 pb-2 space-y-1">
+                                  {services.map((service) => (
+                                    <Link
+                                      key={service.href}
+                                      href={service.href}
+                                      onClick={() => { setMobileMenuOpen(false); setExpandedMobileSubmenu(null); }}
+                                      className="block py-2 px-4 text-sm text-slate-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg"
+                                    >
+                                      {service.title}
+                                    </Link>
+                                  ))}
+                                </div>
+                              </motion.div>
+                            )}
+                            {isProducts && expandedMobileSubmenu === "products" && (
                           <motion.div
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
