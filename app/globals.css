@@ -320,6 +320,16 @@
     50% { transform: translateY(-8px); }
   }
 
+  @keyframes binarySlide {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+
+  @keyframes binaryScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
   .animate-float {
     animation: float 4s ease-in-out infinite;
   }
