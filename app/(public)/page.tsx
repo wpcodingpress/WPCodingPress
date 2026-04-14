@@ -429,19 +429,98 @@ export default function HomePage() {
         <motion.div className="absolute top-60 left-1/2 w-7 h-7 bg-emerald-400/40 rounded-full" animate={{ y: [-14, 14] }} transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }} />
         <motion.div className="absolute bottom-1/4 right-1/2 w-9 h-9 bg-sky-400/40 rounded-xl" animate={{ y: [-16, 16], rotate: [0, -6] }} transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} />
 
-        {/* Compact Digital Clock - Top Left of Hero */}
-        <div className="absolute top-20 left-8 sm:top-24 sm:left-12 lg:top-28 lg:left-16 z-20">
-          <div className="relative w-16 h-10 sm:w-20 sm:h-12 lg:w-24 lg:h-14 rounded-md overflow-hidden shadow-lg border border-violet-200/30 bg-gradient-to-br from-violet-900 via-purple-900 to-violet-950">
-            <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/10 to-transparent rounded-t-md" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="font-mono text-[10px] sm:text-xs lg:text-sm font-bold tracking-wider">
-                <span className="text-violet-200">{hours}</span>
-                <span className="text-violet-400">:</span>
-                <span className="text-violet-200">{minutes}</span>
-                <span className="text-violet-400">:</span>
-                <span className="text-pink-400">{seconds}</span>
-              </div>
+        {/* Transparent Analog Wall Clock - Top Left of Hero */}
+        <div className="absolute top-20 left-6 sm:top-24 sm:left-12 lg:top-28 lg:left-16 z-20">
+          <div className="relative w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32">
+            {/* Transparent Clock Face with Glass Effect */}
+            <div className="absolute inset-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 shadow-lg" />
+            
+            {/* Clock Markers - Hours */}
+            <div className="absolute inset-0">
+              {[...Array(12)].map((_, i) => {
+                const angle = i * 30
+                return (
+                  <div
+                    key={i}
+                    className="absolute w-0.5 bg-slate-700 rounded-full"
+                    style={{
+                      left: '50%',
+                      top: '50%',
+                      height: i % 3 === 0 ? '8px' : '5px',
+                      width: i % 3 === 0 ? '2px' : '1px',
+                      transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-42px)`,
+                    }}
+                  />
+                )
+              })}
             </div>
+            
+            {/* Clock Markers - Minutes */}
+            <div className="absolute inset-0">
+              {[...Array(60)].map((_, i) => {
+                if (i % 5 === 0) return null
+                const angle = i * 6
+                return (
+                  <div
+                    key={`min-${i}`}
+                    className="absolute w-0.5 bg-slate-400 rounded-full"
+                    style={{
+                      left: '50%',
+                      top: '50%',
+                      height: '3px',
+                      transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-42px)`,
+                    }}
+                  />
+                )
+              })}
+            </div>
+            
+            {/* Center Dot */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-slate-800 z-10" />
+            
+            {/* Hour Hand - Short and thick */}
+            <div
+              className="absolute w-1.5 h-6 sm:h-7 lg:h-8 bg-slate-800 rounded-full origin-bottom"
+              style={{
+                left: '50%',
+                top: '50%',
+                transform: `translate(-50%, -100%) rotate(${hourRotation}deg)`,
+                transformOrigin: '50% 100%',
+              }}
+            />
+            
+            {/* Minute Hand - Longer and thinner */}
+            <div
+              className="absolute w-1 h-8 sm:h-9 lg:h-10 bg-slate-700 rounded-full origin-bottom"
+              style={{
+                left: '50%',
+                top: '50%',
+                transform: `translate(-50%, -100%) rotate(${minuteRotation}deg)`,
+                transformOrigin: '50% 100%',
+              }}
+            />
+            
+            {/* Second Hand - Long and red */}
+            <div
+              className="absolute w-0.5 h-9 sm:h-10 lg:h-11 bg-red-500 rounded-full origin-bottom z-10"
+              style={{
+                left: '50%',
+                top: '50%',
+                transform: `translate(-50%, -100%) rotate(${secondRotation}deg)`,
+                transformOrigin: '50% 100%',
+              }}
+            />
+            
+            {/* Second Hand Tail */}
+            <div
+              className="absolute w-0.5 h-3 bg-red-400 rounded-full origin-top z-10"
+              style={{
+                left: '50%',
+                top: '50%',
+                transform: `translate(-50%, 0) rotate(${secondRotation}deg)`,
+                transformOrigin: '50% 0',
+              }}
+            />
           </div>
         </div>
 
