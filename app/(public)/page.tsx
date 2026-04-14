@@ -131,26 +131,17 @@ export default function HomePage() {
   const [isLoadingPlan, setIsLoadingPlan] = useState(true)
   const [homepageServices, setHomepageServices] = useState<any[]>([])
   const [homepageProducts, setHomepageProducts] = useState<any[]>([])
-  const [currentTime, setCurrentTime] = useState(new Date())
-  const [binaryCode, setBinaryCode] = useState('')
+  const [currentTime, setCurrentTime] = useState(() => {
+    const now = new Date()
+    return new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }))
+  })
   
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000)
+    const timer = setInterval(() => {
+      const now = new Date()
+      setCurrentTime(new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Dhaka' })))
+    }, 1000)
     return () => clearInterval(timer)
-  }, [])
-
-  useEffect(() => {
-    const generateBinary = () => {
-      let code = ''
-      for (let i = 0; i < 50; i++) {
-        code += Math.random() > 0.5 ? '1' : '0'
-        if (i % 10 === 9) code += '\n'
-      }
-      return code
-    }
-    setBinaryCode(generateBinary())
-    const interval = setInterval(() => setBinaryCode(generateBinary()), 150)
-    return () => clearInterval(interval)
   }, [])
   
   const hourRotation = ((currentTime.getHours() % 12) + currentTime.getMinutes() / 60) * 30
@@ -432,21 +423,24 @@ export default function HomePage() {
         {/* Transparent Analog Wall Clock - Top Left of Hero */}
         <div className="absolute top-20 left-6 sm:top-24 sm:left-12 lg:top-28 lg:left-16 z-20">
           <div className="relative w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32">
-            {/* Transparent Clock Face with Glass Effect */}
-            <div className="absolute inset-0 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 shadow-lg" />
+            {/* Transparent Clock Face with Glass Effect & Purple tint */}
+            <div className="absolute inset-0 rounded-full bg-purple-50/30 backdrop-blur-sm border border-purple-200/40 shadow-lg" />
             
-            {/* Clock Markers - Hours */}
+            {/* Purple Glow Ring */}
+            <div className="absolute inset-2 rounded-full border border-purple-300/30" />
+            
+            {/* Clock Markers - Hours - Purple */}
             <div className="absolute inset-0">
               {[...Array(12)].map((_, i) => {
                 const angle = i * 30
                 return (
                   <div
                     key={i}
-                    className="absolute w-0.5 bg-slate-700 rounded-full"
+                    className="absolute w-0.5 bg-purple-600 rounded-full"
                     style={{
                       left: '50%',
                       top: '50%',
-                      height: i % 3 === 0 ? '8px' : '5px',
+                      height: i % 3 === 0 ? '10px' : '6px',
                       width: i % 3 === 0 ? '2px' : '1px',
                       transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-42px)`,
                     }}
@@ -455,7 +449,7 @@ export default function HomePage() {
               })}
             </div>
             
-            {/* Clock Markers - Minutes */}
+            {/* Clock Markers - Minutes - Light Purple */}
             <div className="absolute inset-0">
               {[...Array(60)].map((_, i) => {
                 if (i % 5 === 0) return null
@@ -463,7 +457,7 @@ export default function HomePage() {
                 return (
                   <div
                     key={`min-${i}`}
-                    className="absolute w-0.5 bg-slate-400 rounded-full"
+                    className="absolute w-0.5 bg-purple-400/60 rounded-full"
                     style={{
                       left: '50%',
                       top: '50%',
@@ -475,12 +469,12 @@ export default function HomePage() {
               })}
             </div>
             
-            {/* Center Dot */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-slate-800 z-10" />
+            {/* Center Dot - Purple */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-gradient-to-br from-purple-600 to-violet-600 z-10 shadow-sm" />
             
-            {/* Hour Hand - Short and thick */}
+            {/* Hour Hand - Purple gradient */}
             <div
-              className="absolute w-1.5 h-6 sm:h-7 lg:h-8 bg-slate-800 rounded-full origin-bottom"
+              className="absolute w-1.5 h-6 sm:h-7 lg:h-8 bg-gradient-to-b from-purple-700 to-purple-800 rounded-full origin-bottom shadow-sm"
               style={{
                 left: '50%',
                 top: '50%',
@@ -489,9 +483,9 @@ export default function HomePage() {
               }}
             />
             
-            {/* Minute Hand - Longer and thinner */}
+            {/* Minute Hand - Violet gradient */}
             <div
-              className="absolute w-1 h-8 sm:h-9 lg:h-10 bg-slate-700 rounded-full origin-bottom"
+              className="absolute w-1 h-8 sm:h-9 lg:h-10 bg-gradient-to-b from-violet-600 to-violet-700 rounded-full origin-bottom shadow-sm"
               style={{
                 left: '50%',
                 top: '50%',
@@ -500,9 +494,9 @@ export default function HomePage() {
               }}
             />
             
-            {/* Second Hand - Long and red */}
+            {/* Second Hand - Red with Purple accent */}
             <div
-              className="absolute w-0.5 h-9 sm:h-10 lg:h-11 bg-red-500 rounded-full origin-bottom z-10"
+              className="absolute w-0.5 h-9 sm:h-10 lg:h-11 bg-gradient-to-b from-red-500 to-red-600 rounded-full origin-bottom z-10 shadow-sm"
               style={{
                 left: '50%',
                 top: '50%',
