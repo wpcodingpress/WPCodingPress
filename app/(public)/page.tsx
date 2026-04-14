@@ -962,22 +962,16 @@ export default function HomePage() {
                   const getButtonLink = () => {
                     if (!session) {
                       if (plan.planId === 'free') return '/register'
-                      if (plan.planId === 'enterprise') return '/contact'
                       return '/register?plan=pro'
                     }
                     if (plan.planId === 'free') return '/dashboard'
-                    if (plan.planId === 'enterprise') return '/contact'
                     return '/dashboard/subscription'
                   }
                   
                   const getButtonText = () => {
-                    if (!session) {
-                      if (plan.planId === 'free') return 'Get Started'
-                      if (plan.planId === 'enterprise') return 'Contact Sales'
-                      return 'Subscribe Now'
+                    if (plan.planId === 'free') {
+                      return !session ? 'Get Started' : 'Go to Dashboard'
                     }
-                    if (plan.planId === 'free') return 'Go to Dashboard'
-                    if (plan.planId === 'enterprise') return 'Contact Sales'
                     return 'Subscribe Now'
                   }
                   
@@ -1616,18 +1610,37 @@ export default function HomePage() {
             Join 500+ happy clients who switched to lightning-fast Next.js.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/register">
-              <Button size="lg" className="bg-white text-purple-700 hover:bg-white/90 text-lg px-10 py-6 shadow-xl font-bold">
-                Start Free Today
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </Link>
-            <Link href="/order">
-              <Button size="lg" className="bg-white text-purple-700 hover:bg-gray-100 text-lg px-10 py-6 font-semibold shadow-xl">
-                Order Now
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </Link>
+            {session ? (
+              <>
+                <Link href="/dashboard">
+                  <Button size="lg" className="bg-white text-purple-700 hover:bg-white/90 text-lg px-10 py-6 shadow-xl font-bold">
+                    Go to Dashboard
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                </Link>
+                <Link href="/order">
+                  <Button size="lg" variant="outline" className="bg-white/20 text-white hover:bg-white/30 border-white text-lg px-10 py-6 font-semibold shadow-xl">
+                    Order Now
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/register">
+                  <Button size="lg" className="bg-white text-purple-700 hover:bg-white/90 text-lg px-10 py-6 shadow-xl font-bold">
+                    Start Free Today
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                </Link>
+                <Link href="/login">
+                  <Button size="lg" className="bg-white text-purple-700 hover:bg-gray-100 text-lg px-10 py-6 font-semibold shadow-xl">
+                    Order Now
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>
