@@ -10,6 +10,12 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { AnimatedLogo } from "@/components/logo"
 
+const iconMap: Record<string, string> = {
+  code: "⚡", palette: "🎨", "shopping-cart": "🛒", zap: "📈", globe: "🌐", settings: "☁️",
+}
+
+const getServiceIcon = (icon: string) => iconMap[icon] || "⚡"
+
 const mainNavLinks = [
   { href: "/", label: "Home" },
   { href: "/services", label: "Services" },
@@ -216,14 +222,14 @@ export function Navbar() {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const res = await fetch("/api/services?active=true")
+        const res = await fetch("/api/public/services")
         if (res.ok) {
           const data = await res.json()
           if (data.length > 0) {
             const mappedServices: ServiceItem[] = data.map((s: any) => ({
               title: s.name,
               description: s.description?.substring(0, 60) || "",
-              icon: "⚡",
+              icon: s.icon ? getServiceIcon(s.icon) : "⚡",
               href: `/services/${s.slug}`,
               popular: s.isActive
             }))
