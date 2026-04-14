@@ -47,6 +47,7 @@ export function FloatingButtons() {
           </motion.button>
         )}
       </AnimatePresence>
+      <AIChatWidget />
     </div>
   )
 }
