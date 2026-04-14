@@ -388,7 +388,7 @@ export default function HomePage() {
       {/* Hero Section - Light Purple Gradient with Centered Text */}
       <section 
         ref={heroRef} 
-        className="relative min-h-screen flex items-center pt-20 sm:pt-24 lg:pt-28 pb-8 sm:pb-12 overflow-hidden bg-gradient-to-br from-purple-50 via-white to-violet-50"
+        className="relative min-h-screen flex items-center pt-16 sm:pt-20 lg:pt-24 pb-8 sm:pb-12 overflow-hidden bg-gradient-to-br from-purple-50 via-white to-violet-50"
       >
         {/* Optimized Animated Background */}
         <div className="absolute inset-0 overflow-hidden">
@@ -404,7 +404,7 @@ export default function HomePage() {
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #8b5cf6 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
 
         {/* Transparent Analog Wall Clock - Positioned above badge on mobile, inner on larger screens */}
-        <div className="absolute top-28 left-1/2 -translate-x-1/2 sm:top-24 sm:left-20 md:top-28 md:left-24 lg:top-32 lg:left-28 xl:top-32 xl:left-32 z-20">
+        <div className="absolute top-36 left-1/2 -translate-x-1/2 sm:top-24 sm:left-20 md:top-28 md:left-24 lg:top-32 lg:left-28 xl:top-32 xl:left-32 z-20">
           <div className="relative w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 opacity-60 sm:opacity-80 md:opacity-100">
             {/* Transparent Clock Face with Glass Effect & Purple tint */}
             <div className="absolute inset-0 rounded-full bg-purple-50/30 backdrop-blur-sm border border-purple-200/40 shadow-lg" />

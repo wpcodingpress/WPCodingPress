@@ -294,7 +294,7 @@ export function Navbar() {
     >
       <div className="container mx-auto px-3 sm:px-4 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16 lg:h-20">
-          <AnimatedLogo size="sm" />
+          <AnimatedLogo size="md" />
 
           <div className="hidden lg:flex items-center gap-1" ref={dropdownRef}>
             {mainNavLinks.map((link) => (
