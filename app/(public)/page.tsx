@@ -395,133 +395,18 @@ export default function HomePage() {
       {/* Hero Section - Light Purple Gradient with Centered Text */}
       <section 
         ref={heroRef} 
-        className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden bg-gradient-to-br from-purple-50 via-white to-violet-50"
+        className="relative min-h-screen flex items-center pt-20 sm:pt-22 lg:pt-24 pb-12 sm:pb-16 overflow-hidden bg-gradient-to-br from-purple-50 via-white to-violet-50"
       >
-        {/* Enhanced Animated Background */}
-        <motion.div 
-          className="absolute inset-0 overflow-hidden"
-          style={{ opacity: heroOpacity }}
-        >
-          <motion.div 
-            className="hero-glow absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-gradient-to-r from-purple-400/50 to-violet-400/50 rounded-full blur-[120px]"
-            animate={{
-              scale: [1, 1.1, 1],
-              x: [0, 20, 0],
-              y: [0, 10, 0],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <motion.div 
-            className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-gradient-to-r from-indigo-400/40 to-purple-400/40 rounded-full blur-[100px]"
-            animate={{
-              scale: [1, 1.15, 1],
-              x: [0, -25, 0],
-              y: [0, -15, 0],
-            }}
-            transition={{
-              duration: 5,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 0.5
-            }}
-          />
-        </motion.div>
+        {/* Simplified Animated Background - Performance Optimized */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-[400px] sm:w-[600px] h-[400px] sm:h-[600px] bg-gradient-to-r from-purple-400/30 to-violet-400/30 rounded-full blur-[80px] sm:blur-[120px] animate-pulse" style={{ animationDuration: '4s' }} />
+          <div className="absolute bottom-1/4 right-1/4 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-gradient-to-r from-indigo-400/25 to-purple-400/25 rounded-full blur-[60px] sm:blur-[100px] animate-pulse" style={{ animationDuration: '5s', animationDelay: '0.5s' }} />
+        </div>
 
-        {/* Enhanced Floating Background Elements */}
-        <motion.div 
-          className="absolute top-32 right-10 w-24 h-24 bg-purple-300/60 rounded-3xl float-element"
-          animate={{
-            y: [-25, 25],
-            rotate: [0, 5, 0],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div 
-          className="absolute top-48 left-20 w-20 h-20 bg-violet-300/60 rounded-2xl float-element"
-          animate={{
-            y: [-25, 25],
-            rotate: [0, -5, 0],
-          }}
-          transition={{
-            duration: 4.5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.3
-          }}
-        />
-        <motion.div 
-          className="absolute bottom-40 right-1/4 w-16 h-16 bg-pink-300/60 rounded-full float-element"
-          animate={{
-            y: [-25, 25],
-            x: [0, 15],
-          }}
-          transition={{
-            duration: 3.5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.6
-          }}
-        />
-        <motion.div 
-          className="absolute top-1/3 left-10 w-18 h-18 bg-indigo-300/60 rounded-xl float-element"
-          animate={{
-            y: [-25, 25],
-            x: [0, -10],
-          }}
-          transition={{
-            duration: 4.2,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.2
-          }}
-        />
-        <motion.div 
-          className="absolute bottom-1/3 right-20 w-14 h-14 bg-purple-400/60 rounded-lg float-element"
-          animate={{
-            y: [-25, 25],
-            rotate: [0, 8, 0],
-          }}
-          transition={{
-            duration: 3.8,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.5
-          }}
-        />
-        <motion.div 
-          className="absolute top-1/2 left-1/3 w-10 h-10 bg-violet-400/50 rounded-full float-element"
-          animate={{
-            y: [-30, 30],
-            x: [0, 20],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.8
-          }}
-        />
-        <motion.div 
-          className="absolute bottom-1/4 left-10 w-8 h-8 bg-indigo-400/50 rounded-full float-element"
-          animate={{
-            y: [-20, 20],
-            x: [0, -15],
-          }}
-          transition={{
-            duration: 3.2,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1
-          }}
-        />
+        {/* Minimal Floating Elements - CSS Only */}
+        <div className="absolute top-32 right-10 w-16 sm:w-20 h-16 sm:h-20 bg-purple-300/40 rounded-2xl sm:rounded-3xl animate-bounce" style={{ animationDuration: '4s' }} />
+        <div className="absolute top-48 left-16 sm:left-20 w-12 sm:w-16 h-12 sm:h-16 bg-violet-300/40 rounded-xl sm:rounded-2xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '0.3s' }} />
+        <div className="hidden sm:block absolute bottom-40 right-1/4 w-12 h-12 bg-pink-300/40 rounded-full animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.6s' }} />
         
         {/* Animated Grid Pattern */}
         <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle, #8b5cf6 1.5px, transparent 1.5px)', backgroundSize: '30px 30px' }} />
@@ -544,103 +429,18 @@ export default function HomePage() {
         <motion.div className="absolute top-60 left-1/2 w-7 h-7 bg-emerald-400/40 rounded-full" animate={{ y: [-14, 14] }} transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }} />
         <motion.div className="absolute bottom-1/4 right-1/2 w-9 h-9 bg-sky-400/40 rounded-xl" animate={{ y: [-16, 16], rotate: [0, -6] }} transition={{ duration: 3.6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} />
 
-        {/* Futuristic Digital Clock - Top Left of Hero */}
-        <div className="absolute top-28 left-16 lg:left-24 z-20">
-          <div className="relative w-48 h-32 lg:w-60 lg:h-40 rounded-3xl overflow-hidden shadow-2xl">
-            {/* Glossy Glass Effect - Multiple Layers */}
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl" />
-            
-            {/* Glossy Top Highlight */}
-            <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/20 to-transparent rounded-t-3xl" />
-            
-            {/* Reflection Effect */}
-            <div className="absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-cyan-400/10 to-transparent" />
-            
-            {/* Screen Bezel */}
-            <div className="absolute inset-2 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700">
-              {/* Inner Glow */}
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-purple-500/5" />
-              
-              {/* Scan Lines */}
-              <div className="absolute inset-0 opacity-10" style={{
-                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(34, 211, 238, 0.2) 1px, rgba(34, 211, 238, 0.2) 2px)',
-              }} />
-              
-              {/* Digital Display */}
-              <div className="absolute inset-0 flex items-center justify-center p-4">
-                <div className="text-center w-full">
-                  {/* Main Time Display - High Contrast */}
-                  <div className="font-mono text-5xl lg:text-6xl font-bold tracking-[0.15em]">
-                    <span className="text-white drop-shadow-[0_0_15px_rgba(34,211,238,1)]">{hours}</span>
-                    <span className="text-cyan-300 mx-2 animate-pulse">:</span>
-                    <span className="text-white drop-shadow-[0_0_15px_rgba(34,211,238,1)]">{minutes}</span>
-                    <span className="text-cyan-300 mx-2 animate-pulse">:</span>
-                    <span className="text-red-400 drop-shadow-[0_0_15px_rgba(248,113,113,1)]">{seconds}</span>
-                  </div>
-                  
-                  {/* Date Display */}
-                  <div className="mt-3 font-mono text-sm lg:text-base text-cyan-400 tracking-[0.3em] uppercase">
-                    {currentTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                  </div>
-                  
-                  {/* Glowing Divider */}
-                  <div className="mt-3 h-0.5 w-32 mx-auto bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_rgba(34,211,238,0.8)]" />
-                  
-                  {/* Brand Text */}
-                  <div className="mt-2 font-mono text-[10px] text-slate-500 tracking-[0.4em]">WPCODINGPRESS</div>
-                </div>
+        {/* Compact Digital Clock - Top Left of Hero */}
+        <div className="absolute top-20 left-8 sm:top-24 sm:left-12 lg:top-28 lg:left-16 z-20">
+          <div className="relative w-16 h-10 sm:w-20 sm:h-12 lg:w-24 lg:h-14 rounded-md overflow-hidden shadow-lg border border-violet-200/30 bg-gradient-to-br from-violet-900 via-purple-900 to-violet-950">
+            <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/10 to-transparent rounded-t-md" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="font-mono text-[10px] sm:text-xs lg:text-sm font-bold tracking-wider">
+                <span className="text-violet-200">{hours}</span>
+                <span className="text-violet-400">:</span>
+                <span className="text-violet-200">{minutes}</span>
+                <span className="text-violet-400">:</span>
+                <span className="text-pink-400">{seconds}</span>
               </div>
-            </div>
-            
-            {/* Corner LED Indicators */}
-            <div className="absolute top-3 left-3 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,1)] animate-pulse" />
-            <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-green-400 shadow-[0_0_10px_rgba(74,222,128,1)]" />
-            <div className="absolute bottom-3 left-3 w-2 h-2 rounded-full bg-red-400 shadow-[0_0_10px_rgba(248,113,113,1)] animate-pulse" />
-            <div className="absolute bottom-3 right-3 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,1)]" />
-          </div>
-        </div>
-
-        {/* Binary Code Matrix Background - Visible sliding from right to bottom-left */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">
-          <div 
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(90deg, transparent 0%, transparent 70%, rgba(6, 182, 212, 0.03) 100%)',
-            }}
-          />
-          <div className="absolute inset-0 overflow-hidden">
-            <div 
-              className="absolute inset-0 font-mono text-xs leading-6 whitespace-nowrap"
-              style={{
-                transform: 'skewX(-25deg) translateX(-20%)',
-                width: '150%',
-                left: '-20%',
-              }}
-            >
-              {Array(25).fill(0).map((_, row) => (
-                <div 
-                  key={row} 
-                  className="flex"
-                  style={{
-                    animation: `binaryScroll ${6 + row * 0.3}s linear infinite`,
-                    marginTop: row * 2,
-                  }}
-                >
-                  {Array(120).fill(0).map((_, i) => (
-                    <span 
-                      key={i} 
-                      style={{ 
-                        color: i % 10 === 0 ? '#22d3ee' : 'rgba(34, 211, 238, 0.5)',
-                        textShadow: i % 10 === 0 ? '0 0 8px rgba(34, 211, 238, 1)' : 'none',
-                        fontSize: i % 10 === 0 ? '14px' : '12px',
-                        fontWeight: i % 10 === 0 ? 'bold' : 'normal',
-                      }}
-                    >
-                      {Math.random() > 0.5 ? '1' : '0'}
-                    </span>
-                  ))}
-                </div>
-              ))}
             </div>
           </div>
         </div>
@@ -701,7 +501,7 @@ export default function HomePage() {
             initial={{ opacity: 0, scale: 0.95, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.6 }}
-            className="relative max-w-4xl mx-auto mb-16"
+            className="relative max-w-4xl mx-auto mb-12 sm:mb-16 px-2 sm:px-0"
           >
             {/* Terminal Window */}
             <div className="relative">
