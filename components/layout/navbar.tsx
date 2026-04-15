@@ -178,6 +178,14 @@ export function Navbar() {
   const { data: session } = useSession()
   const pathname = usePathname()
 
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.classList.add('chat-blur-active')
+    } else {
+      document.body.classList.remove('chat-blur-active')
+    }
+  }, [mobileMenuOpen])
+
   const [services, setServices] = useState<ServiceItem[]>([
     { title: "WordPress to Next.js", description: "Lightning-fast conversion", icon: "⚡", href: "/services/wordpress-to-nextjs", popular: true },
     { title: "Elementor Pro Design", description: "Stunning custom designs", icon: "🎨", href: "/services/elementor-pro-design", popular: false },
@@ -480,7 +488,7 @@ export function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-slate-900/50 backdrop-blur-xl lg:hidden z-[59]"
+              className="fixed inset-0 lg:hidden z-[59]"
               onClick={() => setMobileMenuOpen(false)}
             />
             <motion.div
