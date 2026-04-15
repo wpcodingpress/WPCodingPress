@@ -585,51 +585,6 @@ export function Navbar() {
           </>
         )}
       </AnimatePresence>
-                    ) : (
-                      <Link
-                        href={link.href}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="block py-3 px-4 text-base text-slate-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg font-medium"
-                      >
-                        {link.label}
-                      </Link>
-                    )}
-                  </div>
-                ))}
-                <div className="pt-4 space-y-2 border-t border-slate-200">
-                  {session?.user ? (
-                    <>
-                      {!['admin', 'editor', 'manager'].includes(session.user.role as string) && (
-                      <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                        <Button variant="outline" className="w-full text-base border-purple-300 text-purple-700 hover:bg-purple-50">Dashboard</Button>
-                      </Link>
-                      )}
-                      {['admin', 'editor', 'manager'].includes(session.user.role as string) ? (
-                        <Link href="/admin" onClick={() => setMobileMenuOpen(false)}>
-                          <Button variant="outline" className="w-full text-base border-slate-300 text-slate-700 hover:bg-slate-100">Admin Panel</Button>
-                        </Link>
-                      ) : (
-                        <Link href="/order" onClick={() => setMobileMenuOpen(false)}>
-                          <Button className="w-full text-base bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700">Start Project</Button>
-                        </Link>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                        <Button variant="outline" className="w-full text-base border-purple-300 text-purple-700 hover:bg-purple-50">Login</Button>
-                      </Link>
-                      <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                        <Button className="w-full text-base bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700">Get Started</Button>
-                      </Link>
-                    </>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
     </nav>
   )
 }
