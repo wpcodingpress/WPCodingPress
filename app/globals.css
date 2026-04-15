@@ -320,6 +320,12 @@
     50% { transform: translateY(-8px); }
   }
 
+  .chat-blur-active main {
+    filter: blur(8px);
+    pointer-events: none;
+    user-select: none;
+  }
+
   .animate-float {
     animation: float 4s ease-in-out infinite;
   }

@@ -509,7 +509,7 @@ export default function HomePage() {
               AI-Powered Web Development Agency
             </div>
 
-            <h1 className="hero-animate text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl font-bold text-slate-900 mb-3 sm:mb-4 lg:mb-6 leading-tight">
+            <h1 className="hero-animate text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-slate-900 mb-3 sm:mb-4 lg:mb-6 leading-tight">
               Transform Your
               <span className="block bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 bg-clip-text text-transparent">
                 WordPress to Next.js

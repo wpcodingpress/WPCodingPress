@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 
 export function FloatingButtons() {
   const [showBackToTop, setShowBackToTop] = useState(false)
+  const [isChatOpen, setIsChatOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,6 +16,14 @@ export function FloatingButtons() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  useEffect(() => {
+    if (isChatOpen) {
+      document.body.classList.add('chat-blur-active')
+    } else {
+      document.body.classList.remove('chat-blur-active')
+    }
+  }, [isChatOpen])
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" })
@@ -47,7 +56,7 @@ export function FloatingButtons() {
           </motion.button>
         )}
       </AnimatePresence>
-      <AIChatWidget />
+      <AIChatWidget isOpen={isChatOpen} setIsOpen={setIsChatOpen} />
     </div>
   )
 }
@@ -59,8 +68,10 @@ interface Message {
   timestamp: Date
 }
 
-export function AIChatWidget() {
-  const [isOpen, setIsOpen] = useState(false)
+export function AIChatWidget({ isOpen: externalIsOpen, setIsOpen: externalSetIsOpen }: { isOpen?: boolean, setIsOpen?: (open: boolean) => void }) {
+  const [internalIsOpen, setInternalIsOpen] = useState(false)
+  const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen
+  const setIsOpen = externalSetIsOpen || setInternalIsOpen
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
