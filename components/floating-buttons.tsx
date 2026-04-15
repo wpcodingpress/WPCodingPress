@@ -165,7 +165,7 @@ export function AIChatWidget({ isOpen: externalIsOpen, setIsOpen: externalSetIsO
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.2 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-[108px] left-[74px] z-50 w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 to-violet-600 text-white shadow-lg shadow-purple-500/30 flex items-center justify-center cursor-pointer group hover:shadow-xl hover:shadow-purple-500/40 hover:scale-110 transition-all duration-300"
+        className="fixed bottom-[93px] left-4 sm:left-[74px] md:left-[74px] lg:left-[74px] -ml-[30px] sm:ml-0 md:ml-0 lg:ml-0 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 to-violet-600 text-white shadow-lg shadow-purple-500/30 flex items-center justify-center cursor-pointer group hover:shadow-xl hover:shadow-purple-500/40 hover:scale-110 transition-all duration-300"
         aria-label="Open AI Chat"
       >
         <motion.div
@@ -213,7 +213,7 @@ export function AIChatWidget({ isOpen: externalIsOpen, setIsOpen: externalSetIsO
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.8, opacity: 0, y: 20 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed bottom-[132px] left-[56px] z-50 w-[380px] max-w-[calc(100vw-48px)] h-[550px] max-h-[calc(100vh-200px)] bg-white rounded-3xl shadow-2xl shadow-purple-500/20 overflow-hidden flex flex-col"
+            className="fixed bottom-[117px] left-4 sm:left-[56px] md:left-[56px] lg:left-[56px] -ml-2 sm:ml-0 md:ml-0 lg:ml-0 z-50 w-[350px] sm:w-[380px] max-w-[calc(100vw-32px)] h-[500px] sm:h-[550px] max-h-[calc(100vh-200px)] bg-white rounded-2xl sm:rounded-3xl shadow-2xl shadow-purple-500/20 overflow-hidden flex flex-col"
           >
             <div className="bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
