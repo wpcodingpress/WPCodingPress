@@ -99,6 +99,7 @@ model Subscription {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
   onboardingForm        OnboardingForm?
+  projectBoard          ProjectBoard?
 }
 
 model OnboardingForm {
@@ -130,6 +131,8 @@ model OnboardingForm {
   projectStatus       String   @default("RECEIVED")
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
+
+  projectBoard          ProjectBoard?
 
   @@index([userId])
   @@index([projectStatus])
@@ -318,4 +321,135 @@ model UserSession {
   ipAddress   String?
   userAgent  String?
   createdAt  DateTime @default(now())
+}
+
+// ─── Project Management System (Monday.com-style) ───
+
+model ProjectBoard {
+  id              String   @id @default(cuid())
+  subscriptionId  String   @unique
+  subscription    Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  onboardingFormId String?   @unique
+  onboardingForm  OnboardingForm? @relation(fields: [onboardingFormId], references: [id])
+  title           String
+  description     String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  columns  ProjectColumn[]
+  tasks    ProjectTask[]
+  activity ActivityLog[]
+
+  @@index([subscriptionId])
+}
+
+model ProjectColumn {
+  id        String   @id @default(cuid())
+  boardId   String
+  board     ProjectBoard @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  title     String
+  color     String   @default("#6366f1")
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  tasks ProjectTask[]
+
+  @@index([boardId])
+}
+
+model ProjectTask {
+  id            String   @id @default(cuid())
+  boardId       String
+  board         ProjectBoard @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  columnId      String
+  column        ProjectColumn @relation(fields: [columnId], references: [id])
+  title         String
+  description   String?   @db.Text
+  priority      String    @default("medium") // low, medium, high, urgent
+  dueDate       DateTime?
+  order         Int       @default(0)
+  estimatedHours Float?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  comments     TaskComment[]
+  attachments  TaskAttachment[]
+  checklists   TaskChecklistItem[]
+  activity     ActivityLog[]
+  assignees    TaskAssignee[]
+
+  @@index([boardId])
+  @@index([columnId])
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      ProjectTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String
+  userName  String
+  userAvatar String?
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([taskId])
+}
+
+model TaskAttachment {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      ProjectTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String
+  fileName  String
+  fileUrl   String
+  fileSize  Int       @default(0)
+  fileType  String    @default("unknown")
+  createdAt DateTime  @default(now())
+
+  @@index([taskId])
+}
+
+model TaskChecklistItem {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      ProjectTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  title     String
+  completed Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([taskId])
+}
+
+model TaskAssignee {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      ProjectTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String
+  userName  String
+  userEmail String
+  userAvatar String?
+  createdAt DateTime @default(now())
+
+  @@unique([taskId, userId])
+  @@index([taskId])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  boardId   String?
+  board     ProjectBoard? @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  taskId    String?
+  task      ProjectTask? @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String
+  userName  String
+  userAvatar String?
+  action    String   // task_created, task_moved, comment_added, etc
+  details   String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([boardId])
+  @@index([taskId])
 }
