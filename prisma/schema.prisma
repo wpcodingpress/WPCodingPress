@@ -36,6 +36,7 @@ model User {
   updatedAt       DateTime @updatedAt
   orders          Order[]
   subscriptions   Subscription[]
+  onboardingForms OnboardingForm[]
   sites           Site[]
   jobs            Job[]
   notifications  Notification[]
@@ -79,20 +80,59 @@ model Product {
 }
 
 model Subscription {
-  id                   String   @id @default(cuid())
-  userId               String
-  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  stripeSubId          String?  @unique
-  stripePriceId        String?
-  lemonCustomerId      String?
-  lemonSubscriptionId  String?  @unique
-  status               String   @default("active")
-  plan                 String   @default("free")
-  currentPeriodStart   DateTime @default(now())
-  currentPeriodEnd     DateTime
-  cancelAtPeriodEnd    Boolean  @default(false)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  id                    String   @id @default(cuid())
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeSubId           String?  @unique
+  stripePriceId         String?
+  lemonCustomerId       String?
+  lemonSubscriptionId   String?  @unique
+  gumroadSaleId         String?  @unique
+  gumroadSubscriptionId String?
+  status                String   @default("active")
+  plan                  String   @default("free")
+  billingCycle          String   @default("monthly")
+  currentPeriodStart    DateTime @default(now())
+  currentPeriodEnd      DateTime
+  cancelAtPeriodEnd     Boolean  @default(false)
+  cancelledAt           DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  onboardingForm        OnboardingForm?
+}
+
+model OnboardingForm {
+  id                  String   @id @default(cuid())
+  subscriptionId      String   @unique
+  subscription        Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName            String
+  email               String
+  phone               String
+  businessName        String
+  currentWebsiteUrl   String?
+  websiteTypes        String   @default("[]")
+  domainName          String?
+  hostingProvider     String?
+  hostingLoginEncrypted String?
+  preferredDomain     String?
+  domainExtension     String?
+  hostingPreferences  String?
+  websiteGoal         String   @db.Text
+  designPreferences   String?  @db.Text
+  designFiles         String?
+  requiredPages       String   @default("[]")
+  targetAudience      String?
+  referenceWebsites   String?  @db.Text
+  complexity          String   @default("NORMAL")
+  additionalNotes     String?  @db.Text
+  projectStatus       String   @default("RECEIVED")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([userId])
+  @@index([projectStatus])
 }
 
 model Site {

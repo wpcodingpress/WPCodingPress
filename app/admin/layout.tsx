@@ -70,6 +70,7 @@ const navItems: NavItem[] = [
   { href: "/admin/products", icon: Image, label: "Products", allowed: ['admin', 'editor', 'manager'] },
   { href: "/admin/users", icon: Users, label: "Users", allowed: ['admin'] },
   { href: "/admin/subscribers", icon: SubscribersIcon, label: "Subscribers", allowed: ['admin', 'manager'] },
+  { href: "/admin/web-dev-subscribers", icon: Zap, label: "Web Dev Clients", allowed: ['admin', 'manager'] },
   { href: "/admin/revenue", icon: BarChart3, label: "Revenue", allowed: ['admin', 'manager'] },
   { href: "/admin/portfolio", icon: BarChart3, label: "Portfolio", allowed: ['admin', 'editor', 'manager'] },
   { href: "/admin/bank", icon: Building2, label: "Bank Settings", allowed: ['admin'] },

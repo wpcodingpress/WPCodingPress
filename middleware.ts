@@ -13,6 +13,8 @@ export async function middleware(request: NextRequest) {
   const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route))
   // Check if accessing dashboard routes  
   const isDashboardRoute = dashboardRoutes.some(route => pathname.startsWith(route))
+  // Check if onboarding route
+  const isOnboardingRoute = pathname === '/onboarding'
 
   // Skip auth check for login pages and API routes - allow through
   if (pathname === '/login' || pathname === '/admin-login' || pathname.startsWith('/api/auth')) {
@@ -29,6 +31,9 @@ export async function middleware(request: NextRequest) {
       }
       if (isAdminRoute) {
         return NextResponse.redirect(new URL('/admin-login', request.url))
+      }
+      if (isOnboardingRoute) {
+        return NextResponse.redirect(new URL('/login', request.url))
       }
       return NextResponse.next()
     }
@@ -75,6 +80,7 @@ export const config = {
     '/dashboard/:path*',
     '/admin',
     '/admin/:path*',
+    '/onboarding',
     '/admin-login',
     '/login',
   ],

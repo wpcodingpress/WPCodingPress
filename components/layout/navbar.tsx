@@ -22,6 +22,7 @@ const mainNavLinks = [
   { href: "/products", label: "Products" },
   { href: "/portfolio", label: "Portfolio" },
   { href: "/pricing", label: "Pricing" },
+  { href: "/web-dev-plans", label: "Web Dev Plans" },
   { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
 ]

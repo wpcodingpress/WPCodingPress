@@ -5,11 +5,11 @@ import { useRouter, usePathname } from "next/navigation"
 import { signOut } from "next-auth/react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { 
-  LayoutDashboard, 
-  ShoppingCart, 
+import {
+  LayoutDashboard,
+  ShoppingCart,
   DownloadCloud,
-  Settings, 
+  Settings,
   LogOut,
   Loader2,
   User,
@@ -25,6 +25,8 @@ import {
   ShoppingBag,
   MessageSquare,
   FileText,
+  Code,
+  Crown,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { FloatingButtons } from "@/components/floating-buttons"
@@ -41,6 +43,7 @@ interface Notification {
 
 const sidebarLinks = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard, allowed: ['user', 'viewer'] },
+  { title: "Web Dev", href: "/dashboard/web-dev", icon: Code, allowed: ['user'] },
   { title: "My Orders", href: "/dashboard/orders", icon: ShoppingCart, allowed: ['user'] },
   { title: "Invoices", href: "/dashboard/invoices", icon: FileText, allowed: ['user'] },
   { title: "Downloads", href: "/dashboard/downloads", icon: DownloadCloud, allowed: ['user'] },
