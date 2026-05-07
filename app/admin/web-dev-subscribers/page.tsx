@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import Link from "next/link"
 import {
   Users,
   Search,
@@ -15,6 +16,7 @@ import {
   DollarSign,
   TrendingUp,
   Check,
+  LayoutDashboard,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -336,6 +338,13 @@ export default function AdminWebDevSubscribersPage() {
                         </td>
                         <td className="px-4 py-4">
                           <div className="flex items-center justify-end gap-1">
+                            <Link
+                              href={`/admin/projects/${sub.id}`}
+                              className="p-1.5 text-purple-500 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition-colors"
+                              title="Project Board"
+                            >
+                              <LayoutDashboard className="w-3.5 h-3.5" />
+                            </Link>
                             {sub.onboardingForm && (
                               <Button
                                 variant="ghost"

@@ -13,6 +13,7 @@ import {
   Loader2,
   AlertTriangle,
   ChevronRight,
+  ChevronDown,
   Mail,
   Shield,
   Crown,
@@ -25,11 +26,13 @@ import {
   CreditCard,
   Check,
   Settings,
+  Columns3,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
+import { KanbanBoard } from "@/components/project-management/KanbanBoard"
 import {
   PROJECT_STATUS_LABELS,
   PROJECT_STATUS_ORDER,
@@ -83,6 +86,7 @@ export default function WebDevDashboardPage() {
   const [showSupport, setShowSupport] = useState(false)
   const [supportMessage, setSupportMessage] = useState("")
   const [supportSent, setSupportSent] = useState(false)
+  const [isBoardOpen, setIsBoardOpen] = useState(false)
 
   const fetchData = useCallback(async () => {
     try {
@@ -397,6 +401,46 @@ export default function WebDevDashboardPage() {
           </motion.button>
         ))}
       </div>
+
+      {/* Project Board */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <Card className="bg-white border-slate-200 overflow-hidden">
+          <CardHeader
+            className="border-b border-slate-100 pb-4 cursor-pointer select-none"
+            onClick={() => setIsBoardOpen(!isBoardOpen)}
+          >
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                <Columns3 className="w-5 h-5 text-purple-500" />
+                Project Board
+              </CardTitle>
+              <ChevronDown
+                className={`w-5 h-5 text-slate-400 transition-transform duration-200 ${
+                  isBoardOpen ? "rotate-180" : ""
+                }`}
+              />
+            </div>
+          </CardHeader>
+          <AnimatePresence>
+            {isBoardOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <CardContent className="p-4 sm:p-6 min-h-[400px]">
+                  <KanbanBoard subscriptionId={subscription.id} />
+                </CardContent>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Card>
+      </motion.div>
 
       {/* Subscription Details */}
       <Card className="bg-white border-slate-200">
