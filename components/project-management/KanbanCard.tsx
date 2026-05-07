@@ -15,9 +15,10 @@ import type { TaskWithRelations } from "@/lib/project-management"
 interface KanbanCardProps {
   task: TaskWithRelations
   isDragOverlay?: boolean
+  onClick?: (task: TaskWithRelations) => void
 }
 
-export function KanbanCard({ task, isDragOverlay }: KanbanCardProps) {
+export function KanbanCard({ task, isDragOverlay, onClick }: KanbanCardProps) {
   const {
     attributes,
     listeners,
@@ -43,6 +44,7 @@ export function KanbanCard({ task, isDragOverlay }: KanbanCardProps) {
     <div
       ref={isDragOverlay ? undefined : setNodeRef}
       style={isDragOverlay ? undefined : style}
+      onClick={() => !isDragOverlay && onClick?.(task)}
       className={`group bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer ${
         isDragOverlay ? "shadow-xl border-purple-300 bg-white" : ""
       }`}

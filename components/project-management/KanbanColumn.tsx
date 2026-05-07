@@ -13,9 +13,10 @@ interface KanbanColumnProps {
   column: ColumnData
   tasks: TaskWithRelations[]
   isOver: boolean
+  onTaskClick?: (task: TaskWithRelations) => void
 }
 
-export function KanbanColumn({ column, tasks, isOver }: KanbanColumnProps) {
+export function KanbanColumn({ column, tasks, isOver, onTaskClick }: KanbanColumnProps) {
   const { setNodeRef, isOver: isDroppableOver } = useDroppable({
     id: column.id,
   })
@@ -60,7 +61,7 @@ export function KanbanColumn({ column, tasks, isOver }: KanbanColumnProps) {
               </div>
             ) : (
               tasks.map((task) => (
-                <KanbanCard key={task.id} task={task} />
+                <KanbanCard key={task.id} task={task} onClick={onTaskClick} />
               ))
             )}
           </div>

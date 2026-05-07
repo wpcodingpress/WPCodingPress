@@ -15,11 +15,13 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
+import { AnimatePresence } from "framer-motion"
 import { Loader2, Columns3 } from "lucide-react"
 import { KanbanColumn } from "./KanbanColumn"
 import { KanbanCard } from "./KanbanCard"
 import { ProjectBoardHeader } from "./ProjectBoardHeader"
 import { CreateTaskForm } from "./CreateTaskForm"
+import { TaskDetailModal } from "./TaskDetailModal"
 import type { BoardWithAll, ColumnData, TaskWithRelations } from "@/lib/project-management"
 
 interface KanbanBoardProps {
@@ -35,6 +37,7 @@ export function KanbanBoard({ subscriptionId, onBoardReady }: KanbanBoardProps) 
   const [activeTask, setActiveTask] = useState<TaskWithRelations | null>(null)
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [overColumnId, setOverColumnId] = useState<string | null>(null)
+  const [selectedTask, setSelectedTask] = useState<TaskWithRelations | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -172,6 +175,14 @@ export function KanbanBoard({ subscriptionId, onBoardReady }: KanbanBoardProps) 
     setShowCreateForm(false)
   }
 
+  function handleTaskUpdated(task: TaskWithRelations) {
+    setTasks((prev) => prev.map((t) => (t.id === task.id ? task : t)))
+  }
+
+  function handleTaskDeleted(taskId: string) {
+    setTasks((prev) => prev.filter((t) => t.id !== taskId))
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -220,6 +231,7 @@ export function KanbanBoard({ subscriptionId, onBoardReady }: KanbanBoardProps) 
               column={column}
               tasks={tasksByColumn[column.id] || []}
               isOver={overColumnId === column.id}
+              onTaskClick={setSelectedTask}
             />
           ))}
         </div>
@@ -232,6 +244,19 @@ export function KanbanBoard({ subscriptionId, onBoardReady }: KanbanBoardProps) 
           ) : null}
         </DragOverlay>
       </DndContext>
+
+      {/* Task Detail Modal */}
+      <AnimatePresence>
+        {selectedTask && (
+          <TaskDetailModal
+            task={selectedTask}
+            columns={columns}
+            onUpdate={handleTaskUpdated}
+            onDelete={handleTaskDeleted}
+            onClose={() => setSelectedTask(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }
