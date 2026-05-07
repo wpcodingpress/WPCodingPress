@@ -106,11 +106,16 @@ export function getDeliverySla(complexity: string): string {
   return complexity === "COMPLEX" ? "5-7 Business Days" : "Within 3 Business Days";
 }
 
-export function createCheckoutUrl(plan: WebDevPlan, billingCycle: BillingCycle): string {
+export function createCheckoutUrl(plan: WebDevPlan, billingCycle: BillingCycle, origin?: string): string {
   const link = getGumroadProductLink(plan, billingCycle);
-  const successUrl = `${process.env.NEXT_PUBLIC_APP_URL}/onboarding?plan=${plan}&billing=${billingCycle}`;
-  const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/web-dev-plans?cancelled=true`;
+  const baseUrl = origin || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const successUrl = `${baseUrl}/onboarding?plan=${plan}&billing=${billingCycle}`;
+  const cancelUrl = `${baseUrl}/web-dev-plans?cancelled=true`;
   return `${link}?success=${encodeURIComponent(successUrl)}&cancel=${encodeURIComponent(cancelUrl)}`;
+}
+
+export function isWebDevPlan(plan: string): boolean {
+  return plan === 'STARTER' || plan === 'COMPLETE';
 }
 
 export function getCurrencySymbol(currency: string): string {

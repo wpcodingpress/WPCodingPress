@@ -35,18 +35,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid billing cycle' }, { status: 400 });
     }
 
-    if (TESTING_MODE) {
-      const existingSub = await prisma.subscription.findFirst({
-        where: { userId: user.id, status: 'active', plan: { in: ['STARTER', 'COMPLETE'] } },
+    const existingSub = await prisma.subscription.findFirst({
+      where: { userId: user.id, status: 'active', plan: { in: ['STARTER', 'COMPLETE'] } },
+    });
+
+    if (existingSub) {
+      return NextResponse.json({
+        message: 'You already have an active web dev subscription',
+        alreadyActive: true,
+        subscription: existingSub,
+        redirectTo: '/dashboard/web-dev',
       });
+    }
 
-      if (existingSub) {
-        return NextResponse.json({
-          message: 'You already have an active web dev subscription',
-          subscription: existingSub,
-        });
-      }
-
+    if (TESTING_MODE) {
       const newSub = await prisma.subscription.create({
         data: {
           userId: user.id,
@@ -59,14 +61,18 @@ export async function POST(request: Request) {
       });
 
       return NextResponse.json({
-        message: 'Subscription activated (TESTING_MODE)',
+        success: true,
         subscription: newSub,
+        redirectTo: '/onboarding?plan=' + plan + '&billing=' + billingCycle,
+        message: 'Subscription activated! Redirecting to onboarding...',
       });
     }
 
-    const checkoutUrl = createCheckoutUrl(plan, billingCycle);
+    const origin = request.headers.get('origin') || undefined;
+    const checkoutUrl = createCheckoutUrl(plan, billingCycle, origin);
 
     return NextResponse.json({
+      success: true,
       url: checkoutUrl,
       plan: {
         name: WEB_DEV_PLANS[plan].name,
