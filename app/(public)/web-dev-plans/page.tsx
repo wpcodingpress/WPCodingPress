@@ -20,7 +20,6 @@ import {
   CheckCircle2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { WEB_DEV_PLANS, type BillingCycle, type WebDevPlan } from "@/lib/web-dev-service"
 
 const PLANS = [

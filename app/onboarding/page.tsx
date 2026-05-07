@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Check,
@@ -17,12 +18,12 @@ import {
   Code,
   ShieldCheck,
   Rocket,
+  Zap,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select } from "@/components/ui/select"
 
 const websiteTypeOptions = [
   { value: "wordpress", label: "WordPress" },
@@ -77,7 +78,6 @@ function OnboardingPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
-  const [sessionCheck, setSessionCheck] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const [formData, setFormData] = useState({
@@ -130,7 +130,6 @@ function OnboardingPage() {
       router.push("/login")
     } finally {
       setIsLoading(false)
-      setSessionCheck(true)
     }
   }
 
@@ -276,8 +275,25 @@ function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50 py-8 sm:py-12">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50">
+      {/* Minimal Header */}
+      <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+          <Link href="/dashboard/web-dev" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-violet-500 flex items-center justify-center">
+              <Zap className="w-3.5 h-3.5 text-white" />
+            </div>
+            <span className="text-sm font-bold text-slate-900">WPCodingPress</span>
+          </Link>
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <span className="hidden sm:inline">{plan === "STARTER" ? "Starter Plan" : "Complete Plan"}</span>
+            <span className="hidden sm:inline">•</span>
+            <span>{billingCycle === "annual" ? "Annual" : "Monthly"}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="py-8 sm:py-12 max-w-3xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

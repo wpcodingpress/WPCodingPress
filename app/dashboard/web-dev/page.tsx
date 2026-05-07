@@ -14,7 +14,6 @@ import {
   AlertTriangle,
   ChevronRight,
   Mail,
-  Phone,
   Shield,
   Crown,
   Zap,
@@ -24,11 +23,12 @@ import {
   FileText,
   Calendar,
   CreditCard,
+  Check,
+  Settings,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
   PROJECT_STATUS_LABELS,
@@ -36,12 +36,15 @@ import {
   type ProjectStatus,
 } from "@/lib/web-dev-service"
 
+const WHATSAPP_NUMBER = "8801943429727"
+
 interface SubscriptionData {
   id: string
   plan: string
   status: string
   billingCycle: string
   currentPeriodEnd: string
+  currentPeriodStart: string
   cancelAtPeriodEnd: boolean
   onboardingForm: {
     projectStatus: string
@@ -75,6 +78,8 @@ export default function WebDevDashboardPage() {
   const [isCancelling, setIsCancelling] = useState(false)
   const [cancelSuccess, setCancelSuccess] = useState(false)
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [isUpgrading, setIsUpgrading] = useState(false)
+  const [upgradeError, setUpgradeError] = useState<string | null>(null)
   const [showSupport, setShowSupport] = useState(false)
   const [supportMessage, setSupportMessage] = useState("")
   const [supportSent, setSupportSent] = useState(false)
@@ -104,7 +109,6 @@ export default function WebDevDashboardPage() {
     : -1
 
   const planName = subscription?.plan === "STARTER" ? "Starter" : "Complete"
-  const planColor = subscription?.plan === "STARTER" ? "from-blue-500 to-violet-500" : "from-purple-500 to-pink-500"
 
   const handleCancel = async () => {
     setIsCancelling(true)
@@ -124,6 +128,8 @@ export default function WebDevDashboardPage() {
   }
 
   const handleUpgrade = async () => {
+    setIsUpgrading(true)
+    setUpgradeError(null)
     try {
       const res = await fetch("/api/web-dev-subscriptions", {
         method: "POST",
@@ -131,18 +137,36 @@ export default function WebDevDashboardPage() {
         body: JSON.stringify({ plan: "COMPLETE", billingCycle: subscription?.billingCycle || "monthly" }),
       })
       const data = await res.json()
+
+      if (!res.ok) {
+        setUpgradeError(data.error || "Upgrade failed. Please try again.")
+        return
+      }
+
+      if (data.redirectTo) {
+        setShowUpgradeModal(false)
+        router.push(data.redirectTo)
+        return
+      }
+
       if (data.url) {
         window.location.href = data.url
+        return
       }
+
+      setUpgradeError("Unexpected response. Please try again.")
     } catch {
-      //
+      setUpgradeError("Network error. Please check your connection.")
+    } finally {
+      setIsUpgrading(false)
     }
   }
 
   const handleSupportSubmit = () => {
-    const subject = encodeURIComponent(`Support Request — ${planName} Plan`)
-    const body = encodeURIComponent(supportMessage)
-    window.open(`mailto:support@wpcodingpress.com?subject=${subject}&body=${body}`)
+    const text = encodeURIComponent(
+      `Support Request — ${planName} Plan\n\n${supportMessage}\n\nSent from WPCodingPress Dashboard`
+    )
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, "_blank")
     setSupportSent(true)
   }
 
@@ -158,7 +182,6 @@ export default function WebDevDashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Success/Error Messages */}
       {cancelSuccess && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -208,19 +231,28 @@ export default function WebDevDashboardPage() {
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                className="border-white/30 text-white hover:bg-white/20"
+                className="border-white/40 text-white bg-white/10 backdrop-blur-sm hover:bg-white/20 font-medium"
                 onClick={() => setShowSupport(true)}
               >
                 <HelpCircle className="w-4 h-4 mr-2" />
                 Support
               </Button>
-              {subscription.plan === "STARTER" && (
+              {subscription.plan === "STARTER" ? (
                 <Button
-                  className="bg-white text-purple-700 hover:bg-purple-50 font-semibold"
+                  className="bg-white text-purple-700 hover:bg-purple-50 font-semibold shadow-lg"
                   onClick={() => setShowUpgradeModal(true)}
                 >
                   <Crown className="w-4 h-4 mr-2" />
                   Upgrade
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="border-white/40 text-white bg-white/10 backdrop-blur-sm hover:bg-white/20 font-medium"
+                  onClick={() => router.push("/dashboard/subscription")}
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Manage
                 </Button>
               )}
             </div>
@@ -250,7 +282,6 @@ export default function WebDevDashboardPage() {
                 {STATUS_STEPS.map((step, i) => {
                   const isCompleted = i < currentStatusIndex
                   const isCurrent = i === currentStatusIndex
-                  const isPending = i > currentStatusIndex
                   const Icon = step.icon
 
                   return (
@@ -315,28 +346,28 @@ export default function WebDevDashboardPage() {
         {[
           {
             title: "Contact PM",
-            desc: "Message your project manager on WhatsApp",
+            desc: "Message on WhatsApp",
             icon: MessageSquare,
-            action: () => window.open("https://wa.me/1234567890", "_blank"),
+            action: () => window.open(`https://wa.me/${WHATSAPP_NUMBER}`, "_blank"),
             color: "from-green-500 to-emerald-500",
           },
           {
             title: "Send Email",
-            desc: "Email support@wpcodingpress.com",
+            desc: "support@wpcodingpress.com",
             icon: Mail,
             action: () => window.open("mailto:support@wpcodingpress.com"),
             color: "from-blue-500 to-cyan-500",
           },
           {
             title: "Invoice History",
-            desc: "View your payment history",
+            desc: "View & download invoices",
             icon: CreditCard,
             action: () => router.push("/dashboard/invoices"),
             color: "from-violet-500 to-purple-500",
           },
           {
             title: "Need Help?",
-            desc: "Submit a support request",
+            desc: "Chat on WhatsApp",
             icon: HelpCircle,
             action: () => setShowSupport(true),
             color: "from-amber-500 to-orange-500",
@@ -521,21 +552,36 @@ export default function WebDevDashboardPage() {
                     )
                   )}
                 </div>
+                {upgradeError && (
+                  <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+                    {upgradeError}
+                  </div>
+                )}
               </div>
               <div className="flex gap-3">
                 <Button
                   variant="outline"
                   className="flex-1 border-slate-200"
-                  onClick={() => setShowUpgradeModal(false)}
+                  onClick={() => { setShowUpgradeModal(false); setUpgradeError(null); }}
                 >
                   Maybe Later
                 </Button>
                 <Button
                   className="flex-1 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white"
                   onClick={handleUpgrade}
+                  disabled={isUpgrading}
                 >
-                  Upgrade Now
-                  <ChevronRight className="ml-2 w-4 h-4" />
+                  {isUpgrading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      Upgrade Now
+                      <ChevronRight className="ml-2 w-4 h-4" />
+                    </>
+                  )}
                 </Button>
               </div>
             </motion.div>
@@ -562,17 +608,24 @@ export default function WebDevDashboardPage() {
             >
               {supportSent ? (
                 <div className="text-center py-4">
-                  <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">Message Sent!</h3>
-                  <p className="text-slate-500 text-sm">We'll get back to you within 24 hours.</p>
-                  <Button variant="outline" className="mt-4" onClick={() => { setShowSupport(false); setSupportSent(false); }}>
+                  <Check className="w-12 h-12 text-green-500 mx-auto mb-4" />
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">WhatsApp Opened!</h3>
+                  <p className="text-slate-500 text-sm">Your message has been pre-filled. Just hit send on WhatsApp.</p>
+                  <Button variant="outline" className="mt-4" onClick={() => { setShowSupport(false); setSupportSent(false); setSupportMessage(""); }}>
                     Close
                   </Button>
                 </div>
               ) : (
                 <>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">Support Request</h3>
-                  <p className="text-sm text-slate-500 mb-4">Describe your issue and we'll get back to you within 24 hours.</p>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 rounded-xl bg-green-100">
+                      <MessageSquare className="w-5 h-5 text-green-600" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900">Support via WhatsApp</h3>
+                  </div>
+                  <p className="text-sm text-slate-500 mb-4">
+                    Describe your issue and we'll open WhatsApp with your message pre-filled. We typically respond within minutes.
+                  </p>
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="supportMessage">Message</Label>
@@ -580,20 +633,21 @@ export default function WebDevDashboardPage() {
                         id="supportMessage"
                         value={supportMessage}
                         onChange={(e) => setSupportMessage(e.target.value)}
-                        className="w-full min-h-[120px] p-3 border border-slate-200 rounded-lg text-sm"
+                        className="w-full min-h-[120px] p-3 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
                         placeholder="Describe what you need help with..."
                       />
                     </div>
                     <div className="flex gap-3">
-                      <Button variant="outline" className="flex-1" onClick={() => setShowSupport(false)}>
+                      <Button variant="outline" className="flex-1 border-slate-200" onClick={() => setShowSupport(false)}>
                         Cancel
                       </Button>
                       <Button
-                        className="flex-1 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white"
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                         onClick={handleSupportSubmit}
                         disabled={!supportMessage.trim()}
                       >
-                        Send Message
+                        <MessageSquare className="w-4 h-4 mr-2" />
+                        Send via WhatsApp
                       </Button>
                     </div>
                   </div>

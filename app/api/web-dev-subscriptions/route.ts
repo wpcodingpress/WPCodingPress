@@ -40,11 +40,56 @@ export async function POST(request: Request) {
     });
 
     if (existingSub) {
+      const isUpgrade = existingSub.plan === 'STARTER' && plan === 'COMPLETE';
+      const isSamePlan = existingSub.plan === plan;
+
+      if (isSamePlan) {
+        return NextResponse.json({
+          message: 'You already have an active subscription on this plan',
+          alreadyActive: true,
+          subscription: existingSub,
+          redirectTo: '/dashboard/web-dev',
+        });
+      }
+
+      if (!isUpgrade) {
+        return NextResponse.json({
+          message: 'Subscription change not supported',
+          alreadyActive: true,
+          subscription: existingSub,
+          redirectTo: '/dashboard/web-dev',
+        });
+      }
+
+      // STARTER → COMPLETE upgrade
+      if (TESTING_MODE) {
+        const updated = await prisma.subscription.update({
+          where: { id: existingSub.id },
+          data: {
+            plan: 'COMPLETE',
+            billingCycle,
+            currentPeriodStart: new Date(),
+            currentPeriodEnd: new Date(Date.now() + (billingCycle === 'annual' ? 365 : 30) * 24 * 60 * 60 * 1000),
+          },
+        });
+
+        return NextResponse.json({
+          success: true,
+          isUpgrade: true,
+          subscription: updated,
+          redirectTo: '/dashboard/web-dev',
+          message: 'Upgraded to Complete Plan!',
+        });
+      }
+
+      const origin = request.headers.get('origin') || undefined;
+      const checkoutUrl = createCheckoutUrl(plan, billingCycle, origin);
+
       return NextResponse.json({
-        message: 'You already have an active web dev subscription',
-        alreadyActive: true,
-        subscription: existingSub,
-        redirectTo: '/dashboard/web-dev',
+        success: true,
+        isUpgrade: true,
+        url: checkoutUrl,
+        message: 'Redirecting to Gumroad to complete upgrade...',
       });
     }
 

@@ -9,17 +9,12 @@ import {
   Loader2,
   Crown,
   Zap,
-  ChevronDown,
-  Check,
   X,
-  Eye,
-  ExternalLink,
   Mail,
-  Phone,
-  Calendar,
+  FileText,
   DollarSign,
   TrendingUp,
-  FileText,
+  Check,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
