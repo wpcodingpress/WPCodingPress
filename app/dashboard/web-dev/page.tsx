@@ -32,14 +32,14 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
-import { KanbanBoard } from "@/components/project-management/KanbanBoard"
+import { MOSAIC_NAME, PM_WHATSAPP_NUMBER, getFirstname } from "@/lib/project-management"
 import {
   PROJECT_STATUS_LABELS,
   PROJECT_STATUS_ORDER,
   type ProjectStatus,
 } from "@/lib/web-dev-service"
 
-const WHATSAPP_NUMBER = "8801943429727"
+const WHATSAPP_NUMBER = PM_WHATSAPP_NUMBER
 
 interface SubscriptionData {
   id: string
@@ -87,6 +87,17 @@ export default function WebDevDashboardPage() {
   const [supportMessage, setSupportMessage] = useState("")
   const [supportSent, setSupportSent] = useState(false)
   const [isBoardOpen, setIsBoardOpen] = useState(false)
+  const [pmName, setPmName] = useState<string | null>(null)
+
+  const fetchPmName = useCallback(async (subId: string) => {
+    try {
+      const res = await fetch(`/api/project-boards?subscriptionId=${subId}`)
+      const data = await res.json()
+      if (data.board?.projectManagerName) {
+        setPmName(data.board.projectManagerName)
+      }
+    } catch { /* ignore */ }
+  }, [])
 
   const fetchData = useCallback(async () => {
     try {
@@ -94,6 +105,7 @@ export default function WebDevDashboardPage() {
       const data = await res.json()
       if (data.subscription) {
         setSubscription(data.subscription)
+        fetchPmName(data.subscription.id)
       } else {
         router.push("/web-dev-plans")
       }
@@ -102,7 +114,7 @@ export default function WebDevDashboardPage() {
     } finally {
       setIsLoading(false)
     }
-  }, [router])
+  }, [router, fetchPmName])
 
   useEffect(() => {
     fetchData()
@@ -349,18 +361,25 @@ export default function WebDevDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           {
-            title: "Contact PM",
-            desc: "Message on WhatsApp",
+            title: pmName ? `Contact ${getFirstname(pmName)}` : "Contact PM",
+            desc: pmName ? `Your PM: ${pmName}` : "Message on WhatsApp",
             icon: MessageSquare,
-            action: () => window.open(`https://wa.me/${WHATSAPP_NUMBER}`, "_blank"),
+            action: () => window.open(
+              `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+                pmName
+                  ? `Hi ${getFirstname(pmName)}, I have a question about my project.`
+                  : "Hi, I have a question about my project."
+              )}`,
+              "_blank"
+            ),
             color: "from-green-500 to-emerald-500",
           },
           {
-            title: "Send Email",
-            desc: "support@wpcodingpress.com",
-            icon: Mail,
-            action: () => window.open("mailto:support@wpcodingpress.com"),
-            color: "from-blue-500 to-cyan-500",
+            title: "Open Mosaic",
+            desc: "Full project management board",
+            icon: Columns3,
+            action: () => window.open("/dashboard/project-board", "_blank"),
+            color: "from-purple-500 to-violet-500",
           },
           {
             title: "Invoice History",
@@ -371,7 +390,7 @@ export default function WebDevDashboardPage() {
           },
           {
             title: "Need Help?",
-            desc: "Chat on WhatsApp",
+            desc: "Chat with support",
             icon: HelpCircle,
             action: () => setShowSupport(true),
             color: "from-amber-500 to-orange-500",
@@ -402,43 +421,54 @@ export default function WebDevDashboardPage() {
         ))}
       </div>
 
-      {/* Project Board */}
+      {/* Mosaic - Open in New Tab */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        onClick={() => window.open("/dashboard/project-board", "_blank")}
+        className="cursor-pointer"
       >
-        <Card className="bg-white border-slate-200 overflow-hidden">
-          <CardHeader
-            className="border-b border-slate-100 pb-4 cursor-pointer select-none"
-            onClick={() => setIsBoardOpen(!isBoardOpen)}
-          >
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                <Columns3 className="w-5 h-5 text-purple-500" />
-                Project Board
-              </CardTitle>
-              <ChevronDown
-                className={`w-5 h-5 text-slate-400 transition-transform duration-200 ${
-                  isBoardOpen ? "rotate-180" : ""
-                }`}
-              />
+        <Card className="bg-white border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/10 to-violet-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
+          <CardContent className="p-5 sm:p-6 relative z-10">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 via-violet-500 to-indigo-500 shadow-lg group-hover:shadow-purple-500/30 transition-all">
+                <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="7" height="7" rx="1" />
+                  <rect x="14" y="3" width="7" height="7" rx="1" />
+                  <rect x="3" y="14" width="7" height="7" rx="1" />
+                  <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-slate-900">
+                    {MOSAIC_NAME}
+                  </h3>
+                  <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[10px] font-semibold uppercase tracking-wider">
+                    Open
+                  </span>
+                </div>
+                <p className="text-sm text-slate-500 mt-0.5">
+                  {pmName
+                    ? `Your Project Manager: ${pmName} — Full project management board`
+                    : "Full agency project management board with Kanban, tasks, files, and team collaboration"}
+                </p>
+              </div>
+              <div className="p-2 rounded-lg bg-purple-100 text-purple-600 group-hover:bg-purple-200 transition-colors">
+                <ExternalLink className="w-5 h-5" />
+              </div>
             </div>
-          </CardHeader>
-          <AnimatePresence>
-            {isBoardOpen && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
-              >
-                <CardContent className="p-4 sm:p-6 min-h-[400px]">
-                  <KanbanBoard subscriptionId={subscription.id} />
-                </CardContent>
-              </motion.div>
-            )}
-          </AnimatePresence>
+
+            {/* Feature pills */}
+            <div className="flex gap-2 mt-4 flex-wrap">
+              {["Kanban Board", "Task Tracking", "File Sharing", "Comments", "Team Collaboration"].map((feat) => (
+                <span key={feat} className="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] font-medium">
+                  {feat}
+                </span>
+              ))}
+            </div>
+          </CardContent>
         </Card>
       </motion.div>
 

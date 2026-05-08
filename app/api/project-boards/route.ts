@@ -90,6 +90,19 @@ export async function POST(request: Request) {
       },
     })
 
+    // Log PM assignment activity
+    if (boardData.projectManagerName) {
+      await prisma.activityLog.create({
+        data: {
+          boardId: board.id,
+          userId: session.user.id,
+          userName: session.user.name || "System",
+          action: "task_created",
+          details: `🎉 Project Manager ${boardData.projectManagerName} has been assigned to your project`,
+        },
+      })
+    }
+
     return NextResponse.json({ board }, { status: 201 })
   } catch (error) {
     console.error("Error creating board:", error)

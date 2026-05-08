@@ -1,3 +1,34 @@
+export const MOSAIC_NAME = "Mosaic"
+export const MOSAIC_DESC = "Agency Project Management Platform"
+
+export const PM_WHATSAPP_NUMBER = "8801943429727"
+
+export const PROJECT_MANAGER_NAMES = [
+  "Sarah Mitchell", "James Rodriguez", "Emily Chen", "Michael Torres",
+  "Olivia Parker", "Daniel Kim", "Sophia Patel", "Alexander Wright",
+  "Isabella Martinez", "William Brooks", "Mia Anderson", "Ethan Cooper",
+  "Charlotte Reed", "Benjamin Hayes", "Amelia Foster", "Lucas Sullivan",
+  "Harper Bennett", "Mason Cruz", "Evelyn Price", "Logan Stewart",
+  "Abigail Myers", "Caleb Fisher", "Elizabeth Hart", "Nathan Pierce",
+  "Aria Coleman", "Dylan Jenkins", "Scarlett Bishop", "Gabriel Turner",
+  "Grace Holmes", "Julian Wallace", "Lily Chandler", "Adrian Ford",
+  "Hannah Gibson", "Connor Webb", "Victoria Hale", "Leo Montgomery",
+  "Stella Reeves", "Roman Fletcher", "Aurora Gibbs", "Kai West",
+]
+
+export function getRandomProjectManager(): string {
+  const index = Math.floor(Math.random() * PROJECT_MANAGER_NAMES.length)
+  return PROJECT_MANAGER_NAMES[index]
+}
+
+export const BOARD_INIT_STEPS = [
+  { key: "initializing", label: "Initializing Your Workspace..." },
+  { key: "creating", label: "Creating Your Project Board..." },
+  { key: "assigning", label: "Assigning Your Project Manager..." },
+  { key: "setting_up", label: "Setting Up Your Dashboard..." },
+  { key: "live", label: "Going Live with Mosaic 🚀" },
+] as const
+
 export const DEFAULT_COLUMNS = [
   { title: "Backlog", color: "#94a3b8", order: 0 },
   { title: "To Do", color: "#6366f1", order: 1 },
@@ -80,11 +111,13 @@ export function getPriorityColor(priority: string): string {
 }
 
 export function getInitialBoardData(subscriptionId: string, onboardingFormId?: string) {
+  const pmName = getRandomProjectManager()
   return {
     subscriptionId,
     onboardingFormId: onboardingFormId || null,
     title: "Project Board",
     description: "Manage your web development project tasks",
+    projectManagerName: pmName,
     columns: {
       create: DEFAULT_COLUMNS.map((col) => ({
         title: col.title,
@@ -95,12 +128,17 @@ export function getInitialBoardData(subscriptionId: string, onboardingFormId?: s
   };
 }
 
+export function getFirstname(name: string): string {
+  return name.split(" ")[0]
+}
+
 export interface BoardWithAll {
   id: string
   subscriptionId: string
   onboardingFormId: string | null
   title: string
   description: string | null
+  projectManagerName: string | null
   isActive: boolean
   createdAt: Date
   updatedAt: Date

@@ -4,6 +4,52 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 import { PROJECT_STATUS_ORDER } from '@/lib/web-dev-service';
 
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { id } = await params;
+
+    const subscription = await prisma.subscription.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, phone: true, company: true },
+        },
+        onboardingForm: true,
+        projectBoard: {
+          select: { id: true, projectManagerName: true },
+        },
+      },
+    });
+
+    if (!subscription) {
+      return NextResponse.json({ error: 'Subscription not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      id: subscription.id,
+      plan: subscription.plan,
+      status: subscription.status,
+      billingCycle: subscription.billingCycle,
+      currentPeriodEnd: subscription.currentPeriodEnd.toISOString(),
+      createdAt: subscription.createdAt.toISOString(),
+      user: subscription.user,
+      onboardingForm: subscription.onboardingForm,
+      projectManagerName: subscription.projectBoard?.projectManagerName || null,
+    });
+  } catch (error) {
+    console.error('Get web dev subscriber error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }

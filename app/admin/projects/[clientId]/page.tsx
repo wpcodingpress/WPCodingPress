@@ -30,6 +30,7 @@ import {
   PROJECT_STATUS_ORDER,
   type ProjectStatus,
 } from "@/lib/web-dev-service"
+import { MOSAIC_NAME, PM_WHATSAPP_NUMBER, getFirstname } from "@/lib/project-management"
 
 interface ClientData {
   id: string
@@ -38,6 +39,7 @@ interface ClientData {
   billingCycle: string
   currentPeriodEnd: string
   createdAt: string
+  projectManagerName: string | null
   user: {
     id: string
     name: string
@@ -120,7 +122,7 @@ export default function AdminProjectPage({
     : -1
 
   const tabs = [
-    { id: "board", label: "Project Board", icon: LayoutDashboard },
+    { id: "board", label: "Mosaic Board", icon: LayoutDashboard },
     { id: "info", label: "Client Info", icon: User },
   ] as const
 
@@ -146,9 +148,17 @@ export default function AdminProjectPage({
             </h1>
             <p className="text-sm text-slate-500">{client.user.email}</p>
           </div>
-          <Badge className={`bg-${planColor}-100 text-${planColor}-700 border-${planColor}-200 ml-auto`}>
-            {client.plan === "STARTER" ? "Starter" : "Complete"}
-          </Badge>
+          <div className="ml-auto flex items-center gap-2">
+            {client.projectManagerName && (
+              <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 rounded-lg text-xs font-medium border border-green-200">
+                <User className="w-3 h-3" />
+                PM: {client.projectManagerName}
+              </div>
+            )}
+            <Badge className={`bg-${planColor}-100 text-${planColor}-700 border-${planColor}-200`}>
+              {client.plan === "STARTER" ? "Starter" : "Complete"}
+            </Badge>
+          </div>
         </div>
       </div>
 
@@ -254,6 +264,23 @@ export default function AdminProjectPage({
                   <p className="text-sm font-medium text-slate-900">{client.onboardingForm.businessName}</p>
                 </div>
               </div>
+              {client.projectManagerName && (
+                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                  <User className="w-4 h-4 text-green-600" />
+                  <div>
+                    <p className="text-xs text-green-600 font-medium">Assigned Project Manager</p>
+                    <p className="text-sm font-semibold text-green-800">{client.projectManagerName}</p>
+                  </div>
+                  <a
+                    href={`https://wa.me/${PM_WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hi ${getFirstname(client.projectManagerName)}, regarding client ${client.onboardingForm.businessName || client.onboardingForm.fullName}...`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-auto p-1.5 text-green-600 hover:bg-green-200 rounded-lg transition-colors"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                  </a>
+                </div>
+              )}
             </CardContent>
           </Card>
 
