@@ -113,7 +113,7 @@ export function FileUpload({ taskId, attachments, onAttachmentAdded }: FileUploa
                 <p className="text-xs text-slate-400">{formatFileSize(attachment.fileSize)}</p>
               </div>
               <a
-                href={attachment.fileUrl}
+                href={`/api/project-attachments/${attachment.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-1.5 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"

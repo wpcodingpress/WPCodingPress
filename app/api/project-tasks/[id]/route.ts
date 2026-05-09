@@ -105,6 +105,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         checklists: true,
         assignees: true,
         column: { select: { id: true, title: true, color: true } },
+        board: { select: { id: true, title: true } },
+        activity: { orderBy: { createdAt: 'desc' }, take: 50 },
       },
     })
 
