@@ -17,8 +17,8 @@ function createComponent(
   return <Component {...data} />
 }
 
-function getSubjectForEvent(eventType: string, data: Record<string, unknown>): string {
-  const subjects: Record<string, string> = {
+function getSubjectForEvent(eventType: string, data: Record<string, unknown>, isAdmin = false): string {
+  const userSubjects: Record<string, string> = {
     USER_REGISTERED: 'Welcome to WPCodingPress!',
     EMAIL_VERIFICATION_REQUESTED: 'Verify Your Email Address',
     PASSWORD_RESET_REQUESTED: 'Reset Your Password - WPCodingPress',
@@ -40,9 +40,6 @@ function getSubjectForEvent(eventType: string, data: Record<string, unknown>): s
     SUSPICIOUS_ACTIVITY_DETECTED: 'Suspicious Activity Detected',
   }
 
-  const defaultSubject = 'Notification from WPCodingPress'
-  const adminPrefix = eventType.startsWith('ADMIN_') ? '[Admin] ' : ''
-
   const adminSubjects: Record<string, string> = {
     USER_REGISTERED: 'New User Registration',
     GUMROAD_PURCHASE_COMPLETED: 'New Gumroad Purchase',
@@ -51,7 +48,10 @@ function getSubjectForEvent(eventType: string, data: Record<string, unknown>): s
     SUPPORT_TICKET_CREATED: `New Support Ticket${data.ticketId ? ` #${data.ticketId}` : ''}`,
   }
 
-  return adminPrefix + (adminSubjects[eventType] || subjects[eventType] || defaultSubject)
+  if (isAdmin) {
+    return adminSubjects[eventType] || `[Admin] ${userSubjects[eventType] || 'Notification from WPCodingPress'}`
+  }
+  return userSubjects[eventType] || 'Notification from WPCodingPress'
 }
 
 class NotificationService {
@@ -59,17 +59,18 @@ class NotificationService {
     eventType: string,
     recipient: EmailRecipient,
     Component: React.ComponentType<Record<string, unknown>>,
-    data: Record<string, unknown> = {}
+    data: Record<string, unknown> = {},
+    isAdmin = false
   ): Promise<boolean> {
     try {
       if (!recipient.email) return false
 
       const element = createComponent(Component, {
         ...data,
-        userName: recipient.name || data.userName || '',
+        userName: data.userName || recipient.name || '',
       })
 
-      const subject = getSubjectForEvent(eventType, data)
+      const subject = getSubjectForEvent(eventType, data, isAdmin)
 
       const result = await sendTemplateEmail(
         recipient.email,
@@ -78,6 +79,10 @@ class NotificationService {
         eventType,
         Component.name || eventType
       )
+
+      if (!result.success) {
+        console.error(`[NotificationService] Email failed for ${eventType} to ${recipient.email}`)
+      }
 
       return result.success
     } catch (error) {
@@ -99,7 +104,7 @@ class NotificationService {
       if (admins.length === 0) {
         const adminEmail = process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL
         if (adminEmail) {
-          return this.sendUserEmail(eventType, { email: adminEmail }, Component, data)
+          return this.sendUserEmail(eventType, { email: adminEmail }, Component, data, true)
         }
         return false
       }
@@ -110,7 +115,8 @@ class NotificationService {
             eventType,
             { email: admin.email, name: admin.name },
             Component,
-            data
+            data,
+            true
           )
         )
       )

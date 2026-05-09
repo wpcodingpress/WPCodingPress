@@ -2,6 +2,7 @@ import { EventType, EventPayload, EventHandler } from './index'
 
 class EventDispatcher {
   private handlers: Map<EventType, Set<EventHandler>> = new Map()
+  private initialized = false
 
   on(event: EventType, handler: EventHandler): void {
     if (!this.handlers.has(event)) {
@@ -15,8 +16,17 @@ class EventDispatcher {
   }
 
   async dispatch(event: EventType, payload: EventPayload): Promise<void> {
+    if (!this.initialized) {
+      const { ensureEventHandlersRegistered } = await import('@/lib/register-events')
+      ensureEventHandlersRegistered()
+      this.initialized = true
+    }
+
     const handlers = this.handlers.get(event)
-    if (!handlers || handlers.size === 0) return
+    if (!handlers || handlers.size === 0) {
+      console.warn(`[EventDispatcher] No handlers registered for ${event}`)
+      return
+    }
 
     const results = await Promise.allSettled(
       Array.from(handlers).map((handler) => handler(payload))

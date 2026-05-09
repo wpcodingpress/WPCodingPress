@@ -107,9 +107,11 @@ export async function sendEmail({
   const result = await sendWithRetry(to, subject, html, from)
 
   if (result.success) {
+    console.log(`[Email] Sent to ${to} — subject: "${subject}"${eventType ? ` (${eventType})` : ''}`)
     await logEmail(to, subject, eventType || null, template || null, 'sent')
   } else {
     const errorMsg = result.error instanceof Error ? result.error.message : 'Unknown error'
+    console.error(`[Email] FAILED to send to ${to} — subject: "${subject}" — error: ${errorMsg}`)
     await logEmail(to, subject, eventType || null, template || null, 'failed', errorMsg)
   }
 
