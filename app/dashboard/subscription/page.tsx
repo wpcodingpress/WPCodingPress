@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  CreditCard, 
-  Check, 
-  Zap, 
+import {
+  Check,
+  Zap,
   Crown,
   Rocket,
   Loader2,
@@ -14,16 +13,17 @@ import {
   XCircle,
   Mail,
   AlertTriangle,
-  ArrowUpCircle,
-  ArrowDownCircle,
-  X
+  X,
+  ExternalLink,
+  Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
-const plans = [
+const automationPlans = [
   {
     name: "Free",
     price: 0,
@@ -81,34 +81,49 @@ const plans = [
 
 export default function SubscriptionPage() {
   const searchParams = useSearchParams();
-  const [isLoading, setIsLoading] = useState<string | null>(null);
-  const [currentPlan, setCurrentPlan] = useState<string | null>(null);
   const [isLoadingPlan, setIsLoadingPlan] = useState(true);
+
+  // Automation
+  const [automationSub, setAutomationSub] = useState<any>(null);
+  const [currentPlan, setCurrentPlan] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<string | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [cancelSuccess, setCancelSuccess] = useState(false);
+
+  // Web Dev
+  const [webDevSub, setWebDevSub] = useState<any>(null);
+  const [showWebDevCancelModal, setShowWebDevCancelModal] = useState(false);
+  const [isWebDevCancelling, setIsWebDevCancelling] = useState(false);
+  const [webDevCancelSuccess, setWebDevCancelSuccess] = useState(false);
+
+  // Verification
   const [showVerify, setShowVerify] = useState(false);
   const [gumroadEmail, setGumroadEmail] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState("");
   const [verifySuccess, setVerifySuccess] = useState(false);
-  const [showCancelModal, setShowCancelModal] = useState(false);
-  const [isCancelling, setIsCancelling] = useState(false);
-  const [cancelSuccess, setCancelSuccess] = useState(false);
-  
+
   const success = searchParams.get('success');
   const cancelled = searchParams.get('cancelled');
 
   useEffect(() => {
-    fetchCurrentPlan();
+    fetchSubscriptions();
   }, []);
 
-  const fetchCurrentPlan = async () => {
+  const fetchSubscriptions = async () => {
     try {
       const response = await fetch('/api/subscriptions');
       const data = await response.json();
-      if (data.subscription) {
-        setCurrentPlan(data.subscription.plan);
+      if (data.automation) {
+        setAutomationSub(data.automation);
+        setCurrentPlan(data.automation.plan);
+      }
+      if (data.webDev) {
+        setWebDevSub(data.webDev);
       }
     } catch (error) {
-      console.error('Error fetching subscription:', error);
+      console.error('Error fetching subscriptions:', error);
     } finally {
       setIsLoadingPlan(false);
     }
@@ -116,9 +131,9 @@ export default function SubscriptionPage() {
 
   const handleSubscribe = async (planId: string) => {
     if (planId === 'free') return;
-    
+
     setIsLoading(planId);
-    
+
     try {
       const response = await fetch('/api/subscriptions', {
         method: 'POST',
@@ -128,12 +143,11 @@ export default function SubscriptionPage() {
 
       const data = await response.json();
 
-      console.log('Subscription response:', data);
-
       if (data.url) {
         window.location.href = data.url;
       } else if (data.subscription || data.message) {
         if (data.subscription) {
+          setAutomationSub(data.subscription);
           setCurrentPlan(data.subscription.plan);
           setVerifySuccess(true);
         }
@@ -182,11 +196,7 @@ export default function SubscriptionPage() {
     }
   };
 
-  const handleCancelSubscription = async () => {
-    if (!confirm("Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your billing period.")) {
-      return;
-    }
-
+  const handleCancelAutomation = async () => {
     setIsCancelling(true);
 
     try {
@@ -198,6 +208,7 @@ export default function SubscriptionPage() {
 
       if (data.success) {
         setCancelSuccess(true);
+        setAutomationSub(null);
         setCurrentPlan('free');
         setShowCancelModal(false);
       } else {
@@ -211,6 +222,31 @@ export default function SubscriptionPage() {
     }
   };
 
+  const handleCancelWebDev = async () => {
+    setIsWebDevCancelling(true);
+
+    try {
+      const response = await fetch('/api/web-dev-subscriptions', {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setWebDevCancelSuccess(true);
+        setWebDevSub(null);
+        setShowWebDevCancelModal(false);
+      } else {
+        alert(data.error || 'Failed to cancel subscription. Please try again.');
+      }
+    } catch (error) {
+      console.error('Cancel web dev subscription error:', error);
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setIsWebDevCancelling(false);
+    }
+  };
+
   if (isLoadingPlan) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -219,29 +255,11 @@ export default function SubscriptionPage() {
     );
   }
 
+  const automationPlanName = currentPlan === 'enterprise' ? 'Enterprise' : currentPlan === 'pro' ? 'Pro' : 'Free';
+  const webDevPlanName = webDevSub?.plan === 'STARTER' ? 'Starter' : webDevSub?.plan === 'COMPLETE' ? 'Complete' : null;
+
   return (
-    <div className="space-y-6">
-      {/* Success/Error Messages */}
-      {success && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
-          <CheckCircle className="h-5 w-5 text-green-600" />
-          <div>
-            <p className="font-medium text-green-800">Payment received!</p>
-            <p className="text-sm text-green-600">Now verify your subscription below.</p>
-          </div>
-        </div>
-      )}
-
-      {cancelled && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center gap-3">
-          <XCircle className="h-5 w-5 text-yellow-600" />
-          <div>
-            <p className="font-medium text-yellow-800">Payment cancelled</p>
-            <p className="text-sm text-yellow-600">You can subscribe anytime from this page.</p>
-          </div>
-        </div>
-      )}
-
+    <div className="space-y-8">
       {/* Success/Error Messages */}
       {success && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
@@ -277,47 +295,279 @@ export default function SubscriptionPage() {
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
           <AlertTriangle className="h-5 w-5 text-amber-600" />
           <div>
-            <p className="font-medium text-amber-800">Subscription cancelled!</p>
+            <p className="font-medium text-amber-800">Automation plan cancelled</p>
             <p className="text-sm text-amber-600">You will have access until the end of your billing period.</p>
           </div>
         </div>
       )}
 
-      {(currentPlan === 'pro' || currentPlan === 'enterprise') && !showVerify && !verifySuccess && (
-        <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className={`p-3 rounded-xl ${
-                currentPlan === 'enterprise' ? 'bg-purple-100' : 'bg-pink-100'
-              }`}>
-                {currentPlan === 'enterprise' ? (
-                  <Rocket className="w-6 h-6 text-purple-600" />
-                ) : (
-                  <Crown className="w-6 h-6 text-pink-600" />
-                )}
-              </div>
-              <div>
-                <p className="font-bold text-lg text-slate-900">
-                  Current Plan: {currentPlan === 'enterprise' ? 'Enterprise' : 'Pro'}
-                </p>
-                <p className="text-sm text-slate-500">
-                  {currentPlan === 'enterprise' ? '$99/month - 3 sites' : '$19/month - 1 site'}
-                </p>
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              className="border-red-200 text-red-600 hover:bg-red-50"
-              onClick={() => setShowCancelModal(true)}
-            >
-              <X className="w-4 h-4 mr-2" />
-              Cancel Subscription
-            </Button>
+      {webDevCancelSuccess && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
+          <AlertTriangle className="h-5 w-5 text-amber-600" />
+          <div>
+            <p className="font-medium text-amber-800">Web Development plan cancelled</p>
+            <p className="text-sm text-amber-600">Your website will remain live until the end of your billing period.</p>
           </div>
         </div>
       )}
 
-      {/* Cancel Subscription Modal */}
+      {/* ─── Section 1: Web Development Plan ─── */}
+      <section>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500 to-violet-500">
+            <Layers className="w-5 h-5 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900">Web Development Plan</h2>
+        </div>
+
+        {webDevSub ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`rounded-2xl p-6 sm:p-8 text-white relative overflow-hidden ${
+              webDevSub.plan === 'COMPLETE'
+                ? 'bg-gradient-to-br from-purple-600 via-violet-600 to-indigo-600'
+                : 'bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600'
+            }`}
+          >
+            <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            <div className="relative z-10">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-xl bg-white/20">
+                    {webDevSub.plan === 'COMPLETE' ? (
+                      <Crown className="w-6 h-6" />
+                    ) : (
+                      <Zap className="w-6 h-6" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-xl sm:text-2xl font-bold">{webDevPlanName} Plan</h3>
+                      <Badge className="bg-green-400 text-green-900 border-0 text-xs font-semibold">
+                        {webDevSub.cancelAtPeriodEnd ? 'Cancelling' : 'Active'}
+                      </Badge>
+                    </div>
+                    <p className="text-white/70 text-sm">
+                      {webDevSub.billingCycle === 'annual' ? 'Annual Billing' : 'Monthly Billing'}
+                      {webDevSub.currentPeriodEnd && (
+                        <> — Next billing: {new Date(webDevSub.currentPeriodEnd).toLocaleDateString()}</>
+                      )}
+                    </p>
+                    {webDevSub.cancelAtPeriodEnd && (
+                      <p className="text-amber-300 text-sm mt-1 font-medium">
+                        Cancels at end of billing period ({new Date(webDevSub.currentPeriodEnd).toLocaleDateString()})
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    className="border-white/40 text-white bg-white/10 backdrop-blur-sm hover:bg-white/20 font-medium"
+                    asChild
+                  >
+                    <Link href="/dashboard/web-dev">
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Manage Project
+                    </Link>
+                  </Button>
+                  {!webDevSub.cancelAtPeriodEnd && (
+                    <Button
+                      variant="outline"
+                      className="border-red-300/50 text-red-200 hover:bg-red-500/20 hover:text-red-100"
+                      onClick={() => setShowWebDevCancelModal(true)}
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center"
+          >
+            <div className="p-4 rounded-full bg-purple-100 w-fit mx-auto mb-4">
+              <Layers className="w-8 h-8 text-purple-600" />
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">No Web Development Plan Active</h3>
+            <p className="text-slate-500 mb-6 max-w-md mx-auto">
+              Get a professional website built by our team. Choose from Starter or Complete plans with dedicated project management.
+            </p>
+            <Button
+              className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white shadow-lg shadow-purple-200"
+              asChild
+            >
+              <Link href="/web-dev-plans">
+                <Rocket className="w-4 h-4 mr-2" />
+                View Web Development Plans
+              </Link>
+            </Button>
+          </motion.div>
+        )}
+      </section>
+
+      {/* ─── Section 2: WordPress Automation Plans ─── */}
+      <section>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-primary to-pink-500">
+            <Zap className="w-5 h-5 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900">WordPress Automation</h2>
+        </div>
+
+        {automationSub && !showVerify && (
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 sm:p-6 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className={`p-2.5 rounded-xl ${
+                  automationSub.plan === 'enterprise' ? 'bg-purple-100' : 'bg-pink-100'
+                }`}>
+                  {automationSub.plan === 'enterprise' ? (
+                    <Rocket className="w-5 h-5 text-purple-600" />
+                  ) : (
+                    <Crown className="w-5 h-5 text-pink-600" />
+                  )}
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900">
+                    Current Plan: {automationPlanName}
+                  </p>
+                  <p className="text-sm text-slate-500">
+                    {automationSub.plan === 'enterprise' ? '$99/month - 3 sites' : '$19/month - 1 site'}
+                    {automationSub.currentPeriodEnd && (
+                      <> — Renews {new Date(automationSub.currentPeriodEnd).toLocaleDateString()}</>
+                    )}
+                  </p>
+                  {automationSub.cancelAtPeriodEnd && (
+                    <p className="text-amber-600 text-sm mt-0.5 font-medium">
+                      Cancels at end of billing period
+                    </p>
+                  )}
+                </div>
+              </div>
+              {!automationSub.cancelAtPeriodEnd && (
+                <Button
+                  variant="outline"
+                  className="border-red-200 text-red-600 hover:bg-red-50 shrink-0"
+                  onClick={() => setShowCancelModal(true)}
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Cancel Automation Plan
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl">
+          {automationPlans.map((plan, index) => {
+            const isCurrentPlan = currentPlan === plan.planId || (plan.planId === 'free' && !currentPlan);
+
+            return (
+              <motion.div
+                key={plan.name}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className={`bg-white rounded-xl border-2 p-6 relative ${
+                  plan.popular
+                    ? "border-primary shadow-lg"
+                    : "border-slate-200 hover:border-slate-300"
+                }`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className="bg-primary text-white text-xs font-medium px-3 py-1 rounded-full">
+                      Most Popular
+                    </span>
+                  </div>
+                )}
+
+                <div className="text-center mb-6">
+                  <div className={`inline-flex p-3 rounded-full mb-4 ${
+                    plan.color === 'primary' ? 'bg-primary/10' :
+                    plan.color === 'purple' ? 'bg-purple-100' :
+                    'bg-slate-100'
+                  }`}>
+                    <plan.icon className={`h-6 w-6 ${
+                      plan.color === 'primary' ? 'text-primary' :
+                      plan.color === 'purple' ? 'text-purple-600' :
+                      'text-slate-600'
+                    }`} />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900">{plan.name}</h3>
+                  <p className="text-sm text-slate-500 mt-1">{plan.description}</p>
+                </div>
+
+                <div className="text-center mb-6">
+                  <span className="text-4xl font-bold text-slate-900">${plan.price}</span>
+                  <span className="text-slate-500">/{plan.period}</span>
+                </div>
+
+                <ul className="space-y-3 mb-6">
+                  {plan.features.map((feature, i) => (
+                    <li key={i} className="flex items-center gap-3 text-sm text-slate-600">
+                      <div className={`p-1 rounded-full ${
+                        plan.color === 'primary' ? 'bg-primary/10' :
+                        plan.color === 'purple' ? 'bg-purple-100' :
+                        'bg-slate-100'
+                      }`}>
+                        <Check className={`h-3 w-3 ${
+                          plan.color === 'primary' ? 'text-primary' :
+                          plan.color === 'purple' ? 'text-purple-600' :
+                          'text-slate-600'
+                        }`} />
+                      </div>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+
+                <Button
+                  className="w-full"
+                  variant={plan.popular ? "default" : "outline"}
+                  disabled={isLoading === plan.planId || isCurrentPlan}
+                  onClick={() => handleSubscribe(plan.planId)}
+                >
+                  {isLoading === plan.planId ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : isCurrentPlan ? (
+                    <>
+                      <Check className="mr-2 h-4 w-4" />
+                      Current Plan
+                    </>
+                  ) : plan.price === 0 ? (
+                    'Get Started'
+                  ) : (
+                    'Subscribe Now'
+                  )}
+                </Button>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Manual Verification Button */}
+        <div className="text-center mt-4">
+          <Button
+            variant="link"
+            onClick={() => setShowVerify(true)}
+          >
+            Already paid? Verify your subscription
+          </Button>
+        </div>
+      </section>
+
+      {/* ─── Cancel Automation Modal ─── */}
       <AnimatePresence>
         {showCancelModal && (
           <motion.div
@@ -336,9 +586,9 @@ export default function SubscriptionPage() {
                 <div className="p-3 rounded-full bg-red-100 w-fit mx-auto mb-4">
                   <AlertTriangle className="w-8 h-8 text-red-600" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900">Cancel Subscription?</h3>
+                <h3 className="text-xl font-bold text-slate-900">Cancel Automation Plan?</h3>
                 <p className="text-slate-500 mt-2">
-                  Are you sure you want to cancel your {currentPlan === 'enterprise' ? 'Enterprise' : 'Pro'} subscription? 
+                  Are you sure you want to cancel your {automationPlanName} plan?
                   You will lose access to premium features at the end of your billing period.
                 </p>
               </div>
@@ -348,11 +598,11 @@ export default function SubscriptionPage() {
                   className="flex-1 border-slate-200"
                   onClick={() => setShowCancelModal(false)}
                 >
-                  Keep Subscription
+                  Keep Plan
                 </Button>
                 <Button
                   className="flex-1 bg-red-600 hover:bg-red-700"
-                  onClick={handleCancelSubscription}
+                  onClick={handleCancelAutomation}
                   disabled={isCancelling}
                 >
                   {isCancelling ? (
@@ -361,7 +611,7 @@ export default function SubscriptionPage() {
                       Cancelling...
                     </>
                   ) : (
-                    'Cancel Subscription'
+                    'Cancel Plan'
                   )}
                 </Button>
               </div>
@@ -370,119 +620,62 @@ export default function SubscriptionPage() {
         )}
       </AnimatePresence>
 
-      {!showVerify && !verifySuccess && (
-        <>
-          <div className="text-center max-w-2xl mx-auto">
-            <h1 className="text-2xl font-bold text-slate-900">Choose Your Plan</h1>
-            <p className="text-slate-500 mt-2">Select the plan that best fits your needs</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {plans.map((plan, index) => {
-              const isCurrentPlan = currentPlan === plan.planId || (plan.planId === 'free' && !currentPlan);
-              
-              return (
-                <motion.div
-                  key={plan.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className={`bg-white rounded-xl border-2 p-6 relative ${
-                    plan.popular 
-                      ? "border-primary shadow-lg" 
-                      : "border-slate-200 hover:border-slate-300"
-                  }`}
+      {/* ─── Cancel Web Dev Modal ─── */}
+      <AnimatePresence>
+        {showWebDevCancelModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              className="bg-white rounded-2xl p-6 max-w-md w-full"
+            >
+              <div className="text-center mb-6">
+                <div className="p-3 rounded-full bg-red-100 w-fit mx-auto mb-4">
+                  <AlertTriangle className="w-8 h-8 text-red-600" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900">Cancel Web Development Plan?</h3>
+                <p className="text-slate-500 mt-2">
+                  Are you sure you want to cancel your {webDevPlanName} Plan?
+                </p>
+                <p className="text-sm text-purple-600 font-medium mt-2 bg-purple-50 p-2 rounded-lg">
+                  Your website will remain live until the end of your billing period.
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  className="flex-1 border-slate-200"
+                  onClick={() => setShowWebDevCancelModal(false)}
                 >
-                  {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="bg-primary text-white text-xs font-medium px-3 py-1 rounded-full">
-                        Most Popular
-                      </span>
-                    </div>
+                  Keep Plan
+                </Button>
+                <Button
+                  className="flex-1 bg-red-600 hover:bg-red-700"
+                  onClick={handleCancelWebDev}
+                  disabled={isWebDevCancelling}
+                >
+                  {isWebDevCancelling ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Cancelling...
+                    </>
+                  ) : (
+                    'Cancel Plan'
                   )}
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-                  <div className="text-center mb-6">
-                    <div className={`inline-flex p-3 rounded-full mb-4 ${
-                      plan.color === 'primary' ? 'bg-primary/10' :
-                      plan.color === 'purple' ? 'bg-purple-100' :
-                      'bg-slate-100'
-                    }`}>
-                      <plan.icon className={`h-6 w-6 ${
-                        plan.color === 'primary' ? 'text-primary' :
-                        plan.color === 'purple' ? 'text-purple-600' :
-                        'text-slate-600'
-                      }`} />
-                    </div>
-                    <h3 className="text-lg font-semibold text-slate-900">{plan.name}</h3>
-                    <p className="text-sm text-slate-500 mt-1">{plan.description}</p>
-                  </div>
-
-                  <div className="text-center mb-6">
-                    <span className="text-4xl font-bold text-slate-900">${plan.price}</span>
-                    <span className="text-slate-500">/{plan.period}</span>
-                  </div>
-
-                  <ul className="space-y-3 mb-6">
-                    {plan.features.map((feature, i) => (
-                      <li key={i} className="flex items-center gap-3 text-sm text-slate-600">
-                        <div className={`p-1 rounded-full ${
-                          plan.color === 'primary' ? 'bg-primary/10' :
-                          plan.color === 'purple' ? 'bg-purple-100' :
-                          'bg-slate-100'
-                        }`}>
-                          <Check className={`h-3 w-3 ${
-                            plan.color === 'primary' ? 'text-primary' :
-                            plan.color === 'purple' ? 'text-purple-600' :
-                            'text-slate-600'
-                          }`} />
-                        </div>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Button 
-                    className="w-full" 
-                    variant={plan.popular ? "default" : "outline"}
-                    disabled={isLoading === plan.planId || isCurrentPlan}
-                    onClick={() => handleSubscribe(plan.planId)}
-                  >
-                    {isLoading === plan.planId ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Processing...
-                      </>
-                    ) : isCurrentPlan ? (
-                      <>
-                        <Check className="mr-2 h-4 w-4" />
-                        Current Plan
-                      </>
-                    ) : plan.price === 0 ? (
-                      'Get Started'
-                    ) : (
-                      'Subscribe Now'
-                    )}
-                  </Button>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {/* Manual Verification Button */}
-          {currentPlan && (
-            <div className="text-center mt-4">
-              <Button
-                variant="link"
-                onClick={() => setShowVerify(true)}
-              >
-                Already paid? Verify your subscription
-              </Button>
-            </div>
-          )}
-        </>
-      )}
-
-      {/* Verification Modal */}
+      {/* ─── Verification Modal ─── */}
       <AnimatePresence>
         {showVerify && !verifySuccess && (
           <motion.div

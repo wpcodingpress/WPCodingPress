@@ -126,18 +126,23 @@ export async function GET() {
       include: {
         subscriptions: {
           orderBy: { createdAt: 'desc' },
-          take: 1,
         },
       },
     });
 
-    const activeSubscription = user?.subscriptions?.find(
-      (sub) => sub.status === 'active'
-    );
+    const subscriptions = user?.subscriptions || [];
+
+    const automation = subscriptions.find(
+      (sub) => sub.status === 'active' && !['STARTER', 'COMPLETE'].includes(sub.plan)
+    ) || null;
+
+    const webDev = subscriptions.find(
+      (sub) => sub.status === 'active' && ['STARTER', 'COMPLETE'].includes(sub.plan)
+    ) || null;
 
     return NextResponse.json({
-      hasSubscription: !!activeSubscription,
-      subscription: activeSubscription || null,
+      automation,
+      webDev,
     });
   } catch (error) {
     console.error('Get subscription error:', error);
