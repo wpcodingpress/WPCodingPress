@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { motion } from "framer-motion"
-import { Users, CreditCard, Calendar, Search, Download, Mail, Trash2, Edit3, X, Check, AlertCircle, Loader2, Crown, Rocket, Pause, Play, DollarSign } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Users, CreditCard, Calendar, Search, Download, Mail, Trash2, Edit3, X, Check, AlertCircle, Loader2, Crown, Rocket, Pause, Play, DollarSign, AlertTriangle } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -33,6 +33,7 @@ export default function AdminSubscribersPage() {
   const [editPlan, setEditPlan] = useState("pro")
   const [editStatus, setEditStatus] = useState("active")
   const [saving, setSaving] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const fetchSubscribers = async () => {
     try {
@@ -77,14 +78,18 @@ export default function AdminSubscribersPage() {
   }
 
   const deleteSubscription = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this subscription?")) return
     try {
       const res = await fetch(`/api/admin/subscribers/${id}`, { method: "DELETE" })
+      const data = await res.json().catch(() => ({}))
       if (res.ok) {
+        setDeletingId(null)
         fetchSubscribers()
+      } else {
+        alert(data.error || 'Failed to delete subscriber. Please try again.')
       }
     } catch (error) {
       console.error("Error deleting:", error)
+      alert('Network error. Please try again.')
     }
   }
 
@@ -325,7 +330,7 @@ export default function AdminSubscribersPage() {
                               <Play className="w-3 h-3" />
                             </Button>
                           )}
-                          <Button variant="ghost" size="sm" onClick={() => deleteSubscription(sub.id)} className="text-slate-600 hover:text-red-600 hover:bg-red-50 font-medium h-8" title="Delete">
+                          <Button variant="ghost" size="sm" onClick={() => setDeletingId(sub.id)} className="text-slate-600 hover:text-red-600 hover:bg-red-50 font-medium h-8" title="Delete">
                             <Trash2 className="w-3 h-3" />
                           </Button>
                         </div>
@@ -338,6 +343,49 @@ export default function AdminSubscribersPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deletingId && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+            onClick={() => setDeletingId(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-2xl p-6 max-w-md w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-center mb-6">
+                <div className="p-3 rounded-full bg-red-100 w-fit mx-auto mb-4">
+                  <AlertTriangle className="w-8 h-8 text-red-600" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900">Delete Subscriber?</h3>
+                <p className="text-sm text-slate-500 mt-2">
+                  This will permanently remove this subscription and all associated data. This action cannot be undone.
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <Button variant="outline" className="flex-1" onClick={() => setDeletingId(null)}>
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                  onClick={() => deleteSubscription(deletingId)}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Edit Modal */}
       {editingSub && (

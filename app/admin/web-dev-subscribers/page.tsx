@@ -85,12 +85,16 @@ export default function AdminWebDevSubscribersPage() {
   const deleteSubscription = async (id: string) => {
     try {
       const res = await fetch(`/api/admin/web-dev-subscribers/${id}`, { method: "DELETE" })
+      const data = await res.json().catch(() => ({}))
       if (res.ok) {
         setDeletingId(null)
         fetchData()
+      } else {
+        alert(data.error || 'Failed to delete subscriber. Please try again.')
       }
     } catch (error) {
       console.error("Error deleting subscriber:", error)
+      alert('Network error. Please try again.')
     }
   }
 

@@ -126,8 +126,37 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    await prisma.onboardingForm.deleteMany({ where: { subscriptionId: id } });
-    await prisma.subscription.delete({ where: { id } });
+
+    const sub = await prisma.subscription.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!sub) {
+      return NextResponse.json({ error: 'Subscription not found' }, { status: 404 });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      const board = await tx.projectBoard.findUnique({
+        where: { subscriptionId: id },
+        select: { id: true },
+      });
+
+      if (board) {
+        await tx.taskAssignee.deleteMany({ where: { task: { boardId: board.id } } });
+        await tx.taskChecklistItem.deleteMany({ where: { task: { boardId: board.id } } });
+        await tx.taskAttachment.deleteMany({ where: { task: { boardId: board.id } } });
+        await tx.taskComment.deleteMany({ where: { task: { boardId: board.id } } });
+        await tx.activityLog.deleteMany({ where: { boardId: board.id } });
+        await tx.activityLog.deleteMany({ where: { task: { boardId: board.id } } });
+        await tx.projectTask.deleteMany({ where: { boardId: board.id } });
+        await tx.projectColumn.deleteMany({ where: { boardId: board.id } });
+        await tx.projectBoard.delete({ where: { id: board.id } });
+      }
+
+      await tx.onboardingForm.deleteMany({ where: { subscriptionId: id } });
+      await tx.subscription.delete({ where: { id } });
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
