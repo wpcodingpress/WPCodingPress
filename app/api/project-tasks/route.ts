@@ -75,6 +75,8 @@ export async function POST(request: Request) {
         checklists: true,
         assignees: true,
         column: { select: { id: true, title: true, color: true } },
+        board: { select: { id: true, title: true } },
+        activity: { orderBy: { createdAt: 'desc' }, take: 50 },
       },
     })
 
