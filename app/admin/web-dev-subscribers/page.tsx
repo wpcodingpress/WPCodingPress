@@ -1,3 +1,4 @@
+Delete button inserted successfully
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
@@ -17,6 +18,8 @@ import {
   TrendingUp,
   Check,
   LayoutDashboard,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -61,6 +64,7 @@ export default function AdminWebDevSubscribersPage() {
   const [planFilter, setPlanFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   const [viewingForm, setViewingForm] = useState<WebDevSubscriber["onboardingForm"] | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const fetchData = useCallback(async () => {
     try {
@@ -78,6 +82,18 @@ export default function AdminWebDevSubscribersPage() {
   }, [])
 
   useEffect(() => { fetchData() }, [fetchData])
+
+  const deleteSubscription = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/web-dev-subscribers/${id}`, { method: "DELETE" })
+      if (res.ok) {
+        setDeletingId(null)
+        fetchData()
+      }
+    } catch (error) {
+      console.error("Error deleting subscriber:", error)
+    }
+  }
 
   const filtered = subscribers.filter((sub) => {
     const matchesSearch =
@@ -363,6 +379,13 @@ export default function AdminWebDevSubscribersPage() {
                             >
                               <Mail className="w-3.5 h-3.5" />
                             </a>
+                            <button
+                              onClick={() => setDeletingId(sub.id)}
+                              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Delete Subscriber"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         </td>
                       </motion.tr>
@@ -441,6 +464,48 @@ export default function AdminWebDevSubscribersPage() {
                   <p className="text-xs text-slate-500">Submitted</p>
                   <p className="text-sm text-slate-900">{new Date(viewingForm.createdAt).toLocaleString()}</p>
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deletingId && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+            onClick={() => setDeletingId(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-2xl p-6 max-w-md w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-center mb-6">
+                <div className="p-3 rounded-full bg-red-100 w-fit mx-auto mb-4">
+                  <AlertTriangle className="w-8 h-8 text-red-600" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900">Delete Subscriber?</h3>
+                <p className="text-sm text-slate-500 mt-2">
+                  This will permanently remove their project board, tasks, comments, and all associated data. This action cannot be undone.
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <Button variant="outline" className="flex-1" onClick={() => setDeletingId(null)}>
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                  onClick={() => deleteSubscription(deletingId)}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete
+                </Button>
               </div>
             </motion.div>
           </motion.div>
