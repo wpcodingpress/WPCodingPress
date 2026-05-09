@@ -438,6 +438,24 @@ model TaskAssignee {
   @@index([taskId])
 }
 
+model EmailLog {
+  id          String   @id @default(cuid())
+  recipient   String
+  subject     String
+  eventType   String?
+  template    String?
+  status      String   @default("pending") // pending, sent, failed
+  error       String?  @db.Text
+  sentAt      DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([recipient])
+  @@index([eventType])
+  @@index([status])
+  @@index([createdAt])
+}
+
 model ActivityLog {
   id        String   @id @default(cuid())
   boardId   String?

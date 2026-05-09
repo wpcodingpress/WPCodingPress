@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import prisma from '@/lib/prisma';
-import { sendEmail } from '@/lib/email';
 import { createNotification } from '@/lib/notifications';
+import { eventDispatcher } from '@/events/dispatcher';
+import { EventTypes } from '@/events';
 
 interface GumroadSalePayload {
   id: string;
@@ -43,88 +44,6 @@ function detectWebDevPlan(productName: string): { plan: string; isWebDev: boolea
   if (name.includes('enterprise')) return { plan: 'enterprise', isWebDev: false };
   if (name.includes('pro')) return { plan: 'pro', isWebDev: false };
   return { plan: 'free', isWebDev: false };
-}
-
-async function sendWelcomeEmailForPlan(email: string, name: string, plan: string) {
-  const planDisplay = plan === 'STARTER' ? 'Starter' : plan === 'COMPLETE' ? 'Complete' : plan;
-  return sendEmail({
-    to: email,
-    subject: `Welcome to WPCodingPress ${planDisplay} Plan!`,
-    html: `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #7c3aed, #a855f7); color: #fff; padding: 30px; text-align: center; border-radius: 12px 12px 0 0; }
-            .content { padding: 30px; background: #f9f9f9; }
-            .footer { padding: 20px; text-align: center; color: #888; font-size: 12px; }
-            .button { display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #7c3aed, #a855f7); color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; }
-            .badge { display: inline-block; padding: 6px 16px; background: #7c3aed; color: #fff; border-radius: 20px; font-size: 12px; font-weight: bold; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Welcome to ${planDisplay}! 🎉</h1>
-            </div>
-            <div class="content">
-              <p>Hi ${name},</p>
-              <p>Thank you for subscribing to the <strong>${planDisplay} Plan</strong>! We're excited to start building your website.</p>
-              <p><strong>Here's what happens next:</strong></p>
-              <ol>
-                <li><strong>Complete Your Onboarding</strong> — Fill out the onboarding form to tell us about your project</li>
-                <li><strong>Project Discussion</strong> — Your dedicated project manager will reach out within 24 hours</li>
-                <li><strong>Design & Development</strong> — Our team gets to work on your website</li>
-                <li><strong>Launch</strong> — Your site goes live within 3 business days</li>
-              </ol>
-              <p style="text-align: center; margin-top: 24px;">
-                <a href="${process.env.NEXT_PUBLIC_APP_URL}/onboarding" class="button">Complete Onboarding</a>
-              </p>
-            </div>
-            <div class="footer">
-              <p>WPCodingPress — AI-Powered Web Development</p>
-              <p>Need help? Contact us at support@wpcodingpress.com</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `,
-  });
-}
-
-async function sendCancellationEmail(email: string, name: string, plan: string) {
-  return sendEmail({
-    to: email,
-    subject: `Subscription Cancelled — WPCodingPress ${plan} Plan`,
-    html: `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: #ef4444; color: #fff; padding: 30px; text-align: center; border-radius: 12px 12px 0 0; }
-            .content { padding: 30px; background: #f9f9f9; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Subscription Cancelled</h1>
-            </div>
-            <div class="content">
-              <p>Hi ${name},</p>
-              <p>Your <strong>${plan} Plan</strong> subscription has been cancelled.</p>
-              <p>You will continue to have access until the end of your current billing period.</p>
-              <p>We're sorry to see you go! If you change your mind, you can resubscribe anytime.</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `,
-  });
 }
 
 export async function POST(request: Request) {
@@ -171,16 +90,23 @@ export async function POST(request: Request) {
           },
         });
 
-        if (isWebDev) {
-          await sendCancellationEmail(subscription.user.email, subscription.user.name, plan);
-        }
+        const planDisplay = plan === 'STARTER' ? 'Starter' : plan === 'COMPLETE' ? 'Complete' : plan;
+
+        eventDispatcher.dispatch(EventTypes.SUBSCRIPTION_CANCELLED, {
+          userId: subscription.userId,
+          email: subscription.user.email,
+          name: subscription.user.name,
+          plan,
+          planDisplay,
+          subscriptionId: subscription.id,
+        }).catch(() => {});
 
         await createNotification({
           userId: subscription.userId,
           type: 'subscription',
-          title: isWebDev ? `${plan} Plan Cancelled` : 'Subscription Cancelled',
+          title: isWebDev ? `${planDisplay} Plan Cancelled` : 'Subscription Cancelled',
           message: isWebDev
-            ? `Your ${plan} Plan subscription has been cancelled. You'll have access until the end of the billing period.`
+            ? `Your ${planDisplay} Plan subscription has been cancelled. You'll have access until the end of the billing period.`
             : 'Your subscription has been cancelled.',
           link: '/dashboard/subscription',
           priority: 'high',
@@ -344,7 +270,19 @@ export async function POST(request: Request) {
       });
     }
 
-    await sendWelcomeEmailForPlan(user.email, user.name, planName);
+    eventDispatcher.dispatch(EventTypes.GUMROAD_PURCHASE_COMPLETED, {
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+      plan: planName,
+      planDisplay,
+      productName: salePayload.product_name,
+      billingCycle,
+      amount: salePayload.price,
+      currency: salePayload.currency,
+      subscriptionId: salePayload.subscription_id,
+      onboardingUrl: `${process.env.NEXT_PUBLIC_APP_URL || ''}/onboarding`,
+    }).catch(() => {});
 
     await createNotification({
       userId: user.id,

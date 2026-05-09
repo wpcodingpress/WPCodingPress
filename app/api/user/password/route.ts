@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { eventDispatcher } from '@/events/dispatcher';
+import { EventTypes } from '@/events';
 
 export async function POST(request: Request) {
   try {
@@ -43,6 +45,12 @@ export async function POST(request: Request) {
       where: { id: session.user.id },
       data: { password: hashedPassword }
     });
+
+    eventDispatcher.dispatch(EventTypes.PASSWORD_CHANGED, {
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+    }).catch(() => {});
 
     return NextResponse.json({ success: true, message: 'Password updated successfully' });
   } catch (error) {

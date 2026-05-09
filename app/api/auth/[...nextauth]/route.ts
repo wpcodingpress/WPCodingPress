@@ -2,6 +2,8 @@ import NextAuth, { type NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import prisma from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
+import { eventDispatcher } from '@/events/dispatcher'
+import { EventTypes } from '@/events'
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -70,6 +72,12 @@ export const authOptions: NextAuthOptions = {
         if (!isPasswordValid) {
           return null
         }
+
+        eventDispatcher.dispatch(EventTypes.USER_LOGGED_IN, {
+          userId: user.id,
+          email: user.email,
+          name: user.name,
+        }).catch(() => {})
 
         return {
           id: user.id,

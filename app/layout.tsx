@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import "./globals.css"
 import { Providers } from "@/components/providers"
 import { ToastProvider } from "@/components/toast-notifications"
+import "@/lib/register-events"
 
 export const metadata: Metadata = {
   title: {

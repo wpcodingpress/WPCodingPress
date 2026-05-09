@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
+import { notificationService } from '@/lib/notification-service'
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,25 +9,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email and subject required' }, { status: 400 })
     }
 
-    console.log('=== EMAIL NOTIFICATION ===')
-    console.log('To:', to)
-    console.log('Subject:', subject)
-    console.log('Body:', body)
-    console.log('Type:', type)
-    console.log('=========================')
+    const eventType = type === 'notification' ? 'NOTIFICATION' : (type || 'QUEUED_EMAIL')
 
-    if (notificationId) {
-      try {
-        await prisma.notification.update({
-          where: { id: notificationId },
-          data: { priority: 'sent' as any }
-        }).catch(() => {})
-      } catch (e) {}
-    }
+    await notificationService.sendUserEmail(
+      eventType,
+      { email: to },
+      (await import('@/emails/templates/AccountUpdate')).default,
+      {
+        changes: body || subject,
+        dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || ''}/dashboard`,
+      }
+    )
 
-    return NextResponse.json({ success: true, message: 'Email queued' })
+    return NextResponse.json({ success: true, message: 'Email sent successfully' })
   } catch (error) {
     console.error('Email queue error:', error)
-    return NextResponse.json({ error: 'Failed to queue email' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
   }
 }

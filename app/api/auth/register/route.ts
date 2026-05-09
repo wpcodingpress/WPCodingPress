@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
+import { eventDispatcher } from '@/events/dispatcher'
+import { EventTypes } from '@/events'
 
 export async function POST(request: Request) {
   try {
@@ -36,6 +38,12 @@ export async function POST(request: Request) {
         company: company || null,
       }
     })
+
+    eventDispatcher.dispatch(EventTypes.USER_REGISTERED, {
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+    }).catch(() => {})
 
     return NextResponse.json({
       message: 'User created successfully',

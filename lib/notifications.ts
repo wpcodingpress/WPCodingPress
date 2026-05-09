@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma'
+import { notificationService } from '@/lib/notification-service'
 
 export type NotificationType = 
   | 'order' 
@@ -64,21 +65,25 @@ async function queueEmailNotification(
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { email: true, notifyOrderUpdates: true, notifyPromotional: true },
+      select: { email: true, name: true, notifyOrderUpdates: true },
     })
 
     if (!user?.email) return
 
-    await fetch('/api/email/queue', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        to: user.email,
-        subject: title,
-        body: message,
-        type: 'notification',
-        notificationId,
-      }),
+    await notificationService.sendUserEmail(
+      'NOTIFICATION',
+      { email: user.email, name: user.name },
+      (await import('@/emails/templates/AccountUpdate')).default,
+      {
+        userName: user.name,
+        changes: message,
+        dashboardUrl: `${process.env.NEXT_PUBLIC_APP_URL || ''}/dashboard`,
+      }
+    )
+
+    await prisma.notification.update({
+      where: { id: notificationId },
+      data: { priority: 'sent' as any },
     }).catch(() => {})
   } catch (error) {
     console.error('Error queueing email notification:', error)
