@@ -1,4 +1,3 @@
-Delete button inserted successfully
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
