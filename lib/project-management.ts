@@ -230,3 +230,10 @@ export interface ActivityData {
   details: string | null
   createdAt: Date
 }
+
+export function getDisplayName(user: { name: string | null; role?: string | null }): string {
+  if (user.role === "admin" || user.role === "manager") {
+    return "WPCodingPress Project Manager(PM)"
+  }
+  return user.name || "Unknown"
+}

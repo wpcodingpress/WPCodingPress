@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { getDisplayName } from "@/lib/project-management"
 
 export async function GET(request: Request) {
   try {
@@ -83,7 +84,7 @@ export async function POST(request: Request) {
         boardId,
         taskId: task.id,
         userId: session.user.id,
-        userName: session.user.name || "Unknown",
+        userName: getDisplayName(session.user),
         action: "task_created",
         details: `Created task "${title}"`,
       },

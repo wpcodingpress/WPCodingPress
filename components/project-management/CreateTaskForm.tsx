@@ -76,14 +76,14 @@ export function CreateTaskForm({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter task title..."
-          className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all"
+          className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all text-slate-900"
         />
 
         <div className="flex gap-2">
           <select
             value={columnId}
             onChange={(e) => setColumnId(e.target.value)}
-            className="flex-1 px-2 py-1.5 text-xs border border-slate-200 rounded-lg focus:border-purple-400 outline-none bg-white"
+            className="flex-1 px-2 py-1.5 text-xs border border-slate-200 rounded-lg focus:border-purple-400 outline-none bg-white text-slate-900"
           >
             {columns.map((col) => (
               <option key={col.id} value={col.id}>
@@ -95,7 +95,7 @@ export function CreateTaskForm({
           <select
             value={priority}
             onChange={(e) => setPriority(e.target.value)}
-            className="px-2 py-1.5 text-xs border border-slate-200 rounded-lg focus:border-purple-400 outline-none bg-white"
+            className="px-2 py-1.5 text-xs border border-slate-200 rounded-lg focus:border-purple-400 outline-none bg-white text-slate-900"
           >
             <option value="low">Low</option>
             <option value="medium">Medium</option>

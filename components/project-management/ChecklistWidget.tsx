@@ -132,7 +132,7 @@ export function ChecklistWidget({ taskId, items, onItemsChanged }: ChecklistWidg
             }
           }}
           placeholder="Add checklist item..."
-          className="flex-1 px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none"
+          className="flex-1 px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none text-slate-900"
         />
         <button
           onClick={addItem}

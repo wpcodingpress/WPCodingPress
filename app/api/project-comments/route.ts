@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { getDisplayName } from "@/lib/project-management"
 
 export async function GET(request: Request) {
   try {
@@ -54,7 +55,7 @@ export async function POST(request: Request) {
       data: {
         taskId,
         userId: session.user.id,
-        userName: session.user.name || "Unknown",
+        userName: getDisplayName(session.user),
         userAvatar: null,
         content,
       },
@@ -65,7 +66,7 @@ export async function POST(request: Request) {
         boardId: task.boardId,
         taskId,
         userId: session.user.id,
-        userName: session.user.name || "Unknown",
+        userName: getDisplayName(session.user),
         action: "comment_added",
         details: `Added comment on "${task.title}"`,
       },

@@ -84,7 +84,7 @@ export function CommentSection({ taskId, comments, onCommentAdded }: CommentSect
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Write a comment..."
-          className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none"
+          className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none text-slate-900"
         />
         <Button
           type="submit"

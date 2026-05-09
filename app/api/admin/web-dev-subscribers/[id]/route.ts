@@ -41,7 +41,13 @@ export async function GET(
       currentPeriodEnd: subscription.currentPeriodEnd.toISOString(),
       createdAt: subscription.createdAt.toISOString(),
       user: subscription.user,
-      onboardingForm: subscription.onboardingForm,
+      onboardingForm: subscription.onboardingForm
+        ? {
+            ...subscription.onboardingForm,
+            websiteTypes: JSON.parse(subscription.onboardingForm.websiteTypes),
+            requiredPages: JSON.parse(subscription.onboardingForm.requiredPages),
+          }
+        : null,
       projectManagerName: subscription.projectBoard?.projectManagerName || null,
     });
   } catch (error) {

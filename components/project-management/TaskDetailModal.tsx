@@ -218,7 +218,7 @@ export function TaskDetailModal({
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Add a description..."
                 rows={4}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none resize-y"
+                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none resize-y text-slate-900"
               />
             </div>
 
@@ -255,7 +255,7 @@ export function TaskDetailModal({
                 <select
                   value={columnId}
                   onChange={(e) => setColumnId(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:border-purple-400 outline-none"
+                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:border-purple-400 outline-none text-slate-900"
                 >
                   {columns.map((col) => (
                     <option key={col.id} value={col.id}>
@@ -273,7 +273,7 @@ export function TaskDetailModal({
                 <select
                   value={priority}
                   onChange={(e) => setPriority(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:border-purple-400 outline-none"
+                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:border-purple-400 outline-none text-slate-900"
                 >
                   {Object.entries(PRIORITY_LABELS).map(([value, label]) => (
                     <option key={value} value={value}>
@@ -304,7 +304,7 @@ export function TaskDetailModal({
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:border-purple-400 outline-none"
+                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:border-purple-400 outline-none text-slate-900"
                 />
               </div>
 
@@ -320,7 +320,7 @@ export function TaskDetailModal({
                   placeholder="0"
                   min="0"
                   step="0.5"
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:border-purple-400 outline-none"
+                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:border-purple-400 outline-none text-slate-900"
                 />
               </div>
 
