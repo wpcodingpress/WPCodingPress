@@ -122,7 +122,7 @@ export default function SitesPage() {
       
       setSites(sitesData.sites || []);
       setJobs(jobsData.jobs || []);
-      setSubscriptionData(subData);
+      setSubscriptionData(subData.automation ? { hasSubscription: true, subscription: subData.automation } : { hasSubscription: false, subscription: null });
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {

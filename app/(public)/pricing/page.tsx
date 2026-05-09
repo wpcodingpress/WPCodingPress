@@ -123,8 +123,8 @@ export default function PricingPage() {
     try {
       const res = await fetch('/api/subscriptions')
       const data = await res.json()
-      if (data.subscription?.plan) {
-        setUserPlan(data.subscription.plan)
+      if (data.automation?.plan) {
+        setUserPlan(data.automation.plan)
       }
     } catch (e) {
       console.error('Error fetching plan:', e)

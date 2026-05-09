@@ -40,11 +40,11 @@ export default function DashboardOverview() {
       // Fetch subscription
       const subRes = await fetch("/api/subscriptions")
       const subData = await subRes.json()
-      if (subData.subscription?.plan) {
-        setCurrentPlan(subData.subscription.plan)
-        setSubscriptionStatus(subData.subscription.status)
-        if (subData.subscription.currentPeriodEnd) {
-          setNextBilling(new Date(subData.subscription.currentPeriodEnd).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }))
+      if (subData.automation?.plan) {
+        setCurrentPlan(subData.automation.plan)
+        setSubscriptionStatus(subData.automation.status)
+        if (subData.automation.currentPeriodEnd) {
+          setNextBilling(new Date(subData.automation.currentPeriodEnd).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }))
         }
       }
 
