@@ -138,7 +138,7 @@ export async function POST(request: Request) {
       `,
     });
 
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@wpcodingpress.com';
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'mmrahmanbld@gmail.com';
     await sendEmail({
       to: adminEmail,
       subject: `New Onboarding Form: ${body.fullName} — ${subscription.plan} Plan`,
