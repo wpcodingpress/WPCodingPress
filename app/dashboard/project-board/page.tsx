@@ -60,7 +60,6 @@ export default function ProjectBoardPage() {
   function handleInitializerComplete() {
     setShowInitializer(false)
     setBoardReady(true)
-    fetchData()
   }
 
   if (isLoading) {
