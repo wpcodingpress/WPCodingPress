@@ -60,10 +60,7 @@ npm install
 Create `.env` file:
 
 ```env
-DATABASE_URL="mysql://USER:PASSWORD@localhost:3306/wpcodingpress"
-NEXTAUTH_SECRET="your-secure-random-string"
-NEXTAUTH_URL="http://localhost:3000"
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
 ```
 
 3. **Initialize Database**
@@ -83,11 +80,7 @@ Visit: `http://localhost:3000/api/seed`
 npm run dev
 ```
 
-6. **Access the Site**
 
-- **Website**: http://localhost:3000
-- **Admin Panel**: http://localhost:3000/admin
-- **Admin Login**: `rahman.ceo@wpcodingpress.com` / `S0pnahenayf`
 
 ## 📁 Project Structure
 
@@ -142,12 +135,7 @@ wpcodingpress/
 - Font: Inter (Google Fonts)
 - Weights: 300-900
 
-## 🔐 Admin Credentials
 
-```
-Email: rahman.ceo@wpcodingpress.com
-Password: S0pnahenayf
-```
 
 ## 🌐 Deployment
 
@@ -182,7 +170,7 @@ The platform is fully responsive and optimized for:
 
 ## 📄 License
 
-Copyright © 2024 WPCodingPress. All rights reserved.
+Copyright © 2026 WPCodingPress. All rights reserved.
 
 ---
 
