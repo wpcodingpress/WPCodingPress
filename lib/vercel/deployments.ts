@@ -18,6 +18,13 @@ export interface CreateDeploymentInput {
   name: string
 }
 
+const NEXTJS_PROJECT_SETTINGS = {
+  framework: 'nextjs',
+  installCommand: 'npm install',
+  buildCommand: 'next build',
+  outputDirectory: '.next',
+}
+
 export async function createDeployment(input: CreateDeploymentInput): Promise<VercelDeployment> {
   const client = getVercelClient()
 
@@ -25,6 +32,7 @@ export async function createDeployment(input: CreateDeploymentInput): Promise<Ve
     name: input.name,
     target: 'production',
     files: [],
+    projectSettings: NEXTJS_PROJECT_SETTINGS,
   }
 
   return client.post<VercelDeployment>(`/v13/deployments?projectId=${input.projectId}`, body)
