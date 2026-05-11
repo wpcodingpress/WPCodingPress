@@ -650,12 +650,12 @@ export default function SitesPage() {
                       <CheckCircle className="h-4 w-4 text-green-600" />
                       <span className="text-sm text-slate-600">Live at:</span>
                       <a
-                        href={site.customDomain ? `https://${site.customDomain}` : site.vercelProjectUrl!}
+                        href={site.customDomain ? `https://${site.customDomain}` : site.vercelProjectUrl!.startsWith("http") ? site.vercelProjectUrl! : `https://${site.vercelProjectUrl!}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-purple-600 hover:underline font-medium flex items-center gap-1"
                       >
-                        {site.customDomain || site.vercelProjectUrl?.replace("https://", "")}
+                        {site.customDomain || site.vercelProjectUrl?.replace(/^https?:\/\//, "")}
                         <ExternalLink className="h-3 w-3" />
                       </a>
                     </div>
@@ -868,7 +868,7 @@ export default function SitesPage() {
                   <div className="flex items-center gap-2">
                     {dep.deploymentUrl && (
                       <a
-                        href={dep.deploymentUrl}
+                        href={dep.deploymentUrl.startsWith("http") ? dep.deploymentUrl : `https://${dep.deploymentUrl}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-purple-600 hover:underline flex items-center gap-1"

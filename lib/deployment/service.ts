@@ -153,9 +153,11 @@ async function processDeployment(
         name: sanitizeProjectName(site.domain),
       })
 
+      const vercelUrl = `https://${deployment.url}`
+
       await updateDeployment(deploymentId, {
         vercelDeploymentId: deployment.id,
-        deploymentUrl: deployment.url,
+        deploymentUrl: vercelUrl,
       })
 
       await prisma.site.update({
@@ -276,9 +278,10 @@ async function pollDeploymentStatus(
   while (Date.now() - startTime < MAX_POLL_TIME) {
     try {
       const status = await getDeployment(vercelDeploymentId)
+      const currentState = status.readyState
 
-      if (isDeploymentFinal(status.state)) {
-        if (isDeploymentSuccessful(status.state)) {
+      if (isDeploymentFinal(currentState)) {
+        if (isDeploymentSuccessful(currentState)) {
           return { success: true, url: status.url }
         }
 
@@ -287,7 +290,7 @@ async function pollDeploymentStatus(
       }
 
       const elapsed = Math.floor((Date.now() - startTime) / 1000)
-      const progressLog = `  Status: ${status.state} (${elapsed}s elapsed)\n`
+      const progressLog = `  Status: ${currentState} (${elapsed}s elapsed)\n`
 
       await prisma.deployment.update({
         where: { id: deploymentId },

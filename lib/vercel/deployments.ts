@@ -4,7 +4,6 @@ export interface VercelDeployment {
   id: string
   url: string
   name: string
-  state: 'BUILDING' | 'READY' | 'ERROR' | 'CANCELED'
   readyState: 'BUILDING' | 'READY' | 'ERROR' | 'CANCELED' | 'INITIALIZING' | 'QUEUED'
   createdAt: number
   buildingAt?: number
