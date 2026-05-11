@@ -19,6 +19,17 @@ function getTemplateProjectId(): string {
   return projectId
 }
 
+function getTemplateRepoId(): string {
+  const repoId = process.env.VERCEL_TEMPLATE_REPO_ID
+  if (!repoId) {
+    throw new DeploymentError(
+      'VERCEL_TEMPLATE_REPO_ID is not configured. Please set it in your environment variables. Find it in Vercel Dashboard → Project → Settings → Git.',
+      'VERCEL_API'
+    )
+  }
+  return repoId
+}
+
 export class DeploymentError extends Error {
   constructor(
     message: string,
@@ -151,6 +162,11 @@ async function processDeployment(
       const deployment = await createDeployment({
         projectId,
         name: site.domain,
+        gitSource: {
+          type: 'github',
+          repoId: getTemplateRepoId(),
+          ref: 'main',
+        },
       })
 
       await updateDeployment(deploymentId, {
