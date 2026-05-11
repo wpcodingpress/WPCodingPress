@@ -6,7 +6,7 @@ import { createNotification } from '@/lib/notifications'
 import { fetchWordPressData, transformWPData } from './wp-data'
 
 const POLL_INTERVAL = 5000
-const MAX_POLL_TIME = 300000
+const MAX_POLL_TIME = 900000
 
 function getTemplateProjectId(): string {
   const projectId = process.env.VERCEL_TEMPLATE_PROJECT_ID
@@ -303,7 +303,7 @@ async function pollDeploymentStatus(
     }
   }
 
-  throw new DeploymentError('Deployment timed out after 5 minutes', 'BUILD_FAILED')
+  throw new DeploymentError('Deployment timed out after 15 minutes. The build may still be running on Vercel — check your Vercel dashboard for the latest status.', 'BUILD_FAILED')
 }
 
 async function updateDeployment(
