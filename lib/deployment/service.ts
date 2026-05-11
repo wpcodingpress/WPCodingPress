@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma'
+import { setProjectEnvironmentVariables } from '@/lib/vercel/projects'
 import { createDeployment, getDeployment, isDeploymentFinal, isDeploymentSuccessful } from '@/lib/vercel/deployments'
 import { buildDeploymentEnvVars } from './builder'
 import { createNotification } from '@/lib/notifications'
@@ -131,14 +132,25 @@ async function processDeployment(
     })
     logs += `✓ Environment variables configured (${Object.keys(envVars).length} vars)\n`
 
-    logs += `\nStep 4: Triggering Vercel deployment...\n`
+    logs += `\nStep 4: Setting project environment variables on Vercel...\n`
+    await appendLog(deploymentId, logs)
+
+    try {
+      await setProjectEnvironmentVariables(projectId, envVars)
+      logs += `✓ Environment variables set (${Object.keys(envVars).length} vars)\n`
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to set env vars'
+      logs += `⚠ Warning: ${message}\n`
+    }
+    await appendLog(deploymentId, logs)
+
+    logs += `\nStep 5: Triggering Vercel deployment...\n`
     await appendLog(deploymentId, logs)
 
     try {
       const deployment = await createDeployment({
         projectId,
         name: site.domain,
-        environmentVariables: envVars,
       })
 
       await updateDeployment(deploymentId, {
@@ -155,7 +167,7 @@ async function processDeployment(
       logs += `Deployment ID: ${deployment.id}\n`
       await appendLog(deploymentId, logs)
 
-      logs += `\nStep 5: Waiting for build to complete...\n`
+      logs += `\nStep 6: Waiting for build to complete...\n`
       await appendLog(deploymentId, logs)
 
       const result = await pollDeploymentStatus(deployment.id, deploymentId, logs)

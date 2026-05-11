@@ -1,4 +1,4 @@
-import { getVercelClient } from './client'
+import { getVercelClient, VercelApiError } from './client'
 
 export interface VercelProject {
   id: string
@@ -49,17 +49,74 @@ export async function deleteProject(projectId: string): Promise<void> {
   await client.delete(`/v9/projects/${projectId}`)
 }
 
-export async function upsertEnvironmentVariables(
+interface VercelEnvVar {
+  id: string
+  key: string
+  value: string
+  target: string[]
+  type: string
+  createdAt: number
+  updatedAt: number
+}
+
+export async function setProjectEnvironmentVariables(
   projectId: string,
-  envVars: Array<{ key: string; value: string; target?: string[] }>
+  envVars: Record<string, string>
 ): Promise<void> {
   const client = getVercelClient()
-  for (const env of envVars) {
-    await client.post(`/v10/projects/${projectId}/env`, {
-      key: env.key,
-      value: env.value,
-      target: env.target || ['production', 'preview', 'development'],
-      type: 'encrypted',
-    })
+
+  const existingVars: VercelEnvVar[] = []
+
+  try {
+    const response = await client.get<{ envs: VercelEnvVar[] }>(
+      `/v10/projects/${projectId}/env?decrypt=true`
+    )
+    existingVars.push(...(response.envs || []))
+  } catch {
+    // If we can't list, we'll just try to create — may get 409 conflicts
+  }
+
+  for (const [key, value] of Object.entries(envVars)) {
+    const existing = existingVars.find((v) => v.key === key)
+
+    if (existing) {
+      try {
+        await client.patch(`/v10/projects/${projectId}/env/${existing.id}`, {
+          key,
+          value,
+          target: ['production', 'preview', 'development'],
+          type: 'encrypted',
+        })
+      } catch {
+        await client.delete(`/v10/projects/${projectId}/env/${existing.id}`)
+        await client.post(`/v10/projects/${projectId}/env`, {
+          key,
+          value,
+          target: ['production', 'preview', 'development'],
+          type: 'encrypted',
+        })
+      }
+    } else {
+      try {
+        await client.post(`/v10/projects/${projectId}/env`, {
+          key,
+          value,
+          target: ['production', 'preview', 'development'],
+          type: 'encrypted',
+        })
+      } catch (err) {
+        if (err instanceof VercelApiError && err.status === 409) {
+          await client.delete(`/v10/projects/${projectId}/env/${key}`)
+          await client.post(`/v10/projects/${projectId}/env`, {
+            key,
+            value,
+            target: ['production', 'preview', 'development'],
+            type: 'encrypted',
+          })
+        } else {
+          throw err
+        }
+      }
+    }
   }
 }

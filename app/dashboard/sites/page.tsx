@@ -23,6 +23,7 @@ import {
   Clock,
   Ban,
 } from "lucide-react";
+import { useToast } from "@/components/toast-notifications";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -108,6 +109,8 @@ export default function SitesPage() {
   const [convertSiteId, setConvertSiteId] = useState<string | null>(null);
   const [expandedLogs, setExpandedLogs] = useState<Set<string>>(new Set());
 
+  const [addSiteError, setAddSiteError] = useState<string | null>(null);
+
   const [showDomainDialog, setShowDomainDialog] = useState(false);
   const [domainSiteId, setDomainSiteId] = useState<string | null>(null);
   const [domainInput, setDomainInput] = useState("");
@@ -115,6 +118,8 @@ export default function SitesPage() {
   const [domainResult, setDomainResult] = useState<{
     dnsRecords: Array<{ type: string; name: string; value: string }>;
   } | null>(null);
+
+  const { showToast } = useToast();
 
   const fetchData = useCallback(async () => {
     try {
@@ -184,6 +189,7 @@ export default function SitesPage() {
   const handleAddSite = async () => {
     if (!formData.domain || !formData.wpSiteUrl) return;
     setIsAddingSite(true);
+    setAddSiteError(null);
     try {
       const response = await fetch("/api/sites", {
         method: "POST",
@@ -194,12 +200,16 @@ export default function SitesPage() {
         const data = await response.json();
         setSites([data.site, ...sites]);
         setFormData({ domain: "", wpSiteUrl: "", apiKey: "" });
+        showToast("success", "Site connected", `${data.site.domain} has been connected successfully.`);
       } else {
         const error = await response.json();
-        alert(error.error || "Failed to add site");
+        setAddSiteError(error.error || "Failed to add site");
+        showToast("error", "Failed to add site", error.error || "An error occurred while connecting your site.");
       }
     } catch (error) {
       console.error("Error adding site:", error);
+      setAddSiteError("An unexpected error occurred. Please try again.");
+      showToast("error", "Connection error", "An unexpected error occurred. Please try again.");
     } finally {
       setIsAddingSite(false);
     }
@@ -259,13 +269,14 @@ export default function SitesPage() {
           ...prev,
         ]);
         setPollingDeploymentIds((prev) => new Set(prev).add(data.deploymentId));
+        showToast("success", "Deployment started", "Your site is being deployed. This may take a few minutes.");
       } else {
         const error = await response.json();
-        alert(error.error || "Failed to start deployment");
+        showToast("error", "Deployment failed", error.error || "Failed to start deployment.");
       }
     } catch (error) {
       console.error("Error converting site:", error);
-      alert("Failed to start deployment. Please try again.");
+      showToast("error", "Deployment error", "Failed to start deployment. Please try again.");
     } finally {
       setDeployingSiteId(null);
       setConvertSiteId(null);
@@ -301,12 +312,14 @@ export default function SitesPage() {
           ...prev,
         ]);
         setPollingDeploymentIds((prev) => new Set(prev).add(data.deploymentId));
+        showToast("success", "Redeploy started", "Your site is being redeployed.");
       } else {
         const error = await response.json();
-        alert(error.error || "Failed to redeploy");
+        showToast("error", "Redeploy failed", error.error || "Failed to redeploy.");
       }
     } catch (error) {
       console.error("Error redeploying:", error);
+      showToast("error", "Redeploy error", "An unexpected error occurred. Please try again.");
     } finally {
       setDeployingSiteId(null);
     }
@@ -332,12 +345,14 @@ export default function SitesPage() {
       if (response.ok) {
         const data = await response.json();
         setDomainResult({ dnsRecords: data.dnsRecords });
+        showToast("success", "Domain added", `${domainInput} has been added. Configure the DNS records below.`);
       } else {
         const error = await response.json();
-        alert(error.error || "Failed to add domain");
+        showToast("error", "Failed to add domain", error.error || "An error occurred.");
       }
     } catch (error) {
       console.error("Error adding domain:", error);
+      showToast("error", "Domain error", "An unexpected error occurred.");
     } finally {
       setIsAddingDomain(false);
     }
@@ -350,14 +365,15 @@ export default function SitesPage() {
       });
       if (response.ok) {
         const data = await response.json();
-        alert(data.message);
+        showToast("success", "Domain verified", data.message || "Domain verification was successful.");
         await fetchData();
       } else {
         const error = await response.json();
-        alert(error.error || "Verification failed");
+        showToast("error", "Verification failed", error.error || "Could not verify domain.");
       }
     } catch (error) {
       console.error("Error verifying domain:", error);
+      showToast("error", "Verification error", "An unexpected error occurred.");
     }
   };
 
@@ -449,7 +465,7 @@ export default function SitesPage() {
         </div>
 
         {hasActiveSubscription && (
-          <Dialog>
+          <Dialog onOpenChange={(open: boolean) => { if (!open) setAddSiteError(null); }}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
@@ -526,15 +542,21 @@ export default function SitesPage() {
                     />
                   </div>
                 </div>
+                {addSiteError && (
+                  <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
+                    <p className="text-sm text-red-700">{addSiteError}</p>
+                  </div>
+                )}
                 <Button
                   onClick={handleAddSite}
                   disabled={isAddingSite || !formData.wpSiteUrl || !formData.apiKey}
                   className="w-full"
                 >
                   {isAddingSite ? (
-                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Connecting...</>
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying Connection...</>
                   ) : (
-                    <><Zap className="mr-2 h-4 w-4" /> Connect Site</>
+                    <><Zap className="mr-2 h-4 w-4" /> Connect & Verify Site</>
                   )}
                 </Button>
               </div>
@@ -781,10 +803,21 @@ export default function SitesPage() {
                         </pre>
                       )}
 
-                      {/* Error */}
-                      {latestDep.status === "failed" && latestDep.error && (
-                        <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700">
-                          {latestDep.error}
+                      {/* Error — visible banner */}
+                      {latestDep.status === "failed" && (
+                        <div className="mt-3 p-3 bg-red-50 border border-red-300 rounded-lg">
+                          <div className="flex items-start gap-2">
+                            <XCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
+                            <div>
+                              <p className="font-medium text-red-800 text-sm">Deployment Failed</p>
+                              <p className="text-red-700 text-xs mt-1">
+                                {latestDep.error || 'An unknown error occurred during deployment.'}
+                              </p>
+                              <p className="text-red-600 text-xs mt-1">
+                                Try redeploying or check the build logs for details.
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -863,9 +896,9 @@ export default function SitesPage() {
       <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Choose Your Template</DialogTitle>
+            <DialogTitle>Choose a Template for Deployment</DialogTitle>
             <DialogDescription>
-              Select a design template for your headless site.
+              Select a design template for your headless WordPress site.
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-3 gap-4 py-4">
@@ -900,7 +933,7 @@ export default function SitesPage() {
             </Button>
             <Button onClick={handleConvert}>
               <Zap className="mr-2 h-4 w-4" />
-              Deploy Now
+              Start Deployment
             </Button>
           </div>
         </DialogContent>
@@ -936,9 +969,9 @@ export default function SitesPage() {
                   className="w-full"
                 >
                   {isAddingDomain ? (
-                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Adding...</>
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Adding Domain...</>
                   ) : (
-                    <><LinkIcon className="mr-2 h-4 w-4" /> Add Domain</>
+                    <><LinkIcon className="mr-2 h-4 w-4" /> Add Custom Domain</>
                   )}
                 </Button>
               </>
