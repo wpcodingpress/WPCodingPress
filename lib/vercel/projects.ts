@@ -8,7 +8,7 @@ export interface VercelProject {
   updatedAt: number
   link?: {
     type: string
-    repoId: string
+    repoId: number | string
     repo?: string
   }
 }

@@ -20,7 +20,7 @@ export interface CreateDeploymentInput {
   files?: Array<{ file: string; data: string }>
   gitSource?: {
     type: 'github'
-    repoId: string
+    repoId: number | string
     ref?: string
   }
   environmentVariables?: Record<string, string>

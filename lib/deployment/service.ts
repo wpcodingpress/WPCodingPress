@@ -19,7 +19,7 @@ function getTemplateProjectId(): string {
   return projectId
 }
 
-async function getTemplateGitSource(): Promise<{ type: 'github'; repoId: string; ref: string }> {
+async function getTemplateGitSource(): Promise<{ type: 'github'; repoId: number | string; ref: string }> {
   const projectId = getTemplateProjectId()
   const project = await getProject(projectId)
 
