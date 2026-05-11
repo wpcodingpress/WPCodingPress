@@ -24,6 +24,7 @@ export async function createDeployment(input: CreateDeploymentInput): Promise<Ve
   const body: Record<string, unknown> = {
     name: input.name,
     target: 'production',
+    files: [],
   }
 
   return client.post<VercelDeployment>(`/v13/deployments?projectId=${input.projectId}`, body)
