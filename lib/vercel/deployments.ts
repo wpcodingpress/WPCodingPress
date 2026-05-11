@@ -1,4 +1,4 @@
-import { getVercelClient, VercelApiError } from './client'
+import { getVercelClient } from './client'
 
 export interface VercelDeployment {
   id: string
@@ -16,14 +16,6 @@ export interface VercelDeployment {
 export interface CreateDeploymentInput {
   projectId: string
   name: string
-  deploymentId?: string
-  files?: Array<{ file: string; data: string }>
-  gitSource?: {
-    type: 'github'
-    repoId: number | string
-    ref?: string
-  }
-  environmentVariables?: Record<string, string>
 }
 
 export async function createDeployment(input: CreateDeploymentInput): Promise<VercelDeployment> {
@@ -32,18 +24,6 @@ export async function createDeployment(input: CreateDeploymentInput): Promise<Ve
   const body: Record<string, unknown> = {
     name: input.name,
     target: 'production',
-  }
-
-  if (input.gitSource) {
-    body.gitSource = input.gitSource
-  }
-
-  if (input.environmentVariables && Object.keys(input.environmentVariables).length > 0) {
-    body.environmentVariables = input.environmentVariables
-  }
-
-  if (input.files && input.files.length > 0) {
-    body.files = input.files
   }
 
   return client.post<VercelDeployment>(`/v13/deployments?projectId=${input.projectId}`, body)

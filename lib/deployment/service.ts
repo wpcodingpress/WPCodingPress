@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma'
-import { getProject, setProjectEnvironmentVariables } from '@/lib/vercel/projects'
+import { setProjectEnvironmentVariables } from '@/lib/vercel/projects'
 import { createDeployment, getDeployment, isDeploymentFinal, isDeploymentSuccessful } from '@/lib/vercel/deployments'
 import { buildDeploymentEnvVars, sanitizeProjectName } from './builder'
 import { createNotification } from '@/lib/notifications'
@@ -17,24 +17,6 @@ function getTemplateProjectId(): string {
     )
   }
   return projectId
-}
-
-async function getTemplateGitSource(): Promise<{ type: 'github'; repoId: number | string; ref: string }> {
-  const projectId = getTemplateProjectId()
-  const project = await getProject(projectId)
-
-  if (!project?.link?.repoId) {
-    throw new DeploymentError(
-      `The Vercel project "${projectId}" is not connected to a Git repository. Go to Vercel Dashboard → Project → Git → "Connect Git Repository" to link it.`,
-      'VERCEL_API'
-    )
-  }
-
-  return {
-    type: 'github',
-    repoId: project.link.repoId,
-    ref: 'main',
-  }
 }
 
 export class DeploymentError extends Error {
@@ -169,7 +151,6 @@ async function processDeployment(
       const deployment = await createDeployment({
         projectId,
         name: sanitizeProjectName(site.domain),
-        gitSource: await getTemplateGitSource(),
       })
 
       await updateDeployment(deploymentId, {
