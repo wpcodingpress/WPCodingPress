@@ -39,6 +39,8 @@ model User {
   onboardingForms OnboardingForm[]
   sites           Site[]
   jobs            Job[]
+  deployments     Deployment[]
+  domains         Domain[]
   notifications  Notification[]
 }
 
@@ -139,19 +141,26 @@ model OnboardingForm {
 }
 
 model Site {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  domain      String
-  apiKey      String   @unique
-  wpApiKey    String?
-  wpSiteUrl   String
-  status      String   @default("disconnected")
-  template    String   @default("news") // news, business, modern
-  lastSyncAt  DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  jobs        Job[]
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  domain            String
+  apiKey            String   @unique
+  wpApiKey          String?
+  wpSiteUrl         String
+  status            String   @default("disconnected")
+  template          String   @default("news") // news, business, modern
+  vercelProjectId   String?  @unique
+  vercelProjectUrl  String?
+  customDomain      String?
+  deploymentStatus  String?  @default("idle") // idle | deploying | deployed | failed
+  lastSyncAt        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  jobs              Job[]
+  deployments       Deployment[]
+  domains           Domain[]
+  rebuildLogs       RebuildLog[]
 }
 
 model Job {
@@ -168,6 +177,73 @@ model Job {
   completedAt DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// ─── Vercel Deployment System ───
+
+model Deployment {
+  id                  String   @id @default(cuid())
+  siteId              String
+  site                Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vercelDeploymentId  String?
+  deploymentUrl       String?
+  status              String   @default("pending") // pending | queued | building | deployed | failed | cancelled
+  buildLogs           String?  @db.LongText
+  error               String?  @db.Text
+  trigger             String   @default("manual") // manual | webhook
+  template            String?
+  startedAt           DateTime?
+  completedAt         DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  rebuildLogs         RebuildLog[]
+
+  @@index([siteId])
+  @@index([userId])
+  @@index([status])
+  @@index([vercelDeploymentId])
+}
+
+model Domain {
+  id                  String   @id @default(cuid())
+  siteId              String
+  site                Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  domain              String   @unique
+  vercelDomainId      String?
+  verificationStatus  String   @default("pending") // pending | verified | failed
+  sslStatus           String   @default("pending") // pending | verified | failed
+  dnsRecords          Json?
+  verifiedAt          DateTime?
+  lastCheckedAt       DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([siteId])
+  @@index([userId])
+  @@index([domain])
+  @@index([verificationStatus])
+}
+
+model RebuildLog {
+  id              String   @id @default(cuid())
+  siteId          String
+  site            Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  deploymentId    String?
+  deployment      Deployment? @relation(fields: [deploymentId], references: [id])
+  trigger         String   @default("webhook") // webhook | manual
+  status          String   @default("pending") // pending | building | deployed | failed | skipped
+  webhookPayload  Json?
+  error           String?  @db.Text
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime @default(now())
+
+  @@index([siteId])
+  @@index([createdAt])
 }
 
 model Service {

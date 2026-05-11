@@ -48,7 +48,8 @@
     "react-dropzone": "^15.0.0",
     "resend": "^6.9.4",
     "stripe": "^21.0.1",
-    "tailwind-merge": "^3.5.0"
+    "tailwind-merge": "^3.5.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
