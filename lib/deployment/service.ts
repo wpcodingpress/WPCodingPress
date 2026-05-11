@@ -1,7 +1,7 @@
 import prisma from '@/lib/prisma'
 import { getProject, setProjectEnvironmentVariables } from '@/lib/vercel/projects'
 import { createDeployment, getDeployment, isDeploymentFinal, isDeploymentSuccessful } from '@/lib/vercel/deployments'
-import { buildDeploymentEnvVars } from './builder'
+import { buildDeploymentEnvVars, sanitizeProjectName } from './builder'
 import { createNotification } from '@/lib/notifications'
 import { fetchWordPressData, transformWPData } from './wp-data'
 
@@ -168,7 +168,7 @@ async function processDeployment(
     try {
       const deployment = await createDeployment({
         projectId,
-        name: site.domain,
+        name: sanitizeProjectName(site.domain),
         gitSource: await getTemplateGitSource(),
       })
 
