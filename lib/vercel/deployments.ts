@@ -15,6 +15,11 @@ export interface VercelDeployment {
 export interface CreateDeploymentInput {
   projectId: string
   name: string
+  gitSource?: {
+    type: 'github'
+    repoId: number | string
+    ref?: string
+  }
 }
 
 const NEXTJS_PROJECT_SETTINGS = {
@@ -30,8 +35,11 @@ export async function createDeployment(input: CreateDeploymentInput): Promise<Ve
   const body: Record<string, unknown> = {
     name: input.name,
     target: 'production',
-    files: [],
     projectSettings: NEXTJS_PROJECT_SETTINGS,
+  }
+
+  if (input.gitSource) {
+    body.gitSource = input.gitSource
   }
 
   return client.post<VercelDeployment>(`/v13/deployments?projectId=${input.projectId}`, body)
