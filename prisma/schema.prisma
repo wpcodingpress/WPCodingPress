@@ -149,11 +149,17 @@ model Site {
   wpApiKey          String?
   wpSiteUrl         String
   status            String   @default("disconnected")
-  template          String   @default("news") // news, business, modern
+  template          String   @default("adaptive") // adaptive, news, business, modern, advanced
   vercelProjectId   String?  @unique
   vercelProjectUrl  String?
   customDomain      String?
   deploymentStatus  String?  @default("idle") // idle | deploying | deployed | failed
+  siteCategory      String?  // Detected industry (business, blog, news, agency, saas, etc.)
+  detectedFeatures  String?  // JSON string of detected WordPress features
+  industryConfidence Int?    // Confidence score 0-100
+  sectionCount      Int?     // Number of adaptive sections
+  heroLayout        String?  // Detected hero layout variant
+  primaryColor      String?  // Industry-specific primary color
   lastSyncAt        DateTime?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -194,6 +200,9 @@ model Deployment {
   error               String?  @db.Text
   trigger             String   @default("manual") // manual | webhook
   template            String?
+  siteCategory        String?  // Industry detected at deployment time
+  detectedFeatures    String?  // Features detected at deployment time
+  intelligenceData    String?  // JSON blob of full intelligence analysis
   startedAt           DateTime?
   completedAt         DateTime?
   createdAt           DateTime @default(now())

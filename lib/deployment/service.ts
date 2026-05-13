@@ -4,6 +4,7 @@ import { createDeployment, getDeployment, isDeploymentFinal, isDeploymentSuccess
 import { buildDeploymentEnvVars, sanitizeProjectName } from './builder'
 import { createNotification } from '@/lib/notifications'
 import { fetchWordPressData, transformWPData } from './wp-data'
+import { analyzeWordPressSite } from '@/lib/engine/site-analyzer'
 
 const POLL_INTERVAL = 5000
 const MAX_POLL_TIME = 900000
@@ -80,8 +81,8 @@ export async function startDeployment(
     )
   }
 
-  const template = options.template || site.template || 'news'
-  const validTemplates = ['news', 'business', 'modern', 'advanced']
+  const template = options.template || site.template || 'adaptive'
+  const validTemplates = ['news', 'business', 'modern', 'advanced', 'adaptive']
   if (!validTemplates.includes(template)) {
     throw new DeploymentError('Invalid template selected', 'NOT_FOUND', 400)
   }
@@ -133,12 +134,19 @@ async function processDeployment(
     const wpData = await fetchWordPressData(site.wpSiteUrl, site.wpApiKey || '')
     logs += `✓ Fetched WordPress data successfully\n`
 
-    logs += `\nStep 2: Transforming data for Next.js format...\n`
+    logs += `\nStep 2: Running AI content analysis...\n`
+    await appendLog(deploymentId, logs)
+    const analysis = analyzeWordPressSite(wpData, site.wpSiteUrl)
+    logs += `✓ Industry detected: ${analysis.industry.category} (${analysis.industry.confidence}% confidence)\n`
+    logs += `✓ ${analysis.site.posts.length} posts, ${analysis.site.categories.length} categories, ${analysis.site.services.length} services\n`
+    logs += `✓ Features detected: ${Object.entries(analysis.features).filter(([, v]) => v).length} active features\n`
+
+    logs += `\nStep 3: Transforming data for Next.js format...\n`
     await appendLog(deploymentId, logs)
     const transformedData = transformWPData(wpData, site.wpSiteUrl)
     logs += `✓ Data transformed (${transformedData.posts.length} posts, ${transformedData.categories.length} categories)\n`
 
-    logs += `\nStep 3: Building deployment env vars...\n`
+    logs += `\nStep 4: Building deployment env vars with intelligence data...\n`
     await appendLog(deploymentId, logs)
     const envVars = buildDeploymentEnvVars({
       siteId: site.id,
@@ -148,21 +156,41 @@ async function processDeployment(
       template: site.template,
       transformedData: transformedData as unknown as Record<string, unknown>,
     })
-    logs += `✓ Environment variables configured (${Object.keys(envVars).length} vars)\n`
 
-    logs += `\nStep 4: Setting project environment variables on Vercel...\n`
+    const intelligenceVars = {
+      NEXT_PUBLIC_SITE_CATEGORY: analysis.industry.category,
+      NEXT_PUBLIC_SITE_CONFIDENCE: String(analysis.industry.confidence),
+      NEXT_PUBLIC_HAS_AUTH: String(analysis.features.hasAuth),
+      NEXT_PUBLIC_HAS_FORMS: String(analysis.features.hasForms),
+      NEXT_PUBLIC_HAS_WOOCOMMERCE: String(analysis.features.hasWooCommerce),
+      NEXT_PUBLIC_HAS_SEARCH: String(analysis.features.hasSearch),
+      NEXT_PUBLIC_HAS_COMMENTS: String(analysis.features.hasComments),
+      NEXT_PUBLIC_HAS_PORTFOLIO: String(analysis.features.hasPortfolio),
+      NEXT_PUBLIC_HAS_SERVICES: String(analysis.features.hasServices),
+      NEXT_PUBLIC_HAS_TESTIMONIALS: String(analysis.features.hasTestimonials),
+      NEXT_PUBLIC_HAS_TEAM: String(analysis.features.hasTeam),
+      NEXT_PUBLIC_HAS_FAQ: String(analysis.features.hasFAQ),
+      NEXT_PUBLIC_PRIMARY_COLOR: analysis.colors.primary,
+      NEXT_PUBLIC_SECTION_COUNT: String(analysis.industryLayout.sections.length),
+      NEXT_PUBLIC_HERO_LAYOUT: analysis.layout.heroLayout,
+    }
+
+    const allEnvVars = { ...envVars, ...intelligenceVars }
+    logs += `✓ ${Object.keys(allEnvVars).length} environment variables configured\n`
+
+    logs += `\nStep 5: Setting project environment variables on Vercel...\n`
     await appendLog(deploymentId, logs)
 
     try {
-      await setProjectEnvironmentVariables(projectId, envVars)
-      logs += `✓ Environment variables set (${Object.keys(envVars).length} vars)\n`
+      await setProjectEnvironmentVariables(projectId, allEnvVars)
+      logs += `✓ Environment variables set (${Object.keys(allEnvVars).length} vars)\n`
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to set env vars'
       logs += `⚠ Warning: ${message}\n`
     }
     await appendLog(deploymentId, logs)
 
-    logs += `\nStep 5: Triggering Vercel deployment...\n`
+    logs += `\nStep 6: Triggering Vercel deployment...\n`
     await appendLog(deploymentId, logs)
 
     try {
@@ -188,7 +216,7 @@ async function processDeployment(
       logs += `Deployment ID: ${deployment.id}\n`
       await appendLog(deploymentId, logs)
 
-      logs += `\nStep 6: Waiting for build to complete...\n`
+      logs += `\nStep 7: Waiting for build to complete...\n`
       await appendLog(deploymentId, logs)
 
       const result = await pollDeploymentStatus(deployment.id, deploymentId, logs)
@@ -196,6 +224,7 @@ async function processDeployment(
       if (result.success) {
         logs += `\n✅ Deployment successful!\n`
         logs += `Live URL: https://${result.url}\n`
+        logs += `Template: ${site.template} (Intelligent Mode: ${site.template === 'adaptive' ? 'Yes' : 'No'})\n`
         await appendLog(deploymentId, logs)
 
         await prisma.deployment.update({
