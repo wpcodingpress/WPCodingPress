@@ -204,6 +204,47 @@ export default function DashboardOverview() {
         ))}
       </div>
 
+      {/* AI Intelligence Panel */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+      >
+        <Link href="/dashboard/sites">
+          <Card className="bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 border-0 text-white hover:shadow-xl transition-shadow cursor-pointer">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="p-2 sm:p-3 rounded-xl bg-white/20">
+                    <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-base sm:text-lg">AI-Powered Intelligence</p>
+                    <p className="text-white/80 text-xs sm:text-sm">Smart content analysis, industry detection, and adaptive layouts</p>
+                  </div>
+                </div>
+                <div className="hidden sm:flex items-center gap-3">
+                  <div className="text-right">
+                    <p className="text-2xl font-bold">7</p>
+                    <p className="text-xs text-white/70">Industries</p>
+                  </div>
+                  <div className="w-px h-8 bg-white/20" />
+                  <div className="text-right">
+                    <p className="text-2xl font-bold">22</p>
+                    <p className="text-xs text-white/70">Features</p>
+                  </div>
+                  <div className="w-px h-8 bg-white/20" />
+                  <div className="text-right">
+                    <p className="text-2xl font-bold">15</p>
+                    <p className="text-xs text-white/70">Sections</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      </motion.div>
+
       {/* Quick Actions & Notifications */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Quick Actions */}

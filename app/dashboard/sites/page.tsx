@@ -35,7 +35,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TEMPLATES } from "@/components/templates";
+import { TEMPLATES, isAdaptiveTemplate } from "@/components/templates";
+import type { AIAnalysisResult } from "@/lib/ai/types";
 
 interface Site {
   id: string;
@@ -118,6 +119,10 @@ export default function SitesPage() {
   const [domainResult, setDomainResult] = useState<{
     dnsRecords: Array<{ type: string; name: string; value: string }>;
   } | null>(null);
+
+  const [analyzingSiteId, setAnalyzingSiteId] = useState<string | null>(null);
+  const [analysisResults, setAnalysisResults] = useState<Record<string, AIAnalysisResult>>({});
+  const [expandedAnalysis, setExpandedAnalysis] = useState<Set<string>>(new Set());
 
   const { showToast } = useToast();
 
@@ -388,6 +393,42 @@ export default function SitesPage() {
       }
     } catch (error) {
       console.error("Error removing domain:", error);
+    }
+  };
+
+  const handleAnalyzeSite = async (siteId: string) => {
+    setAnalyzingSiteId(siteId);
+    try {
+      const response = await fetch("/api/ai/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ siteId }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const aiResult: AIAnalysisResult = {
+          template: data.ai.template,
+          layout: data.ai.layout,
+          sections: data.ai.sections,
+          brand: data.ai.brand,
+          contentScores: data.ai.contentScores || [],
+          homepage: data.ai.homepage,
+          recommendations: data.ai.recommendations,
+          processingTime: data.ai.processingTime,
+          modelVersion: data.ai.modelVersion || 'wpai-rule-based-1.0',
+        };
+        setAnalysisResults((prev) => ({ ...prev, [siteId]: aiResult }));
+        setExpandedAnalysis((prev) => new Set(prev).add(siteId));
+        showToast("success", "Analysis complete", `Industry: ${data.industry.category} (${data.industry.confidence}% confidence)`);
+      } else {
+        const error = await response.json();
+        showToast("error", "Analysis failed", error.error || "Failed to analyze site.");
+      }
+    } catch (error) {
+      console.error("Error analyzing site:", error);
+      showToast("error", "Analysis error", "An unexpected error occurred.");
+    } finally {
+      setAnalyzingSiteId(null);
     }
   };
 
@@ -714,6 +755,94 @@ export default function SitesPage() {
                   </div>
                 )}
 
+                {/* AI Intelligence Section */}
+                {analysisResults[site.id] && (
+                  <div className="px-5 py-3 bg-gradient-to-r from-purple-50 to-violet-50 border-b border-purple-100">
+                    <button
+                      onClick={() => {
+                        setExpandedAnalysis((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(site.id)) next.delete(site.id);
+                          else next.add(site.id);
+                          return next;
+                        });
+                      }}
+                      className="flex items-center justify-between w-full text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-purple-100">
+                          <Zap className="h-3.5 w-3.5 text-purple-600" />
+                        </div>
+                        <span className="text-sm font-semibold text-purple-900">
+                          AI Intelligence
+                        </span>
+                        <span className="text-xs text-purple-500">
+                          ({analysisResults[site.id].processingTime}ms)
+                        </span>
+                      </div>
+                      <ChevronDown className={`h-4 w-4 text-purple-400 transition-transform ${expandedAnalysis.has(site.id) ? 'rotate-180' : ''}`} />
+                    </button>
+                    {expandedAnalysis.has(site.id) && (
+                      <div className="mt-3 space-y-3">
+                        <div className="flex flex-wrap gap-2">
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                            {analysisResults[site.id].template.templateName}
+                          </span>
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                            Hero: {analysisResults[site.id].layout.heroLayout}
+                          </span>
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                            {analysisResults[site.id].sections.length} sections
+                          </span>
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+                            {analysisResults[site.id].brand.visualTone} tone
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                          <div className="bg-white rounded-lg p-2.5 border border-purple-100">
+                            <p className="text-[10px] text-purple-500 font-medium uppercase tracking-wide">Brand Color</p>
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: analysisResults[site.id].brand.primaryColor }} />
+                              <span className="text-xs font-mono text-slate-600">{analysisResults[site.id].brand.primaryColor}</span>
+                            </div>
+                          </div>
+                          <div className="bg-white rounded-lg p-2.5 border border-purple-100">
+                            <p className="text-[10px] text-purple-500 font-medium uppercase tracking-wide">Modernity</p>
+                            <p className="text-sm font-bold text-slate-800 mt-1">{analysisResults[site.id].brand.modernity}/100</p>
+                          </div>
+                          <div className="bg-white rounded-lg p-2.5 border border-purple-100">
+                            <p className="text-[10px] text-purple-500 font-medium uppercase tracking-wide">Content</p>
+                            <p className="text-sm font-bold text-slate-800 mt-1">
+                              {analysisResults[site.id].contentScores.length} scored items
+                            </p>
+                          </div>
+                          <div className="bg-white rounded-lg p-2.5 border border-purple-100">
+                            <p className="text-[10px] text-purple-500 font-medium uppercase tracking-wide">Card Style</p>
+                            <p className="text-sm font-bold text-slate-800 mt-1 capitalize">{analysisResults[site.id].layout.cardStyle}</p>
+                          </div>
+                        </div>
+                        {analysisResults[site.id].recommendations.length > 0 && (
+                          <div>
+                            <p className="text-xs font-medium text-purple-700 mb-1.5">Recommendations</p>
+                            <div className="space-y-1">
+                              {analysisResults[site.id].recommendations.slice(0, 3).map((rec) => (
+                                <div key={rec.id} className="flex items-start gap-2 text-xs text-slate-600">
+                                  <div className={`mt-0.5 w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                                    rec.priority === 'critical' ? 'bg-red-500' :
+                                    rec.priority === 'high' ? 'bg-orange-500' :
+                                    rec.priority === 'medium' ? 'bg-yellow-500' : 'bg-blue-500'
+                                  }`} />
+                                  <span>{rec.description}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Deployment Section */}
                 <div className="p-5">
                   <div className="flex items-center justify-between mb-3">
@@ -726,6 +855,20 @@ export default function SitesPage() {
                     <div className="flex gap-2">
                       {site.status === "connected" && (
                         <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleAnalyzeSite(site.id)}
+                            disabled={analyzingSiteId === site.id}
+                            className={analysisResults[site.id] ? 'text-purple-600 border-purple-300' : ''}
+                          >
+                            {analyzingSiteId === site.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                            ) : (
+                              <Zap className="h-4 w-4 mr-1" />
+                            )}
+                            {analyzingSiteId === site.id ? 'Analyzing...' : 'Analyze'}
+                          </Button>
                           {hasLiveDeployment ? (
                             <Button
                               variant="outline"
@@ -927,6 +1070,45 @@ export default function SitesPage() {
               </div>
             ))}
           </div>
+
+          {convertSiteId && analysisResults[convertSiteId] && isAdaptiveTemplate(selectedTemplate) && (
+            <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg p-4 border border-purple-200 mb-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Zap className="h-4 w-4 text-purple-600" />
+                <span className="text-sm font-semibold text-purple-900">AI Analysis Results</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-xs text-purple-500 font-medium mb-1">Template</p>
+                  <p className="text-sm font-semibold text-slate-800">{analysisResults[convertSiteId].template.templateName}</p>
+                  <p className="text-xs text-slate-500">{analysisResults[convertSiteId].template.reason}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-purple-500 font-medium mb-1">Hero Layout</p>
+                  <p className="text-sm font-semibold text-slate-800 capitalize">{analysisResults[convertSiteId].layout.heroLayout}</p>
+                  <p className="text-xs text-slate-500">Width: {analysisResults[convertSiteId].layout.contentWidth}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-purple-500 font-medium mb-1">Sections</p>
+                  <div className="flex flex-wrap gap-1">
+                    {analysisResults[convertSiteId].sections.slice(0, 5).map((s) => (
+                      <span key={s.section} className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-100 text-purple-700">
+                        {s.section}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs text-purple-500 font-medium mb-1">Brand</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-full border" style={{ backgroundColor: analysisResults[convertSiteId].brand.primaryColor }} />
+                    <span className="text-sm text-slate-700">{analysisResults[convertSiteId].brand.visualTone}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="flex justify-end gap-3">
             <Button variant="outline" onClick={() => setShowTemplateDialog(false)}>
               Cancel

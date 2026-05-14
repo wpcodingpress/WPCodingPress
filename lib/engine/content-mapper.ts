@@ -29,7 +29,7 @@ export function normalizeWPData(wpRaw: WPExportRaw, wpBaseUrl: string): Normaliz
     hero: extractHero(siteInfo, posts, media),
     services: extractServices(wpRaw, siteInfo),
     portfolio: extractPortfolio(wpRaw, siteInfo),
-    products: extractProducts(wpRaw) as unknown as ProductItem[],
+    products: extractProducts(wpRaw),
     testimonials: extractTestimonials(wpRaw, siteInfo),
     team: extractTeam(wpRaw, siteInfo),
     faqs: extractFAQs(wpRaw, siteInfo),
@@ -332,21 +332,40 @@ function extractPortfolio(wpRaw: WPExportRaw, siteInfo: Record<string, unknown>)
   return []
 }
 
-function extractProducts(wpRaw: WPExportRaw): PortfolioItem[] {
+function extractProducts(wpRaw: WPExportRaw): ProductItem[] {
   const products = wpRaw.products as Array<Record<string, unknown>> || []
   if (Array.isArray(products)) {
-    return products.map((p: Record<string, unknown>) => ({
-      id: String(p.id || ''),
-      title: String(p.name || p.title || ''),
-      description: String(p.description || p.content || ''),
-      category: String(p.category || ''),
-      image: { url: String((p.source_url as string) || ((p.images as Array<Record<string, unknown>>)?.[0]?.source_url as string) || ''), alt: String(p.name || ''), width: 0, height: 0, mimeType: 'image/jpeg' },
-      images: [],
-      url: String(p.permalink || p.url || ''),
-      date: String(p.date_created || p.date || ''),
-      client: '',
-      tags: [],
-    }))
+    return products.map((p: Record<string, unknown>) => {
+      const rawImages = p.images as Array<Record<string, unknown>> || []
+      const images: ContentMedia[] = rawImages.map((img) => ({
+        url: String(img.source_url || img.url || ''),
+        alt: String(img.alt || p.name || ''),
+        width: Number(img.width || 0),
+        height: Number(img.height || 0),
+        mimeType: String(img.mime_type || 'image/jpeg'),
+      }))
+      const rawCategories = p.categories as Array<Record<string, unknown>> || []
+      const categories: ContentCategory[] = rawCategories.map((c) => ({
+        id: String(c.id || ''),
+        name: String(c.name || ''),
+        slug: String(c.slug || ''),
+        description: String(c.description || ''),
+        count: Number(c.count || 0),
+      }))
+      return {
+        id: String(p.id || ''),
+        name: String(p.name || p.title || ''),
+        slug: String(p.slug || ''),
+        description: String(p.description || p.content || ''),
+        price: Number(p.price || p.regular_price || 0),
+        salePrice: p.sale_price ? Number(p.sale_price) : null,
+        currency: String(p.currency || 'USD'),
+        images,
+        categories,
+        type: String(p.type || 'simple') as 'simple' | 'variable' | 'external',
+        url: String(p.permalink || p.url || ''),
+      }
+    })
   }
   return []
 }
