@@ -1,10 +1,14 @@
 import { notFound } from 'next/navigation';
+import React from 'react';
 import prisma from '@/lib/prisma';
 import NewsMagazineTemplate from '@/components/templates/NewsMagazine';
 import BusinessTemplate from '@/components/templates/Business';
 import ModernTemplate from '@/components/templates/Modern';
 import AdvancedTemplate from '@/components/templates/AdvancedTemplate';
+import AdaptiveTemplate from '@/components/templates/AdaptiveTemplate';
 import { TEMPLATES } from '@/components/templates';
+import { fetchWordPressData } from '@/lib/deployment/wp-data';
+import { normalizeWPData } from '@/lib/engine/content-mapper';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -36,6 +40,8 @@ async function getSiteBySlug(slug: string) {
 
 function getTemplateComponent(template: string) {
   switch (template) {
+    case 'adaptive':
+      return AdaptiveTemplate;
     case 'business':
       return BusinessTemplate;
     case 'modern':
@@ -53,13 +59,28 @@ export default async function SitePage({ params }: PageProps) {
   
   const site = await getSiteBySlug(slug);
 
-  if (!site || !site.jobs[0]) {
+  if (!site) {
     notFound();
   }
 
-  const template = site.template || 'news';
-  const TemplateComponent = getTemplateComponent(template);
-  const templateInfo = TEMPLATES.find(t => t.id === template);
+  const template = site.template || 'adaptive';
+  const TemplateComponent = getTemplateComponent(template) as React.ComponentType<any>;
+
+  if (template === 'adaptive' && site.status === 'connected') {
+    try {
+      const wpData = await fetchWordPressData(site.wpSiteUrl, site.wpApiKey || '');
+      const normalizedData = normalizeWPData(wpData as unknown as Record<string, unknown>, site.wpSiteUrl);
+      return (
+        <TemplateComponent
+          site={normalizedData}
+          wpRaw={wpData as unknown as Record<string, unknown>}
+          siteName={site.domain}
+        />
+      );
+    } catch (error) {
+      console.error('Failed to fetch WP data for preview:', error);
+    }
+  }
 
   return (
     <TemplateComponent

@@ -39,7 +39,15 @@ export default function AdaptiveTemplate({ site, wpRaw, siteName }: AdaptiveTemp
       const animations = getAnimationsForIndustry(industry.category)
       return { features, industry, layout, industryLayout, colors, typography, animations }
     }
-    return null
+
+    const features = detectFeatures({} as Record<string, unknown>)
+    const industry = classifyIndustry({} as Record<string, unknown>, features)
+    const layout = generateLayout(site, industry)
+    const industryLayout = generateIndustryLayout(site, industry.category)
+    const colors = getIndustryColors(industry.category)
+    const typography = getTypographyForIndustry(industry.category)
+    const animations = getAnimationsForIndustry(industry.category)
+    return { features, industry, layout, industryLayout, colors, typography, animations }
   }, [wpRaw, site])
 
   if (!analysis) return null

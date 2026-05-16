@@ -49,6 +49,10 @@ export class DeploymentError extends Error {
   }
 }
 
+function domainToSlug(domain: string): string {
+  return domain.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+}
+
 export async function startDeployment(
   userId: string,
   siteId: string,
@@ -141,6 +145,18 @@ async function processDeployment(
     logs += `✓ ${analysis.site.posts.length} posts, ${analysis.site.categories.length} categories, ${analysis.site.services.length} services\n`
     logs += `✓ Features detected: ${Object.entries(analysis.features).filter(([, v]) => v).length} active features\n`
 
+    await prisma.site.update({
+      where: { id: site.id },
+      data: {
+        siteCategory: analysis.industry.category,
+        detectedFeatures: JSON.stringify(analysis.features),
+        industryConfidence: analysis.industry.confidence,
+        sectionCount: analysis.industryLayout.sections.length,
+        heroLayout: analysis.layout.heroLayout,
+        primaryColor: analysis.colors.primary,
+      },
+    })
+
     logs += `\nStep 3: Transforming data for Next.js format...\n`
     await appendLog(deploymentId, logs)
     const transformedData = transformWPData(wpData, site.wpSiteUrl)
@@ -148,6 +164,35 @@ async function processDeployment(
 
     logs += `\nStep 4: Building deployment env vars with intelligence data...\n`
     await appendLog(deploymentId, logs)
+    const intelligencePayload = {
+      siteCategory: analysis.industry.category,
+      detectedFeatures: JSON.stringify(analysis.features),
+      intelligenceData: JSON.stringify({
+        industry: analysis.industry,
+        layout: analysis.layout,
+        industryLayout: analysis.industryLayout,
+        colors: analysis.colors,
+        typography: analysis.typography,
+        spacing: analysis.spacing,
+        animations: analysis.animations,
+        site: {
+          settings: analysis.site.settings,
+          hero: analysis.site.hero,
+          services: analysis.site.services.slice(0, 20),
+          portfolio: analysis.site.portfolio.slice(0, 20),
+          testimonials: analysis.site.testimonials.slice(0, 20),
+          team: analysis.site.team.slice(0, 20),
+          faqs: analysis.site.faqs.slice(0, 20),
+          posts: analysis.site.posts.slice(0, 12),
+          products: analysis.site.products.slice(0, 12),
+          footer: analysis.site.footer,
+        },
+      }),
+    }
+    await prisma.deployment.update({
+      where: { id: deploymentId },
+      data: intelligencePayload,
+    })
     const envVars = buildDeploymentEnvVars({
       siteId: site.id,
       wpSiteUrl: site.wpSiteUrl,
@@ -173,6 +218,25 @@ async function processDeployment(
       NEXT_PUBLIC_PRIMARY_COLOR: analysis.colors.primary,
       NEXT_PUBLIC_SECTION_COUNT: String(analysis.industryLayout.sections.length),
       NEXT_PUBLIC_HERO_LAYOUT: analysis.layout.heroLayout,
+      NEXT_PUBLIC_SITE_DATA_URL: `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/sites/${domainToSlug(site.domain)}/data`,
+      NEXT_PUBLIC_SITE_DATA: JSON.stringify({
+        settings: analysis.site.settings,
+        navigation: analysis.site.navigation,
+        hero: analysis.site.hero,
+        services: analysis.site.services,
+        portfolio: analysis.site.portfolio,
+        products: analysis.site.products,
+        testimonials: analysis.site.testimonials,
+        team: analysis.site.team,
+        faqs: analysis.site.faqs,
+        gallery: analysis.site.gallery,
+        stats: analysis.site.stats,
+        cta: analysis.site.cta,
+        contact: analysis.site.contact,
+        newsletter: analysis.site.newsletter,
+        footer: analysis.site.footer,
+        posts: analysis.site.posts.slice(0, 12),
+      }),
     }
 
     const allEnvVars = { ...envVars, ...intelligenceVars }

@@ -111,6 +111,7 @@ export default function SitesPage() {
   const [expandedLogs, setExpandedLogs] = useState<Set<string>>(new Set());
 
   const [addSiteError, setAddSiteError] = useState<string | null>(null);
+  const [showAddSite, setShowAddSite] = useState(false);
 
   const [showDomainDialog, setShowDomainDialog] = useState(false);
   const [domainSiteId, setDomainSiteId] = useState<string | null>(null);
@@ -205,6 +206,7 @@ export default function SitesPage() {
         const data = await response.json();
         setSites([data.site, ...sites]);
         setFormData({ domain: "", wpSiteUrl: "", apiKey: "" });
+        setShowAddSite(false);
         showToast("success", "Site connected", `${data.site.domain} has been connected successfully.`);
       } else {
         const error = await response.json();
@@ -506,51 +508,51 @@ export default function SitesPage() {
         </div>
 
         {hasActiveSubscription && (
-          <Dialog onOpenChange={(open: boolean) => { if (!open) setAddSiteError(null); }}>
+          <Dialog open={showAddSite} onOpenChange={(open: boolean) => { setShowAddSite(open); if (!open) setAddSiteError(null); }}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
                 Add Site
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="bg-slate-900 border-slate-700 text-white">
               <DialogHeader>
-                <DialogTitle>Connect Your WordPress Site</DialogTitle>
-                <DialogDescription className="text-left">
+                <DialogTitle className="text-white text-xl">Connect Your WordPress Site</DialogTitle>
+                <DialogDescription className="text-slate-300 text-left">
                   Follow these simple steps to connect your WordPress site.
                 </DialogDescription>
               </DialogHeader>
               <div className="mt-4 space-y-6">
-                <div className="bg-blue-50 rounded-lg p-4 space-y-3">
-                  <p className="font-semibold text-blue-900 flex items-center gap-2">
-                    <span className="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">1</span>
+                <div className="bg-slate-800 rounded-lg p-4 space-y-3 border border-slate-700">
+                  <p className="font-semibold text-white flex items-center gap-2">
+                    <span className="bg-purple-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">1</span>
                     Install the WordPress Plugin
                   </p>
-                  <p className="text-sm text-blue-800 ml-8">
+                  <p className="text-sm text-slate-300 ml-8">
                     Download the plugin from your{" "}
-                    <a href="/dashboard/downloads" className="underline font-medium">
+                    <a href="/dashboard/downloads" className="text-purple-300 underline font-medium hover:text-purple-200">
                       Downloads page
                     </a>
                     , then upload and activate it on your WordPress site.
                   </p>
-                  <p className="font-semibold text-blue-900 flex items-center gap-2 mt-4">
-                    <span className="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">2</span>
+                  <p className="font-semibold text-white flex items-center gap-2 mt-4">
+                    <span className="bg-purple-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">2</span>
                     Generate API Key
                   </p>
-                  <p className="text-sm text-blue-800 ml-8">
-                    Go to <strong>Settings → Headless Connector</strong> in WordPress admin, click <strong>"Generate New API Key"</strong>.
+                  <p className="text-sm text-slate-300 ml-8">
+                    Go to <strong className="text-white">Settings → Headless Connector</strong> in WordPress admin, click <strong className="text-white">"Generate New API Key"</strong>.
                   </p>
-                  <p className="font-semibold text-blue-900 flex items-center gap-2 mt-4">
-                    <span className="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm">3</span>
+                  <p className="font-semibold text-white flex items-center gap-2 mt-4">
+                    <span className="bg-purple-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold">3</span>
                     Paste API Key Below
                   </p>
-                  <p className="text-sm text-blue-800 ml-8">
+                  <p className="text-sm text-slate-300 ml-8">
                     Copy the API key and paste it below.
                   </p>
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="wpSiteUrl">Your WordPress Site URL</Label>
+                    <Label htmlFor="wpSiteUrl" className="text-white font-semibold">Your WordPress Site URL</Label>
                     <Input
                       id="wpSiteUrl"
                       placeholder="https://mywordpress.com"
@@ -558,10 +560,11 @@ export default function SitesPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, wpSiteUrl: e.target.value })
                       }
+                      className="mt-1 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="apiKey">Plugin API Key</Label>
+                    <Label htmlFor="apiKey" className="text-white font-semibold">Plugin API Key</Label>
                     <Input
                       id="apiKey"
                       placeholder="hwpc_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
@@ -569,10 +572,11 @@ export default function SitesPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, apiKey: e.target.value })
                       }
+                      className="mt-1 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="domain">Site Name</Label>
+                    <Label htmlFor="domain" className="text-white font-semibold">Site Name</Label>
                     <Input
                       id="domain"
                       placeholder="my-site (used for identification)"
@@ -580,19 +584,20 @@ export default function SitesPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, domain: e.target.value })
                       }
+                      className="mt-1 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
                     />
                   </div>
                 </div>
                 {addSiteError && (
-                  <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
-                    <p className="text-sm text-red-700">{addSiteError}</p>
+                  <div className="flex items-start gap-2 p-3 bg-red-900/50 border border-red-700 rounded-lg">
+                    <AlertCircle className="h-4 w-4 text-red-400 mt-0.5 shrink-0" />
+                    <p className="text-sm text-red-200">{addSiteError}</p>
                   </div>
                 )}
                 <Button
                   onClick={handleAddSite}
                   disabled={isAddingSite || !formData.wpSiteUrl || !formData.apiKey}
-                  className="w-full"
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5"
                 >
                   {isAddingSite ? (
                     <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying Connection...</>
