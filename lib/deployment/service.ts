@@ -164,30 +164,38 @@ async function processDeployment(
 
     logs += `\nStep 4: Building deployment env vars with intelligence data...\n`
     await appendLog(deploymentId, logs)
+    const intelligenceDataPayload = {
+      industry: analysis.industry,
+      layout: analysis.layout,
+      industryLayout: analysis.industryLayout,
+      colors: analysis.colors,
+      typography: analysis.typography,
+      spacing: analysis.spacing,
+      animations: analysis.animations,
+      site: {
+        settings: analysis.site.settings,
+        navigation: analysis.site.navigation,
+        hero: analysis.site.hero,
+        services: analysis.site.services.slice(0, 20),
+        portfolio: analysis.site.portfolio.slice(0, 20),
+        testimonials: analysis.site.testimonials.slice(0, 20),
+        team: analysis.site.team.slice(0, 20),
+        faqs: analysis.site.faqs.slice(0, 20),
+        posts: analysis.site.posts.slice(0, 12),
+        products: analysis.site.products.slice(0, 12),
+        gallery: analysis.site.gallery.slice(0, 20),
+        stats: analysis.site.stats.slice(0, 12),
+        cta: analysis.site.cta,
+        contact: analysis.site.contact,
+        newsletter: analysis.site.newsletter,
+        footer: analysis.site.footer,
+      },
+    }
+
     const intelligencePayload = {
       siteCategory: analysis.industry.category,
       detectedFeatures: JSON.stringify(analysis.features),
-      intelligenceData: JSON.stringify({
-        industry: analysis.industry,
-        layout: analysis.layout,
-        industryLayout: analysis.industryLayout,
-        colors: analysis.colors,
-        typography: analysis.typography,
-        spacing: analysis.spacing,
-        animations: analysis.animations,
-        site: {
-          settings: analysis.site.settings,
-          hero: analysis.site.hero,
-          services: analysis.site.services.slice(0, 20),
-          portfolio: analysis.site.portfolio.slice(0, 20),
-          testimonials: analysis.site.testimonials.slice(0, 20),
-          team: analysis.site.team.slice(0, 20),
-          faqs: analysis.site.faqs.slice(0, 20),
-          posts: analysis.site.posts.slice(0, 12),
-          products: analysis.site.products.slice(0, 12),
-          footer: analysis.site.footer,
-        },
-      }),
+      intelligenceData: JSON.stringify(intelligenceDataPayload),
     }
     await prisma.deployment.update({
       where: { id: deploymentId },
@@ -219,24 +227,6 @@ async function processDeployment(
       NEXT_PUBLIC_SECTION_COUNT: String(analysis.industryLayout.sections.length),
       NEXT_PUBLIC_HERO_LAYOUT: analysis.layout.heroLayout,
       NEXT_PUBLIC_SITE_DATA_URL: `${process.env.NEXT_PUBLIC_APP_URL || ''}/api/sites/${domainToSlug(site.domain)}/data`,
-      NEXT_PUBLIC_SITE_DATA: JSON.stringify({
-        settings: analysis.site.settings,
-        navigation: analysis.site.navigation,
-        hero: analysis.site.hero,
-        services: analysis.site.services,
-        portfolio: analysis.site.portfolio,
-        products: analysis.site.products,
-        testimonials: analysis.site.testimonials,
-        team: analysis.site.team,
-        faqs: analysis.site.faqs,
-        gallery: analysis.site.gallery,
-        stats: analysis.site.stats,
-        cta: analysis.site.cta,
-        contact: analysis.site.contact,
-        newsletter: analysis.site.newsletter,
-        footer: analysis.site.footer,
-        posts: analysis.site.posts.slice(0, 12),
-      }),
     }
 
     const allEnvVars = { ...envVars, ...intelligenceVars }

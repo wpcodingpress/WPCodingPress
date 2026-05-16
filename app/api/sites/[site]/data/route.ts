@@ -1,8 +1,5 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { fetchWordPressData } from '@/lib/deployment/wp-data';
-import { analyzeWordPressSite } from '@/lib/engine/site-analyzer';
-import { createAIEngine } from '@/lib/ai';
 
 function domainToSlug(domain: string): string {
   return domain.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
@@ -28,43 +25,64 @@ export async function GET(
       return NextResponse.json({ error: 'Site not found' }, { status: 404 });
     }
 
-    const wpData = await fetchWordPressData(wpSite.wpSiteUrl, wpSite.wpApiKey || '');
+    const latestDeployment = await prisma.deployment.findFirst({
+      where: {
+        siteId: wpSite.id,
+        status: 'deployed',
+        intelligenceData: { not: null },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
 
-    const analysis = analyzeWordPressSite(wpData as unknown as Record<string, unknown>, wpSite.wpSiteUrl);
+    if (!latestDeployment || !latestDeployment.intelligenceData) {
+      return NextResponse.json({ error: 'No deployment data available' }, { status: 404 });
+    }
 
-    const engine = createAIEngine();
-    const aiResult = engine.analyze(
-      analysis.site,
-      analysis.industry,
-      analysis.features,
-      wpData?.site_info as Record<string, unknown> | undefined,
-      undefined,
-      wpData as unknown as Record<string, unknown>
-    );
+    const cached = JSON.parse(latestDeployment.intelligenceData);
 
-    return NextResponse.json({
-      site: analysis.site,
-      industry: analysis.industry,
-      features: analysis.features,
-      layout: analysis.layout,
-      industryLayout: analysis.industryLayout,
-      colors: analysis.colors,
-      typography: analysis.typography,
-      spacing: analysis.spacing,
-      animations: analysis.animations,
-      cssVariables: analysis.cssVariables,
+    const result = {
+      site: {
+        settings: cached.site?.settings || {},
+        navigation: cached.site?.navigation || [],
+        categories: cached.site?.categories || [],
+        tags: cached.site?.tags || [],
+        authors: cached.site?.authors || [],
+        hero: cached.site?.hero || null,
+        services: cached.site?.services || [],
+        portfolio: cached.site?.portfolio || [],
+        products: cached.site?.products || [],
+        testimonials: cached.site?.testimonials || [],
+        team: cached.site?.team || [],
+        faqs: cached.site?.faqs || [],
+        gallery: cached.site?.gallery || [],
+        stats: cached.site?.stats || [],
+        cta: cached.site?.cta || null,
+        contact: cached.site?.contact || null,
+        newsletter: cached.site?.newsletter || null,
+        footer: cached.site?.footer || null,
+        posts: cached.site?.posts || [],
+        media: cached.site?.media || [],
+      },
+      industry: cached.industry || null,
+      features: cached.features || {},
+      layout: cached.layout || null,
+      industryLayout: cached.industryLayout || null,
+      colors: cached.colors || null,
+      typography: cached.typography || null,
       ai: {
-        template: aiResult.template,
-        layout: aiResult.layout,
-        sections: aiResult.sections,
-        brand: aiResult.brand,
-        homepage: aiResult.homepage,
-        recommendations: aiResult.recommendations,
-        adapters: aiResult.adapters,
+        brand: cached.brand || null,
+        homepage: cached.homepage || null,
+        recommendations: cached.recommendations || null,
+      },
+    };
+
+    return NextResponse.json(result, {
+      headers: {
+        'Cache-Control': 'public, max-age=60, s-maxage=60',
       },
     });
   } catch (error) {
-    console.error('Site data export error:', error);
+    console.error('Site data endpoint error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to fetch site data' },
       { status: 500 }

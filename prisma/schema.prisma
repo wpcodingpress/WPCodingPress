@@ -155,7 +155,7 @@ model Site {
   customDomain      String?
   deploymentStatus  String?  @default("idle") // idle | deploying | deployed | failed
   siteCategory      String?  // Detected industry (business, blog, news, agency, saas, etc.)
-  detectedFeatures  String?  // JSON string of detected WordPress features
+  detectedFeatures  String?  @db.Text // JSON string of detected WordPress features
   industryConfidence Int?    // Confidence score 0-100
   sectionCount      Int?     // Number of adaptive sections
   heroLayout        String?  // Detected hero layout variant
@@ -201,8 +201,8 @@ model Deployment {
   trigger             String   @default("manual") // manual | webhook
   template            String?
   siteCategory        String?  // Industry detected at deployment time
-  detectedFeatures    String?  // Features detected at deployment time
-  intelligenceData    String?  // JSON blob of full intelligence analysis
+  detectedFeatures    String?  @db.Text // Features detected at deployment time
+  intelligenceData    String?  @db.LongText // JSON blob of full intelligence analysis
   startedAt           DateTime?
   completedAt         DateTime?
   createdAt           DateTime @default(now())
