@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma'
-import { getProject, setProjectEnvironmentVariables } from '@/lib/vercel/projects'
+import { getProject, setProjectEnvironmentVariables, createProject } from '@/lib/vercel/projects'
 import { createDeployment, getDeployment, isDeploymentFinal, isDeploymentSuccessful } from '@/lib/vercel/deployments'
 import { buildDeploymentEnvVars, sanitizeProjectName } from './builder'
 import { createNotification } from '@/lib/notifications'
@@ -36,6 +36,21 @@ async function getTemplateGitSource(): Promise<{ type: 'github'; repoId: number 
     repoId: project.link.repoId,
     ref: 'main',
   }
+}
+
+async function getOrCreateSiteProject(siteDomain: string, existingProjectId: string | null): Promise<string> {
+  if (existingProjectId) {
+    const project = await getProject(existingProjectId)
+    if (project) return existingProjectId
+  }
+
+  const sanitized = sanitizeProjectName(siteDomain)
+  const newProject = await createProject({
+    name: sanitized,
+    framework: 'nextjs',
+  })
+
+  return newProject.id
 }
 
 export class DeploymentError extends Error {
@@ -120,6 +135,7 @@ async function processDeployment(
     wpApiKey: string | null
     domain: string
     template: string
+    vercelProjectId: string | null
   }
 ): Promise<void> {
   let logs = ''
@@ -127,7 +143,7 @@ async function processDeployment(
   try {
     await updateDeployment(deploymentId, { status: 'building' })
 
-    const projectId = getTemplateProjectId()
+    const projectId = await getOrCreateSiteProject(site.domain, site.vercelProjectId)
 
     logs += `[${new Date().toISOString()}] Starting deployment for ${site.domain}\n`
     logs += `Template: ${site.template}\n`
