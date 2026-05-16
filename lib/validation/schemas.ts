@@ -4,7 +4,7 @@ export const DeploySchema = z.object({
   siteId: z.string().min(1, 'Site ID is required'),
   options: z
     .object({
-      template: z.enum(['news', 'business', 'modern', 'advanced']).optional(),
+      template: z.enum(['news', 'business', 'modern', 'advanced', 'adaptive']).optional(),
     })
     .optional(),
 })

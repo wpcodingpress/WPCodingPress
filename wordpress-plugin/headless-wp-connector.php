@@ -1504,13 +1504,79 @@ class Headless_WP_Connector {
         $posts = get_posts(['numberposts' => -1, 'post_status' => 'publish']);
         $pages = get_pages(['post_status' => 'publish']);
         $categories = get_categories(['hide_empty' => false]);
+        $tags = get_tags(['hide_empty' => false]);
         $media = get_posts(['post_type' => 'attachment', 'numberposts' => -1]);
+        $menus = wp_get_nav_menus();
+        $users = get_users(['number' => -1]);
         
+        $plugins_list = [];
+        if (is_multisite()) {
+            $active_plugins = get_site_option('active_sitewide_plugins');
+            if (is_array($active_plugins)) {
+                $plugins_list = array_keys($active_plugins);
+                $plugins_list = array_map(function($p) { return 'active:' . $p; }, $plugins_list);
+            }
+        }
+        $active_plugins = get_option('active_plugins', []);
+        $all_plugins = array_merge(
+            $plugins_list,
+            array_map(function($p) { return 'active:' . $p; }, $active_plugins)
+        );
+
+        $menu_data = [];
+        foreach ($menus as $menu) {
+            $menu_items = wp_get_nav_menu_items($menu->term_id);
+            $formatted_items = [];
+            if ($menu_items) {
+                foreach ($menu_items as $item) {
+                    $formatted_items[] = [
+                        'id' => $item->ID,
+                        'title' => html_entity_decode($item->title),
+                        'url' => $item->url,
+                        'slug' => basename(parse_url($item->url, PHP_URL_PATH) ?: ''),
+                        'target' => $item->target ?: '_self',
+                        'parent' => intval($item->menu_item_parent),
+                        'order' => intval($item->menu_order),
+                        'type' => $item->type,
+                        'object' => $item->object,
+                    ];
+                }
+            }
+            $menu_data[] = [
+                'id' => $menu->term_id,
+                'name' => $menu->name,
+                'slug' => $menu->slug,
+                'items' => $formatted_items,
+            ];
+        }
+
         $export_data = [
             'posts' => array_map([$this, 'format_post'], $posts),
             'pages' => array_map([$this, 'format_page'], $pages),
             'categories' => array_map([$this, 'format_category'], $categories),
+            'tags' => array_map(function($tag) {
+                return [
+                    'id' => $tag->term_id,
+                    'name' => $tag->name,
+                    'slug' => $tag->slug,
+                    'count' => $tag->count,
+                ];
+            }, $tags),
             'media' => array_map([$this, 'format_media'], $media),
+            'menus' => $menu_data,
+            'users' => array_map(function($user) {
+                return [
+                    'id' => $user->ID,
+                    'name' => $user->display_name,
+                    'slug' => $user->user_nicename,
+                    'avatar' => get_avatar_url($user->ID),
+                    'email' => $user->user_email,
+                    'bio' => get_user_meta($user->ID, 'description', true),
+                ];
+            }, $users),
+            'plugins' => $all_plugins,
+            'theme' => wp_get_theme()->get('Name'),
+            'comment_count' => wp_count_comments()->total_comments,
             'site_info' => [
                 'name' => get_bloginfo('name'),
                 'description' => get_bloginfo('description'),
@@ -1522,7 +1588,7 @@ class Headless_WP_Connector {
             'api_config' => [
                 'base_url' => get_site_url() . '/wp-json/eyepress/v1',
                 'endpoints' => [
-                    'posts' => '/posts?locale=bn&per_page=20',
+                    'posts' => '/posts',
                     'single_post' => '/post/{slug}',
                     'categories' => '/categories',
                     'category_posts' => '/category/{slug}',
@@ -1552,7 +1618,154 @@ class Headless_WP_Connector {
                 ],
             ],
         ];
+
+        // WooCommerce data
+        if (class_exists('WooCommerce')) {
+            $wc_products = wc_get_products(['limit' => -1]);
+            $export_data['woocommerce'] = [
+                'currency' => get_woocommerce_currency(),
+                'has_account_page' => shortcode_exists('woocommerce_my_account'),
+                'has_reviews' => get_option('woocommerce_enable_reviews', 'yes') === 'yes',
+            ];
+            $export_data['products'] = array_map(function($product) {
+                $image_ids = $product->get_gallery_image_ids();
+                $images = [];
+                if ($product->get_image_id()) {
+                    $images[] = [
+                        'source_url' => wp_get_attachment_image_url($product->get_image_id(), 'full'),
+                        'alt' => get_post_meta($product->get_image_id(), '_wp_attachment_image_alt', true) ?: $product->get_name(),
+                        'width' => 0,
+                        'height' => 0,
+                        'mime_type' => 'image/jpeg',
+                    ];
+                }
+                foreach ($image_ids as $img_id) {
+                    $images[] = [
+                        'source_url' => wp_get_attachment_image_url($img_id, 'full'),
+                        'alt' => get_post_meta($img_id, '_wp_attachment_image_alt', true) ?: $product->get_name(),
+                        'width' => 0,
+                        'height' => 0,
+                        'mime_type' => 'image/jpeg',
+                    ];
+                }
+                $cats = $product->get_category_ids();
+                $categories = [];
+                foreach ($cats as $cat_id) {
+                    $term = get_term($cat_id, 'product_cat');
+                    if ($term) {
+                        $categories[] = [
+                            'id' => $term->term_id,
+                            'name' => $term->name,
+                            'slug' => $term->slug,
+                            'description' => $term->description,
+                            'count' => $term->count,
+                        ];
+                    }
+                }
+                return [
+                    'id' => $product->get_id(),
+                    'name' => $product->get_name(),
+                    'slug' => $product->get_slug(),
+                    'description' => $product->get_description(),
+                    'price' => $product->get_price(),
+                    'regular_price' => $product->get_regular_price(),
+                    'sale_price' => $product->get_sale_price(),
+                    'currency' => get_woocommerce_currency(),
+                    'images' => $images,
+                    'categories' => $categories,
+                    'type' => $product->get_type(),
+                    'permalink' => get_permalink($product->get_id()),
+                ];
+            }, $wc_products);
+        }
+
+        // Contact Form 7 data
+        if (class_exists('WPCF7')) {
+            $cf7_forms = get_posts(['post_type' => 'wpcf7_contact_form', 'numberposts' => -1]);
+            $export_data['forms'] = array_map(function($form) {
+                $cf7 = WPCF7_ContactForm::get_instance($form->ID);
+                $form_fields = [];
+                if ($cf7) {
+                    $tags = $cf7->scan_form_tags();
+                    foreach ($tags as $tag) {
+                        if (!empty($tag['name'])) {
+                            $form_fields[] = [
+                                'type' => $tag['type'],
+                                'label' => $tag['name'],
+                                'name' => $tag['name'],
+                                'required' => $tag['required'],
+                                'placeholder' => '',
+                                'options' => $tag['values'] ?? [],
+                            ];
+                        }
+                    }
+                }
+                return [
+                    'id' => $form->ID,
+                    'title' => $form->post_title,
+                    'fields' => $form_fields,
+                    'submit_label' => 'Send',
+                    'success_message' => 'Thank you for your message!',
+                ];
+            }, $cf7_forms);
+        }
+
+        // Elementor data
+        if (defined('ELEMENTOR_VERSION')) {
+            $export_data['elementor'] = [
+                'version' => ELEMENTOR_VERSION,
+                'active' => true,
+            ];
+        }
+
+        // Custom post types
+        $cpt_blacklist = ['attachment', 'revision', 'nav_menu_item', 'custom_css', 'customize_changeset', 
+                          'oembed_cache', 'user_request', 'wp_block', 'wp_template', 'wp_template_part',
+                          'wp_global_styles', 'wp_navigation', 'wp_font_family', 'wp_font_face',
+                          'wpforms', 'wpforms_log', 'shop_order', 'shop_coupon', 'wpcf7_contact_form'];
         
+        $registered_types = get_post_types(['public' => true], 'objects');
+        $custom_types = [];
+        foreach ($registered_types as $type_name => $type_obj) {
+            if (!in_array($type_name, ['post', 'page', 'attachment', ...$cpt_blacklist])) {
+                $items = get_posts(['post_type' => $type_name, 'numberposts' => -1, 'post_status' => 'publish']);
+                $formatted = [];
+                foreach ($items as $item) {
+                    $entry = [
+                        'id' => $item->ID,
+                        'title' => html_entity_decode($item->post_title),
+                        'slug' => $item->post_name,
+                        'content' => $item->post_content,
+                        'excerpt' => $item->post_excerpt,
+                        'date' => $item->post_date,
+                        'featured_image' => get_the_post_thumbnail_url($item->ID, 'full') ?: '',
+                    ];
+                    
+                    $meta = get_post_meta($item->ID);
+                    $meta_clean = [];
+                    foreach ($meta as $key => $val) {
+                        if (!in_array($key, ['_edit_lock', '_edit_last'])) {
+                            $meta_clean[$key] = maybe_unserialize($val[0]);
+                        }
+                    }
+                    if (!empty($meta_clean)) {
+                        $entry['meta'] = $meta_clean;
+                    }
+                    
+                    $formatted[] = $entry;
+                }
+                
+                if (!empty($formatted)) {
+                    $type_label = str_replace('-', '_', $type_name);
+                    $export_data[$type_label] = $formatted;
+                    $custom_types[$type_name] = $type_obj->label;
+                }
+            }
+        }
+        if (!empty($custom_types)) {
+            $export_data['custom_post_types'] = $custom_types;
+        }
+
         return rest_ensure_response($export_data);
     }
     
