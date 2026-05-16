@@ -105,6 +105,38 @@ export function classifyIndustry(wpRaw: Record<string, unknown>, features: Featu
     signals.push({ type: 'industry_signal', value: 'saas', weight: saasScore, source: 'saas_detection' })
   }
 
+  // E-commerce signals
+  const ecommerceKeywords = ['shop', 'store', 'product', 'cart', 'checkout', 'buy', 'order', 'shipping', 'payment', 'ecommerce', 'e-commerce', 'woocommerce', 'merchandise', 'catalog', 'retail']
+  let ecommerceScore = computeKeywordScore(siteName + ' ' + siteDescription, ecommerceKeywords) * 2 +
+    computeKeywordScore(allContentText + ' ' + allTitles.join(' '), ecommerceKeywords)
+
+  if (features.hasWooCommerce) {
+    ecommerceScore += 50
+  }
+
+  const rawProducts = (wpRaw.products || []) as Array<Record<string, unknown>>
+  const rawWooCommerce = wpRaw.woocommerce as Record<string, unknown> | undefined
+  const productCount = Array.isArray(rawProducts) ? rawProducts.length : 0
+  const hasWooCommerceData = rawWooCommerce !== undefined && rawWooCommerce !== null
+
+  if (productCount > 0) {
+    ecommerceScore += Math.min(productCount * 2, 30)
+  }
+  if (hasWooCommerceData) {
+    ecommerceScore += 20
+  }
+  if (features.hasMemberships) {
+    ecommerceScore += 10
+  }
+  if (features.hasBookings) {
+    ecommerceScore += 10
+  }
+
+  signals.push({ type: 'keyword_match', value: ecommerceScore, weight: 0.3, source: 'ecommerce_analysis' })
+  if (ecommerceScore > 30) {
+    signals.push({ type: 'industry_signal', value: 'ecommerce', weight: ecommerceScore, source: 'ecommerce_detection' })
+  }
+
   const category = determineCategory(signals)
   const confidence = calculateConfidence(signals, category)
 
