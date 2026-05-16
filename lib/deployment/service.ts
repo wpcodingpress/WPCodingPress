@@ -39,7 +39,9 @@ async function getTemplateGitSource(): Promise<{ type: 'github'; repoId: number 
 }
 
 async function getOrCreateSiteProject(siteDomain: string, existingProjectId: string | null): Promise<string> {
-  if (existingProjectId) {
+  const templateProjectId = process.env.VERCEL_TEMPLATE_PROJECT_ID
+
+  if (existingProjectId && existingProjectId !== templateProjectId) {
     const project = await getProject(existingProjectId)
     if (project) return existingProjectId
   }
